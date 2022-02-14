@@ -27,4 +27,4 @@ const Footer = props => html`<footer ...${props} />`
 
 console.log("MyST component loaded")
 
-export { Todos }
+export { Todos, html }
