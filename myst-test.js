@@ -1,9 +1,9 @@
-import { html, Component, render } from 'https://unpkg.com/htm/preact/standalone.module.js';
+import { html, Component, render } from 'https://unpkg.com/htm/preact/standalone.module.js'
 
 class App extends Component {
   addTodo() {
-    const { todos = [] } = this.state;
-    this.setState({ todos: todos.concat(`Item ${todos.length}`) });
+    const { todos = [] } = this.state
+    this.setState({ todos: todos.concat(`Item ${todos.length}`) })
   }
   render({ page }, { todos = [] }) {
     return html`
@@ -17,7 +17,7 @@ class App extends Component {
         <button onClick=${() => this.addTodo()}>Add Todo</button>
         <${Footer}>footer content here<//>
       </div>
-    `;
+    `
   }
 }
 
@@ -25,4 +25,4 @@ const Header = ({ name }) => html`<h1>${name} List</h1>`
 
 const Footer = props => html`<footer ...${props} />`
 
-
+export { App }
