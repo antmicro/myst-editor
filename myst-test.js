@@ -25,4 +25,6 @@ const Header = ({ name }) => html`<h1>${name} List</h1>`
 
 const Footer = props => html`<footer ...${props} />`
 
-export { App }
+console.log("MyST component loaded")
+
+export { App as default }
