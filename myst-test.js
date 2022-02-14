@@ -1,6 +1,6 @@
 import { html, Component, render } from 'https://unpkg.com/htm/preact/standalone.module.js'
 
-class App extends Component {
+class Todos extends Component {
   addTodo() {
     const { todos = [] } = this.state
     this.setState({ todos: todos.concat(`Item ${todos.length}`) })
@@ -27,4 +27,4 @@ const Footer = props => html`<footer ...${props} />`
 
 console.log("MyST component loaded")
 
-export { App as default }
+export { Todos }
