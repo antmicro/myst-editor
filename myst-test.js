@@ -17,7 +17,7 @@ class MystEditor extends Component {
   }
   handleInput(event) { this.setState({text: event.target.value}) }
   renderAndSanitize(text) {
-    return purify.sanitize(markdownit().use(markdownitDocutils).render(text)
+    return purify.sanitize(markdownit().use(markdownitDocutils).render(text))
   }
   render({ id = '' }) {
     return html`
