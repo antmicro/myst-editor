@@ -13,6 +13,7 @@ class MystEditor extends Component {
   constructor(props) {
     super(props)
     this.state = { text: props.text }
+    this.handleInput = this.handleInput.bind(this)
   }
   handleInput(event) { this.setState({text: event.target.value}) }
   renderAndSanitize(text) {
