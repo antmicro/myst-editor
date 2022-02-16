@@ -13,11 +13,11 @@ class MystEditor extends Component {
     super(props)
     this.state = { text: props.text }
   }
-  handleChange(event) { this.setState({text: event.target.value}) }
+  handleInput(event) { this.setState({text: event.target.value}) }
   render({ id = '' }) {
     return html`
       <div class="myst_content_parent">
-        <textarea onChange=${this.handleChange} id=${id} class="myst_content">${this.state.text}</textarea>
+        <textarea onChange=${handleInput} id=${id} class="myst_content">${this.state.text}</textarea>
         <div class="myst_rendered">${markdownit().use(markdownitDocutils).render(this.state.text)}</div>
       </div>
     `
