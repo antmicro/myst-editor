@@ -5,6 +5,10 @@
   align-items: start;
 }
 
+.myst_content {
+  font-family: SourceCodePro, monospace
+}
+
 .myst_rendered {
   vertical-align: top;
   padding: 10px;
