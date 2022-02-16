@@ -9,6 +9,10 @@ let importUMD = async (url, module = {exports:{}}) =>
 const markdownit = await importUMD(`https://unpkg.com/markdown-it@12.3.2/dist/markdown-it.min.js`)
 
 class MystEditor extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { text: props.text }
+  }
   handleChange(event) { this.setState({text: event.target.value}) }
   render({ id = '' }) {
     return html`
