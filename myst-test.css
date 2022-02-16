@@ -1,0 +1,18 @@
+.myst_content_parent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+  align-items: start;
+}
+
+.myst_content {
+  font-family: SourceCodePro, monospace
+}
+
+.myst_rendered {
+  vertical-align: top;
+  padding: 10px;
+  margin: 0px 20px 20px;
+  border: 1px solid #e5e5e5;
+  color: #332d37;
+}
