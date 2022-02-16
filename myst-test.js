@@ -29,31 +29,6 @@ class MystEditor extends Component {
   }
 }
 
-class Todos extends Component {
-  addTodo() {
-    const { todos = [] } = this.state
-    this.setState({ todos: todos.concat(`Item ${todos.length}`) })
-  }
-  render({ page }, { todos = [] }) {
-    return html`
-      <div class="app">
-        <${Header} name="ToDo's (${page})" />
-        <ul>
-          ${todos.map(todo => html`
-            <li key=${todo}>${todo}</li>
-          `)}
-        </ul>
-        <button onClick=${() => this.addTodo()}>Add Todo</button>
-        <${Footer}>footer content here<//>
-      </div>
-    `
-  }
-}
-
-const Header = ({ name }) => html`<h1>${name} List</h1>`
-
-const Footer = props => html`<footer ...${props} />`
-
 console.log("Myst component loaded")
 
-export { Todos, MystEditor, html, render }
+export { MystEditor, html, render }
