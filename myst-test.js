@@ -13,7 +13,6 @@ class MystEditor extends Component {
   constructor(props) {
     super(props)
     this.state = { text: props.text }
-    this.contentRef = React.createRef()
     this.handleInput = this.handleInput.bind(this)
   }
   handleInput(event) {
