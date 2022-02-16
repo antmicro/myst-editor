@@ -34,4 +34,4 @@ class MystEditor extends Component {
 
 console.log("Myst component loaded")
 
-export { MystEditor, html, render }
+export { MystEditor, html, render, autosize }
