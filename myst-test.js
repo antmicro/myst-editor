@@ -25,6 +25,7 @@ class MystEditor extends Component {
   render({ id = '' }) {
     return html`
       <div class="myst_content_parent">
+        <div class="myst_top_bar"/>
         <textarea ref=${this.contentRef} onInput=${this.handleInput} id=${id} class="myst_content">${this.state.text}</textarea>
         <div class="myst_rendered" dangerouslySetInnerHTML=${{__html: this.renderAndSanitize(this.state.text)}}/>
       </div>`
