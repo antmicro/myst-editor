@@ -17,7 +17,7 @@ class MystEditor extends Component {
   render({ id = '' }) {
     return html`
       <div class="myst_content_parent">
-        <textarea id=${id} class="myst_content">${this.state.text}</textarea>
+        <textarea onChange=${handleChange} id=${id} class="myst_content">${this.state.text}</textarea>
         <div class="myst_rendered">${markdownit().use(markdownitDocutils).render(this.state.text)}</div>
       </div>
     `
