@@ -8,6 +8,17 @@ let importUMD = async (url, module = {exports:{}}) =>
 // no ESM version for markdownit
 const markdownit = await importUMD(`https://unpkg.com/markdown-it@12.3.2/dist/markdown-it.min.js`)
 
+class MystEditor extends Component {
+  render({ id = '' }) {
+    return html`
+      <div class="myst_content_parent">
+        <textarea id=${id} class="myst_content">TEXT</textarea>
+        <div class="myst_rendered">RENDERED</div>
+      </div>
+    `
+  }
+}
+
 class Todos extends Component {
   addTodo() {
     const { todos = [] } = this.state
@@ -33,6 +44,6 @@ const Header = ({ name }) => html`<h1>${name} List</h1>`
 
 const Footer = props => html`<footer ...${props} />`
 
-console.log("MyST component loaded")
+console.log("Myst component loaded")
 
-export { Todos, html, render }
+export { Todos, MystEditor, html, render }
