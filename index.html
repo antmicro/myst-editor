@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <title>MyST editor Demo</title>
-  <link rel="stylesheet" href="https://rawcdn.githack.com/mgielda/preact-test/8c5126e/myst-test.css">
+  <link rel="stylesheet" href="./myst-test.css">
   <script type="module">
     console.log("Welcome to the MyST editor demo. The right hand side should auto update.")
-    import { MystEditor, html, render } from 'https://cdn.jsdelivr.net/gh/mgielda/preact-test@8c5126e/myst-test.js'
+    import { MystEditor, html, render } from './myst-test.js'
     render(html`<${MystEditor} text="Some **sample** text" id="textarea_id" />`, document.body)
   </script>
 </html>
