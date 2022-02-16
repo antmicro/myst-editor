@@ -18,7 +18,7 @@ class MystEditor extends Component {
     return html`
       <div class="myst_content_parent">
         <textarea id=${id} class="myst_content">${this.state.text}</textarea>
-        <div class="myst_rendered">${markdownit().use(markdownitDocutils.default).render(this.state.text)}</div>
+        <div class="myst_rendered">${markdownit().use(markdownitDocutils).render(this.state.text)}</div>
       </div>
     `
   }
