@@ -16,10 +16,10 @@ class MystEditor extends Component {
     this.contentRef = React.createRef()
     this.handleInput = this.handleInput.bind(this)
   }
-  componentDidMount() {
-    autosize(this.contentRef.current)
+  handleInput(event) {
+    this.setState({text: event.target.value})
+    autosize(event.target)
   }
-  handleInput(event) { this.setState({text: event.target.value}) }
   renderAndSanitize(text) {
     return purify.sanitize(markdownit().use(markdownitDocutils).render(text))
   }
