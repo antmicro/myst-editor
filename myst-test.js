@@ -9,11 +9,16 @@ let importUMD = async (url, module = {exports:{}}) =>
 const markdownit = await importUMD(`https://unpkg.com/markdown-it@12.3.2/dist/markdown-it.min.js`)
 
 class MystEditor extends Component {
+  constructor(initial_text) {
+    super()
+    this.state = { text: initial_text }
+  }
+  handleChange(event) { this.setState({text: event.target.value}) }
   render({ id = '' }) {
     return html`
       <div class="myst_content_parent">
-        <textarea id=${id} class="myst_content">TEXT</textarea>
-        <div class="myst_rendered">RENDERED</div>
+        <textarea id=${id} class="myst_content">${text}</textarea>
+        <div class="myst_rendered">${markdownit().use(markdownitDocutils.default).render(text)}</div>
       </div>
     `
   }
