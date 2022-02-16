@@ -13,7 +13,11 @@ class MystEditor extends Component {
   constructor(props) {
     super(props)
     this.state = { text: props.text }
+    this.contentRef = React.createRef()
     this.handleInput = this.handleInput.bind(this)
+  }
+  componentDidMount() {
+    autosize(this.contentRef.current)
   }
   handleInput(event) { this.setState({text: event.target.value}) }
   renderAndSanitize(text) {
@@ -22,7 +26,7 @@ class MystEditor extends Component {
   render({ id = '' }) {
     return html`
       <div class="myst_content_parent">
-        <textarea onInput=${this.handleInput} id=${id} class="myst_content">${this.state.text}</textarea>
+        <textarea ref=${this.contentRef} onInput=${this.handleInput} id=${id} class="myst_content">${this.state.text}</textarea>
         <div class="myst_rendered" dangerouslySetInnerHTML=${{__html: this.renderAndSanitize(this.state.text)}}/>
       </div>
     `
