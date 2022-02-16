@@ -1,18 +1,28 @@
 .myst_content_parent {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 10px;
   align-items: start;
 }
 
 .myst_content {
-  font-family: SourceCodePro, monospace
+  font-family: SourceCodePro, monospace;
+  resize: none;
+}
+
+.myst_content, .myst_rendered {
+  padding: 8px;
+  min-height: 200px;
 }
 
 .myst_rendered {
   vertical-align: top;
-  padding: 10px;
-  margin: 0px 20px 20px;
   border: 1px solid #e5e5e5;
   color: #332d37;
+}
+
+.myst_top_bar {
+  width: 100%;
+  height: 40px;
+  grid-column: 1 / 3;
+  background-color: #eee;
 }
