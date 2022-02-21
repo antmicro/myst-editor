@@ -1,13 +1,11 @@
-import { html, Component, render } from 'https://unpkg.com/htm/preact/standalone.module.js'
-import autosize from 'https://cdnjs.cloudflare.com/ajax/libs/autosize.js/5.0.1/autosize.esm.min.js'
-import markdownitDocutils from 'https://unpkg.com/markdown-it-docutils@0.1.1/dist/mjs/index.js'
-import purify from 'https://unpkg.com/dompurify@2.3.5/dist/purify.es.js'
+import { h, Component, render } from 'preact'
+import htm from 'htm'
 
-let importUMD = async (url, module = {exports:{}}) =>
-  (Function('module', 'exports', await (await fetch(url)).text()).call(module, module, module.exports), module).exports
+const html = htm.bind(h)
 
-// no ESM version for markdownit
-const markdownit = await importUMD(`https://unpkg.com/markdown-it@12.3.2/dist/markdown-it.min.js`)
+import markdownit from 'markdown-it'
+import markdownitDocutils from 'markdown-it-docutils'
+import DOMPurify from 'dompurify'
 
 class MystEditor extends Component {
   constructor(props) {
@@ -17,10 +15,9 @@ class MystEditor extends Component {
   }
   handleInput(event) {
     this.setState({text: event.target.value})
-    autosize(event.target)
   }
   renderAndSanitize(text) {
-    return purify.sanitize(markdownit().use(markdownitDocutils).render(text))
+    return DOMPurify.sanitize(markdownit().use(markdownitDocutils).render(text))
   }
   render({ id = '' }) {
     return html`
@@ -34,4 +31,4 @@ class MystEditor extends Component {
 
 console.log("MystEditor component loaded")
 
-export { MystEditor, html, render, autosize }
+export { MystEditor, html, render }
