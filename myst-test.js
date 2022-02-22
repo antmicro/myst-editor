@@ -1,11 +1,7 @@
-import { h, Component, render } from 'preact'
-import htm from 'htm'
-
-const html = htm.bind(h)
-
-import markdownit from 'markdown-it'
-import markdownitDocutils from 'markdown-it-docutils'
-import DOMPurify from 'dompurify'
+import { html, Component, render } from 'https://unpkg.com/htm/preact/standalone.module.js'
+import markdownitDocutils from 'https://unpkg.com/markdown-it-docutils@0.1.1/dist/mjs/index.js'
+import purify from 'https://unpkg.com/dompurify@2.3.5/dist/purify.es.js'
+import markdownIt from 'https://cdn.skypack.dev/@esm-bundle/markdown-it'
 
 class MystEditor extends Component {
   constructor(props) {
@@ -17,7 +13,7 @@ class MystEditor extends Component {
     this.setState({text: event.target.value})
   }
   renderAndSanitize(text) {
-    return DOMPurify.sanitize(markdownit().use(markdownitDocutils).render(text))
+    return purify.sanitize(markdownIt().use(markdownitDocutils).render(text))
   }
   render({ id = '' }) {
     return html`
