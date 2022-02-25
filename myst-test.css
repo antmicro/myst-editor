@@ -1,7 +1,10 @@
 .myst_content_parent {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: start;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.flex-break {
+  width: 100%;
 }
 
 .myst_content {
@@ -12,6 +15,7 @@
 .myst_content, .myst_rendered {
   padding: 8px;
   min-height: 300px;
+  flex: 1;
 }
 
 .myst_rendered {
@@ -22,11 +26,20 @@
 
 .myst_top_bar {
   width: 100%;
-  height: 40px;
-  grid-column: 1 / 3;
+  height: 30px;
+  flex: 2;
   background-color: #eee;
 }
 
+/* This will need to be moved to the button group */
+.myst_top_bar button {
+  height: 30px;
+}
+
+.myst_top_bar button.active {
+  background-color: #aaa;
+}
+
 .hidden {
-  display: none; 
+  display: none;
 }
