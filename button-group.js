@@ -17,14 +17,14 @@ class ButtonGroup extends Component {
   render() {
   return html`
     ${this.state.buttons.map((buttonLabel, i) => (
-      html`<button key={i} name=${buttonLabel} onClick=${(event) => this.handleClick(event, i)} class=${i === this.state.clickedId ? "customButton active" : "customButton"}>
+      html`<button type="button" key={i} name=${buttonLabel} onClick=${(event) => this.handleClick(event, i)} class=${i === this.state.clickedId ? "customButton active" : "customButton"}>
         ${buttonLabel}
       </button>`
     ))}`
   }
 }
 
-console.log("ButotonGroup component loaded")
+console.log("ButtonGroup component loaded")
 
 export default ButtonGroup
 
