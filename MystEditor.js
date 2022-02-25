@@ -3,7 +3,7 @@ import markdownitDocutils from 'https://unpkg.com/markdown-it-docutils@0.1.1/dis
 import purify from 'https://unpkg.com/dompurify@2.3.5/dist/purify.es.js'
 import markdownIt from 'https://cdn.skypack.dev/@esm-bundle/markdown-it'
 
-import ButtonGroup from "./button-group.js";
+import ButtonGroup from "./ButtonGroup.js";
 
 class MystEditor extends Component {
   constructor(props) {
