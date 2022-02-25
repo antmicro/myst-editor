@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <title>MyST editor Demo</title>
-  <link rel="stylesheet" href="./myst-test.css">
+  <link rel="stylesheet" href="./MystEditor.css">
   <style>body { margin: 0 }</style>
   <script type="module">
     console.log("Welcome to the MyST editor demo. The right hand side should auto update.")
-    import { MystEditor, html, render } from './myst-test.js'
+    import { MystEditor, html, render } from './MystEditor.js'
     render(html`<${MystEditor} text="Some **sample** text" id="textarea_id" />`, document.body)
   </script>
 </html>
