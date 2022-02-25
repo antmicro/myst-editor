@@ -1,6 +1,6 @@
 # MyST Editor
 
-Copyright (c) 2022 Antmicro
+Copyright (c) 2022 [Antmicro](https://antmicro.com)
 
 This is a MyST editor in Preact component, using [htm](https://github.com/developit/htm) as the templating language.
 
