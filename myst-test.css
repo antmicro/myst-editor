@@ -34,6 +34,8 @@
 /* This will need to be moved to the button group */
 .myst_top_bar button {
   height: 30px;
+  padding: 0 10px;
+  margin: 0;
 }
 
 .myst_top_bar button.active {
