@@ -8,12 +8,9 @@ import ButtonGroup from "./ButtonGroup.js";
 class MystEditor extends Component {
   constructor(props) {
     super(props)
-    this.state = { text: props.text, topbar: props.topbar, source: props.source, preview: props.preview }
+    this.state = {...props}
     this.handleInput = this.handleInput.bind(this)
     this.changeMode = this.changeMode.bind(this)
-  }
-  print(event) {
-    window.print()
   }
   changeMode(event) {
     const name = event.target.name
@@ -31,19 +28,22 @@ class MystEditor extends Component {
   handleInput(event) {
     this.setState({ text: event.target.value })
   }
+  handlePrint(event, printCallback) {
+    printCallback(event)
+  }
   renderAndSanitize(text) {
     return purify.sanitize(markdownIt().use(markdownitDocutils).render(text))
   }
-  render({ id = '' }) {
+  render(state, props) {
     return html`
       <div class="myst_content_parent">
-        <div class="myst_top_bar ${this.state.topbar? 'shown' : 'hidden'}">
+        <div class="myst_top_bar ${state.topbar? 'shown' : 'hidden'}">
 	  <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} clickCallback=${this.changeMode}/>
-	  <button onClick=${this.print}>Print</button>
+	  <button onClick=${(event) => this.handlePrint(event, props.printCallback)}>Print</button>
 	</div>
         <div class="flex-break"></div>
-        <textarea ref=${this.contentRef} onInput=${this.handleInput} id=${id} class="myst_content ${this.state.source? 'shown' : 'hidden'}">${this.state.text}</textarea>
-        <div class="myst_rendered ${this.state.preview? 'shown' : 'hidden'}" dangerouslySetInnerHTML=${{__html: this.renderAndSanitize(this.state.text)}}/>
+        <textarea onInput=${this.handleInput} id=${props.id} class="myst_content ${state.source? 'shown' : 'hidden'}">${state.text}</textarea>
+        <div class="myst_rendered ${state.preview? 'shown' : 'hidden'}" dangerouslySetInnerHTML=${{__html: this.renderAndSanitize(state.text)}}/>
       </div>`
   }
 }
@@ -51,7 +51,8 @@ class MystEditor extends Component {
 MystEditor.defaultProps = {
   topbar: true,
   source: true,
-  preview: true
+  preview: true,
+  printCallback: window.print
 }
 
 console.log("MystEditor component loaded")
