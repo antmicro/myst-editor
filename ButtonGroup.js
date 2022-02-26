@@ -4,7 +4,7 @@ class ButtonGroup extends Component {
 
   constructor(props) {
     super(props)
-    this.state = { clickedId: 0, buttons: props.buttons }
+    this.state = { clickedId: props.clickedId, buttons: props.buttons }
   }
 
   handleClick(event, id, clickCallback) {
@@ -20,6 +20,10 @@ class ButtonGroup extends Component {
       </button>`
     ))}`
   }
+}
+
+ButtonGroup.defaultProps = {
+  clickedId: 0
 }
 
 console.log("ButtonGroup component loaded")
