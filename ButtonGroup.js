@@ -5,19 +5,17 @@ class ButtonGroup extends Component {
   constructor(props) {
     super(props)
     this.state = { clickedId: 0, buttons: props.buttons }
-    this.doSomethingAfterClick = props.doSomethingAfterClick
-    this.doSomethingAfterClick.bind(this)
   }
 
-  handleClick(event, id) {
+  handleClick(event, id, clickCallback) {
     this.setState({ clickedId: id })
-    this.doSomethingAfterClick(event)
+    clickCallback(event)
   }
 
   render(props, state) {
   return html`
     ${state.buttons.map((buttonLabel, i) => (
-      html`<button type="button" key={i} name=${buttonLabel} onClick=${(event) => this.handleClick(event, i)} class=${i === state.clickedId ? "customButton active" : "customButton"}>
+      html`<button type="button" key={i} name=${buttonLabel} onClick=${(event) => this.handleClick(event, i, props.clickCallback)} class=${i === state.clickedId ? "customButton active" : "customButton"}>
         ${buttonLabel}
       </button>`
     ))}`
