@@ -10,9 +10,12 @@ class MystEditor extends Component {
     super(props)
     this.state = { text: props.text, topbar: props.topbar, source: props.source, preview: props.preview }
     this.handleInput = this.handleInput.bind(this)
-    this.printButtonLabel = this.printButtonLabel.bind(this)
+    this.changeMode = this.changeMode.bind(this)
   }
-  printButtonLabel(event) {
+  print(event) {
+    window.print()
+  }
+  changeMode(event) {
     const name = event.target.name
     if (name == "Source") {
       this.setState({source: true, preview: false})
@@ -35,7 +38,8 @@ class MystEditor extends Component {
     return html`
       <div class="myst_content_parent">
         <div class="myst_top_bar ${this.state.topbar? 'shown' : 'hidden'}">
-	  <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} doSomethingAfterClick=${this.printButtonLabel}/>
+	  <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} clickCallback=${this.changeMode}/>
+	  <button onClick=${this.print}>Print</button>
 	</div>
         <div class="flex-break"></div>
         <textarea ref=${this.contentRef} onInput=${this.handleInput} id=${id} class="myst_content ${this.state.source? 'shown' : 'hidden'}">${this.state.text}</textarea>
