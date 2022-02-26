@@ -6,6 +6,10 @@
   <script type="module">
     console.log("Welcome to the MyST editor demo. The right hand side should auto update.")
     import { MystEditor, html, render } from './MystEditor.js'
-    render(html`<${MystEditor} text="Some **sample** text" id="textarea_id" />`, document.body)
+    const exampleCallback = (event) => {
+      console.log(`Example callback fired on ${event.target}`)
+      window.print()
+    }
+    render(html`<${MystEditor} printCallback=${exampleCallback} text="Some **sample** text" id="textarea_id"/>`, document.body)
   </script>
 </html>
