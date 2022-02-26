@@ -8,7 +8,12 @@ import ButtonGroup from "./ButtonGroup.js";
 class MystEditor extends Component {
   constructor(props) {
     super(props)
-    this.state = {...props}
+    this.state = {
+      text: props.text,
+      topbar: props.topbar,
+      source: props.source,
+      preview: props.preview
+    }
     this.handleInput = this.handleInput.bind(this)
     this.changeMode = this.changeMode.bind(this)
   }
@@ -34,11 +39,11 @@ class MystEditor extends Component {
   renderAndSanitize(text) {
     return purify.sanitize(markdownIt().use(markdownitDocutils).render(text))
   }
-  render(state, props) {
+  render(props,state) {
     return html`
       <div class="myst_content_parent">
         <div class="myst_top_bar ${state.topbar? 'shown' : 'hidden'}">
-	  <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} clickCallback=${this.changeMode}/>
+	  <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} clickedId=${2} clickCallback=${this.changeMode}/>
 	  <button type="button" onClick=${(event) => this.handlePrint(event, props.printCallback)}>Print</button>
 	</div>
         <div class="flex-break"></div>
