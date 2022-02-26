@@ -47,7 +47,7 @@ class MystEditor extends Component {
 	  <button type="button" onClick=${(event) => this.handlePrint(event, props.printCallback)}>Print</button>
 	</div>
         <div class="flex-break"></div>
-        <textarea onInput=${this.handleInput} id=${props.id} class="myst_content ${state.source? 'shown' : 'hidden'}" value=${state.text}/>
+        <textarea onInput=${this.handleInput} name=${props.name} id=${props.id} class="myst_content ${state.source? 'shown' : 'hidden'}" value=${state.text}/>
         <div class="myst_rendered ${state.preview? 'shown' : 'hidden'}" dangerouslySetInnerHTML=${{__html: this.renderAndSanitize(state.text)}}/>
       </div>`
   }
