@@ -1,31 +1,27 @@
-body {
-  font-family: sans-serif;
-}
-
-p {
+.myst-rendered p {
   margin-top: 0px;
   line-height: 1.5em;
   font-size: 1em;
 }
 
-a {
+.myst-rendered a {
   color: #0083E1;
 }
 
-h1, h2, h3, h4, h5, h6 {
+.myst-rendered h1, .myst-rendered h2, .myst-rendered h3, .myst-rendered h4, .myst-rendered h5, .myst-rendered h6 {
   font-weight: bold;
   line-height: 1.5;
   margin: 1em 0;
 }
 
-h1 { font-size: 1.8em; }
-h2 { font-size: 1.5em; }
-h3 { font-size: 1.25em; }
-h4 { font-size: 1.15em; }
-h5 { font-size: 1.1em; }
-h6 { font-size: 1em; }
+.myst-rendered h1 { font-size: 1.8em; }
+.myst-rendered h2 { font-size: 1.5em; }
+.myst-rendered h3 { font-size: 1.25em; }
+.myst-rendered h4 { font-size: 1.15em; }
+.myst-rendered h5 { font-size: 1.1em; }
+.myst-rendered h6 { font-size: 1em; }
 
-hr {
+.myst-rendered hr {
   height: 1px;
   padding: 0;
   margin: 16px 0;
@@ -33,23 +29,23 @@ hr {
   border: 0 none;
 }
 
-code, pre {
+.myst-rendered code, .myst-rendered pre {
   border-radius: 6px;
   background-color: rgba(175,184,193,0.2);
 }
 
-code {
+.myst-rendered code {
   padding: 0.2em 0.4em;
   font-family: monospace;
   font-size: 1em;
 }
 
-pre {
+.myst-rendered pre {
   white-space: pre-wrap;
   padding: 16px;
 }
 
-pre > code {
+.myst-rendered pre > code {
   padding: 0;
   background-color: transparent;
 }
