@@ -130,10 +130,20 @@ td {
 }
 
 .myst_top_bar {
+  position: fixed;
+  display: flex;
   width: 100%;
-  height: 30px;
-  flex: 2;
-  background-color: #eee;
+  height: 60px;
+  background-color: #333333;
+  border-bottom: 1px solid #ced2de;
+}
+
+.myst_top_bar-right {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 20px;
 }
 
 /* This will need to be moved to the button group */
