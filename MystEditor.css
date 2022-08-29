@@ -191,3 +191,11 @@ button.active img {
 .hidden {
   display: none;
 }
+
+.vl {
+  border-left: 1px solid #5c5c5c;
+  height: 40px;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
