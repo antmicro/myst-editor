@@ -182,6 +182,12 @@ button.active img {
     brightness(102%) contrast(102%);
 }
 
+#customButton_print {
+  padding: 0px 15px;
+  color: #ffff;
+  width: auto;
+}
+
 .hidden {
   display: none;
 }
