@@ -97,22 +97,36 @@ td {
 }
 
 .myst_content {
+  padding-top: 40px;
+  border-radius: 3px 0px 0px 3px;
+  background: #f7f7f7;
+  margin-left: 20px;
   font-family: monospace;
   font-size: 0.94em;
   resize: none;
+  border: 0;
 }
 
-.myst_content, .myst_rendered {
-  padding: 8px;
-  min-height: 300px;
+.myst_content,
+.myst_rendered {
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+  min-height: 500px;
   flex: 1;
+  border: 1px solid #e5e5e5;
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
 }
 
 .myst_rendered {
-  font-family: sans-serif;
+  font-family: "Lato";
   vertical-align: top;
-  border: 1px solid #e5e5e5;
+  border-left: 1px solid #ced2de;
+  margin-right: 20px;
   color: #332d37;
+  word-break: break-all;
 }
 
 .myst_top_bar {
