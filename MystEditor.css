@@ -148,13 +148,38 @@ td {
 
 /* This will need to be moved to the button group */
 .myst_top_bar button {
-  height: 30px;
-  padding: 0 10px;
-  margin: 0;
+  color: #212b36;
+  font-family: "Lato";
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid #5c5c5c;
+  background-color: #5c5c5c;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  transition: 0.4s ease;
+  border-radius: 5px;
+  margin: 5px;
+}
+
+.myst_top_bar button:hover {
+  background-color: #00ccaa;
+  border: 1px solid #00ccaa;
 }
 
 .myst_top_bar button.active {
-  background-color: #aaa;
+  background-color: #00af91;
+  border: 1px solid #00af91;
+  color: white;
+}
+
+button.active img {
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg)
+    brightness(102%) contrast(102%);
 }
 
 .hidden {
