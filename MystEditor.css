@@ -50,6 +50,26 @@
   background-color: transparent;
 }
 
+.myst_rendered table {
+  border-collapse: collapse;
+}
+
+.myst_rendered th,
+td {
+  padding: 20px;
+  text-align: left;
+  border: 1px solid #dfdfdf;
+}
+
+.myst_rendered thead {
+  color: #ffff;
+  background: #333333;
+}
+
+.myst_rendered tr:nth-child(2n + 2) {
+  background: #f9f9f9;
+}
+
 .myst_content_parent {
   display: flex;
   flex-flow: row wrap;
