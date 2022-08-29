@@ -40,6 +40,22 @@
   font-size: 1em;
 }
 
+.myst_rendered aside.admonition header,
+.myst_rendered aside.admonition p {
+  padding: 10px;
+  box-shadow: inset 4px 0px 0px #88818c;
+}
+
+.myst_rendered aside.admonition header {
+  color: #ffffff;
+  background: #00af91;
+}
+
+.myst_rendered aside.admonition p {
+  color: #000000;
+  background: rgba(136, 129, 140, 0.1);
+}
+
 .myst_rendered pre {
   white-space: pre-wrap;
   padding: 16px;
