@@ -67,7 +67,10 @@
   background: #00af91;
 }
 
-.myst_rendered aside.admonition.note header {
+.myst_rendered aside.admonition.note header,
+.myst_rendered aside.admonition.important header,
+.myst_rendered aside.admonition.tip header,
+.myst_rendered aside.admonition.hint header {
   background-color: #6ab0de;
 }
 
