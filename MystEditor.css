@@ -48,6 +48,8 @@
 .myst_rendered aside.admonition p {
   padding: 10px;
   box-shadow: inset 4px 0px 0px #88818c;
+  background-color: inherit;
+  color: black;
 }
 
 .myst_rendered aside.admonition header {
