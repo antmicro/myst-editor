@@ -102,6 +102,8 @@
   padding-right: 5px;
 }
 
+.myst_rendered aside.admonition.important header::before {
+  content: url("./img/admonitions/important.svg");
 }
 
 .myst_rendered aside.admonition.warning header::before {
