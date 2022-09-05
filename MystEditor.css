@@ -57,6 +57,11 @@
   background-color: #e8e6e8;
 }
 
+.myst_rendered aside[class^="admonition "] {
+  background-color: #e8e6e8;
+  box-shadow: inset 4px 0px 0px #88818c;
+}
+
 .myst_rendered aside.admonition header {
   color: #ffffff;
   background: #00af91;
