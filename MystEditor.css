@@ -52,6 +52,11 @@
   color: black;
 }
 
+.myst_rendered aside.admonition > p {
+  color: black;
+  background-color: #e8e6e8;
+}
+
 .myst_rendered aside.admonition header {
   color: #ffffff;
   background: #00af91;
