@@ -129,6 +129,11 @@
   font-weight: bold;
 }
 
+.myst_rendered numref {
+  vertical-align: super;
+  font-size: 0.83em;
+}
+
 .myst_rendered th,
 td {
   padding: 20px;
