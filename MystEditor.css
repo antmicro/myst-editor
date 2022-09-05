@@ -124,6 +124,11 @@
   border-collapse: collapse;
 }
 
+.myst_rendered abbr {
+  letter-spacing: 0.1em;
+  font-weight: bold;
+}
+
 .myst_rendered th,
 td {
   padding: 20px;
