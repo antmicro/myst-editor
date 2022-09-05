@@ -124,12 +124,21 @@
   border-collapse: collapse;
 }
 
+.myst_rendered sup {
+  line-height: 0;
+}
+
+.myst_rendered sub {
+  line-height: 0;
+}
+
 .myst_rendered abbr {
   letter-spacing: 0.1em;
   font-weight: bold;
 }
 
 .myst_rendered numref {
+  line-height: 0;
   vertical-align: super;
   font-size: 0.83em;
 }
