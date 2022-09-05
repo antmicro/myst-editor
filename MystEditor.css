@@ -78,6 +78,16 @@
   background-color: #D0342C;
 }
 
+.myst_rendered aside.admonition.note header::before,
+.myst_rendered aside.admonition.important header::before,
+.myst_rendered aside.admonition.warning header::before,
+.myst_rendered aside.admonition.tip header::before,
+.myst_rendered aside.admonition.hint header::before  {
+  padding-right: 5px;
+  position: relative;
+  top: 2px;
+}
+
 .myst_rendered aside.admonition.note header::before {
   content: url("./img/admonitions/note.svg");
   align-self: flex-start;
