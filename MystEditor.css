@@ -100,3 +100,36 @@
 .hidden {
   display: none;
 }
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media print {
+  .myst_content,
+  .myst_top_bar {
+    display: none!important;
+  }
+  .myst_rendered {
+    display: block!important;
+    border: 0px!important;
+    box-shadow: none!important;
+    border-radius: 0px!important;
+    word-break: unset!important;
+  }
+  .myst_rendered > p {
+    break-inside: avoid!important;
+    text-align: justify!important;
+    text-justify: inter-word!important;
+  }
+  a:after {
+    content: "("attr(href)")"!important;
+  }
+  @page {
+    margin: 1.5cm!important;
+  }
+}
