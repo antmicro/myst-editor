@@ -194,7 +194,7 @@ td {
 }
 
 .myst_rendered {
-  font-family: "Lato";
+  font-family: 'Lato', sans-serif;
   vertical-align: top;
   border-left: 1px solid #ced2de;
   margin-right: 20px;
@@ -226,7 +226,7 @@ textarea:focus {
 /* This will need to be moved to the button group */
 .myst_top_bar button {
   color: #212b36;
-  font-family: "Lato";
+  font-family: 'Lato', sans-serif;
   text-transform: uppercase;
   font-size: 12px;
   font-weight: bold;
