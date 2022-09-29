@@ -159,7 +159,15 @@ td {
   background: #f9f9f9;
 }
 
-.myst_content_parent {
+.myst_editor_parent {
+  display: flex;
+  flex-flow: row wrap;
+  width: 100%;
+}
+
+.myst_wrapper {
+  margin-top: 60px;
+  padding: 20px;
   display: flex;
   flex-flow: row wrap;
   width: 100%;
@@ -172,7 +180,6 @@ td {
 .myst_content {
   border-radius: 3px 0px 0px 3px;
   background: #f7f7f7;
-  margin-left: 20px;
   font-family: monospace;
   font-size: 0.94em;
   resize: none;
@@ -182,8 +189,6 @@ td {
 .myst_content,
 .myst_rendered {
   padding: 20px;
-  margin-top: 80px;
-  margin-bottom: 20px;
   min-height: 500px;
   flex: 1;
   border: 1px solid #e5e5e5;
@@ -195,12 +200,12 @@ td {
   font-family: 'Lato', sans-serif;
   vertical-align: top;
   border-left: 1px solid #ced2de;
-  margin-right: 20px;
   color: #332d37;
   word-break: break-all;
 }
 
 .myst_top_bar {
+  z-index: 10;
   position: fixed;
   display: flex;
   width: 100%;
@@ -214,7 +219,7 @@ td {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin-right: 20px;
+  margin-right: 15px;
 }
 
 textarea:focus {
@@ -223,6 +228,7 @@ textarea:focus {
 
 /* This will need to be moved to the button group */
 .myst_top_bar button {
+  cursor: pointer;
   color: #212b36;
   font-family: 'Lato', sans-serif;
   text-transform: uppercase;

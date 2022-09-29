@@ -41,16 +41,18 @@ class MystEditor extends Component {
   }
   render(props,state) {
     return html`
-      <div class="myst_content_parent">
+      <div class="myst_editor_parent">
         <div class="myst_top_bar ${state.topbar? 'shown' : 'hidden'}">
-        <div class="myst_top_bar-right">
-    <button type="button" onClick=${(event) => this.handlePrint(event, props.printCallback)} id="customButton_print">Export as PDF</button>
-    <div class="vl"></div>
-	  <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} clickedId=${2} clickCallback=${this.changeMode}/>
-      </div>
-    </div>
-        <textarea onInput=${this.handleInput} name=${props.name} id=${props.id} class="myst_content ${state.source? 'shown' : 'hidden'}" value=${state.text}/>
-        <div class="myst_rendered ${state.preview? 'shown' : 'hidden'}" dangerouslySetInnerHTML=${{__html: this.renderAndSanitize(state.text)}}/>
+	  <div class="myst_top_bar-right">
+            <button type="button" onClick=${(event) => this.handlePrint(event, props.printCallback)} id="customButton_print">Export as PDF</button>
+            <div class="vl"></div>
+	    <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} clickedId=${2} clickCallback=${this.changeMode}/>
+          </div>
+	</div>
+	<div class="myst_wrapper">
+          <textarea onInput=${this.handleInput} name=${props.name} id=${props.id} class="myst_content ${state.source? 'shown' : 'hidden'}" value=${state.text}/>
+          <div class="myst_rendered ${state.preview? 'shown' : 'hidden'}" dangerouslySetInnerHTML=${{__html: this.renderAndSanitize(state.text)}}/>
+	</div>
       </div>`
   }
 }
