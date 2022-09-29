@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "dev": "npx browser-sync start --server --files '*.css' '*.js' '*.html'"
+  }
+}
