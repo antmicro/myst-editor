@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
   <title>MyST editor Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,6 +97,10 @@ w_{t+1} = (1 + r_{t+1}) s(w_t) + y_{t+1}
       console.log(`Example callback fired on ${event.target}`)
       window.print()
     }
-    render(html`<${MystEditor} printCallback=${exampleCallback} text=${exampleText} id="textarea_id"/>`, document.body)
+    render(html`<${MystEditor} printCallback=${exampleCallback} text=${exampleText} id="textarea_id"/>`, document.getElementById("myst"))
   </script>
+  </head>
+  <body>
+    <div id="myst"></div>
+  </body>
 </html>
