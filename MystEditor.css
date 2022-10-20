@@ -166,7 +166,6 @@ td {
 }
 
 .myst_wrapper {
-  margin-top: 60px;
   padding: 20px;
   display: flex;
   flex-flow: row wrap;
@@ -206,7 +205,8 @@ td {
 
 .myst_top_bar {
   z-index: 10;
-  position: fixed;
+  position: sticky;
+  top: 0;
   display: flex;
   width: 100%;
   height: 60px;
