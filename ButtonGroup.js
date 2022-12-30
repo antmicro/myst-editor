@@ -16,7 +16,7 @@ class ButtonGroup extends Component {
   return html`
     ${state.buttons.map((buttonLabel, i) => (
       html`<button type="button" key={i} name=${buttonLabel} onClick=${(event) => this.handleClick(event, i, props.clickCallback)} class=${i === state.clickedId ? "customButton active" : "customButton"}>
-       <img key={i} name=${buttonLabel} onClick=${(event) => this.handleClick(event, i, props.clickCallback)} src=./img/${buttonLabel}.svg />
+       <img key={i} name=${buttonLabel} onClick=${(event) => this.handleClick(event, i, props.clickCallback)}/>
       </button>`
     ))}`
   }
