@@ -71,6 +71,7 @@
 .myst_rendered aside.admonition.important header,
 .myst_rendered aside.admonition.tip header,
 .myst_rendered aside.admonition.hint header,
+.myst_rendered aside.directive-unhandled header,
 .myst_rendered aside.admonition.warning aside[class^="admonition"] header {
   background-color: #6ab0de;
 }
@@ -133,6 +134,7 @@
 
 .myst_rendered table {
   border-collapse: collapse;
+  margin: 20px 0 20px 0;
 }
 
 .myst_rendered sup {
@@ -207,7 +209,11 @@
   vertical-align: top;
   border-left: 1px solid #ced2de;
   color: #332d37;
-  word-break: break-all;
+  word-break: unset;
+}
+
+.myst_rendered > p {
+  break-inside: avoid!important;
 }
 
 .myst_top_bar {
@@ -293,6 +299,48 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+.myst_rendered li {
+  margin-bottom: 1em;
+}
+
+.myst_rendered ul,
+.myst_rendered ol {
+  margin-bottom: 2em;
+}
+
+.myst_rendered .directive-unhandled {
+  margin-bottom: 1em;
+}
+
+.myst_rendered aside .directive-unhandled {
+  background-color: #e8e6e8;
+  box-shadow: inset 4px 0px 0px #88818c;
+}
+
+.myst_rendered aside.directive-unhandled header mark {
+  background-color: inherit;
+  color: #ffffff;
+}
+
+.myst_rendered aside.directive-unhandled header {
+  padding: 10px;
+  box-shadow: inset 4px 0px 0px #88818c;
+}
+
+.myst_rendered aside.directive-unhandled header code {
+  background-color: inherit;
+  color: #ffffff;
+  font-family: 'Lato', sans-serif;
+  padding: 0;
+}
+
+.myst_rendered aside.directive-unhandled pre {
+  box-shadow: inset 4px 0px 0px #88818c;
+  background-color: #e8e6e8;
+  border-radius: 0;
+  margin: 0;
 }
 
 @media print {
