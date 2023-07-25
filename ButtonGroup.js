@@ -1,33 +1,17 @@
-import { Component } from 'preact';
+import { useState } from 'preact/hooks';
 import { html } from 'htm/preact';
 
-class ButtonGroup extends Component {
+const ButtonGroup = ({buttons, initialClickedId = 0, clickCallback}) => {
+    const [clickedId, setClickedId] = useState(initialClickedId);
 
-  constructor(props) {
-    super(props)
-    this.state = { clickedId: props.clickedId, buttons: props.buttons }
-  }
-
-  handleClick(event, id, clickCallback) {
-    this.setState({ clickedId: id })
-    clickCallback(event)
-  }
-
-  render(props, state) {
-  return html`
-    ${state.buttons.map((buttonLabel, i) => (
-      html`<button type="button" key={i} name=${buttonLabel} onClick=${(event) => this.handleClick(event, i, props.clickCallback)} class=${i === state.clickedId ? "customButton active" : "customButton"}>
-       <img key={i} name=${buttonLabel} onClick=${(event) => this.handleClick(event, i, props.clickCallback)}/>
-      </button>`
-    ))}`
-  }
-}
-
-ButtonGroup.defaultProps = {
-  clickedId: 0
+    return html`
+        ${buttons.map((buttonLabel, i) => (
+            html`<button type="button" key=${buttonLabel} name=${buttonLabel} onClick=${(event) => {setClickedId(i); clickCallback(event);}} class=${i === clickedId ? "customButton active" : "customButton"}>
+            </button>`
+        ))}
+    `;
 }
 
 console.log("ButtonGroup component loaded")
 
 export default ButtonGroup
-

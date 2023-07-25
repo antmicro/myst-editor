@@ -47,7 +47,7 @@ class MystEditor extends Component {
 	  <div class="myst_top_bar-right">
             <button type="button" onClick=${(event) => this.handlePrint(event, props.printCallback)} id="customButton_print">Export as PDF</button>
             <div class="vl"></div>
-	    <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} clickedId=${2} clickCallback=${this.changeMode}/>
+	    <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} initialClickedId=${2} clickCallback=${this.changeMode}/>
           </div>
 	</div>
 	<div class="myst_wrapper">
