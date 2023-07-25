@@ -1,7 +1,8 @@
-import { html, Component, render } from 'https://unpkg.com/htm/preact/standalone.module.js'
-import markdownitDocutils from 'https://unpkg.com/markdown-it-docutils@0.1.3/dist/index.esm.min.js'
-import purify from 'https://unpkg.com/dompurify@2.3.5/dist/purify.es.js'
-import markdownIt from 'https://cdn.skypack.dev/@esm-bundle/markdown-it'
+import { render, Component } from 'preact';
+import { html } from 'htm/preact';
+import markdownitDocutils from 'markdown-it-docutils'
+import purify from 'dompurify'
+import markdownIt from 'markdown-it'
 
 import ButtonGroup from "./ButtonGroup.js";
 

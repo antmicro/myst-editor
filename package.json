@@ -1,5 +1,24 @@
 {
+  "name": "myst-editor",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "npx browser-sync start --server --files '*.css' '*.js' '*.html'"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "host": "vite --host"
+  },
+  "dependencies": {
+    "@babel/core": "^7.12.10",
+    "dompurify": "^2.3.5",
+    "htm": "^3.1.1",
+    "markdown-it": "^12.3.2",
+    "markdown-it-docutils": "^0.1.3",
+    "preact": "^10.11.3"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.4.0",
+    "vite": "^3.2.3"
   }
 }

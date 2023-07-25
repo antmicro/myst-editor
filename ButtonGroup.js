@@ -1,4 +1,5 @@
-import { html, Component, render } from 'https://unpkg.com/htm/preact/standalone.module.js'
+import { Component } from 'preact';
+import { html } from 'htm/preact';
 
 class ButtonGroup extends Component {
 
