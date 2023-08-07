@@ -5,10 +5,22 @@ import { keymap } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { EditorState } from "@codemirror/state";
 
-const CodeMirror = ({ value, setText, id, name, className }) => {
-  let view = null
+const usePrevious = (value) => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+};
+
+const CodeMirror = ({ value, setText, id, name, className, templateState }) => {
+  const editorRef = useRef(null);
+  const viewRef = useRef(null);
+  const prevTemplateState = usePrevious(templateState);
+  const prepareTextToSubmit = (doc, comp) => document.getElementById(comp).value = doc;
 
   useEffect(() => {
+
     const startState = EditorState.create({
       doc: value,
       extensions: [
@@ -28,7 +40,32 @@ const CodeMirror = ({ value, setText, id, name, className }) => {
       state: startState,
       parent: document.getElementById('editor')
     });
+
+    editorRef.current = view;
+    viewRef.current = view;
+    return () => {
+      view.destroy();
+    };
   }, []);
+
+  useEffect(() => {
+    if (
+      templateState &&
+      (!prevTemplateState || prevTemplateState.timestamp !== templateState.timestamp)
+    ) {
+      viewRef.current.dispatch({
+        changes: {
+          from: 0,
+          to: viewRef.current.state.doc.length,
+          insert: templateState.template,
+        },
+      });
+
+      setText(templateState.template);
+      prepareTextToSubmit(templateState.template, id);
+    }
+
+  }, [templateState]);
 
   return html`
     <div id="editor" class=${className}></div>

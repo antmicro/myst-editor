@@ -7,6 +7,7 @@ import markdownIt from 'markdown-it'
 
 import ButtonGroup from "./ButtonGroup.js";
 import CodeMirror from './CodeMirror.js';
+import TemplateManager from './TemplateManager.js';
 
 const MystEditor = ({
   name = "myst_editor_textarea",
@@ -14,10 +15,16 @@ const MystEditor = ({
   initialMode = "Both",
   initialText = "",
   printCallback = window.print,
-  topbar = true
+  topbar = true,
+  templatelist
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [text, setText] = useState(initialText);
+  const [templateState, setTemplateState] = useState(null);
+
+  const setDocumentTemplate = (template) => {
+    setTemplateState({template, timestamp: Date.now()})
+  }
 
   const renderAndSanitize = (text) => {
     return purify.sanitize(markdownIt().use(markdownitDocutils).render(text))
@@ -28,12 +35,13 @@ const MystEditor = ({
     <div class="myst_top_bar ${topbar? 'shown' : 'hidden'}">
       <div class="myst_top_bar-right">
         <button type="button" onClick=${(event) => printCallback(event)} id="customButton_print">Export as PDF</button>
+        <${TemplateManager} templatelist=${templatelist} templateState=${templateState} setDocumentTemplate=${setDocumentTemplate}/>
         <div class="vl"></div>
         <${ButtonGroup} buttons=${["Source", "Preview", "Both"]} clickedId=${2} clickCallback=${(event) => setMode(event.target.name)}/>
       </div>
     </div>
   <div class="myst_wrapper">
-    <${CodeMirror} setText=${setText} name=${name} id=${id} className="myst_content ${mode === "Both" || mode === "Source" ? 'shown' : 'hidden'}" value=${text}/>
+    <${CodeMirror} setText=${setText} name=${name} id=${id} className="myst_content ${mode === "Both" || mode === "Source" ? 'shown' : 'hidden'}" templateState=${templateState} value=${text}/>
     <div class="myst_rendered ${mode === "Both" || mode === "Preview" ? 'shown' : 'hidden'}" dangerouslySetInnerHTML=${{__html: renderAndSanitize(text)}}/>
   </div>
 </div>`
