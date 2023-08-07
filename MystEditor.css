@@ -264,7 +264,6 @@
   outline: none;
 }
 
-/* This will need to be moved to the button group */
 .myst_top_bar button {
   cursor: pointer;
   color: var(--white);
@@ -275,19 +274,25 @@
   border: 1px solid var(--gray-800);
   background-color: var(--gray-800);
   height: 40px;
-  width: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0;
+  margin: 0px;
+  padding: 0px;
   transition: 0.4s ease;
-  border-radius: var(--border-radius);
+  border-radius: 5px;
+}
+
+.myst_top_bar button:not(.template-name-button, .modal-button, .modal-close-button) {
+  color: #212b36;
+  border: 1px solid #5c5c5c;
+  width: 40px;
   margin: 5px;
 }
 
-.myst_top_bar button:hover {
-  background-color: var(--green-400);
-  border: 1px solid var(--green-400);
+.myst_top_bar button:hover:not(.modal-close-button, .myst_top_bar #customButton_templates.disabled, .myst_top_bar .template-name-button.disabled) {
+  background-color: #00ccaa;
+  border: 1px solid #00ccaa;
 }
 
 .myst_top_bar button.active {
@@ -295,15 +300,97 @@
   border: 1px solid var(--green-500);
 }
 
+.myst_top_bar .modal-close-button:hover {
+  background-color: red;
+  border: 1px solid red;
+}
+
 .myst_top_bar button.active img {
   filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg)
     brightness(102%) contrast(102%);
 }
 
-.myst_top_bar #customButton_print {
+.myst_top_bar #customButton_print,
+#customButton_templates {
   padding: 0px 15px;
   width: auto;
 }
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  width: min-content;
+}
+
+.template-dropdown-content {
+  display: none;
+  margin-left: 5px;
+  font-family: 'Lato', sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  align-items: center;
+  justify-content: space-around;
+  white-space: nowrap;
+  border: 1px solid #333333;
+  border-radius: 3px;
+  color: #ffff;
+  background-color: #5c5c5c;
+  z-index: 20;
+  width: 100%;
+}
+
+.dropdown:hover .template-dropdown-content {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.modal {
+z-index: 2;
+display: flex;
+flex-direction: column;
+justify-content: center;
+gap: 10px;
+width: 450px;
+padding: 20px;
+right: 50%;
+transform: translate(50%, 0);
+top: 100%;
+position: absolute;
+background-color: white;
+border: 1px solid #ddd;
+border-radius: 15px;
+}
+
+.modal .flex-container {
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.modal-text {
+font-family: 'Lato', sans-serif;
+color: black;
+}
+
+.template-name-button,
+.modal-button,
+.modal-close-button {
+color: white;
+border: 1px solid #333333;
+padding: 0 10px 0 10px!important;
+margin-top: 0px;
+}
+
+.template-name-button {
+width: 100%!important;
+}
+
+.templates-list {
+position: absolute;
+display: flex;
+padding-top: 5px;
+}
+
 
 .myst_editor_parent .hidden {
   display: none;
