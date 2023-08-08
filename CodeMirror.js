@@ -9,7 +9,6 @@ const CodeMirror = ({ value, setText, id, name, className }) => {
   const editorRef = useRef(null);
 
   useEffect(() => {
-    const prepareTextToSubmit = (doc, comp) => document.getElementById(comp).value = doc;
 
     const startState = EditorState.create({
       doc: value,
@@ -21,7 +20,7 @@ const CodeMirror = ({ value, setText, id, name, className }) => {
           if (update.docChanged) {
             const text = editorRef.current.state.doc.toString();
             setText(text);
-            prepareTextToSubmit(text, id);
+            document.getElementById(id).value = text;
           }
         })
       ]
