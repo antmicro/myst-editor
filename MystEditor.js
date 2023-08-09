@@ -6,6 +6,7 @@ import purify from 'dompurify'
 import markdownIt from 'markdown-it'
 
 import ButtonGroup from "./ButtonGroup.js";
+import CodeMirror from './CodeMirror.js';
 
 const MystEditor = ({
   name = "myst_editor_textarea",
@@ -32,7 +33,7 @@ const MystEditor = ({
       </div>
     </div>
   <div class="myst_wrapper">
-    <textarea onInput=${(event) => setText(event.target.value)} name=${name} id=${id} className="myst_content ${mode === "Both" || mode === "Source" ? 'shown' : 'hidden'}" value=${text}/>
+    <${CodeMirror} setText=${setText} name=${name} id=${id} className="myst_content ${mode === "Both" || mode === "Source" ? 'shown' : 'hidden'}" value=${text}/>
     <div class="myst_rendered ${mode === "Both" || mode === "Preview" ? 'shown' : 'hidden'}" dangerouslySetInnerHTML=${{__html: renderAndSanitize(text)}}/>
   </div>
 </div>`
