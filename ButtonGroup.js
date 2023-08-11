@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 import { html } from 'htm/preact';
 
-const ButtonGroup = ({buttons, initialClickedId = 0, clickCallback}) => {
+const ButtonGroup = ({ buttons, initialClickedId = 2, clickCallback }) => {
     const [clickedId, setClickedId] = useState(initialClickedId);
 
     return html`
