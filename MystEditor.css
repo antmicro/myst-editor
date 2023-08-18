@@ -328,7 +328,7 @@
   display: none;
 }
 
-.myst_rendered .vl {
+.myst_editor_parent .vl {
   border-left: 1px solid var(--btn-bg-color);
   height: 40px;
   margin-right: 10px;
