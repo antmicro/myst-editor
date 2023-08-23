@@ -1,3 +1,40 @@
+:root {
+  /* admonitions */
+  --admonition-left-border-color: #88818c;
+  --admonition-bg-color: #e8e6e8;
+  --admonition-text-color: black;
+  --admonition-header-text-color: #ffffff;
+  --admonition-header-bg-color: #00af91;
+  --labeled-admonition-header-bg-color: #6ab0de;
+  --warning-admonition-header-bg-color:#D0342C; 
+
+  /* tables */
+  --table-border-color: #dfdfdf;
+  --table-head-text-color: #ffff;
+  --table-head-bg-color: #333333;
+  --table-row-even-bg-color: #f9f9f9;
+
+  /* editor and preview */
+  --editor-bg-color: #f7f7f7;
+  --editor-preview-border-color: #e5e5e5;
+  --editor-preview-shadow-color: rgba(0, 0, 0, 0.15);
+  --editor-preview-separator-color: #ced2de;
+  --preview-text-color: #332d37;
+  --link-color: #0083e1;
+  --hr-color: #DFDFDF;
+  --code-bg-color: rgba(175,184,193,0.2);
+
+  /* topbar */
+  --topbar-bg-color: #333333;
+  --topbar-border-bot-color: #ced2de;
+
+  /* buttons */
+  --btn-bg-color: #5c5c5c;
+  --btn-text-color: #fff;
+  --btn-hover-bg-color: #00ccaa;
+  --btn-active-bg-color: #00af91;
+}
+
 .myst_rendered p {
   margin-top: 0px;
   line-height: 1.5em;
@@ -5,7 +42,7 @@
 }
 
 .myst_rendered a {
-  color: #0083E1;
+  color: var(--link-color);
 }
 
 .myst_rendered h1, .myst_rendered h2, .myst_rendered h3, .myst_rendered h4, .myst_rendered h5, .myst_rendered h6 {
@@ -25,13 +62,13 @@
   height: 1px;
   padding: 0;
   margin: 16px 0;
-  background-color: #DFDFDF;
+  background-color: var(--hr-color);
   border: 0 none;
 }
 
 .myst_rendered code, .myst_rendered pre {
   border-radius: 6px;
-  background-color: rgba(175,184,193,0.2);
+  background-color: var(--code-bg-color);
 }
 
 .myst_rendered code {
@@ -47,24 +84,24 @@
 .myst_rendered aside.admonition header,
 .myst_rendered aside.admonition p {
   padding: 10px;
-  box-shadow: inset 4px 0px 0px #88818c;
+  box-shadow: inset 4px 0px 0px var(--admonition-left-border-color);
   background-color: inherit;
-  color: black;
+  color: var(--admonition-text-color);
 }
 
 .myst_rendered aside.admonition > p {
-  color: black;
-  background-color: #e8e6e8;
+  color: var(--admonition-text-color);
+  background-color: var(--admonition-bg-color);
 }
 
 .myst_rendered aside[class^="admonition "] {
-  background-color: #e8e6e8;
-  box-shadow: inset 4px 0px 0px #88818c;
+  background-color: var(--admonition-bg-color);
+  box-shadow: inset 4px 0px 0px var(--admonition-left-border-color);
 }
 
 .myst_rendered aside.admonition header {
-  color: #ffffff;
-  background: #00af91;
+  color: var(--admonition-header-text-color);
+  background: var(--admonition-header-bg-color);
 }
 
 .myst_rendered aside.admonition.note header,
@@ -73,11 +110,11 @@
 .myst_rendered aside.admonition.hint header,
 .myst_rendered aside.directive-unhandled header,
 .myst_rendered aside.admonition.warning aside[class^="admonition"] header {
-  background-color: #6ab0de;
+  background-color: var(--labeled-admonition-header-bg-color);
 }
 
 .myst_rendered aside.admonition.warning header {
-  background-color: #D0342C;
+  background-color: var(--warning-admonition-header-bg-color);
 }
 
 .myst_rendered aside.admonition.note header::before,
@@ -165,16 +202,16 @@
 .myst_rendered td {
   padding: 20px;
   text-align: left;
-  border: 1px solid #dfdfdf;
+  border: 1px solid var(--table-border-color);
 }
 
 .myst_rendered thead {
-  color: #ffff;
-  background: #333333;
+  color: var(--table-head-text-color);
+  background: var(--table-head-bg-color);
 }
 
 .myst_rendered tr:nth-child(2n + 2) {
-  background: #f9f9f9;
+  background: var(--table-row-even-bg-color);
 }
 
 .myst_editor_parent {
@@ -192,7 +229,7 @@
 
 .myst_content {
   border-radius: 3px 0px 0px 3px;
-  background: #f7f7f7;
+  background: var(--editor-bg-color);
   font-family: monospace;
   font-size: 0.94em;
   resize: none;
@@ -204,16 +241,16 @@
   padding: 20px;
   min-height: 500px;
   flex: 1;
-  border: 1px solid #e5e5e5;
-  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--editor-preview-border-color);
+  box-shadow: inset 0px 0px 4px var(--editor-preview-shadow-color);
   border-radius: 4px;
 }
 
 .myst_rendered {
   font-family: 'Lato', sans-serif;
   vertical-align: top;
-  border-left: 1px solid #ced2de;
-  color: #332d37;
+  border-left: 1px solid var(--editor-preview-separator-color);
+  color: var(--preview-text-color);
   word-break: unset;
 }
 
@@ -228,8 +265,8 @@
   display: flex;
   width: 100%;
   height: 60px;
-  background-color: #333333;
-  border-bottom: 1px solid #ced2de;
+  background-color: var(--topbar-bg-color);
+  border-bottom: 1px solid var(--topbar-border-bot-color);
 }
 
 .myst_top_bar-right {
@@ -247,13 +284,13 @@
 /* This will need to be moved to the button group */
 .myst_top_bar button {
   cursor: pointer;
-  color: #212b36;
+  color: var(--btn-text-color);
   font-family: 'Lato', sans-serif;
   text-transform: uppercase;
   font-size: 12px;
   font-weight: bold;
-  border: 1px solid #5c5c5c;
-  background-color: #5c5c5c;
+  border: 1px solid var(--btn-bg-color);
+  background-color: var(--btn-bg-color);
   height: 40px;
   width: 40px;
   display: flex;
@@ -266,14 +303,13 @@
 }
 
 .myst_top_bar button:hover {
-  background-color: #00ccaa;
-  border: 1px solid #00ccaa;
+  background-color: var(--btn-hover-bg-color);
+  border: 1px solid var(--btn-hover-bg-color);
 }
 
 .myst_top_bar button.active {
-  background-color: #00af91;
-  border: 1px solid #00af91;
-  color: white;
+  background-color: var(--btn-active-bg-color);
+  border: 1px solid var(--btn-active-bg-color);
 }
 
 .myst_top_bar button.active img {
@@ -283,7 +319,6 @@
 
 .myst_top_bar #customButton_print {
   padding: 0px 15px;
-  color: #ffff;
   width: auto;
 }
 
@@ -292,7 +327,7 @@
 }
 
 .myst_rendered .vl {
-  border-left: 1px solid #5c5c5c;
+  border-left: 1px solid var(--btn-bg-color);
   height: 40px;
   margin-right: 10px;
   margin-left: 10px;
@@ -319,31 +354,26 @@
   margin-bottom: 1em;
 }
 
-.myst_rendered aside .directive-unhandled {
-  background-color: #e8e6e8;
-  box-shadow: inset 4px 0px 0px #88818c;
-}
-
 .myst_rendered aside.directive-unhandled header mark {
   background-color: inherit;
-  color: #ffffff;
+  color: var(--admonition-header-text-color);
 }
 
 .myst_rendered aside.directive-unhandled header {
   padding: 10px;
-  box-shadow: inset 4px 0px 0px #88818c;
+  box-shadow: inset 4px 0px 0px var(--admonition-left-border-color);
 }
 
 .myst_rendered aside.directive-unhandled header code {
   background-color: inherit;
-  color: #ffffff;
+  color: var(--admonition-header-text-color);
   font-family: 'Lato', sans-serif;
   padding: 0;
 }
 
 .myst_rendered aside.directive-unhandled pre {
-  box-shadow: inset 4px 0px 0px #88818c;
-  background-color: #e8e6e8;
+  box-shadow: inset 4px 0px 0px var(--admonition-left-border-color);
+  background-color: var(--admonition-bg-color);
   border-radius: 0;
   margin: 0;
 }
