@@ -1,11 +1,11 @@
 import { html } from 'htm/preact';
 
-const Tooltip = (props) => {
+const Tooltip = ({ tooltipOrientation, showTooltip, errorMessage }) => {
 
     return html`
-              <div class="tooltip-box${`-${props.tooltipOrientation}`} ${props.showTooltip? "" : "hidden"}">
-                <div class="tooltip${`-${props.tooltipOrientation}`}">
-                    ${props.errorMessage}
+              <div class="tooltip-box${`-${tooltipOrientation}`} ${showTooltip? "" : "hidden"}">
+                <div class="tooltip${`-${tooltipOrientation}`}">
+                    ${errorMessage}
                 </div>
               </div>`
   }

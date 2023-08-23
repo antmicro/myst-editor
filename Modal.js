@@ -1,7 +1,6 @@
 import { html } from 'htm/preact';
 
-const Modal = (props) => {
-  const { showModal, changeDocumentTemplate, selectedTemplate, closeModal } = props;
+const Modal = ({showModal, changeDocumentTemplate, selectedTemplate, closeModal}) => {
 
   return html`
     <section class="modal ${showModal? "" : "hidden"}">

@@ -3,7 +3,7 @@ import {useState, useEffect} from 'preact/hooks';
 import Modal from './Modal.js'
 import Tooltip from './Tooltip.js'
 
-const TemplateManager = (props) => {
+const TemplateManager = ({setDocumentTemplate, templatelist}) => {
   const [template, setTemplate] = useState("");
   const [readyTemplates, setReadyTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -26,7 +26,7 @@ const TemplateManager = (props) => {
 
   const changeDocumentTemplate = (template) => {
     setTemplate(readyTemplates[template].templatetext);
-    props.setDocumentTemplate(readyTemplates[template].templatetext);
+    setDocumentTemplate(readyTemplates[template].templatetext);
     setShowModal(false);
   }
 
@@ -73,7 +73,7 @@ const TemplateManager = (props) => {
   }
 
   useEffect(async() => {
-    const linkedtemplatelist = await getTemplateConfig(props.templatelist);
+    const linkedtemplatelist = await getTemplateConfig(templatelist);
     const readyTemplates = await fillTemplatesWithFetchedData(linkedtemplatelist);
     setReadyTemplates(readyTemplates);
   }, []);
