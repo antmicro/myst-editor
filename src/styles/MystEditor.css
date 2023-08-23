@@ -16,6 +16,7 @@
   --red-500: #D0342C;
   --green-500: #00af91;
   --green-400: #00ccaa;
+  --border-2: 3px;
 }
 
 .myst_rendered p {
@@ -60,31 +61,49 @@
   font-size: 1em;
 }
 
+.myst_rendered aside {
+  border-radius: var(--border-radius);
+}
+
+.myst_rendered aside.admonition {
+  border: var(--border-2) solid var(--green-500);
+  margin-bottom: 1rem;
+}
+
 .myst_rendered aside.admonition aside.admonition {
-  margin-left: 1.4rem;
+  margin: 0 1.4rem 0.9rem 1.4rem;
 }
 
 .myst_rendered aside.admonition header,
 .myst_rendered aside.admonition p {
   padding: 10px;
-  box-shadow: inset 4px 0px 0px var(--gray-700);
   background-color: inherit;
   color: var(--black);
 }
 
 .myst_rendered aside.admonition > p {
   color: var(--black);
-  background-color: var(--gray-300);
+  background-color: var(--white);
+  margin-bottom: 0;
 }
 
 .myst_rendered aside[class^="admonition "] {
-  background-color: var(--gray-300);
-  box-shadow: inset 4px 0px 0px var(--gray-700);
+  background-color: var(--white);
 }
 
 .myst_rendered aside.admonition header {
   color: var(--white);
+  font-weight: bold;
   background: var(--green-500);
+}
+
+.myst_rendered aside.admonition.note ,
+.myst_rendered aside.admonition.important ,
+.myst_rendered aside.admonition.tip ,
+.myst_rendered aside.admonition.hint ,
+.myst_rendered aside.directive-unhandled ,
+.myst_rendered aside.admonition.warning aside[class^="admonition"]  {
+  border: 3px solid var(--blue-400);
 }
 
 .myst_rendered aside.admonition.note header,
@@ -94,6 +113,10 @@
 .myst_rendered aside.directive-unhandled header,
 .myst_rendered aside.admonition.warning aside[class^="admonition"] header {
   background-color: var(--blue-400);
+}
+
+.myst_rendered aside.admonition.warning {
+  border: 3px solid var(--red-500);
 }
 
 .myst_rendered aside.admonition.warning header {
@@ -481,31 +504,34 @@
 }
 
 .myst_rendered .directive-unhandled {
+  border: 3px solid var(--blue-400);
   margin-bottom: 1em;
 }
 
 .myst_rendered aside.directive-unhandled header mark {
-  background-color: inherit;
+  background: transparent;
   color: var(--white);
+  font-weight: bold;
 }
 
 .myst_rendered aside.directive-unhandled header {
   padding: 10px;
-  box-shadow: inset 4px 0px 0px var(--gray-700);
 }
 
 .myst_rendered aside.directive-unhandled header code {
-  background-color: inherit;
+  background: transparent;
   color: var(--white);
   font-family: 'Lato', sans-serif;
+  font-weight: bold;
   padding: 0;
 }
 
 .myst_rendered aside.directive-unhandled pre {
-  box-shadow: inset 4px 0px 0px var(--gray-700);
-  background-color: var(--gray-300);
-  border-radius: 0;
+  background-color: var(--white);
   margin: 0;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  font-size: 1rem;
+  font-family: 'Lato', sans-serif;
 }
 
 .myst_rendered blockquote {
