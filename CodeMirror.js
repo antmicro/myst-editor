@@ -1,4 +1,4 @@
-import { useEffect } from 'preact/hooks';
+import { useEffect, useRef } from 'preact/hooks';
 import { html } from "htm/preact";
 import { basicSetup, EditorView } from "codemirror";
 import { keymap } from "@codemirror/view";
@@ -15,12 +15,10 @@ const usePrevious = (value) => {
 
 const CodeMirror = ({ value, setText, id, name, className, templateState }) => {
   const editorRef = useRef(null);
-  const viewRef = useRef(null);
   const prevTemplateState = usePrevious(templateState);
   const prepareTextToSubmit = (doc, comp) => document.getElementById(comp).value = doc;
 
   useEffect(() => {
-
     const startState = EditorState.create({
       doc: value,
       extensions: [
@@ -29,20 +27,18 @@ const CodeMirror = ({ value, setText, id, name, className, templateState }) => {
         EditorView.lineWrapping,
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
-            const text = view.state.doc.toString();
-            setText(text);
+            setText(view.state.doc.toString());
           }
         })
       ]
     });
 
-    view = new EditorView({
+    let view = new EditorView({
       state: startState,
       parent: document.getElementById('editor')
     });
 
     editorRef.current = view;
-    viewRef.current = view;
     return () => {
       view.destroy();
     };
@@ -53,14 +49,13 @@ const CodeMirror = ({ value, setText, id, name, className, templateState }) => {
       templateState &&
       (!prevTemplateState || prevTemplateState.timestamp !== templateState.timestamp)
     ) {
-      viewRef.current.dispatch({
+      editorRef.current.dispatch({
         changes: {
           from: 0,
-          to: viewRef.current.state.doc.length,
+          to: editorRef.current.state.doc.length,
           insert: templateState.template,
         },
       });
-
       setText(templateState.template);
       prepareTextToSubmit(templateState.template, id);
     }
