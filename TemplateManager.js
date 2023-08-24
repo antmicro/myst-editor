@@ -86,7 +86,7 @@ const TemplateManager = ({setDocumentTemplate, templatelist}) => {
       <${Tooltip} tooltipOrientation="bottom" showTooltip=${showTooltip} errorMessage=${error.errorText}/>`;
   }
   return html`
-    <${Modal} showModal=${showModal} selectedTemplate=${selectedTemplate} closeModal=${() => {setShowModal(false); setSelectedTemplate(null);}} changeDocumentTemplate=${changeDocumentTemplate}/>
+    ${showModal && html`<${Modal} selectedTemplate=${selectedTemplate} closeModal=${() => {setShowModal(false); setSelectedTemplate(false);}} changeDocumentTemplate=${changeDocumentTemplate}/>`}
     <div class="dropdown">
       <button type="button" template=${template} id="customButton_templates">Templates</button>
       <div class="templates-list">
@@ -96,7 +96,7 @@ const TemplateManager = ({setDocumentTemplate, templatelist}) => {
             ${readyTemplates[key].templatetext == null && html`
               <div class="button-tooltip-flex">
               <${Tooltip} tooltipOrientation="left" showTooltip=${showTooltip === key} errorMessage="Failed to fetch template"/>
-              <button type="button" class="template-name-button disabled" onMouseEnter=${() => setShowTooltip(key)} onMouseLeave=${() => setShowTooltip(null)}>${readyTemplates[key].id}
+              <button type="button" class="template-name-button disabled" onMouseEnter=${() => setShowTooltip(key)} onMouseLeave=${() => setShowTooltip(false)}>${readyTemplates[key].id}
               </button>
               </div>`}
             ${readyTemplates[key].templatetext !== null && html`
