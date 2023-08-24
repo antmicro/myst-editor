@@ -1,40 +1,21 @@
 :root {
-  /* admonitions */
-  --admonition-left-border-color: #88818c;
-  --admonition-bg-color: #e8e6e8;
-  --admonition-text-color: black;
-  --admonition-header-text-color: #ffffff;
-  --admonition-header-bg-color: #00af91;
-  --labeled-admonition-header-bg-color: #6ab0de;
-  --warning-admonition-header-bg-color:#D0342C; 
-
-  /* tables */
-  --table-border-color: #dfdfdf;
-  --table-head-text-color: #ffff;
-  --table-head-bg-color: #333333;
-  --table-row-even-bg-color: #f9f9f9;
-
-  /* editor and preview */
-  --editor-bg-color: #f7f7f7;
-  --editor-preview-border-color: #e5e5e5;
-  --editor-preview-shadow-color: rgba(0, 0, 0, 0.15);
-  --editor-preview-separator-color: #ced2de;
-  --preview-text-color: #332d37;
-  --link-color: #0083e1;
-  --hr-color: #DFDFDF;
-  --code-bg-color: rgba(175,184,193,0.2);
-
-  /* topbar */
-  --topbar-bg-color: #333333;
-  --topbar-border-bot-color: #ced2de;
-
-  /* buttons */
-  --btn-bg-color: #5c5c5c;
-  --btn-text-color: #fff;
-  --btn-hover-bg-color: #00ccaa;
-  --btn-active-bg-color: #00af91;
-
-  --border-radius: 5px
+  --border-radius: 5px; 
+  --black: #000;
+  --gray-900: #333;
+  --gray-800: #5c5c5c;
+  --gray-700: #88818c;
+  --gray-600: #ced2de;
+  --gray-500: #dfdfdf;
+  --gray-400: #e5e5e5;
+  --gray-300: #e8e6e8;
+  --gray-200: #f7f7f7;
+  --gray-100: #f9f9f9;
+  --white: #fff;
+  --blue-500: #0083e1; 
+  --blue-400: #6ab0de;
+  --red-500: #D0342C;
+  --green-500: #00af91;
+  --green-400: #00ccaa;
 }
 
 .myst_rendered p {
@@ -44,7 +25,7 @@
 }
 
 .myst_rendered a {
-  color: var(--link-color);
+  color: var(--blue-500);
 }
 
 .myst_rendered h1, .myst_rendered h2, .myst_rendered h3, .myst_rendered h4, .myst_rendered h5, .myst_rendered h6 {
@@ -64,13 +45,13 @@
   height: 1px;
   padding: 0;
   margin: 16px 0;
-  background-color: var(--hr-color);
+  background-color: var(--gray-500);
   border: 0 none;
 }
 
 .myst_rendered code, .myst_rendered pre {
   border-radius: var(--border-radius);
-  background-color: var(--code-bg-color);
+  background-color: rgba(175,184,193,0.2);
 }
 
 .myst_rendered code {
@@ -86,24 +67,24 @@
 .myst_rendered aside.admonition header,
 .myst_rendered aside.admonition p {
   padding: 10px;
-  box-shadow: inset 4px 0px 0px var(--admonition-left-border-color);
+  box-shadow: inset 4px 0px 0px var(--gray-700);
   background-color: inherit;
-  color: var(--admonition-text-color);
+  color: var(--black);
 }
 
 .myst_rendered aside.admonition > p {
-  color: var(--admonition-text-color);
-  background-color: var(--admonition-bg-color);
+  color: var(--black);
+  background-color: var(--gray-300);
 }
 
 .myst_rendered aside[class^="admonition "] {
-  background-color: var(--admonition-bg-color);
-  box-shadow: inset 4px 0px 0px var(--admonition-left-border-color);
+  background-color: var(--gray-300);
+  box-shadow: inset 4px 0px 0px var(--gray-700);
 }
 
 .myst_rendered aside.admonition header {
-  color: var(--admonition-header-text-color);
-  background: var(--admonition-header-bg-color);
+  color: var(--white);
+  background: var(--green-500);
 }
 
 .myst_rendered aside.admonition.note header,
@@ -112,11 +93,11 @@
 .myst_rendered aside.admonition.hint header,
 .myst_rendered aside.directive-unhandled header,
 .myst_rendered aside.admonition.warning aside[class^="admonition"] header {
-  background-color: var(--labeled-admonition-header-bg-color);
+  background-color: var(--blue-400);
 }
 
 .myst_rendered aside.admonition.warning header {
-  background-color: var(--warning-admonition-header-bg-color);
+  background-color: var(--red-500);
 }
 
 .myst_rendered aside.admonition.note header::before,
@@ -204,16 +185,16 @@
 .myst_rendered td {
   padding: 20px;
   text-align: left;
-  border: 1px solid var(--table-border-color);
+  border: 1px solid var(--gray-500);
 }
 
 .myst_rendered thead {
-  color: var(--table-head-text-color);
-  background: var(--table-head-bg-color);
+  color: var(--white);
+  background: var(--gray-900);
 }
 
 .myst_rendered tr:nth-child(2n + 2) {
-  background: var(--table-row-even-bg-color);
+  background: var(--gray-100);
 }
 
 .myst_editor_parent {
@@ -231,7 +212,7 @@
 
 .myst_content {
   border-radius: var(--border-radius) 0px 0px var(--border-radius);
-  background: var(--editor-bg-color);
+  background: var(--gray-200);
   font-family: monospace;
   font-size: 0.94em;
   resize: none;
@@ -243,16 +224,16 @@
   padding: 20px;
   min-height: 500px;
   flex: 1;
-  border: 1px solid var(--editor-preview-border-color);
-  box-shadow: inset 0px 0px 4px var(--editor-preview-shadow-color);
+  border: 1px solid var(--gray-400);
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
   border-radius: var(--border-radius);
 }
 
 .myst_rendered {
   font-family: 'Lato', sans-serif;
   vertical-align: top;
-  border-left: 1px solid var(--editor-preview-separator-color);
-  color: var(--preview-text-color);
+  border-left: 1px solid var(--gray-600);
+  color: var(--gray-900);
   word-break: unset;
 }
 
@@ -267,8 +248,8 @@
   display: flex;
   width: 100%;
   height: 60px;
-  background-color: var(--topbar-bg-color);
-  border-bottom: 1px solid var(--topbar-border-bot-color);
+  background-color: var(--gray-900);
+  border-bottom: 1px solid var(--gray-600);
 }
 
 .myst_top_bar-right {
@@ -286,13 +267,13 @@
 /* This will need to be moved to the button group */
 .myst_top_bar button {
   cursor: pointer;
-  color: var(--btn-text-color);
+  color: var(--white);
   font-family: 'Lato', sans-serif;
   text-transform: uppercase;
   font-size: 12px;
   font-weight: bold;
-  border: 1px solid var(--btn-bg-color);
-  background-color: var(--btn-bg-color);
+  border: 1px solid var(--gray-800);
+  background-color: var(--gray-800);
   height: 40px;
   width: 40px;
   display: flex;
@@ -305,13 +286,13 @@
 }
 
 .myst_top_bar button:hover {
-  background-color: var(--btn-hover-bg-color);
-  border: 1px solid var(--btn-hover-bg-color);
+  background-color: var(--green-400);
+  border: 1px solid var(--green-400);
 }
 
 .myst_top_bar button.active {
-  background-color: var(--btn-active-bg-color);
-  border: 1px solid var(--btn-active-bg-color);
+  background-color: var(--green-500);
+  border: 1px solid var(--green-500);
 }
 
 .myst_top_bar button.active img {
@@ -329,7 +310,7 @@
 }
 
 .myst_editor_parent .vl {
-  border-left: 1px solid var(--btn-bg-color);
+  border-left: 1px solid var(--gray-800);
   height: 40px;
   margin-right: 10px;
   margin-left: 10px;
@@ -358,24 +339,24 @@
 
 .myst_rendered aside.directive-unhandled header mark {
   background-color: inherit;
-  color: var(--admonition-header-text-color);
+  color: var(--white);
 }
 
 .myst_rendered aside.directive-unhandled header {
   padding: 10px;
-  box-shadow: inset 4px 0px 0px var(--admonition-left-border-color);
+  box-shadow: inset 4px 0px 0px var(--gray-700);
 }
 
 .myst_rendered aside.directive-unhandled header code {
   background-color: inherit;
-  color: var(--admonition-header-text-color);
+  color: var(--white);
   font-family: 'Lato', sans-serif;
   padding: 0;
 }
 
 .myst_rendered aside.directive-unhandled pre {
-  box-shadow: inset 4px 0px 0px var(--admonition-left-border-color);
-  background-color: var(--admonition-bg-color);
+  box-shadow: inset 4px 0px 0px var(--gray-700);
+  background-color: var(--gray-300);
   border-radius: 0;
   margin: 0;
 }
