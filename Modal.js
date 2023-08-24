@@ -1,9 +1,9 @@
 import { html } from 'htm/preact';
 
-const Modal = ({showModal, changeDocumentTemplate, selectedTemplate, closeModal}) => {
+const Modal = ({changeDocumentTemplate, selectedTemplate, closeModal}) => {
 
   return html`
-    <section class="modal ${showModal? "" : "hidden"}">
+    <section class="modal">
         <h3 class="modal-text">Are you sure you want to change the current template?</h3>
         <div class="flex-container">
             <button type="button" class="modal-button" onClick=${ () => changeDocumentTemplate(selectedTemplate)}>✓ Yes</button>
