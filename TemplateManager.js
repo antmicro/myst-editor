@@ -8,7 +8,7 @@ const TemplateManager = ({setDocumentTemplate, templatelist}) => {
   const [readyTemplates, setReadyTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(null);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [error, setError] = useState({
     fetchError: false,
     errorText: "",
@@ -80,10 +80,10 @@ const TemplateManager = ({setDocumentTemplate, templatelist}) => {
 
   if(error.fetchError) {
     return html`
-      <button type="button" template=${template} id="customButton_templates" class="disabled" onMouseEnter=${() => setShowTooltip(true)} onMouseLeave=${() => setShowTooltip(null)}>
+      <button type="button" template=${template} id="customButton_templates" class="disabled" onMouseEnter=${() => setShowTooltip(true)} onMouseLeave=${() => setShowTooltip(false)}>
         Templates
       </button>
-      <${Tooltip} tooltipOrientation="bottom" showTooltip=${showTooltip} errorMessage=${error.errorText}/>`
+      <${Tooltip} tooltipOrientation="bottom" showTooltip=${showTooltip} errorMessage=${error.errorText}/>`;
   }
   return html`
     <${Modal} showModal=${showModal} selectedTemplate=${selectedTemplate} closeModal=${() => {setShowModal(false); setSelectedTemplate(null);}} changeDocumentTemplate=${changeDocumentTemplate}/>
