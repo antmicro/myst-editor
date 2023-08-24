@@ -1,9 +1,9 @@
 import { html } from 'htm/preact';
 
-const Tooltip = ({ tooltipOrientation, showTooltip, errorMessage }) => {
+const Tooltip = ({ tooltipOrientation, errorMessage }) => {
 
     return html`
-              <div class="tooltip-box${`-${tooltipOrientation}`} ${showTooltip? "" : "hidden"}">
+              <div class="tooltip-box${`-${tooltipOrientation}`}">
                 <div class="tooltip${`-${tooltipOrientation}`}">
                     ${errorMessage}
                 </div>
