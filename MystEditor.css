@@ -314,6 +314,7 @@
 #customButton_templates {
   padding: 0px 15px;
   width: auto;
+  color: var(--btn-text-color);
 }
 
 .dropdown {
