@@ -377,7 +377,7 @@ color: black;
 .modal-button,
 .modal-close-button {
 color: white;
-border: 1px solid #333333;
+border: 1px solid #333333!important;
 padding: 0 10px 0 10px!important;
 margin-top: 0px;
 }
