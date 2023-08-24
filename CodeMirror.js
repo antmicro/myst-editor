@@ -33,7 +33,7 @@ const CodeMirror = ({ value, setText, id, name, className, templateState }) => {
       ]
     });
 
-    let view = new EditorView({
+    const view = new EditorView({
       state: startState,
       parent: document.getElementById('editor')
     });
