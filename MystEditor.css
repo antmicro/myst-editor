@@ -51,7 +51,7 @@
 
 .myst_rendered code, .myst_rendered pre {
   border-radius: var(--border-radius);
-  background-color: rgba(175,184,193,0.2);
+  background-color: var(--gray-200);
 }
 
 .myst_rendered code {
@@ -225,7 +225,7 @@
   min-height: 500px;
   flex: 1;
   border: 1px solid var(--gray-400);
-  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0px 0px 4px var(--gray-600);
   border-radius: var(--border-radius);
 }
 
@@ -284,15 +284,15 @@
 }
 
 .myst_top_bar button:not(.template-name-button, .modal-button, .modal-close-button) {
-  color: var(--topbar-bg-color);
-  border: 1px solid var(--btn-bg-color);
+  color: var(--gray-900);
+  border: 1px solid var(--gray-800);
   width: 40px;
   margin: 5px;
 }
 
 .myst_top_bar button:hover:not(.modal-close-button, .myst_top_bar #customButton_templates.disabled, .myst_top_bar .template-name-button.disabled) {
-  background-color: var(--btn-hover-bg-color);
-  border: 1px solid var(--btn-hover-bg-color);
+  background-color: var(--green-400);
+  border: 1px solid var(--green-400);
 }
 
 .myst_top_bar button.active {
@@ -301,8 +301,8 @@
 }
 
 .myst_top_bar .modal-close-button:hover {
-  background-color: var(--warning-admonition-header-bg-color);
-  border: 1px solid var(--warning-admonition-header-bg-color);
+  background-color: var(--red-500);
+  border: 1px solid var(--red-500);
 }
 
 .myst_top_bar button.active img {
@@ -314,7 +314,7 @@
 #customButton_templates {
   padding: 0px 15px;
   width: auto;
-  color: var(--btn-text-color);
+  color: var(--white);
 }
 
 .dropdown {
@@ -332,10 +332,10 @@
   align-items: center;
   justify-content: space-around;
   white-space: nowrap;
-  border: 1px solid var(--topbar-bg-color);
+  border: 1px solid var(--gray-900);
   border-radius: 3px;
-  color: var(--btn-text-color);
-  background-color: var(--btn-bg-color);
+  color: var(--white);
+  background-color: var(--gray-800);
   z-index: 20;
   width: 100%;
 }
@@ -357,8 +357,8 @@ right: 50%;
 transform: translate(50%, 0);
 top: 100%;
 position: absolute;
-background-color: var(--admonition-header-text-color);
-border: 1px solid var(--topbar-border-bot-color);
+background-color: var(--white);
+border: 1px solid var(--gray-600);
 border-radius: 15px;
 }
 
@@ -370,14 +370,14 @@ justify-content: space-between;
 
 .modal-text {
 font-family: 'Lato', sans-serif;
-color: var(--admonition-text-color);
+color: var(--white);
 }
 
 .template-name-button,
 .modal-button,
 .modal-close-button {
-color: var(white--btn-text-color);
-border: 1px solid var(--topbar-bg-color)!important;
+color: var(white--white);
+border: 1px solid var(--gray-900)!important;
 padding: 0 10px 0 10px!important;
 margin-top: 0px;
 }
