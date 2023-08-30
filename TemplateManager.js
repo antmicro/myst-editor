@@ -1,9 +1,9 @@
-import {html} from 'htm/preact'
-import {useState, useEffect} from 'preact/hooks';
+import { html } from 'htm/preact'
+import { useState, useEffect } from 'preact/hooks';
 import Modal from './Modal.js'
 import Tooltip from './Tooltip.js'
 
-const TemplateManager = ({setDocumentTemplate, templatelist}) => {
+const TemplateManager = ({ setDocumentTemplate, templatelist }) => {
   const [template, setTemplate] = useState("");
   const [readyTemplates, setReadyTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -33,23 +33,23 @@ const TemplateManager = ({setDocumentTemplate, templatelist}) => {
   const getTemplateConfig = async (url) => {
     try {
       const response = await fetch(url);
-      if(!response.ok) 
+      if (!response.ok)
         throw new Error(`HTTP error! Status: ${response.status}`);
       const responseJson = await response.json();
       return responseJson;
-    } catch(err) {
+    } catch (err) {
       handleError(err, "Unable to download template config.");
     }
   }
   const loadTemplateFromURL = async (URL) => {
     try {
       const response = await fetch(URL);
-      if (!response.ok) 
+      if (!response.ok)
         throw new Error(`Encountered error while fetching the template`);
       
       const data = await response.text();
       return data;
-    } catch(err) {
+    } catch (err) {
       setError({
         ...error,
         templateError: [...error.templateError, URL]
@@ -72,13 +72,13 @@ const TemplateManager = ({setDocumentTemplate, templatelist}) => {
     )
   }
 
-  useEffect(async() => {
+  useEffect(async () => {
     const linkedtemplatelist = await getTemplateConfig(templatelist);
     const readyTemplates = await fillTemplatesWithFetchedData(linkedtemplatelist);
     setReadyTemplates(readyTemplates);
   }, []);
 
-  if(error.fetchError) {
+  if (error.fetchError) {
     return html`
       <button type="button" template=${template} id="customButton_templates" class="disabled" onMouseEnter=${() => setShowTooltip(true)} onMouseLeave=${() => setShowTooltip(false)}>
         Templates
@@ -86,24 +86,24 @@ const TemplateManager = ({setDocumentTemplate, templatelist}) => {
       <${Tooltip} tooltipOrientation="bottom" showTooltip=${showTooltip} errorMessage=${error.errorText}/>`;
   }
   return html`
-    ${showModal && html`<${Modal} selectedTemplate=${selectedTemplate} closeModal=${() => {setShowModal(false); setSelectedTemplate(false);}} changeDocumentTemplate=${changeDocumentTemplate}/>`}
+    ${showModal && html`<${Modal} selectedTemplate=${selectedTemplate} closeModal=${() => { setShowModal(false); setSelectedTemplate(false); }} changeDocumentTemplate=${changeDocumentTemplate}/>`}
     <div class="dropdown">
       <button type="button" template=${template} id="customButton_templates">Templates</button>
       <div class="templates-list">
       <div className="template-dropdown-content">
       ${Object.keys(readyTemplates).map(key => (
-        html`
-            ${readyTemplates[key].templatetext == null && html`
+    html`
+            ${readyTemplates[key].templatetext == null ? html`
               <div class="button-tooltip-flex">
               <${Tooltip} tooltipOrientation="left" showTooltip=${showTooltip === key} errorMessage="Failed to fetch template"/>
               <button type="button" class="template-name-button disabled" onMouseEnter=${() => setShowTooltip(key)} onMouseLeave=${() => setShowTooltip(false)}>${readyTemplates[key].id}
               </button>
-              </div>`}
-            ${readyTemplates[key].templatetext !== null && html`
+              </div>`
+        : html`
               <button type="button" class="template-name-button" 
-              onClick=${ () => {setShowModal(true); setSelectedTemplate(key);}}>${readyTemplates[key].id}
+              onClick=${() => { setShowModal(true); setSelectedTemplate(key); }}>${readyTemplates[key].id}
               </button>`}`
-      ))}      
+  ))}      
       </div>
       </div>
     </div>
