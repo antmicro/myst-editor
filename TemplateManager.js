@@ -63,7 +63,7 @@ const TemplateManager = ({ setDocumentTemplate, templatelist }) => {
       const newKey = key
       const newValue = {
         ...val,
-        templatetext: await loadTemplateFromURL(val.templatetext)
+        templatetext: val.templatetext ? await loadTemplateFromURL(val.templatetext) : undefined
       }
       return [newKey, newValue]
     })
