@@ -7,10 +7,8 @@ export default defineConfig({
   plugins: [preact()],
   build: {
     lib: {
-      entry: [resolve(__dirname, 'components/MystEditor.js'), resolve(__dirname, 'styles/MystEditor.css')],
+      entry: [resolve(__dirname, 'src/MystEditor.js'), resolve(__dirname, 'styles/MystEditor.css')],
       formats: ['es'],
-      name: 'MystEditor',
-      fileName: 'MystEditor',
     },
   },
 })
