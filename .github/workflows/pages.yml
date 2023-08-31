@@ -10,11 +10,10 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
 
-      - name: Build Project
-        uses: actions/setup-node@v3
-        with:
-          cmd: yarn && yarn build
+      - name: Build
+        run: yarn && yarn build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
