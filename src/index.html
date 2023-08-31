@@ -84,12 +84,12 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`
     console.log("Welcome to the MyST editor demo. The right hand side should auto update.")
-    import MystEditor, { html, render } from './src/MystEditor.js'
+    import MystEditor, { html, render } from './MystEditor.js'
     const exampleCallback = (event) => {
       console.log(`Example callback fired on ${event.target}`)
       window.print()
     }
-    render(html`<${MystEditor} printCallback=${exampleCallback} templatelist="./linkedtemplatelist.json" initialText=${exampleText} id="textarea_id"/>`, document.getElementById("myst"))
+    render(html`<${MystEditor} printCallback=${exampleCallback} templatelist="linkedtemplatelist.json" initialText=${exampleText} id="textarea_id"/>`, document.getElementById("myst"))
   </script>
   </head>
   <body>
