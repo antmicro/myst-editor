@@ -5,7 +5,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet"> 
-  <link rel="stylesheet" href="./MystEditor.css">
+  <link rel="stylesheet" href="./styles/MystEditor.css">
   <style>body { margin: 0 }</style>
   <script type="module">
     let exampleText = `# h1 is quite big
@@ -84,7 +84,7 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`
     console.log("Welcome to the MyST editor demo. The right hand side should auto update.")
-    import MystEditor, { html, render } from './MystEditor.js'
+    import MystEditor, { html, render } from './src/MystEditor.js'
     const exampleCallback = (event) => {
       console.log(`Example callback fired on ${event.target}`)
       window.print()

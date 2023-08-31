@@ -5,9 +5,9 @@ import { resolve } from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [preact()],
-    build: {
+  build: {
     lib: {
-      entry: [resolve(__dirname, 'MystEditor.js'), resolve(__dirname, 'MystEditor.css')],
+      entry: [resolve(__dirname, 'components/MystEditor.js'), resolve(__dirname, 'styles/MystEditor.css')],
       formats: ['es'],
       name: 'MystEditor',
       fileName: 'MystEditor',

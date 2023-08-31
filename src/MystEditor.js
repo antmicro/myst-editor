@@ -5,9 +5,9 @@ import markdownitDocutils from 'markdown-it-docutils'
 import purify from 'dompurify'
 import markdownIt from 'markdown-it'
 
-import ButtonGroup from "./ButtonGroup.js";
-import CodeMirror from './CodeMirror.js';
-import TemplateManager from './TemplateManager.js';
+import ButtonGroup from "./components/ButtonGroup";
+import CodeMirror from './components/CodeMirror';
+import TemplateManager from './components/TemplateManager';
 
 const MystEditor = ({
   name = "myst_editor_textarea",
@@ -32,7 +32,7 @@ const MystEditor = ({
 
   return html`
   <div class="myst_editor_parent">
-    <div class="myst_top_bar ${topbar? 'shown' : 'hidden'}">
+    <div class="myst_top_bar ${topbar ? 'shown' : 'hidden'}">
       <div class="myst_top_bar-right">
         <button type="button" onClick=${(event) => printCallback(event)} id="customButton_print">Export as PDF</button>
         <${TemplateManager} templatelist=${templatelist} templateState=${templateState} setDocumentTemplate=${setDocumentTemplate}/>
