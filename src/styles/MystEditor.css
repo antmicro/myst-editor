@@ -405,50 +405,50 @@
 }
 
 .modal {
-z-index: 2;
-display: flex;
-flex-direction: column;
-justify-content: center;
-gap: 10px;
-width: 450px;
-padding: 20px;
-right: 50%;
-transform: translate(50%, 0);
-top: 100%;
-position: absolute;
-background-color: var(--white);
-border: 1px solid var(--gray-600);
-border-radius: 15px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  width: 450px;
+  padding: 20px;
+  right: 50%;
+  transform: translate(50%, 0);
+  top: 100%;
+  position: absolute;
+  background-color: var(--white);
+  border: 1px solid var(--gray-600);
+  border-radius: 15px;
 }
 
 .modal .flex-container {
-display: flex;
-align-items: center;
-justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .modal-text {
-font-family: 'Lato', sans-serif;
-color: var(--gray-900);
+  font-family: 'Lato', sans-serif;
+  color: var(--gray-900);
 }
 
 .template-name-button,
 .modal-button,
 .modal-close-button {
-color: var(white--white);
-border: 1px solid var(--gray-900)!important;
-padding: 0 10px 0 10px!important;
-margin-top: 0px;
+  color: var(white--white);
+  border: 1px solid var(--gray-900)!important;
+  padding: 0 10px 0 10px!important;
+  margin-top: 0px;
 }
 
 .template-name-button {
-width: 100%!important;
+  width: 100%!important;
 }
 
 .templates-list {
-position: absolute;
-display: flex;
-padding-top: 5px;
+  position: absolute;
+  display: flex;
+  padding-top: 5px;
 }
 
 
