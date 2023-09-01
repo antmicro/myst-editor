@@ -508,6 +508,13 @@
   margin: 0;
 }
 
+.myst_rendered blockquote {
+  border-left: 5px solid var(--green-500);
+  margin-left: 0;
+  margin-top: 0;
+  padding-left: 0.75rem;
+}
+
 @media print {
   .myst_content,
   .myst_top_bar {
