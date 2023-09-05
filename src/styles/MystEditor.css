@@ -287,7 +287,7 @@
   vertical-align: top;
   border-left: 1px solid var(--gray-600);
   color: var(--gray-900);
-  word-break: unset;
+  word-break: break-word;
 }
 
 .myst_rendered > p {
