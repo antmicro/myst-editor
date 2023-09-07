@@ -1,12 +1,13 @@
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
 import { resolve } from 'path'
+import macrosPlugin from 'vite-plugin-babel-macros';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '',
   root: 'src',
-  plugins: [preact()],
+  plugins: [macrosPlugin(), preact()],
   build: {
     outDir: '../dist',
     emptyOutDir: true,
@@ -24,4 +25,7 @@ export default defineConfig({
       }
     }
   },
+  define: {
+    'process.env': {}
+  }
 })

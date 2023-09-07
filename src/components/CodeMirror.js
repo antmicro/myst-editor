@@ -4,6 +4,30 @@ import { basicSetup, EditorView } from "codemirror";
 import { keymap } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { EditorState } from "@codemirror/state";
+import styled from 'styled-components/macro';
+
+const CodeEditor = styled.div`
+  border-radius: var(--border-radius);
+  background: var(--gray-200);
+  font-family: monospace;
+  font-size: 0.94em;
+  resize: none;
+  border: 0;
+  padding: 20px;
+  min-height: 500px;
+  display: ${props => props.$shown ? 'block' : 'none'};
+  flex: 1;
+  border: 1px solid var(--gray-400);
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
+
+  @media print {
+    display: none;
+  }
+`;
+
+const HiddenTextArea = styled.textarea`
+  display: none;
+`;
 
 const usePrevious = (value) => {
   const ref = useRef();
@@ -13,7 +37,7 @@ const usePrevious = (value) => {
   return ref.current;
 };
 
-const CodeMirror = ({ value, setText, id, name, className, templateState }) => {
+const CodeMirror = ({ value, setText, id, name, className, shown, templateState }) => {
   const editorRef = useRef(null);
   const prevTemplateState = usePrevious(templateState);
   const prepareTextToSubmit = (doc, comp) => document.getElementById(comp).value = doc;
@@ -63,8 +87,8 @@ const CodeMirror = ({ value, setText, id, name, className, templateState }) => {
   }, [templateState]);
 
   return html`
-    <div id="editor" class=${className}></div>
-    <textarea value=${value} name=${name} id=${id} class="hidden"></textarea>
+      <${CodeEditor} $shown="${shown}" id="editor" class=${className}><//>
+      <${HiddenTextArea} value=${value} name=${name} id=${id}><//>
   `;
 };
 

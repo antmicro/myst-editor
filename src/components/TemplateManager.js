@@ -2,6 +2,59 @@ import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks';
 import Modal from './Modal.js'
 import Tooltip from './Tooltip.js'
+import DefaultButton, { TopbarButton } from './Buttons.js';
+import { styled } from 'styled-components/macro';
+
+const TemplateDropdownContent = styled.div`
+  display: none;
+  margin-left: 5px;
+  font-family: 'Lato', sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  align-items: center;
+  justify-content: space-around;
+  white-space: nowrap;
+  border: 1px solid var(--gray-900);
+  border-radius: var(--border-radius);
+  color: var(--white);
+  background-color: var(--gray-800);
+  z-index: 20;
+  width: 100%;
+`;
+
+const TemplateButton = styled(DefaultButton)`
+  width: 100%!important;
+  color: var(--white);
+  border: 1px solid var(--gray-900)!important;
+  padding: 0 10px 0 10px!important;
+  margin-top: 0px;
+`;
+
+const Dropdown = styled.div`
+  position: relative;
+  display: inline-block;
+  width: min-content;
+
+  &:hover {
+    div {
+      display: inline-flex;
+      flex-direction: column;
+    }
+  }
+`;
+
+const ButtonTooltipFlex = styled.div`
+  display: flex;
+  flex-direction: row-reverse;
+  border: 1px solid var(--gray-900);
+  width: inherit;
+`;
+
+const TemplatesList = styled.div`
+  position: absolute;
+  display: flex;
+  padding-top: 5px;
+`;
 
 const TemplateManager = ({ setDocumentTemplate, templatelist }) => {
   const [template, setTemplate] = useState("");
@@ -46,7 +99,7 @@ const TemplateManager = ({ setDocumentTemplate, templatelist }) => {
       const response = await fetch(URL);
       if (!response.ok)
         throw new Error(`Encountered error while fetching the template`);
-      
+
       const data = await response.text();
       return data;
     } catch (err) {
@@ -80,33 +133,35 @@ const TemplateManager = ({ setDocumentTemplate, templatelist }) => {
 
   if (error.fetchError) {
     return html`
-      <button type="button" template=${template} id="customButton_templates" class="disabled" onMouseEnter=${() => setShowTooltip(true)} onMouseLeave=${() => setShowTooltip(false)}>
+      <${TopbarButton} disabled type="button" template=${template} onMouseEnter=${() => setShowTooltip(true)} onMouseLeave=${() => setShowTooltip(false)}>
         Templates
-      </button>
+      <//>
       <${Tooltip} tooltipOrientation="bottom" showTooltip=${showTooltip} errorMessage=${error.errorText}/>`;
   }
   return html`
     ${showModal && html`<${Modal} selectedTemplate=${selectedTemplate} closeModal=${() => { setShowModal(false); setSelectedTemplate(false); }} changeDocumentTemplate=${changeDocumentTemplate}/>`}
-    <div class="dropdown">
-      <button type="button" template=${template} id="customButton_templates">Templates</button>
-      <div class="templates-list">
-      <div className="template-dropdown-content">
-      ${Object.keys(readyTemplates).map(key => (
+    <${Dropdown}>
+      <${TopbarButton} type="button" template=${template}>Templates<//>
+      <${TemplatesList}>
+        <${TemplateDropdownContent}>
+        ${Object.keys(readyTemplates).map(key => (
     html`
-            ${readyTemplates[key].templatetext == null ? html`
-              <div class="button-tooltip-flex">
-              <${Tooltip} tooltipOrientation="left" showTooltip=${showTooltip === key} errorMessage="Failed to fetch template"/>
-              <button type="button" class="template-name-button disabled" onMouseEnter=${() => setShowTooltip(key)} onMouseLeave=${() => setShowTooltip(false)}>${readyTemplates[key].id}
-              </button>
-              </div>`
+            ${readyTemplates[key].templatetext == undefined ? html`
+              <${ButtonTooltipFlex}>
+                <${Tooltip} tooltipOrientation="left" showTooltip=${showTooltip === key} errorMessage="Failed to fetch template"/>
+                  <${TemplateButton} disabled type="button" onMouseEnter=${() => setShowTooltip(key)} onMouseLeave=${() => setShowTooltip(false)}>${readyTemplates[key].id}
+                <//>
+              <//>
+            `
         : html`
-              <button type="button" class="template-name-button" 
+              <${TemplateButton} type="button" 
               onClick=${() => { setShowModal(true); setSelectedTemplate(key); }}>${readyTemplates[key].id}
-              </button>`}`
-  ))}      
-      </div>
-      </div>
-    </div>
+              <//>
+            `}
+          `))}      
+        <//>
+      <//>
+    <//>
   `
 }
 
