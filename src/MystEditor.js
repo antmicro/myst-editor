@@ -10,6 +10,7 @@ import ButtonGroup from "./components/ButtonGroup";
 import CodeMirror from './components/CodeMirror';
 import TemplateManager from './components/TemplateManager';
 import { TopbarButton } from './components/Buttons';
+import Preview from './components/Preview';
 
 const EditorParent = styled.div`
   display: flex;
@@ -93,7 +94,7 @@ const MystEditor = ({
     <//>
     <${MystWrapper}>
       <${CodeMirror} setText=${setText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"} templateState=${templateState} value=${text}/>
-      <div class="myst_rendered ${mode === "Both" || mode === "Preview" ? '' : 'hidden'}" dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
+      <${Preview} $shown=${mode === "Both" || mode === "Preview"} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
     <//>
   <//>`
 }
