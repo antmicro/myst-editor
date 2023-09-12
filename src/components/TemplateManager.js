@@ -56,7 +56,7 @@ const TemplatesList = styled.div`
   padding-top: 5px;
 `;
 
-const TemplateManager = ({ setDocumentTemplate, templatelist }) => {
+const TemplateManager = ({ setText, templatelist, setSyncText }) => {
   const [template, setTemplate] = useState("");
   const [readyTemplates, setReadyTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -79,7 +79,8 @@ const TemplateManager = ({ setDocumentTemplate, templatelist }) => {
 
   const changeDocumentTemplate = (template) => {
     setTemplate(readyTemplates[template].templatetext);
-    setDocumentTemplate(readyTemplates[template].templatetext);
+    setText(readyTemplates[template].templatetext);
+    setSyncText(true);
     setShowModal(false);
   }
 

@@ -29,22 +29,12 @@ const HiddenTextArea = styled.textarea`
   display: none;
 `;
 
-const usePrevious = (value) => {
-  const ref = useRef();
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  return ref.current;
-};
-
-const CodeMirror = ({ value, setText, id, name, className, shown, templateState }) => {
+const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSyncText }) => {
   const editorRef = useRef(null);
-  const prevTemplateState = usePrevious(templateState);
-  const prepareTextToSubmit = (doc, comp) => document.getElementById(comp).value = doc;
 
   useEffect(() => {
     const startState = EditorState.create({
-      doc: value,
+      doc: text,
       extensions: [
         basicSetup,
         keymap.of([indentWithTab]),
@@ -61,34 +51,29 @@ const CodeMirror = ({ value, setText, id, name, className, shown, templateState 
       state: startState,
       parent: document.getElementById('editor')
     });
-
     editorRef.current = view;
+
     return () => {
       view.destroy();
     };
   }, []);
 
   useEffect(() => {
-    if (
-      templateState &&
-      (!prevTemplateState || prevTemplateState.timestamp !== templateState.timestamp)
-    ) {
+    if (syncText) {
       editorRef.current.dispatch({
         changes: {
           from: 0,
           to: editorRef.current.state.doc.length,
-          insert: templateState.template,
+          insert: text,
         },
       });
-      setText(templateState.template);
-      prepareTextToSubmit(templateState.template, id);
+      setSyncText(false);
     }
-
-  }, [templateState]);
+  }, [text, syncText]);
 
   return html`
       <${CodeEditor} $shown="${shown}" id="editor" class=${className}><//>
-      <${HiddenTextArea} value=${value} name=${name} id=${id}><//>
+      <${HiddenTextArea} value=${text} name=${name} id=${id}><//>
   `;
 };
 

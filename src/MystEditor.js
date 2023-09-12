@@ -72,11 +72,7 @@ const MystEditor = ({
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [text, setText] = useState(initialText);
-  const [templateState, setTemplateState] = useState(null);
-
-  const setDocumentTemplate = (template) => {
-    setTemplateState({template, timestamp: Date.now()})
-  }
+  const [syncText, setSyncText] = useState(false);
 
   const renderAndSanitize = (text) => {
     return purify.sanitize(markdownIt().use(markdownitDocutils).render(text))
@@ -87,13 +83,13 @@ const MystEditor = ({
     <${Topbar} $shown=${topbar}>
       <${TopbarRight}>
         <${TopbarButton} type="button" onClick=${(event) => printCallback(event)}>Export as PDF<//>
-        <${TemplateManager} templatelist=${templatelist} templateState=${templateState} setDocumentTemplate=${setDocumentTemplate}/>
+        <${TemplateManager} templatelist=${templatelist} setText=${setText} setSyncText=${setSyncText}/>
         <${Separator} />
         <${ButtonGroup} buttons=${buttons} clickedId=${2} clickCallback=${(newMode) => setMode(newMode)}/>
       <//>
     <//>
     <${MystWrapper}>
-      <${CodeMirror} setText=${setText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"} templateState=${templateState} value=${text}/>
+      <${CodeMirror} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"}/>
       <${Preview} $shown=${mode === "Both" || mode === "Preview"} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
     <//>
   <//>`
