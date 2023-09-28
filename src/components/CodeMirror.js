@@ -49,7 +49,7 @@ const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSy
 
     const view = new EditorView({
       state: startState,
-      parent: document.getElementById('editor')
+      parent: document.getElementById(id+'-editor')
     });
     editorRef.current = view;
 
@@ -72,7 +72,7 @@ const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSy
   }, [text, syncText]);
 
   return html`
-      <${CodeEditor} $shown="${shown}" id="editor" class=${className}><//>
+      <${CodeEditor} $shown="${shown}" id="${id}-editor" class=${className}><//>
       <${HiddenTextArea} value=${text} name=${name} id=${id}><//>
   `;
 };
