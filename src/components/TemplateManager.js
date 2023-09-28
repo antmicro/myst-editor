@@ -142,7 +142,7 @@ const TemplateManager = ({ setText, templatelist, setSyncText }) => {
   return html`
     ${showModal && html`<${Modal} selectedTemplate=${selectedTemplate} closeModal=${() => { setShowModal(false); setSelectedTemplate(false); }} changeDocumentTemplate=${changeDocumentTemplate}/>`}
     <${Dropdown}>
-      <${TopbarButton} type="button" template=${template}>Templates<//>
+      <${TopbarButton} type="button">Templates<//>
       <${TemplatesList}>
         <${TemplateDropdownContent}>
         ${Object.keys(readyTemplates).map(key => (
