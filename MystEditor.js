@@ -22052,7 +22052,7 @@ const Hhe = /* @__PURE__ */ N.baseTheme({
       })]
     }), h = new N({
       state: c,
-      parent: document.getElementById("editor")
+      parent: document.getElementById(n + "-editor")
     });
     return a.current = h, () => {
       h.destroy();
@@ -22066,7 +22066,7 @@ const Hhe = /* @__PURE__ */ N.baseTheme({
       }
     }), l(!1));
   }, [t, s]), ut`
-      <${Uhe} $shown="${o}" id="editor" class=${i}><//>
+      <${Uhe} $shown="${o}" id="${n}-editor" class=${i}><//>
       <${Whe} value=${t} name=${r} id=${n}><//>
   `;
 };
