@@ -22250,7 +22250,7 @@ const Qhe = ve.div`
     h(!1), a(!1);
   }} changeDocumentTemplate=${g}/>`}
     <${eue}>
-      <${dc} type="button" template=${r}>Templates<//>
+      <${dc} type="button">Templates<//>
       <${nue}>
         <${Qhe}>
         ${Object.keys(o).map((v) => ut`
