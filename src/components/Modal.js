@@ -31,6 +31,7 @@ const ButtonContainer = styled.div`
 `;
 
 const ModalButton = styled(DefaultButton)`
+&& {
   padding: 0 10px;
   margin-top: 0px;
 
@@ -38,7 +39,7 @@ const ModalButton = styled(DefaultButton)`
     background-color: ${props => props.$negative ? 'var(--red-500)' : 'var(--green-400)'} !important;
     border: 1px solid ${props => props.$negative ? 'var(--red-500)' : 'var(--green-400)'} !important;
   }
-`;
+}`;
 
 const Modal = ({changeDocumentTemplate, selectedTemplate, closeModal}) => {
 

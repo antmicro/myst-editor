@@ -1,6 +1,7 @@
 import styled from 'styled-components/macro';
 
 const DefaultButton = styled.button`
+&& {
   cursor: pointer;
   color: #fff;
   font-family: "Lato", sans-serif;
@@ -21,11 +22,12 @@ const DefaultButton = styled.button`
     background-color: var(--green-400);
     border: 1px solid var(--green-400);
   }
-`;
+}`;
 
 export const TopbarButton = styled(DefaultButton)`
+&& {
   padding: 0px 15px;
   margin: 5px;
-`;
+}`;
 
 export default DefaultButton;
