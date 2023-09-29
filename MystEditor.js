@@ -8834,13 +8834,13 @@ var die = vt;
 const pie = /* @__PURE__ */ uv(Gg.exports), ml = ve.button.withConfig({
   displayName: "Buttons__DefaultButton",
   componentId: "sc-temzhj-0"
-})(['cursor:pointer;color:#fff;font-family:"Lato",sans-serif;text-transform:uppercase;font-size:12px;font-weight:bold;border:1px solid var(--gray-800);background-color:var(--gray-800);height:40px;display:flex;justify-content:center;align-items:center;padding:0;transition:0.4s ease;border-radius:var(--border-radius);&:not(:disabled):hover{background-color:var(--green-400);border:1px solid var(--green-400);}']), dc = ve(ml).withConfig({
+})(['&&{cursor:pointer;color:#fff;font-family:"Lato",sans-serif;text-transform:uppercase;font-size:12px;font-weight:bold;border:1px solid var(--gray-800);background-color:var(--gray-800);height:40px;display:flex;justify-content:center;align-items:center;padding:0;transition:0.4s ease;border-radius:var(--border-radius);&:not(:disabled):hover{background-color:var(--green-400);border:1px solid var(--green-400);}}']), dc = ve(ml).withConfig({
   displayName: "Buttons__TopbarButton",
   componentId: "sc-temzhj-1"
-})(["padding:0px 15px;margin:5px;"]), mie = ve(ml).withConfig({
+})(["&&{padding:0px 15px;margin:5px;}"]), mie = ve(ml).withConfig({
   displayName: "ButtonGroup__GroupButton",
   componentId: "sc-retnx5-0"
-})(["color:", ";border:", ";background-color:", ";margin:5px;width:40px;"], (t) => t.$active ? "white" : "var(--gray-900)", (t) => t.$active ? "1px solid var(--green-500)" : "1px solid var(--gray-800)", (t) => t.$active ? "var(--green-500)" : "var(--gray-800)"), gie = ({
+})(["&&{color:", ";border:", ";background-color:", ";margin:5px;width:40px;}"], (t) => t.$active ? "white" : "var(--gray-900)", (t) => t.$active ? "1px solid var(--green-500)" : "1px solid var(--gray-800)", (t) => t.$active ? "var(--green-500)" : "var(--gray-800)"), gie = ({
   buttons: t,
   initialClickedId: e = 2,
   clickCallback: n
@@ -22094,6 +22094,7 @@ const Ghe = ve.section`
   align-items: center;
   justify-content: space-between;
 `, rm = ve(ml)`
+&& {
   padding: 0 10px;
   margin-top: 0px;
 
@@ -22101,7 +22102,7 @@ const Ghe = ve.section`
     background-color: ${(t) => t.$negative ? "var(--red-500)" : "var(--green-400)"} !important;
     border: 1px solid ${(t) => t.$negative ? "var(--red-500)" : "var(--green-400)"} !important;
   }
-`, Zhe = ({
+}`, Zhe = ({
   changeDocumentTemplate: t,
   selectedTemplate: e,
   closeModal: n
