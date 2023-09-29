@@ -23,12 +23,13 @@ const TemplateDropdownContent = styled.div`
 `;
 
 const TemplateButton = styled(DefaultButton)`
+&& {
   width: 100%!important;
   color: var(--white);
   border: 1px solid var(--gray-900)!important;
   padding: 0 10px 0 10px!important;
   margin-top: 0px;
-`;
+}`;
 
 const Dropdown = styled.div`
   position: relative;
