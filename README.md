@@ -30,6 +30,12 @@ You can export the rendered markdown to a PDF file.
 
 ![PDF Demo](./assets/PDFDemo.png)
 
+### Live Collaboration
+
+You can work on a document with multiple people at the same time.
+
+![Collaboration Demo](./assets/CollaborationDemo.gif)
+
 ## Usage
 
 ### Building the component
@@ -82,6 +88,17 @@ You can edit the source files in `src/` to modify the behavior of the component,
 
 An analogous demo deployed with GH actions from latest main should be deployed at https://antmicro.github.io/myst-editor/
 
+### Collaboration Server
+
+The example server is located in the `bin` directory. To run it use:
+
+```bash
+cd bin
+yarn && yarn server
+```
+
+You can change the port it runs on with setting a `PORT` environment variable.
+
 ### MystEditor Props
 
 Here are the props you can pass to the MystEditor component:
@@ -93,6 +110,12 @@ Here are the props you can pass to the MystEditor component:
 - `printCallback` *(default: window.print())* - gets called when you click the `Export to PDF` button
 - `topbar` *(default: true)* - whether to show the topbar
 - `templateList` - path/url to a JSON file containing your document templates. For an example see `public/linkedtemplatelist.json`.
+- `collaboration` - options related to live collaboration:
+  - `enabled` *(default: false)*
+  - `wsUrl` *(example: ws://example:4444)* - url of the websocket server
+  - `username`
+  - `room` - name of the room to join, users will see others in the same room
+  - `color` - color of the cursor seen by other users
 
 ## License
 

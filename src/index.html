@@ -84,12 +84,46 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`
     console.log("Welcome to the MyST editor demo. The right hand side should auto update.")
+
     import MystEditor, { html, render } from './MystEditor.js'
+
     const exampleCallback = (event) => {
       console.log(`Example callback fired on ${event.target}`)
       window.print()
     }
-    render(html`<${MystEditor} printCallback=${exampleCallback} templatelist="linkedtemplatelist.json" initialText=${exampleText} id="textarea_id"/>`, document.getElementById("myst"))
+
+    const usercolors = [
+      "#30bced",
+      "#60c771",
+      "#e6aa3a",
+      "#cbb63e",
+      "#ee6352",
+      "#9ac2c9",
+      "#8acb88",
+      "#14b2c4",
+    ];
+
+    const room = '0';
+    const username = Math.floor(Math.random() * 1000).toString();
+    const color = usercolors[Math.floor(Math.random() * usercolors.length)];
+
+    render(
+      html`
+        <${MystEditor}
+          printCallback=${exampleCallback}
+          templatelist="linkedtemplatelist.json"
+          initialText=${exampleText}
+          id="textarea_id"
+          collaboration=${{
+            enabled: import.meta.env.VITE_COLLAB == 'ON',
+            wsUrl: import.meta.env.VITE_WS_URL,
+            username,
+            room,
+            color,
+          }}
+        />
+      `, document.getElementById("myst")
+    )
   </script>
   </head>
   <body>

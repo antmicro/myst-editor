@@ -1,0 +1,17 @@
+{
+  "name": "myst-editor-server",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "lib0": "^0.2.83",
+    "lodash.debounce": "^4.0.8",
+    "y-leveldb": "^0.1.2",
+    "y-protocols": "^1.0.5",
+    "y-websocket": "^1.5.0",
+    "yjs": "^13.5.44"
+  }
+}
