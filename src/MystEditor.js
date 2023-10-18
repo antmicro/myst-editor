@@ -76,7 +76,7 @@ const MystEditor = ({
   const [syncText, setSyncText] = useState(false);
 
   const renderAndSanitize = (text) => {
-    return purify.sanitize(markdownIt().use(markdownitDocutils).render(text))
+    return purify.sanitize(markdownIt({breaks: true, linkify: true}).use(markdownitDocutils).render(text))
   }
 
   return html`
