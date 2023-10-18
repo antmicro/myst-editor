@@ -26686,7 +26686,10 @@ const ube = Ce.div.withConfig({
     <${mbe}>
       <${Qye} text=${h} setText=${u} syncText=${f} setSyncText=${d} name=${t} id=${e} shown=${c === "Both" || c === "Source"} collaboration=${l}/>
       <${ube} $shown=${c === "Both" || c === "Preview"} dangerouslySetInnerHTML=${{
-    __html: ((g) => K2.sanitize(Zce().use(v2).render(g)))(h)
+    __html: ((g) => K2.sanitize(Zce({
+      breaks: !0,
+      linkify: !0
+    }).use(v2).render(g)))(h)
   }}/>
     <//>
   <//>`;
