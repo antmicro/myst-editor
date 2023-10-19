@@ -6,14 +6,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet"> 
   
-  <style>body { margin: 0 }</style>
+  <style>body { margin: 0 } body p { line-height: 100px }</style>
   
     <script type="module" crossorigin src="./index.js"></script>
-    <link rel="modulepreload" crossorigin href="./MystEditor2.js">
     <link rel="modulepreload" crossorigin href="./MystEditor.js">
+    <link rel="modulepreload" crossorigin href="./MystEditor.2bd7cdff.js">
     <link rel="stylesheet" href="./MystEditor.css">
   </head>
   <body>
+    <p>This text has a line height of 100px. This should not propagate into the MyST Editor.</p>
     <div id="myst"></div>
   </body>
 </html>
