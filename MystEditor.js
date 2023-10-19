@@ -26408,7 +26408,9 @@ const Kye = Ce.div.withConfig({
       c.enabled && (f.disconnect(), g.destroy()), w.destroy();
     };
   }, []), Gs(() => {
-    const y = c.enabled && p.toString().length == 0 && f.awareness.getStates().size == 1 && f.firstUser && m;
+    if (!c.enabled)
+      return;
+    const y = p.toString().length == 0 && f.awareness.getStates().size == 1 && f.firstUser && m;
     p.toString().length != 0 && e(p.toString()), y ? (console.log("You are the first user in this document. Initiating..."), a.current.dispatch({
       changes: {
         from: 0,
