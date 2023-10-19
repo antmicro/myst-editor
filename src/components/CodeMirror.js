@@ -129,13 +129,9 @@ const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSy
   }, []);
 
   useEffect(() => {
-    if (!collaboration.enabled) {
-      return;
-    }
+    const isFirstUser = collaboration.enabled && ytext.toString().length == 0 && provider.awareness.getStates().size == 1 && provider.firstUser && ready;
 
-    const isFirstUser = ytext.toString().length == 0 && provider.awareness.getStates().size == 1 && provider.firstUser && ready;
-
-    if (ytext.toString().length != 0) setText(ytext.toString());
+    if (ytext && ytext.toString().length != 0) setText(ytext.toString());
 
     if (isFirstUser) {
       console.log('You are the first user in this document. Initiating...');
