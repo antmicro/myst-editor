@@ -226,6 +226,9 @@ const Preview = styled.div`
   }
   ul, ol {
     margin-bottom: 2em;
+    list-style: revert;
+    padding-left: 40px;
+    padding-top: 1em;
   }
 
   blockquote {
