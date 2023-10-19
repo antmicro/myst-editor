@@ -129,7 +129,11 @@ const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSy
   }, []);
 
   useEffect(() => {
-    const isFirstUser = collaboration.enabled && ytext.toString().length == 0 && provider.awareness.getStates().size == 1 && provider.firstUser && ready;
+    if (!collaboration.enabled) {
+      return;
+    }
+
+    const isFirstUser = ytext.toString().length == 0 && provider.awareness.getStates().size == 1 && provider.firstUser && ready;
 
     if (ytext.toString().length != 0) setText(ytext.toString());
 
