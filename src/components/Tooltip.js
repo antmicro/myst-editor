@@ -6,7 +6,7 @@ const TooltipBox = styled.div`
   ${props => props.$orientation == 'left' && css`
     left: 0;
   `}
-  transform: ${props => props.$orientation == 'left' ? 'translateX(-81%)' : 'translate(-50%, 130%)'};
+  transform: ${props => props.$orientation == 'left' ? 'translateX(-105%)' : 'translate(-50%, 130%)'};
 `;
 
 const TooltipContent = styled.div`
@@ -19,11 +19,12 @@ const TooltipContent = styled.div`
   border-radius: var(--border-radius);
   border: solid var(--green-400);
   border-width: 1px 1px 1px 1px;
+  max-height: 40px;
   top: calc(100% + 11px);
   ${props => props.$orientation == 'bottom' && css`
     left: 50%;
   `}
-  transform: ${props => props.$orientation == 'left' ? 'translateX(-20%)' : 'translateX(-25%)'};
+  transform: ${props => props.$orientation == 'left' ? 'none' : 'translateX(-25%)'};
 
   &::before {
     content: '';

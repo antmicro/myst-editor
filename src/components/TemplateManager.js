@@ -57,26 +57,33 @@ const TemplatesList = styled.div`
   padding-top: 5px;
 `;
 
+const validateTemplConfig = templConfig => {
+  const requiredFields = ['id', 'templatetext']
+  for (const key in templConfig) {
+    for (let field of requiredFields) {
+      if (!templConfig[key][field]) templConfig[key].errorMessage = `Configuration of template ${key} is lacking '${field}'`;
+    }
+
+    if (templConfig[key].errorMessage)
+      console.error(templConfig[key].errorMessage)
+  }
+
+  return templConfig;
+}
+
 const TemplateManager = ({ setText, templatelist, setSyncText }) => {
   const [template, setTemplate] = useState("");
   const [readyTemplates, setReadyTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [error, setError] = useState({
-    fetchError: false,
-    errorText: "",
-    templateError: []
+
+  const [generalErr, setGeneralErr] = useState({
+    error: null,
+    message: null,
   });
 
-  const handleError = (err, message) => {
-    setError({
-      ...error,
-      fetchError: true,
-      errorText: message
-    });
-    throw new Error(message);
-  };
+  const checkResponseStatus = (response) => response.ok ? response : Promise.reject(`Invalid HTTP response: ${response.status}`)
 
   const changeDocumentTemplate = (template) => {
     setTemplate(readyTemplates[template].templatetext);
@@ -85,61 +92,62 @@ const TemplateManager = ({ setText, templatelist, setSyncText }) => {
     setShowModal(false);
   }
 
-  const getTemplateConfig = async (url) => {
-    try {
-      const response = await fetch(url);
-      if (!response.ok)
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      const responseJson = await response.json();
-      return responseJson;
-    } catch (err) {
-      handleError(err, "Unable to download template config.");
-    }
-  }
-  const loadTemplateFromURL = async (URL) => {
-    try {
-      const response = await fetch(URL);
-      if (!response.ok)
-        throw new Error(`Encountered error while fetching the template`);
-
-      const data = await response.text();
-      return data;
-    } catch (err) {
-      setError({
-        ...error,
-        templateError: [...error.templateError, URL]
-      });
-      return null;
-    }
-  }
-  const fillTemplatesWithFetchedData = async (templatesJSON) => {
-    const entries = Object.entries(templatesJSON)
-    const templatePromises = entries.map(async ([key, val]) => {
-      const newKey = key
-      const newValue = {
-        ...val,
-        templatetext: val.templatetext ? await loadTemplateFromURL(val.templatetext) : undefined
-      }
-      return [newKey, newValue]
+  const getTemplateConfig = url => fetch(url)
+    .then(checkResponseStatus)
+    .then(response => response.json()
+      .catch(error => {
+        console.error(error);
+        setGeneralErr({ error, message: "Template configuration is not valid" });
+      }))
+    .catch(error => {
+      console.warn(error);
+      setGeneralErr({ error, message: "Template configuration not found" })
     })
-    return Object.fromEntries(
-      await Promise.all(templatePromises)
-    )
+
+  const loadTemplateFromURL = url => fetch(url)
+    .then(checkResponseStatus)
+    .then(response => response.text())
+    .catch(err => {
+      console.error(err);
+      throw new Error("Could not fetch the template");
+    })
+
+  const fillTemplatesWithFetchedData = async (templatesConfig) => {
+    if (!templatesConfig) {
+      return {};
+    }
+
+    for (const templateName in templatesConfig) {
+      const templateUrl = templatesConfig[templateName].templatetext;
+      await loadTemplateFromURL(templateUrl)
+        .then(templateText => templatesConfig[templateName].templatetext = templateText)
+        .catch(err => templatesConfig[templateName].errorMessage ??= err.message);
+    }
+
+    return templatesConfig;
   }
 
-  useEffect(async () => {
-    const linkedtemplatelist = await getTemplateConfig(templatelist);
-    const readyTemplates = await fillTemplatesWithFetchedData(linkedtemplatelist);
-    setReadyTemplates(readyTemplates);
-  }, []);
+  useEffect(() => getTemplateConfig(templatelist)
+    .then(validateTemplConfig)
+    .then(fillTemplatesWithFetchedData)
+    .then(setReadyTemplates),
+    []);
 
-  if (error.fetchError) {
+  if (generalErr.error) {
     return html`
-      <${TopbarButton} disabled type="button" template=${template} onMouseEnter=${() => setShowTooltip(true)} onMouseLeave=${() => setShowTooltip(false)}>
-        Templates
-      <//>
-      <${Tooltip} tooltipOrientation="bottom" showTooltip=${showTooltip} errorMessage=${error.errorText}/>`;
+        <${TopbarButton} type="button" template=${template} onMouseEnter=${() => setShowTooltip(true)} onMouseLeave=${() => setShowTooltip(false)}>
+          Templates
+        <//>
+        <${showTooltip && Tooltip} tooltipOrientation="bottom" errorMessage=${generalErr.message}/>`;
   }
+
+  if (Object.keys(readyTemplates).length == 0) {
+    return html`
+        <${TopbarButton} type="button" template=${template} onMouseEnter=${() => setShowTooltip(true)} onMouseLeave=${() => setShowTooltip(false)}>
+          Templates
+        <//>`
+  }
+
   return html`
     ${showModal && html`<${Modal} selectedTemplate=${selectedTemplate} closeModal=${() => { setShowModal(false); setSelectedTemplate(false); }} changeDocumentTemplate=${changeDocumentTemplate}/>`}
     <${Dropdown}>
@@ -148,10 +156,10 @@ const TemplateManager = ({ setText, templatelist, setSyncText }) => {
         <${TemplateDropdownContent}>
         ${Object.keys(readyTemplates).map(key => (
     html`
-            ${readyTemplates[key].templatetext == undefined ? html`
+            ${readyTemplates[key].errorMessage ? html`
               <${ButtonTooltipFlex}>
-                <${Tooltip} tooltipOrientation="left" showTooltip=${showTooltip === key} errorMessage="Failed to fetch template"/>
-                  <${TemplateButton} disabled type="button" onMouseEnter=${() => setShowTooltip(key)} onMouseLeave=${() => setShowTooltip(false)}>${readyTemplates[key].id}
+                <${showTooltip === key && Tooltip} tooltipOrientation="left" errorMessage="${readyTemplates[key].errorMessage}"/>
+                  <${TemplateButton} type="button" onMouseEnter=${() => setShowTooltip(key)} onMouseLeave=${() => setShowTooltip(false)}>${readyTemplates[key].id}
                 <//>
               <//>
             `
