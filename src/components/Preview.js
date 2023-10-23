@@ -28,6 +28,10 @@ const Preview = styled.div`
     margin-top: 0px;
     line-height: 1.5em;
 
+    a {
+      display: inline;
+    }
+    
     @media print {
       break-inside: avoid !important;
       text-align: justify !important;

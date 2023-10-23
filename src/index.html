@@ -6,7 +6,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet"> 
   <link rel="stylesheet" href="./styles/MystEditor.css">
-  <style>body { margin: 0 } body p { line-height: 100px }</style>
+  <style>body { margin: 0 }</style>
   <script type="module">
     let exampleText = `# h1 is quite big
 
@@ -107,24 +107,8 @@ HTML:
     const username = Math.floor(Math.random() * 1000).toString();
     const color = usercolors[Math.floor(Math.random() * usercolors.length)];
 
-    import { StyleSheetManager } from 'styled-components/macro';
-
-    const createExtraScopePlugin = (scope) => {
-      const plugin = (element, index, children) => {
-        if (element.type == "rule") {
-          element.props[0] = element.props[0].split(',').map(x => `${scope} ${x}`).join(',');
-        }
-      };
-
-      // Styled-components require the function to have a name
-      Object.defineProperty(plugin, 'name', { value: `scope-${scope}` });
-
-      return plugin;
-    };
-
     render(
       html`
-      <${StyleSheetManager} stylisPlugins=${[createExtraScopePlugin('#myst')]}>
         <${MystEditor}
           printCallback=${exampleCallback}
           templatelist="linkedtemplatelist.json"
@@ -138,12 +122,11 @@ HTML:
             color,
           }}
         />
-      <//>`, document.getElementById("myst")
+      `, document.getElementById("myst")
     )
   </script>
   </head>
   <body>
-    <p>This text has a line height of 100px. This should not propagate into the MyST Editor.</p>
     <div id="myst"></div>
   </body>
 </html>

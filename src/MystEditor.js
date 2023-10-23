@@ -4,7 +4,7 @@ import { html } from 'htm/preact';
 import markdownitDocutils from 'markdown-it-docutils'
 import purify from 'dompurify'
 import markdownIt from 'markdown-it'
-import styled from 'styled-components/macro';
+import { StyleSheetManager, styled } from 'styled-components/macro';
 
 import ButtonGroup from "./components/ButtonGroup";
 import CodeMirror from './components/CodeMirror';
@@ -61,6 +61,19 @@ const buttons = [
   { label: 'Both', img: "data:image/svg+xml,%3Csvg width='22' height='17' viewBox='0 0 22 17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2.66667 0.666667H10.5338V15.5109H2.66667C1.5621 15.5109 0.666667 14.6154 0.666667 13.5109V2.66667C0.666667 1.5621 1.5621 0.666667 2.66667 0.666667Z' stroke='white' stroke-width='1.33333'/%3E%3Cpath d='M10.8001 0.666667H18.6673C19.7718 0.666667 20.6673 1.5621 20.6673 2.66667V13.5109C20.6673 14.6154 19.7718 15.5109 18.6673 15.5109H10.8001V0.666667Z' stroke='white' stroke-width='1.33333'/%3E%3C/svg%3E%0A" }
 ]
 
+const createExtraScopePlugin = (scope) => {
+  const plugin = (element, index, children) => {
+    if (element.type == "rule") {
+      element.props[0] = element.props[0].split(',').map(x => `${scope} ${x}`).join(',');
+    }
+  };
+
+  // Styled-components require the function to have a name
+  Object.defineProperty(plugin, 'name', { value: `scope-${scope}` });
+
+  return plugin;
+}; 
+
 const MystEditor = ({
   name = "myst_editor_textarea",
   id = "myst_editor_textarea",
@@ -80,20 +93,24 @@ const MystEditor = ({
   }
 
   return html`
-  <${EditorParent}>
-    <${Topbar} $shown=${topbar}>
-      <${TopbarRight}>
-        <${TopbarButton} type="button" onClick=${(event) => printCallback(event)}>Export as PDF<//>
-        <${TemplateManager} templatelist=${templatelist} setText=${setText} setSyncText=${setSyncText}/>
-        <${Separator} />
-        <${ButtonGroup} buttons=${buttons} clickedId=${2} clickCallback=${(newMode) => setMode(newMode)}/>
+  <div id="myst-css-namespace">
+    <${StyleSheetManager} stylisPlugins=${[createExtraScopePlugin('#myst-css-namespace')]}>
+      <${EditorParent}>
+        <${Topbar} $shown=${topbar}>
+          <${TopbarRight}>
+            <${TopbarButton} type="button" onClick=${(event) => printCallback(event)}>Export as PDF<//>
+            <${TemplateManager} templatelist=${templatelist} setText=${setText} setSyncText=${setSyncText}/>
+            <${Separator} />
+            <${ButtonGroup} buttons=${buttons} clickedId=${2} clickCallback=${(newMode) => setMode(newMode)}/>
+          <//>
+        <//>
+        <${MystWrapper}>
+          <${CodeMirror} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"} collaboration=${collaboration}/>
+          <${Preview} $shown=${mode === "Both" || mode === "Preview"} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
+        <//>
       <//>
     <//>
-    <${MystWrapper}>
-      <${CodeMirror} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"} collaboration=${collaboration}/>
-      <${Preview} $shown=${mode === "Both" || mode === "Preview"} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
-    <//>
-  <//>`;
+  </div>`;
 }
 
 export default MystEditor
