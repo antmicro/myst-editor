@@ -27,6 +27,7 @@ const Preview = styled.div`
   p {
     margin-top: 0px;
     line-height: 1.5em;
+    display: block;
 
     a {
       display: inline;
