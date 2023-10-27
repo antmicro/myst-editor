@@ -26439,8 +26439,8 @@ const Xye = Ce.div.withConfig({
       c.enabled && (f.disconnect(), g.destroy()), w.destroy();
     };
   }, []), Hi(() => {
-    const y = c.enabled && p.toString().length == 0 && f.awareness.getStates().size == 1 && f.firstUser && m;
-    p && p.toString().length != 0 && e(p.toString()), y ? (console.log("You are the first user in this document. Initiating..."), a.current.dispatch({
+    const y = document.querySelectorAll("#myst-css-namespace").length, b = c.enabled && p.toString().length == 0 && f.awareness.getStates().size == y && f.firstUser && m;
+    p && p.toString().length != 0 && e(p.toString()), b ? (console.log("You are the first user in this document. Initiating..."), a.current.dispatch({
       changes: {
         from: 0,
         to: a.current.state.doc.length,
