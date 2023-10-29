@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components/macro';
 
 const Preview = styled.div`
+  background-color: white;
   padding: 20px;
   min-height: 500px;
   flex: 1;
