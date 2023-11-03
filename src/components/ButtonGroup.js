@@ -10,13 +10,13 @@ const GroupButton = styled(DefaultButton)`
   margin: 5px;
   width: 40px;`;
 
-const ButtonGroup = ({ buttons, initialClickedId = 2, clickCallback }) => {
+const ButtonGroup = ({ buttons, initialClickedId = 2, clickCallback, highlightActive = true }) => {
   const [clickedId, setClickedId] = useState(initialClickedId);
 
   return html`
     ${buttons.map((buttonOptions, i) => (
     html`
-      <${GroupButton} type="button" key=${buttonOptions.label} name=${buttonOptions.label} onClick=${() => { setClickedId(i); clickCallback(buttonOptions.label); }} $active=${i === clickedId}>
+      <${GroupButton} type="button" key=${buttonOptions.label} name=${buttonOptions.label} onClick=${() => { highlightActive && setClickedId(i); clickCallback(buttonOptions.label); }} $active=${i === clickedId}>
         <img src=${buttonOptions.img} alt=${buttonOptions.label} />
       <//>`
   ))}
