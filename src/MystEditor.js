@@ -46,7 +46,8 @@ const TopbarLeft = styled.div`
 const Alert = styled(TopbarButton)`
   pointer-events: none; 
   background-color: green; 
-  border: none
+  border: none;
+  width: fit-content;
 `
 
 const TopbarRight = styled.div`
@@ -158,7 +159,7 @@ const MystEditor = ({
         <${MystWrapper}>
           <${CodeMirror} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"} collaboration=${collaboration}/>
           <${Preview} $shown=${mode === "Both" || mode === "Preview"} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
-          <${mode == 'Diff' && Diff} oldText=${initialText} text=${text} setText=${setText} setSyncText=${setSyncText} syncText=${syncText} collaboration=${collaboration}/>
+          <${mode == 'Diff' && Diff} oldText=${initialText} text=${text}/>
         <//>
       <//>
     <//>
