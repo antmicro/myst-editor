@@ -1102,6 +1102,14 @@
     "@codemirror/view" "^6.0.0"
     crelt "^1.0.5"
 
+"@codemirror/merge@^6.2.1":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@codemirror/merge/-/merge-6.0.0.tgz#69c4877437bc0a75ff9984da1f5dabb5d88301a6"
+  integrity sha512-dxdUIQRxgC+xqzBtfY5zjgDIR38Xp6iycb8Lp1Q2gzEkX9y/UrqOAOlpqU3kfDBa0wGHrjlSYzpcQ/lXWG/59w==
+  dependencies:
+    "@codemirror/state" "^6.0.0"
+    "@codemirror/view" "^6.0.0"
+
 "@codemirror/search@^6.0.0":
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/@codemirror/search/-/search-6.5.2.tgz#01cc58f27c88e902971b9596d89a3af671b1ef9f"

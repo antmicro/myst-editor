@@ -48,6 +48,10 @@ const CodeEditor = styled.div`
   .cm-yLineSelection {
     margin: 0 2px 0 6px !important;
   }
+
+  .cm-editor {
+    outline: 0;
+  }
 `;
 
 const HiddenTextArea = styled.textarea`
@@ -169,3 +173,6 @@ const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSy
 console.log('CodeMirror component loaded');
 
 export default CodeMirror
+export {
+  CodeEditor
+}
