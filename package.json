@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@codemirror/commands": "^6.2.4",
-    "@codemirror/merge": "^6.2.1",
+    "@codemirror/merge": "^6.0.0",
     "@codemirror/state": "^6.2.1",
     "@codemirror/view": "^6.16.0",
     "@preact/compat": "^17.1.2",
