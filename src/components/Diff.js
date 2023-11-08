@@ -4,12 +4,19 @@ import { EditorState } from "@codemirror/state"
 import { useRef, useEffect } from 'preact/hooks'
 import { CodeEditor } from './CodeMirror';
 import { html } from "htm/preact";
+import { styled } from 'styled-components/macro';
+
+const MergeViewCodeEditor = styled(CodeEditor)`
+  width: 50%;
+  display: block;
+`
 
 const initMergeView = ({ old, current }) => {
   let basicReadOnly = [
     basicSetup,
     EditorView.editable.of(false),
     EditorState.readOnly.of(true),
+    EditorView.lineWrapping,
   ]
 
   return new MergeView({
@@ -48,8 +55,8 @@ const Diff = ({ oldText, text }) => {
 
   return html`
   <div style="display:flex; width: 100%">
-    <${CodeEditor} ref=${leftRef} $shown=${true}/>
-    <${CodeEditor} ref=${rightRef} $shown=${true}/>
+    <${MergeViewCodeEditor} ref=${leftRef} $shown=${true}/>
+    <${MergeViewCodeEditor} ref=${rightRef} $shown=${true}/>
   </div>`
 }
 
