@@ -230,13 +230,20 @@ const Preview = styled.div`
   }
 
   li {
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
+    p {
+      margin-bottom: 0px;
+    }
   }
   ul, ol {
-    margin-bottom: 2em;
     list-style: revert;
     padding-left: 40px;
-    padding-top: 1em;
+    padding-top: 0.5em;
+  }
+  /* Add some padding to the outermost ul */
+  &[class^="Preview"] > ul  {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
   }
 
   blockquote {
