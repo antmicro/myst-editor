@@ -45,6 +45,7 @@ const Preview = styled.div`
 
   a {
     color: var(--blue-500);
+    line-break: anywhere;
 
     @media print {
       &::after {
