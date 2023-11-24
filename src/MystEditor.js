@@ -30,7 +30,9 @@ const Topbar = styled.div`
   border-bottom: 1px solid var(--gray-600);
 
   @media print {
-    display: none;
+    & {
+      display: none;
+    }
   }
 `;
 

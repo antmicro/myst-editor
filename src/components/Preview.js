@@ -18,11 +18,13 @@ const Preview = styled.div`
   `}
 
   @media print {
-    display: block !important;
-    border: 0px !important;
-    box-shadow: none !important;
-    border-radius: 0px !important;
-    word-break: unset !important;
+    & {
+      display: block !important;
+      border: 0px !important;
+      box-shadow: none !important;
+      border-radius: 0px !important;
+      word-break: unset !important;
+    }
   }
 
   p {
