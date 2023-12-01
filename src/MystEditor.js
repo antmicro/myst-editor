@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import { html } from 'htm/preact';
 import markdownitDocutils from 'markdown-it-docutils'
 import purify from 'dompurify'
@@ -17,6 +17,7 @@ const EditorParent = styled.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
+  ${props => props.fullscreen && 'position: fixed; left: 0; top: 0; z-index: 10;'}
 `;
 
 const Topbar = styled.div`
@@ -72,6 +73,8 @@ const MystWrapper = styled.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
+  background-color: white;
+  ${props => props.fullscreen && 'box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;'}
 `;
 
 const buttonsRight = [
@@ -82,6 +85,7 @@ const buttonsRight = [
 ]
 
 const buttonsLeft = [
+  { label: 'Fullscreen', img: "data:image/svg+xml,%3Csvg width='25' height='25' viewBox='-10 -10 400 400' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg xmlns='http://www.w3.org/2000/svg' fill='%23FFFFFF' %3E%3Cpath d='M384.97,12.03c0-6.713-5.317-12.03-12.03-12.03H264.847c-6.833,0-11.922,5.39-11.934,12.223    c0,6.821,5.101,11.838,11.934,11.838h96.062l-0.193,96.519c0,6.833,5.197,12.03,12.03,12.03c6.833-0.012,12.03-5.197,12.03-12.03    l0.193-108.369c0-0.036-0.012-0.06-0.012-0.084C384.958,12.09,384.97,12.066,384.97,12.03z'/%3E%3Cpath d='M120.496,0H12.403c-0.036,0-0.06,0.012-0.096,0.012C12.283,0.012,12.247,0,12.223,0C5.51,0,0.192,5.317,0.192,12.03    L0,120.399c0,6.833,5.39,11.934,12.223,11.934c6.821,0,11.838-5.101,11.838-11.934l0.192-96.339h96.242    c6.833,0,12.03-5.197,12.03-12.03C132.514,5.197,127.317,0,120.496,0z'/%3E%3Cpath d='M120.123,360.909H24.061v-96.242c0-6.833-5.197-12.03-12.03-12.03S0,257.833,0,264.667v108.092    c0,0.036,0.012,0.06,0.012,0.084c0,0.036-0.012,0.06-0.012,0.096c0,6.713,5.317,12.03,12.03,12.03h108.092    c6.833,0,11.922-5.39,11.934-12.223C132.057,365.926,126.956,360.909,120.123,360.909z'/%3E%3Cpath d='M372.747,252.913c-6.833,0-11.85,5.101-11.838,11.934v96.062h-96.242c-6.833,0-12.03,5.197-12.03,12.03    s5.197,12.03,12.03,12.03h108.092c0.036,0,0.06-0.012,0.084-0.012c0.036-0.012,0.06,0.012,0.096,0.012    c6.713,0,12.03-5.317,12.03-12.03V264.847C384.97,258.014,379.58,252.913,372.747,252.913z' /%3E   %3C/g%3E %3C/svg%3E" },
   { label: 'Copy HTML', img: "data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 -3 25 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9 2h7v4h4v10h-3v1h4V4.6L17.4 1H8v5h1zm8 0h.31L20 4.69V5h-3zM5 19h7v1H5zm-2 4h13V10.6L12.4 7H3zm9-15h.31L15 10.69V11h-3zM4 8h7v4h4v10H4zm1 5h9v1H5zm4 3h5v1H5v-1z' fill='%23FFFFFF'/%3E%3C/svg%3E" },
 ]
 
@@ -98,6 +102,7 @@ const createExtraScopePlugin = (scope) => {
   return plugin;
 };
 
+const hideBodyScrollIf = val => document.documentElement.style.overflow = val ? "hidden" : "visible";
 
 function copyHtmlAsRichText(str) {
   function listener(e) {
@@ -122,6 +127,7 @@ const MystEditor = ({
   spellcheckOpts = { dict: "en_US", dictionaryPath: "/dictionaries" }
 }) => {
   const [mode, setMode] = useState(initialMode);
+  const [fullscreen, setFullscreen] = useState(false);
   const [text, setText] = useState(initialText);
   const [alert, setAlert] = useState(null);
   const [syncText, setSyncText] = useState(false);
@@ -143,13 +149,20 @@ const MystEditor = ({
     alertFor("copied!", 2)
   }
 
+  const buttonActions = {
+    "Copy HTML": copyHtml,
+    "Fullscreen": () => setFullscreen(f => !f)
+  }
+
+  useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen])
+
   return html`
   <div id="myst-css-namespace">
     <${StyleSheetManager} stylisPlugins=${[createExtraScopePlugin('#myst-css-namespace')]}>
-      <${EditorParent}>
+      <${EditorParent} fullscreen=${fullscreen}>
         <${Topbar} $shown=${topbar}>
           <${TopbarLeft}> 
-            <${ButtonGroup} buttons=${buttonsLeft} highlightActive=${false} clickCallback=${() => copyHtml()}/>
+            <${ButtonGroup} buttons=${buttonsLeft} highlightActive=${false} clickCallback=${(label) => buttonActions[label]()}/>
             ${alert && html`<${Alert}> ${alert} <//>`}
           <//>
           <${TopbarRight}>
@@ -159,7 +172,7 @@ const MystEditor = ({
             <${ButtonGroup} buttons=${buttonsRight} clickedId=${2} clickCallback=${(newMode) => setMode(newMode)}/>
           <//>
         <//>
-        <${MystWrapper}>
+        <${MystWrapper} fullscreen=${fullscreen}>
           <${CodeMirror} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts}/>
           <${Preview} $shown=${mode === "Both" || mode === "Preview"} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
           <${mode == 'Diff' && Diff} oldText=${initialText} text=${text}/>
