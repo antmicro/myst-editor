@@ -80,6 +80,15 @@ const restoreCursorLocation = (view, location) => {
   });
 };
 
+const setEditorText = (editor, text) => {
+  editor.dispatch({
+    changes: {
+      from: 0,
+      to: editor.state.doc.length,
+      insert: text,
+    }
+  });
+}
 
 const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSyncText, collaboration, spellcheckOpts }) => {
   const editorRef = useRef(null);
@@ -152,22 +161,10 @@ const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSy
 
     if (isFirstUser) {
       console.log('You are the first user in this document. Initiating...');
-      editorRef.current.dispatch({
-        changes: {
-          from: 0,
-          to: editorRef.current.state.doc.length,
-          insert: text,
-        },
-      });
+      setEditorText(editorRef.current, text);
     } else if (syncText) {
       console.log('setting text');
-      editorRef.current.dispatch({
-        changes: {
-          from: 0,
-          to: editorRef.current.state.doc.length,
-          insert: text,
-        },
-      });
+      setEditorText(editorRef.current, text);
       setSyncText(false);
     }
   }, [syncText, ready, initialized]);
