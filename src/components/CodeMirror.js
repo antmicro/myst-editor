@@ -7,6 +7,7 @@ import { EditorState } from "@codemirror/state";
 import styled from 'styled-components/macro';
 import { yCollab } from "y-codemirror.next";
 import useCollaboration from '../hooks/useCollaboration'
+import spellcheck from '../hooks/spellchecker';
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -54,6 +55,10 @@ const CodeEditor = styled.div`
   .cm-editor {
     outline: 0;
   }
+
+  .cm-error {
+    text-decoration: underline red
+  }
 `;
 
 const HiddenTextArea = styled.textarea`
@@ -76,7 +81,7 @@ const restoreCursorLocation = (view, location) => {
 };
 
 
-const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSyncText, collaboration }) => {
+const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSyncText, collaboration, spellcheckOpts }) => {
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
   const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
@@ -97,6 +102,7 @@ const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSy
       keymap.of([
         indentWithTab
       ]),
+      spellcheck(spellcheckOpts),
       EditorView.lineWrapping,
       EditorView.updateListener.of(update => {
         if (update.docChanged) {

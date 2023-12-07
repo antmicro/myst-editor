@@ -118,7 +118,8 @@ const MystEditor = ({
   printCallback = window.print,
   topbar = true,
   templatelist,
-  collaboration = {}
+  collaboration = {},
+  spellcheckOpts = { dict: "en_US", dictionaryPath: "/dictionaries" }
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [text, setText] = useState(initialText);
@@ -159,7 +160,7 @@ const MystEditor = ({
           <//>
         <//>
         <${MystWrapper}>
-          <${CodeMirror} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"} collaboration=${collaboration}/>
+          <${CodeMirror} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts}/>
           <${Preview} $shown=${mode === "Both" || mode === "Preview"} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
           <${mode == 'Diff' && Diff} oldText=${initialText} text=${text}/>
         <//>
