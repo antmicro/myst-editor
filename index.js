@@ -5,22 +5,22 @@ import s, { render as c, html as d } from "./MystEditor.js";
   if (o && o.supports && o.supports("modulepreload"))
     return;
   for (const e of document.querySelectorAll('link[rel="modulepreload"]'))
-    i(e);
+    r(e);
   new MutationObserver((e) => {
     for (const t of e)
       if (t.type === "childList")
         for (const n of t.addedNodes)
-          n.tagName === "LINK" && n.rel === "modulepreload" && i(n);
+          n.tagName === "LINK" && n.rel === "modulepreload" && r(n);
   }).observe(document, { childList: !0, subtree: !0 });
-  function a(e) {
+  function l(e) {
     const t = {};
     return e.integrity && (t.integrity = e.integrity), e.referrerpolicy && (t.referrerPolicy = e.referrerpolicy), e.crossorigin === "use-credentials" ? t.credentials = "include" : e.crossorigin === "anonymous" ? t.credentials = "omit" : t.credentials = "same-origin", t;
   }
-  function i(e) {
+  function r(e) {
     if (e.ep)
       return;
     e.ep = !0;
-    const t = a(e);
+    const t = l(e);
     fetch(e.href, t);
   }
 })();
@@ -100,9 +100,9 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const u = (r) => {
-  console.log(`Example callback fired on ${r.target}`), window.print();
-}, l = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], m = "0", f = Math.floor(Math.random() * 1e3).toString(), p = l[Math.floor(Math.random() * l.length)];
+const u = (i) => {
+  console.log(`Example callback fired on ${i.target}`), window.print();
+}, a = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], m = "0", p = Math.floor(Math.random() * 1e3).toString(), f = a[Math.floor(Math.random() * a.length)];
 c(d`
         <${s}
           printCallback=${u}
@@ -112,9 +112,13 @@ c(d`
           collaboration=${{
   enabled: {}.VITE_COLLAB == "ON",
   wsUrl: {}.VITE_WS_URL,
-  username: f,
+  username: p,
   room: m,
-  color: p
+  color: f
+}}
+          spellcheckOpts=${{
+  dict: "en_US",
+  dictionaryPath: "/dictionaries"
 }}
         />
       `, document.getElementById("myst"));
