@@ -10,9 +10,15 @@ const dictionary = Facet.define({
 // Class which will be applied to misspelled words
 const errorHighlight = Decoration.mark({ class: "cm-error" });
 
+const dictReady = dict => Object.keys(dict.rules).length > 0;
+
 function doSpellcheck(/** @type {EditorView} */ view) {
   const builder = new RangeSetBuilder();
   const dict = view.state.facet(dictionary)
+
+  if (!dictReady(dict)) {
+    return builder.finish();
+  }
 
   view.state.doc
     .toString()
