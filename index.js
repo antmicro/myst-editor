@@ -100,12 +100,12 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const u = (i) => {
+const m = (i) => {
   console.log(`Example callback fired on ${i.target}`), window.print();
-}, a = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], m = "0", p = Math.floor(Math.random() * 1e3).toString(), f = a[Math.floor(Math.random() * a.length)];
+}, a = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], u = "0", p = Math.floor(Math.random() * 1e3).toString(), f = a[Math.floor(Math.random() * a.length)];
 c(d`
         <${s}
-          printCallback=${u}
+          printCallback=${m}
           templatelist="linkedtemplatelist.json"
           initialText=${h}
           id="textarea_id"
@@ -113,12 +113,12 @@ c(d`
   enabled: {}.VITE_COLLAB == "ON",
   wsUrl: {}.VITE_WS_URL,
   username: p,
-  room: m,
+  room: u,
   color: f
 }}
           spellcheckOpts=${{
   dict: "en_US",
-  dictionaryPath: "/dictionaries"
+  dictionaryPath: "/myst-editor/dictionaries"
 }}
         />
       `, document.getElementById("myst"));
