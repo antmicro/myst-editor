@@ -36,6 +36,18 @@ You can work on a document with multiple people at the same time.
 
 ![Collaboration Demo](./assets/CollaborationDemo.gif)
 
+### See the changes you've made
+
+You can use the diff view to see exactly what changes have been made to the document.
+
+![Diff Demo](./assets/DiffDemo.png)
+
+### Use the document in other editors
+
+Copy and paste the document into other tools, such as email clients.
+
+![Copy Demo](./assets/CopyDemo.png)
+
 ## Usage
 
 ### Building the component
