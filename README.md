@@ -24,17 +24,17 @@ The editor can display the text area and preview area separately, or in a split 
 
 ![Layout Demo](./assets/ViewChangeDemo.gif)
 
-### Exporting to PDF
-
-You can export the rendered markdown to a PDF file.
-
-![PDF Demo](./assets/PDFDemo.png)
-
 ### Live Collaboration
 
 You can work on a document with multiple people at the same time.
 
 ![Collaboration Demo](./assets/CollaborationDemo.gif)
+
+### Exporting to PDF
+
+You can export the rendered markdown to a PDF file.
+
+![PDF Demo](./assets/PDFDemo.png)
 
 ### See the changes you've made
 
