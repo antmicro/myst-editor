@@ -162,12 +162,16 @@ const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSy
     if (isFirstUser) {
       console.log('You are the first user in this document. Initiating...');
       setEditorText(editorRef.current, text);
-    } else if (syncText) {
+    }
+  }, [ready, initialized]);
+
+  useEffect(() => {
+    if (syncText) {
       console.log('setting text');
       setEditorText(editorRef.current, text);
       setSyncText(false);
     }
-  }, [syncText, ready, initialized]);
+  }, [syncText])
 
   return html`
       <${CodeEditor} $shown="${shown}" id="${id}-editor" class=${className}><//>
