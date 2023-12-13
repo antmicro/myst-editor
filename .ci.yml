@@ -1,0 +1,26 @@
+image: node:20
+
+before_script:
+  - yarn
+
+stages:
+  - build
+  - ui-tests
+
+build:
+  stage: build
+  script:   
+    - yarn build
+
+ui-tests:
+  stage: ui-tests
+  script:
+    - apt-get -qqy update > /dev/null 2> /dev/null
+    - apt-get -qqy install --no-install-recommends chromium > /dev/null 2> /dev/null
+    - npm run dev&
+    - node bin/server.js&
+    - npm run ui-test
+  artifacts:
+    when: always
+    paths:
+      - ui-tests/*.png
