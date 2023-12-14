@@ -17,7 +17,7 @@ const mkDriver = () => new Builder()
             "--no-sandbox",
             "--disable-dev-shm-usage"
         ])
-        .windowSize({ width: 1200, height: 1000 }))
+        .windowSize({ width: 1200, height: 2000 }))
     .build();
 
 const openMyst = (driver) => driver.get(ADDR)

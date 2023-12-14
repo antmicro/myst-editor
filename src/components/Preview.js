@@ -29,7 +29,7 @@ const Preview = styled.div`
 
   p {
     margin-top: 0px;
-    line-height: 1.5em;
+    line-height: 1.3em;
     display: block;
 
     a {
@@ -232,8 +232,9 @@ const Preview = styled.div`
 
   li {
     margin-bottom: 0.5em;
+    line-height: 1.3em;
     p {
-      margin-bottom: 0px;
+      padding: 0px;
     }
   }
   ul, ol {
