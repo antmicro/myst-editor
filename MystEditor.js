@@ -26668,12 +26668,12 @@ const rbe = L_.exports, R_ = N.define({
   combine: (t) => t[t.length - 1]
 }), ibe = F.mark({
   class: "cm-error"
-});
+}), sbe = (t) => Object.keys(t.rules).length > 0;
 function ny(t) {
   const e = new xt(), n = t.state.facet(R_);
-  return t.state.doc.toString().replaceAll(/\w+/g, (r, i) => !n.check(r) && e.add(i, i + r.length, ibe)), e.finish();
+  return sbe(n) && t.state.doc.toString().replaceAll(/\w+/g, (r, i) => !n.check(r) && e.add(i, i + r.length, ibe)), e.finish();
 }
-const sbe = _e.fromClass(class {
+const obe = _e.fromClass(class {
   constructor(t) {
     this.decorations = ny(t);
   }
@@ -26683,7 +26683,7 @@ const sbe = _e.fromClass(class {
 }, {
   decorations: (t) => t.decorations
 });
-function obe(t) {
+function lbe(t) {
   if (!t)
     return [];
   let {
@@ -26692,15 +26692,15 @@ function obe(t) {
   } = t;
   return [R_.of(new rbe(e, null, null, {
     dictionaryPath: n
-  })), sbe];
+  })), obe];
 }
 const I_ = me.div.withConfig({
   displayName: "CodeMirror__CodeEditor",
   componentId: "sc-1q0hyc9-0"
-})(["border-radius:var(--border-radius);background:var(--gray-200);font-family:monospace;font-size:0.94em;resize:none;border:0;padding:20px;min-height:500px;display:", ';flex:1;border:1px solid var(--gray-400);box-shadow:inset 0px 0px 4px rgba(0,0,0,0.15);@media print{&{display:none;}}.cm-ySelectionInfo{opacity:1 !important;font-size:0.6rem;padding:0.25rem 0.5rem !important;border-top-left-radius:10px;border-top-right-radius:10px;border-bottom-right-radius:10px;font-family:"Lato" !important;font-weight:600 !important;}.cm-widgetBuffer{margin-bottom:0;}.cm-ySelectionCaretDot{display:none;}.cm-yLineSelection{margin:0 2px 0 6px !important;}.cm-editor{outline:0;}.cm-error{text-decoration:underline red}'], (t) => t.$shown ? "block" : "none"), lbe = me.textarea.withConfig({
+})(["border-radius:var(--border-radius);background:var(--gray-200);font-family:monospace;font-size:0.94em;resize:none;border:0;padding:20px;min-height:500px;display:", ';flex:1;border:1px solid var(--gray-400);box-shadow:inset 0px 0px 4px rgba(0,0,0,0.15);@media print{&{display:none;}}.cm-ySelectionInfo{opacity:1 !important;font-size:0.6rem;padding:0.25rem 0.5rem !important;border-top-left-radius:10px;border-top-right-radius:10px;border-bottom-right-radius:10px;font-family:"Lato" !important;font-weight:600 !important;}.cm-widgetBuffer{margin-bottom:0;}.cm-ySelectionCaretDot{display:none;}.cm-yLineSelection{margin:0 2px 0 6px !important;}.cm-editor{outline:0;}.cm-error{text-decoration:underline red}'], (t) => t.$shown ? "block" : "none"), cbe = me.textarea.withConfig({
   displayName: "CodeMirror__HiddenTextArea",
   componentId: "sc-1q0hyc9-1"
-})(["display:none;"]), cbe = (t) => {
+})(["display:none;"]), abe = (t) => {
   const {
     from: e
   } = t.state.selection.main, n = t.state.doc.lineAt(e);
@@ -26708,7 +26708,7 @@ const I_ = me.div.withConfig({
     line: n.number - 1,
     ch: e - n.from
   };
-}, abe = (t, e) => {
+}, hbe = (t, e) => {
   const {
     line: n,
     ch: r
@@ -26728,7 +26728,7 @@ const I_ = me.div.withConfig({
       insert: e
     }
   });
-}, hbe = ({
+}, ube = ({
   text: t,
   setText: e,
   id: n,
@@ -26749,11 +26749,11 @@ const I_ = me.div.withConfig({
   } = Xye(c);
   return gr(() => {
     c.enabled && (p.on("stack-item-added", (w) => {
-      w.stackItem.meta.set("cursor-location", cbe(h.current));
+      w.stackItem.meta.set("cursor-location", abe(h.current));
     }), p.on("stack-item-popped", (w) => {
-      abe(h.current, w.stackItem.meta.get("cursor-location"));
+      hbe(h.current, w.stackItem.meta.get("cursor-location"));
     }));
-    const b = Ff.filter((w, k) => k != 3), x = [c.enabled ? b : Ff, wo.of([oge]), obe(a), L.lineWrapping, L.updateListener.of((w) => {
+    const b = Ff.filter((w, k) => k != 3), x = [c.enabled ? b : Ff, wo.of([oge]), lbe(a), L.lineWrapping, L.updateListener.of((w) => {
       w.docChanged && (localStorage.getItem("log") == "true" && console.log("doc changed"), e(_.state.doc.toString()));
     })];
     c.enabled && (x.push(Bye(g, d.awareness, {
@@ -26782,11 +26782,11 @@ const I_ = me.div.withConfig({
     g && g.toString().length != 0 && e(g.toString()), x ? (console.log("You are the first user in this document. Initiating..."), ry(h.current, t)) : o && (console.log("setting text"), ry(h.current, t), l(!1));
   }, [o, y, u]), lt`
       <${I_} $shown="${s}" id="${n}-editor" class=${i}><//>
-      <${lbe} value=${t} name=${r} id=${n}><//>
+      <${cbe} value=${t} name=${r} id=${n}><//>
   `;
 };
 console.log("CodeMirror component loaded");
-const ube = me.section`
+const fbe = me.section`
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -26801,10 +26801,10 @@ const ube = me.section`
   background-color: var(--white);
   border: 1px solid var(--gray-600);
   border-radius: var(--border-radius);
-`, fbe = me.h3`
+`, dbe = me.h3`
   font-family: 'Lato', sans-serif;
   color: var(--gray-900);
-`, dbe = me.div`
+`, pbe = me.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -26815,25 +26815,25 @@ const ube = me.section`
   &:hover {
     background-color: ${(t) => t.$negative ? "var(--red-500)" : "var(--green-400)"} !important;
     border: 1px solid ${(t) => t.$negative ? "var(--red-500)" : "var(--green-400)"} !important;
-  }`, pbe = ({
+  }`, gbe = ({
   changeDocumentTemplate: t,
   selectedTemplate: e,
   closeModal: n
 }) => lt`
-    <${ube}>
-        <${fbe}>Are you sure you want to change the current template?<//>
-        <${dbe}>
+    <${fbe}>
+        <${dbe}>Are you sure you want to change the current template?<//>
+        <${pbe}>
             <${iy} type="button" onClick=${() => t(e)}>✓ Yes<//>
             <${iy} $negative type="button" onClick=${n}>x Cancel<//>
         <//>
     <//>
   `;
 console.log("Modal functional component loaded");
-const gbe = me.div`
+const mbe = me.div`
   position: absolute;
   ${(t) => t.$orientation == "left" && Bi(["left:0;"])}
   transform: ${(t) => t.$orientation == "left" ? "translateX(-105%)" : "translate(-50%, 130%)"};
-`, mbe = me.div`
+`, ybe = me.div`
   position: relative; 
   background: var(--green-400);
   color: #ffffff;
@@ -26858,13 +26858,13 @@ const gbe = me.div`
   tooltipOrientation: t,
   errorMessage: e
 }) => lt`
-    <${gbe} $orientation=${t}>
-      <${mbe} $orientation=${t}>
+    <${mbe} $orientation=${t}>
+      <${ybe} $orientation=${t}>
           ${e}
       <//>
     <//>`;
 console.log("Tooltip component loaded");
-const ybe = me.div`
+const bbe = me.div`
   display: none;
   margin-left: 5px;
   font-family: 'Lato', sans-serif;
@@ -26884,7 +26884,7 @@ const ybe = me.div`
   color: var(--white);
   border: 1px solid var(--gray-900)!important;
   padding: 0 10px 0 10px!important;
-  margin-top: 0px;`, bbe = me.div`
+  margin-top: 0px;`, vbe = me.div`
   position: relative;
   display: inline-block;
   width: min-content;
@@ -26895,16 +26895,16 @@ const ybe = me.div`
       flex-direction: column;
     }
   }
-`, vbe = me.div`
+`, wbe = me.div`
   display: flex;
   flex-direction: row-reverse;
   border: 1px solid var(--gray-900);
   width: inherit;
-`, wbe = me.div`
+`, xbe = me.div`
   position: absolute;
   display: flex;
   padding-top: 5px;
-`, xbe = (t) => {
+`, kbe = (t) => {
   const e = ["id", "templatetext"];
   for (const n in t) {
     for (let r of e)
@@ -26912,7 +26912,7 @@ const ybe = me.div`
     t[n].errorMessage && console.error(t[n].errorMessage);
   }
   return t;
-}, kbe = ({
+}, _be = ({
   setText: t,
   templatelist: e,
   setSyncText: n
@@ -26946,7 +26946,7 @@ const ybe = me.div`
     }
     return v;
   };
-  return gr(() => y(e).then(xbe).then(x).then(o), []), d.error ? lt`
+  return gr(() => y(e).then(kbe).then(x).then(o), []), d.error ? lt`
         <${Js} type="button" template=${r} onMouseEnter=${() => f(!0)} onMouseLeave=${() => f(!1)}>
           Templates
         <//>
@@ -26954,16 +26954,16 @@ const ybe = me.div`
         <${Js} type="button" template=${r} onMouseEnter=${() => f(!0)} onMouseLeave=${() => f(!1)}>
           Templates
         <//>` : lt`
-    ${a && lt`<${pbe} selectedTemplate=${l} closeModal=${() => {
+    ${a && lt`<${gbe} selectedTemplate=${l} closeModal=${() => {
     h(!1), c(!1);
   }} changeDocumentTemplate=${m}/>`}
-    <${bbe}>
+    <${vbe}>
       <${Js} type="button">Templates<//>
-      <${wbe}>
-        <${ybe}>
+      <${xbe}>
+        <${bbe}>
         ${Object.keys(s).map((v) => lt`
             ${s[v].errorMessage ? lt`
-              <${vbe}>
+              <${wbe}>
                 <${u === v && sy} tooltipOrientation="left" errorMessage="${s[v].errorMessage}"/>
                   <${oy} type="button" onMouseEnter=${() => f(v)} onMouseLeave=${() => f(!1)}>${s[v].id}
                 <//>
@@ -26982,7 +26982,7 @@ const ybe = me.div`
   `;
 };
 console.log("TemplateManager component loaded");
-const _be = me.div.withConfig({
+const Cbe = me.div.withConfig({
   displayName: "Preview",
   componentId: "sc-1gprrj9-0"
 })(['background-color:white;padding:20px;min-height:500px;flex:1;border:1px solid var(--gray-400);border-left:1px solid var(--gray-600);box-shadow:inset 0px 0px 4px var(--gray-600);border-radius:var(--border-radius);font-family:"Lato",sans-serif;vertical-align:top;color:var(--gray-900);word-break:unset;max-width:50%;', ` @media print{&{display:block !important;border:0px !important;box-shadow:none !important;border-radius:0px !important;word-break:unset !important;}}p{margin-top:0px;line-height:1.3em;display:block;a{display:inline;}@media print{break-inside:avoid !important;text-align:justify !important;text-justify:inter-word !important;}}a{color:var(--blue-500);word-break:break-word;@media print{&::after{content:"(" attr(href) ")" !important;}}}h1,h2,h3,h4,h5,h6{font-weight:bold;line-height:1.5;margin:1em 0;}h1{font-size:1.8em;}h2{font-size:1.5em;}h3{font-size:1.25em;}h4{font-size:1.15em;}h5{font-size:1.1em;}h6{font-size:1em;}hr{height:1px;margin:16px 0;background-color:var(--gray-500);border:0 none;}code,pre{border-radius:var(--border-radius);background-color:var(--gray-200);}code{padding:0.1em 0.4em;font-family:"Source Code Pro";font-size:0.9em;}pre{white-space:pre-wrap;padding:16px;}aside{border-radius:var(--border-radius);&.admonition{border:var(--border-2) solid var(--green-500);margin-bottom:1rem;.admonition{margin:0rem 1.4rem 0.9rem 1.4rem;}& > header,p{padding:10px;}& > p{margin-bottom:0;}& > header{color:var(--white);font-weight:bold;background:var(--green-500);}}&[class="admonition"]{.admonition{margin-top:0.9rem;}}&.note,&.important,&.tip,&.hint,&.directive-unhandled,&.warning{border:3px solid var(--blue-400);& > header{background-color:var(--blue-400);display:flex;&::before{padding-right:5px;display:flex;align-items:center;}}}&.warning{border:3px solid var(--orange-500);& > header{background-color:var(--orange-500);&::before{content:url("data:image/svg+xml,%3Csvg style='color: white' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-exclamation-triangle' viewBox='0 0 16 16'%3E%3Cpath d='M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z' fill='white'%3E%3C/path%3E%3Cpath d='M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z' fill='white'%3E%3C/path%3E%3C/svg%3E%0A");}}}&.tip,&.hint{& > header::before{content:url("data:image/svg+xml,%3Csvg style='color: white' width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 0V2H8V0H7Z' fill='white'%3E%3C/path%3E%3Cpath d='M3.35355 3.64645L1.85355 2.14645L1.14645 2.85355L2.64645 4.35355L3.35355 3.64645Z' fill='white'%3E%3C/path%3E%3Cpath d='M12.3536 4.35355L13.8536 2.85355L13.1464 2.14645L11.6464 3.64645L12.3536 4.35355Z' fill='white'%3E%3C/path%3E%3Cpath d='M7.49998 3C5.52977 3 3.85938 4.44872 3.58075 6.39913L3.5707 6.46949C3.41148 7.58398 3.73042 8.64543 4.36009 9.45895C4.74345 9.95426 5 10.427 5 10.9013V12.5C5 12.7761 5.22386 13 5.5 13H9.5C9.77614 13 10 12.7761 10 12.5V10.9013C10 10.427 10.2565 9.95423 10.6399 9.45893C11.2696 8.64541 11.5885 7.58397 11.4293 6.4695L11.4192 6.39914C11.1406 4.44873 9.4702 3 7.49998 3Z' fill='white'%3E%3C/path%3E%3Cpath d='M0 8H2V7H0V8Z' fill='white'%3E%3C/path%3E%3Cpath d='M13 8H15V7H13V8Z' fill='white'%3E%3C/path%3E%3Cpath d='M6 15H9V14H6V15Z' fill='white'%3E%3C/path%3E%3C/svg%3E");}}&.note > header::before{content:url("data:image/svg+xml,%3Csvg style='color: white' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-pencil' viewBox='0 0 16 16'%3E%3Cpath d='M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z' fill='white'%3E%3C/path%3E%3C/svg%3E");}&.important > header::before{content:url("data:image/svg+xml,%3Csvg style='color: white' xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath d='M18 16v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-5 0h-2v-2h2v2zm0-4h-2V8h2v4zm-1 10c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2z' fill='white'%3E%3C/path%3E%3C/svg%3E");}&.directive-unhandled,&.directive-error{margin-bottom:1em;& > header{padding:10px;color:var(--white);mark{background:transparent;font-weight:bold;color:inherit;}code{background:transparent;font-family:'Lato',sans-serif;font-weight:bold;padding:0;margin-left:.3em;}}pre{background-color:var(--white);margin:0;font-family:'Lato',sans-serif;}}&.directive-unhandled{border:3px solid var(--gray-700);& > header{background-color:var(--gray-700);}}&.directive-error{border:3px solid var(--red-500);& > header{background-color:var(--red-500);}}}sup,sub,numref{line-height:0;}abbr{letter-spacing:0.1em;font-weight:bold;}img{max-width:100%;height:auto;display:block;margin-left:auto;margin-right:auto;}li{margin-bottom:0.5em;line-height:1.3em;p{padding:0px;}}ul,ol{list-style:revert;padding-left:40px;padding-top:0.5em;}&[class^="Preview"] > ul{padding-top:0.5em;padding-bottom:0.5em;}blockquote{border-left:5px solid var(--green-500);margin-left:0;margin-top:0;padding-left:0.75rem;}table{border-spacing:0;margin:20px 0 20px 0;}th,td{padding:20px;text-align:left;border-right:1px solid var(--gray-500);border-bottom:1px solid var(--gray-500);}th{background:var(--gray-900);border-top:1px solid var(--gray-500);color:var(--white);&:first-of-type{border-top-left-radius:var(--border-radius);border-left:1px solid var(--gray-500);}&:last-of-type{border-top-right-radius:var(--border-radius);}}td{&:first-of-type{border-left:1px solid var(--gray-500);}p:last-of-type{margin-bottom:0;}}tr{&:nth-child(2n + 2){background:var(--gray-100);}&:last-of-type{td{&:first-of-type{border-bottom-left-radius:var(--border-radius);}&:last-of-type{border-bottom-right-radius:var(--border-radius);}}}}`], (t) => !t.$shown && Bi`
@@ -27026,10 +27026,10 @@ function ai(t, e, n, r, i, s) {
     let [u, f, d] = h;
     return ai(t, e, u, r, i, f).concat(ai(t, u + d, n, r, f + d, s));
   }
-  return Cbe(t, e, n, r, i, s);
+  return Sbe(t, e, n, r, i, s);
 }
 let td = 1e9;
-function Cbe(t, e, n, r, i, s) {
+function Sbe(t, e, n, r, i, s) {
   let o = n - e, l = s - i;
   if (Math.min(o, l) > td * 16)
     return ly(t, e, n, r, i, s);
@@ -27041,7 +27041,7 @@ function Cbe(t, e, n, r, i, s) {
       return ly(t, e, n, r, i, s);
     let p = gu.advance(d, o, l, c, u, !1, a) || mu.advance(d, o, l, c, f, !0, h);
     if (p)
-      return Sbe(t, e, n, e + p[0], r, i, s, i + p[1]);
+      return Abe(t, e, n, e + p[0], r, i, s, i + p[1]);
   }
   return [new Oe(e, n, i, s)];
 }
@@ -27082,7 +27082,7 @@ class N_ {
   }
 }
 const gu = /* @__PURE__ */ new N_(), mu = /* @__PURE__ */ new N_();
-function Sbe(t, e, n, r, i, s, o, l) {
+function Abe(t, e, n, r, i, s, o, l) {
   let c = !1;
   return !fs(t, r) && ++r == n && (c = !0), !fs(i, l) && ++l == o && (c = !0), c ? [new Oe(e, n, s, o)] : ai(t, e, r, i, s, l).concat(ai(t, r, n, i, l, o));
 }
@@ -27172,7 +27172,7 @@ function F_(t, e) {
     r.toA > i.fromA - e && r.toB > i.fromB - e && (t[n - 1] = new Oe(r.fromA, i.toA, r.fromB, i.toB), t.splice(n--, 1));
   }
 }
-function Abe(t, e, n) {
+function Ebe(t, e, n) {
   for (; ; ) {
     F_(n, 1);
     let r = !1;
@@ -27193,14 +27193,14 @@ function Abe(t, e, n) {
   }
   return n;
 }
-function Ebe(t, e, n) {
+function Dbe(t, e, n) {
   for (let r = 0, i = 0; i < t.length; i++) {
     let s = t[i], o = s.toA - s.fromA, l = s.toB - s.fromB;
     if (o && l || o > 3 || l > 3) {
       let c = i == t.length - 1 ? e.length : t[i + 1].fromA, a = s.fromA - r, h = c - s.toA, u = ay(e, s.fromA, Math.min(a, 5)), f = cy(e, s.toA, Math.min(h, 5)), d = s.fromA - u, p = f - s.toA;
       if (!o || !l) {
         let g = Math.max(o, l), [m, y, b] = o ? [e, s.fromA, s.toA] : [n, s.fromB, s.toB], x, v;
-        d && p ? (g > d && e.slice(u, s.fromA) == m.slice(b - d, b) ? (s = t[i] = new Oe(u, u + o, s.fromB - d, s.toB - d), u = s.fromA, f = cy(e, s.toA, Math.min(c - s.toA, 5))) : g > p && e.slice(s.toA, f) == m.slice(y, y + p) && (s = t[i] = new Oe(f - o, f, s.fromB + p, s.toB + p), f = s.toA, u = ay(e, s.fromA, Math.min(s.fromA - r, 5))), d = s.fromA - u, p = f - s.toA) : !d && !p && (v = s.fromA - (x = Dbe(e, s.fromA, a))) && e.slice(x, s.fromA) == m.slice(b - v, b) && (s = t[i] = new Oe(x, x + o, s.fromB - v, s.toB - v));
+        d && p ? (g > d && e.slice(u, s.fromA) == m.slice(b - d, b) ? (s = t[i] = new Oe(u, u + o, s.fromB - d, s.toB - d), u = s.fromA, f = cy(e, s.toA, Math.min(c - s.toA, 5))) : g > p && e.slice(s.toA, f) == m.slice(y, y + p) && (s = t[i] = new Oe(f - o, f, s.fromB + p, s.toB + p), f = s.toA, u = ay(e, s.fromA, Math.min(s.fromA - r, 5))), d = s.fromA - u, p = f - s.toA) : !d && !p && (v = s.fromA - (x = Tbe(e, s.fromA, a))) && e.slice(x, s.fromA) == m.slice(b - v, b) && (s = t[i] = new Oe(x, x + o, s.fromB - v, s.toB - v));
       }
       (d || p) && (s = t[i] = new Oe(s.fromA - d, s.toA + p, s.fromB - d, s.toB + p)), r = s.toA;
     }
@@ -27249,7 +27249,7 @@ function ay(t, e, n) {
       return e;
   }
 }
-function Dbe(t, e, n) {
+function Tbe(t, e, n) {
   for (let r = e, i = e - n; ; ) {
     let s = r ? t.charCodeAt(r - 1) : 10;
     if (s == 10)
@@ -27262,12 +27262,12 @@ const z_ = (t) => t >= 55296 && t <= 56319, V_ = (t) => t >= 56320 && t <= 57343
 function fs(t, e) {
   return !e || e == t.length || !z_(t.charCodeAt(e - 1)) || !V_(t.charCodeAt(e));
 }
-function Tbe(t, e, n) {
+function Mbe(t, e, n) {
   var r;
-  return td = ((r = n == null ? void 0 : n.scanLimit) !== null && r !== void 0 ? r : 1e9) >> 1, Abe(t, e, ai(t, 0, t.length, e, 0, e.length));
+  return td = ((r = n == null ? void 0 : n.scanLimit) !== null && r !== void 0 ? r : 1e9) >> 1, Ebe(t, e, ai(t, 0, t.length, e, 0, e.length));
 }
 function U_(t, e, n) {
-  return Ebe(Tbe(t, e, n), t, e);
+  return Dbe(Mbe(t, e, n), t, e);
 }
 const W_ = { scanLimit: 500 };
 class ji {
@@ -27388,7 +27388,7 @@ const rd = /* @__PURE__ */ j.define(), ds = /* @__PURE__ */ Ie.define({
     ({ deco: this.deco, gutter: this.gutter } = yy(t));
   }
   update(t) {
-    (t.docChanged || t.viewportChanged || Mbe(t.startState, t.state) || Obe(t.startState, t.state)) && ({ deco: this.deco, gutter: this.gutter } = yy(t.view));
+    (t.docChanged || t.viewportChanged || Obe(t.startState, t.state) || Lbe(t.startState, t.state)) && ({ deco: this.deco, gutter: this.gutter } = yy(t.view));
   }
 }, {
   decorations: (t) => t.deco
@@ -27400,18 +27400,18 @@ const rd = /* @__PURE__ */ j.define(), ds = /* @__PURE__ */ Ie.define({
   },
   renderEmptyElements: !1
 }));
-function Mbe(t, e) {
+function Obe(t, e) {
   return t.field(ds, !1) != e.field(ds, !1);
 }
-function Obe(t, e) {
+function Lbe(t, e) {
   return t.facet(dn) != e.facet(dn);
 }
-const gy = /* @__PURE__ */ F.line({ class: "cm-changedLine" }), Lbe = /* @__PURE__ */ F.mark({ class: "cm-changedText" }), my = /* @__PURE__ */ new class extends Cn {
+const gy = /* @__PURE__ */ F.line({ class: "cm-changedLine" }), Rbe = /* @__PURE__ */ F.mark({ class: "cm-changedText" }), my = /* @__PURE__ */ new class extends Cn {
   constructor() {
     super(...arguments), this.elementClass = "cm-changedLineGutter";
   }
 }();
-function Rbe(t, e, n, r, i, s) {
+function Ibe(t, e, n, r, i, s) {
   let o = n ? t.fromA : t.fromB, l = n ? t.toA : t.toB, c = 0;
   if (o != l) {
     i.add(o, o, gy), s && s.add(o, o, my);
@@ -27424,7 +27424,7 @@ function Rbe(t, e, n, r, i, s) {
       if (r)
         for (; c < t.changes.length; ) {
           let f = t.changes[c], d = o + (n ? f.fromA : f.fromB), p = o + (n ? f.toA : f.toB), g = Math.max(h, d), m = Math.min(u, p);
-          if (g < m && i.add(g, m, Lbe), p < u)
+          if (g < m && i.add(g, m, Rbe), p < u)
             c++;
           else
             break;
@@ -27438,7 +27438,7 @@ function yy(t) {
   for (let h of e) {
     if ((s ? h.fromA : h.fromB) >= a)
       break;
-    (s ? h.toA : h.toB) > c && Rbe(h, t.state.doc, s, r, o, l);
+    (s ? h.toA : h.toB) > c && Ibe(h, t.state.doc, s, r, o, l);
   }
   return { deco: o.finish(), gutter: l && l.finish() };
 }
@@ -27475,7 +27475,7 @@ const sa = /* @__PURE__ */ j.define({
   },
   provide: (t) => L.decorations.from(t)
 }), ql = 1e-4;
-function Ibe(t, e, n) {
+function Nbe(t, e, n) {
   let r = new xt(), i = new xt(), s = t.viewportLineBlocks, o = e.viewportLineBlocks, l = 0, c = 0, a = t.state.field(js).iter(), h = e.state.field(js).iter(), u = 0, f = 0, d = 0, p = 0;
   e:
     for (let b = 0; ; b++) {
@@ -27533,7 +27533,7 @@ function Ibe(t, e, n) {
 const id = /* @__PURE__ */ j.define({
   map: (t, e) => e.mapPos(t)
 });
-class Nbe extends tn {
+class Bbe extends tn {
   constructor(e) {
     super(), this.lines = e;
   }
@@ -27546,7 +27546,7 @@ class Nbe extends tn {
       let i = e.posAtDOM(r.target);
       e.dispatch({ effects: id.of(i) });
       let { side: s, sibling: o } = e.state.facet(dn);
-      o().dispatch({ effects: id.of(Bbe(i, e.state.field(ds), s == "a")) });
+      o().dispatch({ effects: id.of(Pbe(i, e.state.field(ds), s == "a")) });
     }), n;
   }
   ignoreEvent(e) {
@@ -27556,7 +27556,7 @@ class Nbe extends tn {
     return 27;
   }
 }
-function Bbe(t, e, n) {
+function Pbe(t, e, n) {
   let r = 0, i = 0;
   for (let s = 0; ; s++) {
     let o = s < e.length ? e[s] : null;
@@ -27565,7 +27565,7 @@ function Bbe(t, e, n) {
     [r, i] = n ? [o.toA, o.toB] : [o.toB, o.toA];
   }
 }
-const Pbe = /* @__PURE__ */ Ie.define({
+const Fbe = /* @__PURE__ */ Ie.define({
   create(t) {
     return F.none;
   },
@@ -27578,14 +27578,14 @@ const Pbe = /* @__PURE__ */ Ie.define({
   provide: (t) => L.decorations.from(t)
 });
 function by({ margin: t = 3, minSize: e = 4 }) {
-  return Pbe.init((n) => Fbe(n, t, e));
+  return Fbe.init((n) => $be(n, t, e));
 }
-function Fbe(t, e, n) {
+function $be(t, e, n) {
   let r = new xt(), i = t.facet(dn).side == "a", s = t.field(ds), o = 1;
   for (let l = 0; ; l++) {
     let c = l < s.length ? s[l] : null, a = l ? o + e : 1, h = c ? t.doc.lineAt(i ? c.fromA : c.fromB).number - 1 - e : t.doc.lines, u = h - a + 1;
     if (u >= n && r.add(t.doc.line(a).from, t.doc.line(h).to, F.replace({
-      widget: new Nbe(u),
+      widget: new Bbe(u),
       block: !0
     })), !c)
       break;
@@ -27593,7 +27593,7 @@ function Fbe(t, e, n) {
   }
   return r.finish();
 }
-const $be = /* @__PURE__ */ L.styleModule.of(/* @__PURE__ */ new Un({
+const qbe = /* @__PURE__ */ L.styleModule.of(/* @__PURE__ */ new Un({
   ".cm-mergeView": {
     overflowY: "auto"
   },
@@ -27623,7 +27623,7 @@ const $be = /* @__PURE__ */ L.styleModule.of(/* @__PURE__ */ new Un({
     font: "inherit",
     cursor: "pointer"
   }
-})), qbe = /* @__PURE__ */ L.baseTheme({
+})), Hbe = /* @__PURE__ */ L.baseTheme({
   "& .cm-scroller, &": {
     height: "auto !important",
     overflowY: "visible !important"
@@ -27664,13 +27664,13 @@ const $be = /* @__PURE__ */ L.styleModule.of(/* @__PURE__ */ new Un({
   "&light.cm-merge-b .cm-changedLineGutter": { background: "#2b2" },
   "&dark.cm-merge-b .cm-changedLineGutter": { background: "#8f8" }
 }), vy = /* @__PURE__ */ new xs(), Hl = /* @__PURE__ */ new xs();
-class Hbe {
+class zbe {
   constructor(e) {
     this.revertDOM = null, this.revertToA = !1, this.revertToLeft = !1, this.measuring = -1;
     let n = [
       Ar.low(G_),
+      Hbe,
       qbe,
-      $be,
       js,
       L.updateListener.of((u) => {
         this.measuring < 0 && (u.heightChanged || u.viewportChanged) && !u.transactions.some((f) => f.effects.some((d) => d.is(sa))) && this.measure();
@@ -27782,7 +27782,7 @@ class Hbe {
     }
   }
   measure() {
-    Ibe(this.a, this.b, this.chunks), this.revertDOM && this.updateRevertButtons();
+    Nbe(this.a, this.b, this.chunks), this.revertDOM && this.updateRevertButtons();
   }
   updateRevertButtons() {
     let e = this.revertDOM, n = e.firstChild, r = this.a.viewport, i = this.b.viewport;
@@ -27834,12 +27834,12 @@ function wy(t) {
 const xy = me(I_)`
   width: 50%;
   display: block;
-`, zbe = ({
+`, Vbe = ({
   old: t,
   current: e
 }) => {
   let n = [Ff, L.editable.of(!1), X.readOnly.of(!0), L.lineWrapping];
-  return new Hbe({
+  return new zbe({
     a: {
       doc: t,
       extensions: n
@@ -27850,7 +27850,7 @@ const xy = me(I_)`
     },
     orientation: "b-a"
   });
-}, Vbe = ({
+}, Ube = ({
   oldText: t,
   text: e
 }) => {
@@ -27858,7 +27858,7 @@ const xy = me(I_)`
   return gr(() => {
     if (i.current)
       return !1;
-    i.current = zbe({
+    i.current = Vbe({
       old: t,
       current: e
     }), n.current.appendChild(i.current.b.dom), r.current.appendChild(i.current.a.dom);
@@ -27867,12 +27867,12 @@ const xy = me(I_)`
     <${xy} ref=${n} $shown=${!0}/>
     <${xy} ref=${r} $shown=${!0}/>
   </div>`;
-}, Ube = me.div`
+}, Wbe = me.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
   ${(t) => t.fullscreen && "position: fixed; left: 0; top: 0; z-index: 10;"}
-`, Wbe = me.div`
+`, jbe = me.div`
   z-index: 10;
   position: sticky;
   top: 0;
@@ -27887,36 +27887,36 @@ const xy = me(I_)`
       display: none;
     }
   }
-`, jbe = me.div`
+`, Gbe = me.div`
   width: 100%;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   margin-left: 5px;
-`, Gbe = me(Js)`
+`, Ybe = me(Js)`
   pointer-events: none; 
   background-color: green; 
   border: none;
   width: fit-content;
-`, Ybe = me.div`
+`, Kbe = me.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   margin-right: 15px;
-`, Kbe = me.div`
+`, Jbe = me.div`
   border-left: 1px solid var(--gray-800);
   height: 40px;
   margin-right: 10px;
   margin-left: 10px;
-`, Jbe = me.div`
+`, Zbe = me.div`
   padding: 20px;
   display: flex;
   flex-flow: row wrap;
   width: 100%;
   background-color: white;
   ${(t) => t.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;"}
-`, Zbe = [{
+`, Xbe = [{
   label: "Source",
   img: "data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22 14.3344V15.6663L17 18.1331V16.7394L20.525 15L17 13.2562V11.8669L22 14.3344ZM12 16.7394L8.475 15L12 13.2562V11.8669L7 14.3344V15.6663L12 18.1331V16.7394ZM16.4044 10H15.1056L12.5988 20H13.8944L16.4044 10V10Z' fill='%23FFFFFF'/%3E%3C/svg%3E"
 }, {
@@ -27928,27 +27928,27 @@ const xy = me(I_)`
 }, {
   label: "Diff",
   img: "data:image/svg+xml,%3Csvg width='22' height='17' viewBox='-2 0 20 15' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.207 15.061L1 11.854v-.707L4.207 7.94l.707.707-2.353 2.354H15v1H2.56l2.354 2.353-.707.707zm7.586-7L15 4.854v-.707L11.793.94l-.707.707L13.439 4H1v1h12.44l-2.354 2.354.707.707z' stroke='white' stroke-width='0.3'/%3E%3C/svg%3E%0A"
-}], Xbe = [{
+}], Qbe = [{
   label: "Fullscreen",
   img: "data:image/svg+xml,%3Csvg width='25' height='25' viewBox='-10 -10 400 400' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg xmlns='http://www.w3.org/2000/svg' fill='%23FFFFFF' %3E%3Cpath d='M384.97,12.03c0-6.713-5.317-12.03-12.03-12.03H264.847c-6.833,0-11.922,5.39-11.934,12.223    c0,6.821,5.101,11.838,11.934,11.838h96.062l-0.193,96.519c0,6.833,5.197,12.03,12.03,12.03c6.833-0.012,12.03-5.197,12.03-12.03    l0.193-108.369c0-0.036-0.012-0.06-0.012-0.084C384.958,12.09,384.97,12.066,384.97,12.03z'/%3E%3Cpath d='M120.496,0H12.403c-0.036,0-0.06,0.012-0.096,0.012C12.283,0.012,12.247,0,12.223,0C5.51,0,0.192,5.317,0.192,12.03    L0,120.399c0,6.833,5.39,11.934,12.223,11.934c6.821,0,11.838-5.101,11.838-11.934l0.192-96.339h96.242    c6.833,0,12.03-5.197,12.03-12.03C132.514,5.197,127.317,0,120.496,0z'/%3E%3Cpath d='M120.123,360.909H24.061v-96.242c0-6.833-5.197-12.03-12.03-12.03S0,257.833,0,264.667v108.092    c0,0.036,0.012,0.06,0.012,0.084c0,0.036-0.012,0.06-0.012,0.096c0,6.713,5.317,12.03,12.03,12.03h108.092    c6.833,0,11.922-5.39,11.934-12.223C132.057,365.926,126.956,360.909,120.123,360.909z'/%3E%3Cpath d='M372.747,252.913c-6.833,0-11.85,5.101-11.838,11.934v96.062h-96.242c-6.833,0-12.03,5.197-12.03,12.03    s5.197,12.03,12.03,12.03h108.092c0.036,0,0.06-0.012,0.084-0.012c0.036-0.012,0.06,0.012,0.096,0.012    c6.713,0,12.03-5.317,12.03-12.03V264.847C384.97,258.014,379.58,252.913,372.747,252.913z' /%3E   %3C/g%3E %3C/svg%3E"
 }, {
   label: "Copy HTML",
   img: "data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 -3 25 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9 2h7v4h4v10h-3v1h4V4.6L17.4 1H8v5h1zm8 0h.31L20 4.69V5h-3zM5 19h7v1H5zm-2 4h13V10.6L12.4 7H3zm9-15h.31L15 10.69V11h-3zM4 8h7v4h4v10H4zm1 5h9v1H5zm4 3h5v1H5v-1z' fill='%23FFFFFF'/%3E%3C/svg%3E"
-}], Qbe = (t) => {
+}], eve = (t) => {
   const e = (n, r, i) => {
     n.type == "rule" && (n.props[0] = n.props[0].split(",").map((s) => `${t} ${s}`).join(","));
   };
   return Object.defineProperty(e, "name", {
     value: `scope-${t}`
   }), e;
-}, eve = (t) => document.documentElement.style.overflow = t ? "hidden" : "visible";
-function tve(t) {
+}, tve = (t) => document.documentElement.style.overflow = t ? "hidden" : "visible";
+function nve(t) {
   function e(n) {
     n.clipboardData.setData("text/html", t), n.clipboardData.setData("text/plain", t), n.preventDefault();
   }
   document.addEventListener("copy", e), document.execCommand("copy"), document.removeEventListener("copy", e);
 }
-const sve = ({
+const ove = ({
   name: t = "myst_editor_textarea",
   id: e = "myst_editor_textarea",
   initialMode: n = "Both",
@@ -27969,39 +27969,39 @@ const sve = ({
     m(k), setTimeout(() => m(null), M * 1e3);
   }, w = {
     "Copy HTML": () => {
-      tve(x(d)), v("copied!", 2);
+      nve(x(d)), v("copied!", 2);
     },
     Fullscreen: () => f((k) => !k)
   };
-  return gr(() => eve(u), [u]), lt`
+  return gr(() => tve(u), [u]), lt`
   <div id="myst-css-namespace">
-    <${QS} stylisPlugins=${[Qbe("#myst-css-namespace")]}>
-      <${Ube} fullscreen=${u}>
-        <${Wbe} $shown=${s}>
-          <${jbe}> 
-            <${Wm} buttons=${Xbe} highlightActive=${!1} clickCallback=${(k) => w[k]()}/>
-            ${g && lt`<${Gbe}> ${g} <//>`}
+    <${QS} stylisPlugins=${[eve("#myst-css-namespace")]}>
+      <${Wbe} fullscreen=${u}>
+        <${jbe} $shown=${s}>
+          <${Gbe}> 
+            <${Wm} buttons=${Qbe} highlightActive=${!1} clickCallback=${(k) => w[k]()}/>
+            ${g && lt`<${Ybe}> ${g} <//>`}
           <//>
-          <${Ybe}>
+          <${Kbe}>
             <${Js} type="button" onClick=${(k) => i(k)}>Export as PDF<//>
-            <${kbe} templatelist=${o} setText=${p} setSyncText=${b}/>
-            <${Kbe} />
-            <${Wm} buttons=${Zbe} clickedId=${2} clickCallback=${(k) => h(k)}/>
+            <${_be} templatelist=${o} setText=${p} setSyncText=${b}/>
+            <${Jbe} />
+            <${Wm} buttons=${Xbe} clickedId=${2} clickCallback=${(k) => h(k)}/>
           <//>
         <//>
-        <${Jbe} fullscreen=${u}>
-          <${hbe} text=${d} setText=${p} syncText=${y} setSyncText=${b} name=${t} id=${e} shown=${a === "Both" || a === "Source"} collaboration=${l} spellcheckOpts=${c}/>
-          <${_be} $shown=${a === "Both" || a === "Preview"} dangerouslySetInnerHTML=${{
+        <${Zbe} fullscreen=${u}>
+          <${ube} text=${d} setText=${p} syncText=${y} setSyncText=${b} name=${t} id=${e} shown=${a === "Both" || a === "Source"} collaboration=${l} spellcheckOpts=${c}/>
+          <${Cbe} $shown=${a === "Both" || a === "Preview"} dangerouslySetInnerHTML=${{
     __html: x(d)
   }}/>
-          <${a == "Diff" && Vbe} oldText=${r} text=${d}/>
+          <${a == "Diff" && Ube} oldText=${r} text=${d}/>
         <//>
       <//>
     <//>
   </div>`;
 };
 export {
-  sve as default,
+  ove as default,
   lt as html,
   so as render
 };
