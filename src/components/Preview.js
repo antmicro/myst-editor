@@ -13,6 +13,7 @@ const Preview = styled.div`
   vertical-align: top;
   color: var(--gray-900);
   word-break: unset;
+  max-width: 50%;
   ${props => !props.$shown && css`
     display: none;
   `}
@@ -45,7 +46,7 @@ const Preview = styled.div`
 
   a {
     color: var(--blue-500);
-    line-break: anywhere;
+    word-break: break-word;
 
     @media print {
       &::after {
@@ -90,8 +91,9 @@ const Preview = styled.div`
     background-color: var(--gray-200);
   }
   code {
-    padding: 0.2em 0.4em;
+    padding: 0.1em 0.4em;
     font-family: "Source Code Pro";
+    font-size: 0.9em;
   }
   pre {
     white-space: pre-wrap;
