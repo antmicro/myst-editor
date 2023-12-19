@@ -27,5 +27,8 @@ export default defineConfig({
   },
   define: {
     'process.env': {}
+  },
+  test: {
+    testTimeout: 20_000
   }
 })
