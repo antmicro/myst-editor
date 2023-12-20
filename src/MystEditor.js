@@ -12,6 +12,7 @@ import TemplateManager from './components/TemplateManager';
 import { TopbarButton } from './components/Buttons';
 import Preview from './components/Preview';
 import Diff from './components/Diff';
+import { markdownReplacer } from './hooks/markdownReplacer';
 
 const EditorParent = styled.div`
   display: flex;
@@ -124,7 +125,8 @@ const MystEditor = ({
   topbar = true,
   templatelist,
   collaboration = {},
-  spellcheckOpts = { dict: "en_US", dictionaryPath: "/dictionaries" }
+  spellcheckOpts = { dict: "en_US", dictionaryPath: "/dictionaries" },
+  transforms = []
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
@@ -133,7 +135,12 @@ const MystEditor = ({
   const [syncText, setSyncText] = useState(false);
 
   const renderAndSanitize = (text) => {
-    return purify.sanitize(markdownIt({ breaks: true, linkify: true }).use(markdownitDocutils).render(text))
+    return purify.sanitize(
+      markdownIt({ breaks: true, linkify: true })
+        .use(markdownitDocutils)
+        .use(markdownReplacer(transforms))
+        .render(text)
+    )
   }
 
   const alertFor = (alertText, secs) => {
