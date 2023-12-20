@@ -173,8 +173,8 @@ const MystEditor = ({
           <//>
         <//>
         <${MystWrapper} fullscreen=${fullscreen}>
-          <${CodeMirror} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} shown=${mode === "Both" || mode === "Source"} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts}/>
-          <${Preview} $shown=${mode === "Both" || mode === "Preview"} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
+          <${CodeMirror} mode=${mode} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts}/>
+          <${Preview} $mode=${mode} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
           <${mode == 'Diff' && Diff} oldText=${initialText} text=${text}/>
         <//>
       <//>

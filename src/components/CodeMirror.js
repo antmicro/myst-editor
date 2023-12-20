@@ -4,10 +4,22 @@ import { basicSetup, EditorView } from "codemirror";
 import { keymap } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { EditorState } from "@codemirror/state";
-import styled from 'styled-components/macro';
+import styled, { css } from 'styled-components/macro';
 import { yCollab } from "y-codemirror.next";
 import useCollaboration from '../hooks/useCollaboration'
 import spellcheck from '../hooks/spellchecker';
+
+const adjustToMode = (mode) => {
+  if (mode === "Both") {
+    return css`
+      display: block;
+      max-width: 50%;`
+  } else if (mode === "Source") {
+    return css`display: block;`
+  } else {
+    return css`display: none;`
+  }
+}
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -18,7 +30,9 @@ const CodeEditor = styled.div`
   border: 0;
   padding: 20px;
   min-height: 500px;
-  display: ${props => props.$shown ? 'block' : 'none'};
+
+  ${props => adjustToMode(props.$mode)}
+
   flex: 1;
   border: 1px solid var(--gray-400);
   box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
@@ -90,7 +104,7 @@ const setEditorText = (editor, text) => {
   });
 }
 
-const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSyncText, collaboration, spellcheckOpts }) => {
+const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyncText, collaboration, spellcheckOpts }) => {
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
   const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
@@ -174,7 +188,7 @@ const CodeMirror = ({ text, setText, id, name, className, shown, syncText, setSy
   }, [syncText])
 
   return html`
-      <${CodeEditor} $shown="${shown}" id="${id}-editor" class=${className}><//>
+      <${CodeEditor} $mode=${mode} id="${id}-editor" class=${className}><//>
       <${HiddenTextArea} value=${text} name=${name} id=${id}><//>
   `;
 };
