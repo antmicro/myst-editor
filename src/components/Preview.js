@@ -1,14 +1,18 @@
 import styled, { css } from 'styled-components/macro';
 
-const adjustToMode = (mode) => {
+export const adjustToMode = (mainMode) => (mode) => {
   if (mode === "Both") {
-    return css`max-width: 50%;`
-  } else if (mode === "Preview") {
+    return css`
+      display: block;
+      max-width: 50%;`
+  } else if (mode === mainMode) {
     return css``
   } else {
     return css`display: none;`
   }
 }
+
+const adjust = adjustToMode("Preview");
 
 const Preview = styled.div`
   background-color: white;
@@ -23,7 +27,7 @@ const Preview = styled.div`
   vertical-align: top;
   color: var(--gray-900);
   word-break: unset;
-  ${props => adjustToMode(props.$mode)}
+  ${props => adjust(props.$mode)}
 
   @media print {
     & {

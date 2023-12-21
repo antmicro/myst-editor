@@ -4,22 +4,13 @@ import { basicSetup, EditorView } from "codemirror";
 import { keymap } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { EditorState } from "@codemirror/state";
-import styled, { css } from 'styled-components/macro';
+import styled from 'styled-components/macro';
 import { yCollab } from "y-codemirror.next";
 import useCollaboration from '../hooks/useCollaboration'
 import spellcheck from '../hooks/spellchecker';
+import { adjustToMode } from './Preview';
 
-const adjustToMode = (mode) => {
-  if (mode === "Both") {
-    return css`
-      display: block;
-      max-width: 50%;`
-  } else if (mode === "Source") {
-    return css`display: block;`
-  } else {
-    return css`display: none;`
-  }
-}
+const adjust = adjustToMode("Source")
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -31,7 +22,7 @@ const CodeEditor = styled.div`
   padding: 20px;
   min-height: 500px;
 
-  ${props => adjustToMode(props.$mode)}
+  ${props => adjust(props.$mode)}
 
   flex: 1;
   border: 1px solid var(--gray-400);
