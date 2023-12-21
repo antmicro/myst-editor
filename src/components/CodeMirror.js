@@ -6,11 +6,12 @@ import { indentWithTab } from "@codemirror/commands";
 import { EditorState } from "@codemirror/state";
 import styled from 'styled-components/macro';
 import { yCollab } from "y-codemirror.next";
-import useCollaboration from '../hooks/useCollaboration'
+import useCollaboration from '../hooks/useCollaboration';
 import spellcheck from '../hooks/spellchecker';
 import { adjustToMode } from './Preview';
+import {markdown} from "@codemirror/lang-markdown";
 
-const adjust = adjustToMode("Source")
+const adjust = adjustToMode("Source");
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -116,6 +117,7 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
       keymap.of([
         indentWithTab
       ]),
+      markdown(),
       spellcheck(spellcheckOpts),
       EditorView.lineWrapping,
       EditorView.updateListener.of(update => {
@@ -176,7 +178,7 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
       setEditorText(editorRef.current, text);
       setSyncText(false);
     }
-  }, [syncText])
+  }, [syncText]);
 
   return html`
       <${CodeEditor} $mode=${mode} id="${id}-editor" class=${className}><//>

@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@codemirror/commands": "^6.2.4",
+    "@codemirror/lang-markdown": "^6.2.3",
     "@codemirror/merge": "@6.0.0",
     "@codemirror/state": "^6.2.1",
     "@codemirror/view": "^6.16.0",
@@ -38,9 +39,9 @@
     "babel-plugin-styled-components": "^2.1.4",
     "eslint": "latest",
     "selenium-webdriver": "^4.16.0",
-    "vitest": "^1.0.4",
     "vite": "^3.2.3",
-    "vite-plugin-babel-macros": "^1.0.6"
+    "vite-plugin-babel-macros": "^1.0.6",
+    "vitest": "^1.0.4"
   },
   "alias": {
     "react": "@preact/compat",
