@@ -4,12 +4,13 @@ import { basicSetup, EditorView } from "codemirror";
 import { keymap } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { EditorState } from "@codemirror/state";
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import { yCollab } from "y-codemirror.next";
 import useCollaboration from '../hooks/useCollaboration';
 import spellcheck from '../hooks/spellchecker';
 import { adjustToMode } from './Preview';
-import {markdown} from "@codemirror/lang-markdown";
+import { markdown } from "@codemirror/lang-markdown";
+import { javascript } from "@codemirror/lang-javascript";
 
 const adjust = adjustToMode("Source");
 
@@ -102,7 +103,7 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
   const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
 
   useEffect(() => {
-      if (collaboration.enabled) {
+    if (collaboration.enabled) {
       undoManager.on('stack-item-added', event => {
         event.stackItem.meta.set('cursor-location', getRelativeCursorLocation(editorRef.current));
       });

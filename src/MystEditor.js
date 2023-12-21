@@ -4,7 +4,7 @@ import { html } from 'htm/preact';
 import markdownitDocutils from 'markdown-it-docutils'
 import purify from 'dompurify'
 import markdownIt from 'markdown-it'
-import { StyleSheetManager, styled } from 'styled-components/macro';
+import { StyleSheetManager, styled } from 'styled-components';
 
 import ButtonGroup from "./components/ButtonGroup";
 import CodeMirror from './components/CodeMirror';

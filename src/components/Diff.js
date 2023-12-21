@@ -4,7 +4,7 @@ import { EditorState } from "@codemirror/state"
 import { useRef, useEffect } from 'preact/hooks'
 import { CodeEditor } from './CodeMirror';
 import { html } from "htm/preact";
-import { styled } from 'styled-components/macro';
+import { styled } from 'styled-components';
 
 const MergeViewCodeEditor = styled(CodeEditor)`
   width: 50%;

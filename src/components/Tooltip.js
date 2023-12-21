@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import { css, styled } from 'styled-components/macro';
+import { css, styled } from 'styled-components';
 
 const TooltipBox = styled.div`
   position: absolute;

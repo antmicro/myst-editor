@@ -1,5 +1,5 @@
 import { html } from 'htm/preact';
-import { styled } from 'styled-components/macro';
+import { styled } from 'styled-components';
 import DefaultButton from './Buttons';
 
 const Container = styled.section`

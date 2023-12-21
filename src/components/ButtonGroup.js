@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import { html } from 'htm/preact';
-import styled from 'styled-components/macro';
+import styled from 'styled-components';
 import DefaultButton from './Buttons.js';
 
 const GroupButton = styled(DefaultButton)`

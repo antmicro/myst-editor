@@ -3,7 +3,7 @@ import { useState, useEffect } from 'preact/hooks';
 import Modal from './Modal.js'
 import Tooltip from './Tooltip.js'
 import DefaultButton, { TopbarButton } from './Buttons.js';
-import { styled } from 'styled-components/macro';
+import { styled } from 'styled-components';
 
 const TemplateDropdownContent = styled.div`
   display: none;
