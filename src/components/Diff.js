@@ -5,6 +5,7 @@ import { useRef, useEffect } from 'preact/hooks'
 import { CodeEditor } from './CodeMirror';
 import { html } from "htm/preact";
 import { styled } from 'styled-components';
+import { markdown } from "@codemirror/lang-markdown";
 
 const MergeViewCodeEditor = styled(CodeEditor)`
   width: 50%;
@@ -14,6 +15,7 @@ const MergeViewCodeEditor = styled(CodeEditor)`
 const initMergeView = ({ old, current }) => {
   let basicReadOnly = [
     basicSetup,
+    markdown(),
     EditorView.editable.of(false),
     EditorState.readOnly.of(true),
     EditorView.lineWrapping,

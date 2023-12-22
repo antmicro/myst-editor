@@ -10,7 +10,6 @@ import useCollaboration from '../hooks/useCollaboration';
 import spellcheck from '../hooks/spellchecker';
 import { adjustToMode } from './Preview';
 import { markdown } from "@codemirror/lang-markdown";
-import { javascript } from "@codemirror/lang-javascript";
 
 const adjust = adjustToMode("Source");
 
