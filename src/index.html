@@ -142,14 +142,14 @@ HTML:
         }
       },
       {  // Same repo issue links
-        target: /#\d+/g,
+        target: /(^|(?<=\s))#\d+/g,
         transform: (match) => {
           const issueId = match.slice(1);
           return `<a href="https://github.com/antmicro/myst-editor/issues/${issueId}">${match}</a>`
         }
       },
       { // Same repo PR links
-        target: /\!\d+/g,
+        target: /(^|(?<=\s))!\d+/g,
         transform: (match) => {
           const prid = match.slice(1);
           return `<a href="https://github.com/antmicro/myst-editor/pull/${prid}">${match}</a>`
