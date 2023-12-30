@@ -1,6 +1,6 @@
 # MyST Editor
 
-Copyright (c) 2022-2023 [Antmicro](https://antmicro.com)
+Copyright (c) 2022-2024 [Antmicro](https://antmicro.com)
 
 This is a [MyST](https://myst-parser.readthedocs.io/en/v0.16.0/) editor in a [Preact](https://preactjs.com/) component, using [htm](https://github.com/developit/htm) as the templating language.
 
