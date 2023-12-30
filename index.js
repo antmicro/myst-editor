@@ -1,32 +1,37 @@
 import "./MystEditor2.js";
-import l, { render as u, html as d } from "./MystEditor.js";
+import u, { render as l, html as d } from "./MystEditor.js";
 (function() {
   const i = document.createElement("link").relList;
   if (i && i.supports && i.supports("modulepreload"))
     return;
-  for (const e of document.querySelectorAll('link[rel="modulepreload"]'))
-    n(e);
-  new MutationObserver((e) => {
-    for (const t of e)
-      if (t.type === "childList")
-        for (const o of t.addedNodes)
-          o.tagName === "LINK" && o.rel === "modulepreload" && n(o);
+  for (const t of document.querySelectorAll('link[rel="modulepreload"]'))
+    n(t);
+  new MutationObserver((t) => {
+    for (const o of t)
+      if (o.type === "childList")
+        for (const a of o.addedNodes)
+          a.tagName === "LINK" && a.rel === "modulepreload" && n(a);
   }).observe(document, { childList: !0, subtree: !0 });
-  function s(e) {
-    const t = {};
-    return e.integrity && (t.integrity = e.integrity), e.referrerpolicy && (t.referrerPolicy = e.referrerpolicy), e.crossorigin === "use-credentials" ? t.credentials = "include" : e.crossorigin === "anonymous" ? t.credentials = "omit" : t.credentials = "same-origin", t;
+  function r(t) {
+    const o = {};
+    return t.integrity && (o.integrity = t.integrity), t.referrerpolicy && (o.referrerPolicy = t.referrerpolicy), t.crossorigin === "use-credentials" ? o.credentials = "include" : t.crossorigin === "anonymous" ? o.credentials = "omit" : o.credentials = "same-origin", o;
   }
-  function n(e) {
-    if (e.ep)
+  function n(t) {
+    if (t.ep)
       return;
-    e.ep = !0;
-    const t = s(e);
-    fetch(e.href, t);
+    t.ep = !0;
+    const o = r(t);
+    fetch(t.href, o);
   }
 })();
 let c = `# h1 is quite big
 
 ## [h2 which is a link](https://google.com)
+
+Issue in this repo: #1
+PR in this repo: !2
+Issue in another repo: github/docs#30828
+PR in another repo: github/docs!100
 
 ### h3
 
@@ -113,15 +118,44 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const m = (a) => {
-  console.log(`Example callback fired on ${a.target}`), window.print();
-}, r = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], p = "0", h = Math.floor(Math.random() * 1e3).toString(), g = r[Math.floor(Math.random() * r.length)];
-u(d`
-        <${l}
+const m = (e) => {
+  console.log(`Example callback fired on ${e.target}`), window.print();
+}, s = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], p = "0", h = Math.floor(Math.random() * 1e3).toString(), g = s[Math.floor(Math.random() * s.length)];
+let f = [{
+  target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
+  transform: (e) => {
+    const [i, r] = e.split("#");
+    return `<a href="https://github.com/${i}/issues/${r}">${e}</a>`;
+  }
+}, {
+  target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
+  transform: (e) => {
+    const [i, r] = e.split("!");
+    return `<a href="https://github.com/${i}/pull/${r}">${e}</a>`;
+  }
+}, {
+  target: /#\d+/g,
+  transform: (e) => `<a href="https://github.com/antmicro/myst-editor/issues/${e.slice(1)}">${e}</a>`
+}, {
+  target: /\!\d+/g,
+  transform: (e) => `<a href="https://github.com/antmicro/myst-editor/pull/${e.slice(1)}">${e}</a>`
+}, {
+  target: /@[0-9a-z\-]+/g,
+  transform: (e) => {
+    const i = e.slice(1);
+    return `
+          <a href='https://github.com/${i}'>
+            ${i}
+          </a>`;
+  }
+}];
+l(d`
+        <${u}
           printCallback=${m}
           templatelist="linkedtemplatelist.json"
           initialText=${c}
           id="textarea_id"
+          transforms=${f}
           collaboration=${{
   enabled: {}.VITE_COLLAB == "ON",
   wsUrl: {}.VITE_WS_URL,
