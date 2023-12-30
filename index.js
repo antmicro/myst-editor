@@ -135,10 +135,10 @@ let f = [{
     return `<a href="https://github.com/${i}/pull/${r}">${e}</a>`;
   }
 }, {
-  target: /#\d+/g,
+  target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
   transform: (e) => `<a href="https://github.com/antmicro/myst-editor/issues/${e.slice(1)}">${e}</a>`
 }, {
-  target: /\!\d+/g,
+  target: new RegExp("(^|(?<=\\s))!\\d+", "g"),
   transform: (e) => `<a href="https://github.com/antmicro/myst-editor/pull/${e.slice(1)}">${e}</a>`
 }, {
   target: /@[0-9a-z\-]+/g,
