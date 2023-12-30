@@ -12,6 +12,11 @@
 
 ## [h2 which is a link](https://google.com)
 
+Issue in this repo: #1
+PR in this repo: !2
+Issue in another repo: github/docs#30828
+PR in another repo: github/docs!100
+
 ### h3
 
 #### h4
@@ -120,6 +125,46 @@ HTML:
     const username = Math.floor(Math.random() * 1000).toString();
     const color = usercolors[Math.floor(Math.random() * usercolors.length)];
 
+    let exampleTransforms = [
+      {  // Other repo issue links
+        target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
+        transform: (match) => {
+          const [repo, issueId] = match.split('#');
+          return `<a href="https://github.com/${repo}/issues/${issueId}">${match}</a>`
+        }
+      },
+      { // Other repo PR links
+        target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
+        transform: (match) => {
+          const [repo, prid] = match.split("!");
+          return `<a href="https://github.com/${repo}/pull/${prid}">${match}</a>`
+        }
+      },
+      {  // Same repo issue links
+        target: /#\d+/g,
+        transform: (match) => {
+          const issueId = match.slice(1);
+          return `<a href="https://github.com/antmicro/myst-editor/issues/${issueId}">${match}</a>`
+        }
+      },
+      { // Same repo PR links
+        target: /\!\d+/g,
+        transform: (match) => {
+          const prid = match.slice(1);
+          return `<a href="https://github.com/antmicro/myst-editor/pull/${prid}">${match}</a>`
+        }
+      },
+      { // User links
+        target: /@[0-9a-z\-]+/g,
+        transform: (match) => {
+          const user = match.slice(1,);
+          return `
+          <a href='https://github.com/${user}'>
+            ${user}
+          </a>`
+        }
+      },
+    ]
     render(
       html`
         <${MystEditor}
@@ -127,6 +172,7 @@ HTML:
           templatelist="linkedtemplatelist.json"
           initialText=${exampleText}
           id="textarea_id"
+          transforms=${exampleTransforms}
           collaboration=${{
             enabled: import.meta.env.VITE_COLLAB == 'ON',
             wsUrl: import.meta.env.VITE_WS_URL,

@@ -36,17 +36,36 @@ You can export the rendered markdown to a PDF file.
 
 ![PDF Demo](./assets/PDFDemo.png)
 
-### See the changes you've made
+### Diff
 
-You can use the diff view to see exactly what changes have been made to the document.
+You can use the diff view to see exactly what changes have been made to the document as compared to the original state.
 
 ![Diff Demo](./assets/DiffDemo.png)
 
-### Use the document in other editors
+### Copy rendered contents
 
 Copy and paste the document into other tools, such as email clients.
 
 ![Copy Demo](./assets/CopyDemo.png)
+
+### Custom transforms
+
+You can create custom transforms that turn specific regexes to custom output HTML.
+This is useful for implementing functionalities such as issue links, for example (as showcased in the demo):
+
+```js
+const transforms = [{
+  target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
+  transform: (match) => {
+    const [repo, issueId] = match.split('#');
+    return `<a href="https://github.com/${repo}/issues/${issueId}">${match}</a>`
+  }
+}]
+```
+
+Then provide the transforms array as the `transforms` prop to MyST editor.
+
+For more examples see the exampleTransforms object in [the demo HTML](src/index.html).
 
 ## Usage
 
@@ -122,6 +141,7 @@ Here are the props you can pass to the MystEditor component:
 - `printCallback` *(default: window.print())* - gets called when you click the `Export to PDF` button
 - `topbar` *(default: true)* - whether to show the topbar
 - `templateList` - path/url to a JSON file containing your document templates. For an example see `public/linkedtemplatelist.json`.
+- `transforms` - [custom transforms](#custom-transforms)
 - `collaboration` - options related to live collaboration:
   - `enabled` *(default: false)*
   - `wsUrl` *(example: ws://example:4444)* - url of the websocket server
