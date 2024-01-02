@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { yCollab } from "y-codemirror.next";
 import useCollaboration from '../hooks/useCollaboration';
 import spellcheck from '../hooks/spellchecker';
+import { customHighlighter } from '../hooks/customHighlights';
 import { adjustToMode } from './Preview';
 import { markdown } from "@codemirror/lang-markdown";
 
@@ -65,6 +66,18 @@ const CodeEditor = styled.div`
   .cm-error {
     text-decoration: underline red
   }
+
+  .cm-link {
+    color: var(--blue-500);
+
+    .cm-error {
+      text-decoration: unset;
+    }
+  }
+
+  .cm-mono {
+    color: #219;
+  }
 `;
 
 const HiddenTextArea = styled.textarea`
@@ -96,7 +109,7 @@ const setEditorText = (editor, text) => {
   });
 }
 
-const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyncText, collaboration, spellcheckOpts }) => {
+const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyncText, collaboration, spellcheckOpts, transforms }) => {
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
   const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
@@ -119,6 +132,7 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
       ]),
       markdown(),
       spellcheck(spellcheckOpts),
+      customHighlighter(transforms),
       EditorView.lineWrapping,
       EditorView.updateListener.of(update => {
         if (update.docChanged) {
