@@ -109,7 +109,7 @@ const setEditorText = (editor, text) => {
   });
 }
 
-const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyncText, collaboration, spellcheckOpts, transforms }) => {
+const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyncText, collaboration, spellcheckOpts, highlights }) => {
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
   const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
@@ -132,7 +132,7 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
       ]),
       markdown(),
       spellcheck(spellcheckOpts),
-      customHighlighter(transforms),
+      customHighlighter(highlights),
       EditorView.lineWrapping,
       EditorView.updateListener.of(update => {
         if (update.docChanged) {
