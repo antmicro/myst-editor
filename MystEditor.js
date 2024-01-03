@@ -27664,6 +27664,8 @@ const Ive = (t) => {
     padding: 0.1em 0.4em;
     font-family: "Source Code Pro";
     font-size: 0.9em;
+    color: var(--black);
+    border: none;
   }
   pre {
     white-space: pre-wrap;
