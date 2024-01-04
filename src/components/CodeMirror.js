@@ -73,6 +73,10 @@ const CodeEditor = styled.div`
     .cm-error {
       text-decoration: unset;
     }
+
+    .ͼ6.ͼ5 {
+      color: unset;
+    }
   }
 
   .cm-mono {
