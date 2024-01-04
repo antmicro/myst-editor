@@ -32855,6 +32855,10 @@ const Z_e = RC("Source"), YA = xe.div`
     .cm-error {
       text-decoration: unset;
     }
+
+    .ͼ6.ͼ5 {
+      color: unset;
+    }
   }
 
   .cm-mono {
