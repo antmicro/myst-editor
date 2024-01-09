@@ -23,6 +23,7 @@ const CodeEditor = styled.div`
   border: 0;
   padding: 20px;
   min-height: 500px;
+  color: black;
 
   ${props => adjust(props.$mode)}
 
