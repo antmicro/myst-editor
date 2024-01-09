@@ -32805,6 +32805,7 @@ const Z_e = RC("Source"), YA = xe.div`
   border: 0;
   padding: 20px;
   min-height: 500px;
+  color: black;
 
   ${(t) => Z_e(t.$mode)}
 
