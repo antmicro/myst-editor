@@ -1,25 +1,26 @@
 import MarkdownIt from "markdown-it";
+import { Role, rolePlugin } from "markdown-it-docutils";
 /**
  * @typedef {{ 
- *  target: RegExp,
- *  transform: function(string): string | Promise<string>
+ *  target: string | RegExp,
+ *  transform: (input: string) => string | Promise<string>
  * }} Transform 
  * 
  * A transformation which will be applied to the output of `markdown-it`. 
  * `transform` will be applied to all matches of `target`.
  */
 
-const cachePrefix = "myst-editor/"
-const getCached = (key) => sessionStorage.getItem(cachePrefix + key)
-const setCached = (key, value) => sessionStorage.setItem(cachePrefix + key, value)
+const cachePrefix = "myst-editor/";
+const getCached = (key) => sessionStorage.getItem(cachePrefix + key);
+const setCached = (key, value) => sessionStorage.setItem(cachePrefix + key, value);
 
 function waitForElementWithId(id) {
   return new Promise(resolve => {
     const observer = new MutationObserver(() => {
       const elem = document.getElementById(id);
       if (elem) {
-        observer.disconnect()
-        resolve(elem)
+        observer.disconnect();
+        resolve(elem);
       };
     });
 
@@ -31,7 +32,7 @@ function waitForElementWithId(id) {
 }
 
 const fillPlaceholder = (placeholderId, html) => {
-  const placeholder = document.getElementById(placeholderId)
+  const placeholder = document.getElementById(placeholderId);
   if (placeholder) placeholder.outerHTML = html;
 }
 
@@ -48,7 +49,7 @@ const cancelTransform = (placeholderId) => {
  * @returns {string}
  */
 const createTransformPlaceholder = (input, promise) => {
-  const placeholderId = Math.random().toString().slice(2);
+  const placeholderId = "placeholder-" + Math.random().toString().slice(2);
 
   promise
     .then(waitForElementWithId(placeholderId))
@@ -59,7 +60,7 @@ const createTransformPlaceholder = (input, promise) => {
     .catch(err => {
       console.error(err);
       cancelTransform(placeholderId);
-      setCached(input, input)
+      setCached(input, input);
     })
 
   return `<span id="${placeholderId}">${input}</span>`
@@ -82,7 +83,7 @@ const overloadTransform = ({ transform: originalTransform, target }) => ({
     if (typeof transformResult.then == "function") {
       return createTransformPlaceholder(input, transformResult);
     }
-    
+
     return transformResult;
   }
 })
@@ -109,6 +110,60 @@ const markdownReplacer =
       };
     }
 
+/***************************** CUSTOM ROLES *****************************/
+
+/**
+ * @typedef {{ 
+ *  target: string,
+ *  transform: (input: string) => string | Promise<string>
+ * }} RoleTransform 
+ * 
+ * A transformation which will be applied to the content of a MyST role specified as `target`
+ */
+
+const CUSTOM_ROLE_RULE = "custom_role";
+
+/**
+ * @param {RoleTransform}
+ * @returns {{ name: string, role: Role }}
+ */
+const toDocutilsRole = ({ target, transform }) => {
+  const DocutilsRole = class extends Role {
+    run({ content }) {
+      const token = new this.state.Token(CUSTOM_ROLE_RULE, "span", 1);
+      token.content = transform(content);
+      return [token];
+    }
+  }
+
+  return { name: target, role: DocutilsRole }
+}
+
+/**
+ *  @param { Transform[] }
+ *  @returns {{ [rolename: string]: Role }}
+ */
+const asDocutilsRoles = (transforms) => transforms
+  .map(overloadTransform)
+  .map(toDocutilsRole)
+  .reduce((roles, {name, role}) => {roles[name] = role; return roles}, {});
+
+/**
+ *  @param { Transform[] } transforms
+ *  @returns {function(MarkdownIt): void} 
+ */
+const useCustomRoles =
+  (transforms) =>
+    (markdownIt) => {
+      const customRoles = asDocutilsRoles(transforms);
+
+      // Usually a markdownIt renderer rule would escape all html code. Here we create a rule 
+      // which explicitly does nothing so that all html returned by transforms is rendered.
+      markdownIt.renderer.rules[CUSTOM_ROLE_RULE] = (tokens, idx) => tokens[idx].content;
+      markdownIt.use(rolePlugin, { roles: customRoles });
+    }
+
 export {
-  markdownReplacer
+  markdownReplacer,
+  useCustomRoles
 }

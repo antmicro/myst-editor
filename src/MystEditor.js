@@ -12,7 +12,7 @@ import TemplateManager from './components/TemplateManager';
 import { TopbarButton } from './components/Buttons';
 import Preview from './components/Preview';
 import Diff from './components/Diff';
-import { markdownReplacer } from './hooks/markdownReplacer';
+import { markdownReplacer, useCustomRoles } from './hooks/markdownReplacer';
 
 const EditorParent = styled.div`
   display: flex;
@@ -126,6 +126,7 @@ const MystEditor = ({
   templatelist,
   collaboration = {},
   spellcheckOpts = { dict: "en_US", dictionaryPath: "/dictionaries" },
+  customRoles = [],
   transforms = []
 }) => {
   const [mode, setMode] = useState(initialMode);
@@ -139,6 +140,7 @@ const MystEditor = ({
       markdownIt({ breaks: true, linkify: true })
         .use(markdownitDocutils)
         .use(markdownReplacer(transforms))
+        .use(useCustomRoles(customRoles))
         .render(text)
     )
   }
