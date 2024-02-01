@@ -165,6 +165,13 @@ const MystEditor = ({
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen])
 
+  useEffect(() => {
+    if (!window.myst_editor) {
+      window.myst_editor = {};
+    }
+    window.myst_editor.text = text;
+  }, [text])
+
   return html`
   <div id="myst-css-namespace">
     <${StyleSheetManager} stylisPlugins=${[createExtraScopePlugin('#myst-css-namespace')]}>
