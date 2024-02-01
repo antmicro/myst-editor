@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { html } from "htm/preact";
 import { basicSetup, EditorView } from "codemirror";
 import { keymap } from "@codemirror/view";
-import { indentWithTab } from "@codemirror/commands";
+import { indentWithTab, redo } from "@codemirror/commands";
 import { EditorState } from "@codemirror/state";
 import styled from 'styled-components';
 import { yCollab } from "y-codemirror.next";
@@ -133,7 +133,8 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
     const extensions = [
       collaboration.enabled ? basicSetupWithoutHistory : basicSetup,
       keymap.of([
-        indentWithTab
+        indentWithTab,
+        { key: "Mod-Z", run: redo }
       ]),
       markdown(),
       spellcheck(spellcheckOpts),
@@ -151,6 +152,7 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
       extensions.push(keymap.of([
         { key: "Mod-z", run: () => undoManager.undo(), preventDefault: true },
         { key: "Mod-y", run: () => undoManager.redo(), preventDefault: true },
+        { key: "Mod-Z", run: () => undoManager.redo(), preventDefault: true },
       ]));
     }
 
