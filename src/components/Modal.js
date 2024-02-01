@@ -52,6 +52,4 @@ const Modal = ({changeDocumentTemplate, selectedTemplate, closeModal}) => {
   `
 }
 
-console.log("Modal functional component loaded")
-
 export default Modal;

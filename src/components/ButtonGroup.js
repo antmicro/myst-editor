@@ -23,6 +23,4 @@ const ButtonGroup = ({ buttons, initialClickedId = 2, clickCallback, highlightAc
   `;
 }
 
-console.log("ButtonGroup component loaded")
-
 export default ButtonGroup

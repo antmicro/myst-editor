@@ -205,8 +205,6 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
   `;
 };
 
-console.log('CodeMirror component loaded');
-
 export default CodeMirror
 export {
   CodeEditor

@@ -173,6 +173,4 @@ const TemplateManager = ({ setText, templatelist, setSyncText }) => {
   `
 }
 
-console.log("TemplateManager component loaded")
-
 export default TemplateManager

@@ -54,6 +54,4 @@ const Tooltip = ({ tooltipOrientation, errorMessage }) => {
     <//>`
 }
 
-console.log("Tooltip component loaded")
-
 export default Tooltip
