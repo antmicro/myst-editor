@@ -8922,7 +8922,6 @@ const Dh = xe.button`
       <//>`)}
   `;
 };
-console.log("ButtonGroup component loaded");
 class ie {
   lineAt(e) {
     if (e < 0 || e > this.length)
@@ -32954,9 +32953,7 @@ const q_e = ZC("Source"), VA = xe.div`
       <${VA} $mode=${s} id="${n}-editor" class=${i}><//>
       <${N_e} value=${t} name=${r} id=${n}><//>
   `;
-};
-console.log("CodeMirror component loaded");
-const Y_e = xe.section`
+}, Y_e = xe.section`
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -32997,9 +32994,7 @@ const Y_e = xe.section`
             <${zy} $negative type="button" onClick=${n}>x Cancel<//>
         <//>
     <//>
-  `;
-console.log("Modal functional component loaded");
-const j_e = xe.div`
+  `, j_e = xe.div`
   position: absolute;
   ${(t) => t.$orientation == "left" && Tr`
     left: 0;
@@ -33047,9 +33042,7 @@ const j_e = xe.div`
       <${U_e} $orientation=${t}>
           ${e}
       <//>
-    <//>`;
-console.log("Tooltip component loaded");
-const G_e = xe.div`
+    <//>`, G_e = xe.div`
   display: none;
   margin-left: 5px;
   font-family: 'Lato', sans-serif;
@@ -33166,7 +33159,6 @@ const G_e = xe.div`
     <//>
   `;
 };
-console.log("TemplateManager component loaded");
 class Re {
   constructor(e, n, r, i) {
     this.fromA = e, this.toA = n, this.fromB = r, this.toB = i;
