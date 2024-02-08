@@ -12,7 +12,12 @@ import TemplateManager from './components/TemplateManager';
 import { TopbarButton } from './components/Buttons';
 import Preview from './components/Preview';
 import Diff from './components/Diff';
-import { markdownReplacer, useCustomRoles } from './hooks/markdownReplacer';
+import { markdownReplacer, resetCache, useCustomRoles } from './hooks/markdownReplacer';
+
+if (!window.myst_editor?.isFresh) {
+  resetCache();
+  window.myst_editor = { isFresh: true };
+}
 
 const EditorParent = styled.div`
   display: flex;
@@ -88,6 +93,7 @@ const buttonsRight = [
 const buttonsLeft = [
   { label: 'Fullscreen', img: "data:image/svg+xml,%3Csvg width='25' height='25' viewBox='-10 -10 400 400' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg xmlns='http://www.w3.org/2000/svg' fill='%23FFFFFF' %3E%3Cpath d='M384.97,12.03c0-6.713-5.317-12.03-12.03-12.03H264.847c-6.833,0-11.922,5.39-11.934,12.223    c0,6.821,5.101,11.838,11.934,11.838h96.062l-0.193,96.519c0,6.833,5.197,12.03,12.03,12.03c6.833-0.012,12.03-5.197,12.03-12.03    l0.193-108.369c0-0.036-0.012-0.06-0.012-0.084C384.958,12.09,384.97,12.066,384.97,12.03z'/%3E%3Cpath d='M120.496,0H12.403c-0.036,0-0.06,0.012-0.096,0.012C12.283,0.012,12.247,0,12.223,0C5.51,0,0.192,5.317,0.192,12.03    L0,120.399c0,6.833,5.39,11.934,12.223,11.934c6.821,0,11.838-5.101,11.838-11.934l0.192-96.339h96.242    c6.833,0,12.03-5.197,12.03-12.03C132.514,5.197,127.317,0,120.496,0z'/%3E%3Cpath d='M120.123,360.909H24.061v-96.242c0-6.833-5.197-12.03-12.03-12.03S0,257.833,0,264.667v108.092    c0,0.036,0.012,0.06,0.012,0.084c0,0.036-0.012,0.06-0.012,0.096c0,6.713,5.317,12.03,12.03,12.03h108.092    c6.833,0,11.922-5.39,11.934-12.223C132.057,365.926,126.956,360.909,120.123,360.909z'/%3E%3Cpath d='M372.747,252.913c-6.833,0-11.85,5.101-11.838,11.934v96.062h-96.242c-6.833,0-12.03,5.197-12.03,12.03    s5.197,12.03,12.03,12.03h108.092c0.036,0,0.06-0.012,0.084-0.012c0.036-0.012,0.06,0.012,0.096,0.012    c6.713,0,12.03-5.317,12.03-12.03V264.847C384.97,258.014,379.58,252.913,372.747,252.913z' /%3E   %3C/g%3E %3C/svg%3E" },
   { label: 'Copy HTML', img: "data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 -3 25 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9 2h7v4h4v10h-3v1h4V4.6L17.4 1H8v5h1zm8 0h.31L20 4.69V5h-3zM5 19h7v1H5zm-2 4h13V10.6L12.4 7H3zm9-15h.31L15 10.69V11h-3zM4 8h7v4h4v10H4zm1 5h9v1H5zm4 3h5v1H5v-1z' fill='%23FFFFFF'/%3E%3C/svg%3E" },
+  { label: 'Refresh', img: "data:image/svg+xml,%3Csvg fill='white' height='25px' width='25px' version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 489.645 489.645' xml:space='preserve'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cg%3E%3Cpath d='M460.656,132.911c-58.7-122.1-212.2-166.5-331.8-104.1c-9.4,5.2-13.5,16.6-8.3,27c5.2,9.4,16.6,13.5,27,8.3 c99.9-52,227.4-14.9,276.7,86.3c65.4,134.3-19,236.7-87.4,274.6c-93.1,51.7-211.2,17.4-267.6-70.7l69.3,14.5 c10.4,2.1,21.8-4.2,23.9-15.6c2.1-10.4-4.2-21.8-15.6-23.9l-122.8-25c-20.6-2-25,16.6-23.9,22.9l15.6,123.8 c1,10.4,9.4,17.7,19.8,17.7c12.8,0,20.8-12.5,19.8-23.9l-6-50.5c57.4,70.8,170.3,131.2,307.4,68.2 C414.856,432.511,548.256,314.811,460.656,132.911z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E" }
 ]
 
 const createExtraScopePlugin = (scope) => {
@@ -160,7 +166,11 @@ const MystEditor = ({
 
   const buttonActions = {
     "Copy HTML": copyHtml,
-    "Fullscreen": () => setFullscreen(f => !f)
+    "Fullscreen": () => setFullscreen(f => !f),
+    "Refresh": () => {
+      resetCache();
+      alertFor("Rich links refreshed!", 1);
+    }
   }
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen])
@@ -178,7 +188,7 @@ const MystEditor = ({
       <${EditorParent} fullscreen=${fullscreen}>
         <${Topbar} $shown=${topbar}>
           <${TopbarLeft}> 
-            <${ButtonGroup} buttons=${buttonsLeft} highlightActive=${false} clickCallback=${(label) => buttonActions[label]()}/>
+            <${ButtonGroup} buttons=${buttonsLeft} highlightActive=${false} initialClickedId=${null} clickCallback=${(label) => buttonActions[label]()}/>
             ${alert && html`<${Alert}> ${alert} <//>`}
           <//>
           <${TopbarRight}>

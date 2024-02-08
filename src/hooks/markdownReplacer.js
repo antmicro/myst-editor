@@ -14,6 +14,14 @@ const cachePrefix = "myst-editor/";
 const getCached = (key) => sessionStorage.getItem(cachePrefix + key);
 const setCached = (key, value) => sessionStorage.setItem(cachePrefix + key, value);
 
+const resetCache = () => {
+  for (var key in sessionStorage) {
+    if (key.startsWith("myst-editor")) {
+      sessionStorage.removeItem(key);
+    }
+  }
+}
+
 function waitForElementWithId(id) {
   return new Promise(resolve => {
     const observer = new MutationObserver(() => {
@@ -165,5 +173,6 @@ const useCustomRoles =
 
 export {
   markdownReplacer,
-  useCustomRoles
+  useCustomRoles,
+  resetCache
 }
