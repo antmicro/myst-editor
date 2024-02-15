@@ -1,5 +1,5 @@
 import "./MystEditor2.js";
-import u, { render as l, html as d } from "./MystEditor.js";
+import l, { render as u, html as d } from "./MystEditor.js";
 (function() {
   const i = document.createElement("link").relList;
   if (i && i.supports && i.supports("modulepreload"))
@@ -150,8 +150,8 @@ let f = [{
           </a>`;
   }
 }];
-l(d`
-        <${u}
+u(d`
+        <${l}
           printCallback=${m}
           templatelist="linkedtemplatelist.json"
           initialText=${c}
@@ -159,6 +159,7 @@ l(d`
           transforms=${f}
           collaboration=${{
   enabled: {}.VITE_COLLAB == "ON",
+  commentsEnabled: {}.VITE_COLLAB == "ON",
   wsUrl: {}.VITE_WS_URL,
   username: h,
   room: p,
