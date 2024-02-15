@@ -176,6 +176,7 @@ HTML:
           transforms=${exampleTransforms}
           collaboration=${{
             enabled: import.meta.env.VITE_COLLAB == 'ON',
+            commentsEnabled: import.meta.env.VITE_COLLAB == 'ON',
             wsUrl: import.meta.env.VITE_WS_URL,
             username,
             room,

@@ -79,6 +79,7 @@ const MystWrapper = styled.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
+  position: relative;
   background-color: white;
   ${props => props.fullscreen && 'box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;'}
 `;

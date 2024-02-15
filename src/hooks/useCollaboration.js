@@ -2,6 +2,7 @@ import * as Y from "yjs";
 import * as awarenessProtocol from "y-protocols/awareness.js";
 import { WebsocketProvider } from 'y-websocket';
 import { useMemo, useState } from "preact/hooks";
+import useComments from "./useComments";
 
 export default function useCollaboration(settings) {
   if (!settings.enabled) {
@@ -46,11 +47,16 @@ export default function useCollaboration(settings) {
     ignoreRemoteMapChanges: true,
   }), []);
 
+  const { ycomments, ycommentsExtension, ycommentsComponent } = useComments(ydoc, provider);
+
   return {
     provider,
     undoManager,
     ytext,
     ydoc,
-    ready
+    ready,
+    ycommentsExtension,
+    ycommentsComponent,
+    ycomments
   }
 }
