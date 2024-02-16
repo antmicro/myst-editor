@@ -149,10 +149,8 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
     editorRef.current = view;
     setInitialized(true);
 
-    if (ycomments) {
-      ycomments.registerCodeMirror(view);
-    }
-
+    ycomments?.registerCodeMirror(view);
+    
     return () => {
       if (collaboration.enabled) {
         provider.disconnect();
@@ -177,9 +175,8 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
       setEditorText(editorRef.current, text);
     }
     
-    if (ycomments) {
-      ycomments.updateMainCodeMirror();
-    }
+    ycomments?.updateMainCodeMirror();
+    
   }, [ready, initialized]);
 
   useEffect(() => {
