@@ -136,7 +136,7 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
       extensions: ExtensionBuilder.basicSetup()
         .useHighlighter(highlights)
         .useSpellcheck(spellcheckOpts)
-        .useCollaboration({enabled: collaboration.enabled, ytext, undoManager, provider, editorRef})
+        .useCollaboration({enabled: collaboration.enabled || false, ytext, undoManager, provider, editorRef})
         .useComments({enabled: collaboration.commentsEnabled, ycomments})
         .addUpdateListener(update => update.docChanged && setText(view.state.doc.toString()))
         .create()
@@ -149,7 +149,9 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
     editorRef.current = view;
     setInitialized(true);
 
-    ycomments.registerCodeMirror(view);
+    if (ycomments) {
+      ycomments.registerCodeMirror(view);
+    }
 
     return () => {
       if (collaboration.enabled) {
@@ -174,8 +176,10 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
       console.log('You are the first user in this document. Initiating...');
       setEditorText(editorRef.current, text);
     }
-
-    ycomments.updateMainCodeMirror();
+    
+    if (ycomments) {
+      ycomments.updateMainCodeMirror();
+    }
   }, [ready, initialized]);
 
   useEffect(() => {
