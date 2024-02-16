@@ -33332,12 +33332,12 @@ const oA = (t) => (e) => e === "Both" ? Qr`
       state: S,
       parent: document.getElementById(n + "-editor")
     });
-    return u.current = v, d(!0), y && y.registerCodeMirror(v), () => {
+    return u.current = v, d(!0), y == null || y.registerCodeMirror(v), () => {
       a.enabled && (p.disconnect(), O.destroy()), v.destroy();
     };
   }, []), Ft(() => {
     const S = document.querySelectorAll("#myst-css-namespace").length, v = a.enabled && g.toString().length == 0 && p.awareness.getStates().size == S && p.firstUser && b;
-    g && g.toString().length != 0 && e(g.toString()), v && (console.log("You are the first user in this document. Initiating..."), nw(u.current, t)), y && y.updateMainCodeMirror();
+    g && g.toString().length != 0 && e(g.toString()), v && (console.log("You are the first user in this document. Initiating..."), nw(u.current, t)), y == null || y.updateMainCodeMirror();
   }, [b, f]), Ft(() => {
     o && (console.log("setting text"), nw(u.current, t), l(!1));
   }, [o]), Be`
