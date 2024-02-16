@@ -1,11 +1,9 @@
 import { html } from "htm/preact";
 import { useRef, useEffect, useState, useCallback } from 'preact/hooks'
 import { styled } from 'styled-components';
-import { highlightActiveLine } from "@codemirror/view"
-import { EditorView, minimalSetup } from "codemirror";
+import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
-import { yCollab } from "y-codemirror.next";
-import { markdown } from "@codemirror/lang-markdown";
+import { ExtensionBuilder } from "../extensions";
 
 const YCommentWrapper = styled.div`
     position:absolute; 
@@ -31,11 +29,7 @@ const YComment = ({ ycomments, shownComments, commentId }) => {
   let cmref = useRef(null);
 
   const updateHeight = useCallback(
-    (update) => {
-      if (update.heightChanged) {
-        ycomments.syncHeight(commentId, cmref.current.clientHeight)
-      }
-    },
+    (update) => update.heightChanged && ycomments.syncHeight(commentId, cmref.current.clientHeight),
     [commentId]
   )
 
@@ -47,17 +41,11 @@ const YComment = ({ ycomments, shownComments, commentId }) => {
     const view = new EditorView({
       state: EditorState.create({
         doc: ytext.toString(),
-        extensions: [
-          EditorView.lineWrapping,
-          EditorView.updateListener.of(updateHeight),
-          minimalSetup,
-          markdown(),
-          highlightActiveLine(),
-          yCollab(
-            ytext,
-            ycomments.getProvider().awareness
-          )
-        ]
+        extensions: ExtensionBuilder.minimalSetup()
+          .useCollaboration({ ytext, provider: ycomments.getProvider() })
+          .useDefaultHistory()
+          .addUpdateListener(updateHeight)
+          .create()
       }),
       parent: cmref.current
     });

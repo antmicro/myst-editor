@@ -47,7 +47,7 @@ export default function useCollaboration(settings) {
     ignoreRemoteMapChanges: true,
   }), []);
 
-  const { ycomments, ycommentsExtension, ycommentsComponent } = useComments(ydoc, provider);
+  const { ycomments, ycommentsComponent } = useComments(ydoc, provider);
 
   return {
     provider,
@@ -55,7 +55,6 @@ export default function useCollaboration(settings) {
     ytext,
     ydoc,
     ready,
-    ycommentsExtension,
     ycommentsComponent,
     ycomments
   }

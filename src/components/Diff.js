@@ -1,11 +1,9 @@
 import { MergeView } from "@codemirror/merge"
-import { EditorView, basicSetup } from "codemirror"
-import { EditorState } from "@codemirror/state"
 import { useRef, useEffect } from 'preact/hooks'
 import { CodeEditor } from './CodeMirror';
 import { html } from "htm/preact";
 import { styled } from 'styled-components';
-import { markdown } from "@codemirror/lang-markdown";
+import { ExtensionBuilder } from "../extensions";
 
 const MergeViewCodeEditor = styled(CodeEditor)`
   width: 50%;
@@ -13,23 +11,10 @@ const MergeViewCodeEditor = styled(CodeEditor)`
 `
 
 const initMergeView = ({ old, current }) => {
-  let basicReadOnly = [
-    basicSetup,
-    markdown(),
-    EditorView.editable.of(false),
-    EditorState.readOnly.of(true),
-    EditorView.lineWrapping,
-  ]
-
+  const extensions = ExtensionBuilder.basicSetup().readonly().create();
   return new MergeView({
-    a: {
-      doc: old,
-      extensions: basicReadOnly
-    },
-    b: {
-      doc: current,
-      extensions: basicReadOnly
-    },
+    a: { doc: old, extensions },
+    b: { doc: current, extensions },
     orientation: "b-a"
   });
 }
