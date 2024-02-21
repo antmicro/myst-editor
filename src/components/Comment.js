@@ -64,23 +64,23 @@ const YComment = ({ ycomments, shownComments, commentId }) => {
     <//>`
 }
 
-export const YCommentsParent = ({ ycomments, comments }) => {
+export const YCommentsParent = ({ ycomments }) => {
   let createCommentPopup = useCallback(
     (commentId) => html`
       <${YComment} 
         key=${commentId}
         commentId=${commentId}
         ycomments=${ycomments}
-        shownComments=${comments}
+        shownComments=${ycomments.comments}
       />`,
-    [ycomments, comments]
+    [ycomments, ycomments.comments]
   );
 
-  let [elems, setElems] = useState(Object.keys(comments).map(createCommentPopup));
+  let [elems, setElems] = useState(Object.keys(ycomments.comments).map(createCommentPopup));
 
   useEffect(
-    () => setElems(Object.keys(comments).map(createCommentPopup)), 
-    [comments]
+    () => setElems(Object.keys(ycomments.comments).map(createCommentPopup)), 
+    [ycomments.comments]
   )
 
   return html`${elems}`

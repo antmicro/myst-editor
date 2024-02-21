@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import useCollaboration from '../hooks/useCollaboration';
 import { adjustToMode } from './Preview';
 import { ExtensionBuilder } from '../extensions';
+import { YCommentsParent } from "../components/Comment";
+import useComments from '../hooks/useComments';
 
 const adjust = adjustToMode("Source");
 
@@ -128,7 +130,8 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
 
-  const { provider, undoManager, ytext, ydoc, ready, ycommentsComponent, ycomments } = useCollaboration(collaboration);
+  const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
+  const ycomments = useComments(ydoc, provider);
 
   useEffect(() => {
     const startState = EditorState.create({
@@ -183,7 +186,7 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
 
   return html`
       <${CodeEditor} $mode=${mode} id="${id}-editor" class=${className}>
-        ${collaboration.commentsEnabled ? ycommentsComponent() : ""}
+        ${collaboration.commentsEnabled ? html`<${YCommentsParent} ycomments=${ycomments}/>` : ""}
       <//>
       <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;
