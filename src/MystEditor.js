@@ -1,9 +1,6 @@
 import { render } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { html } from 'htm/preact';
-import markdownitDocutils from 'markdown-it-docutils'
-import purify from 'dompurify'
-import markdownIt from 'markdown-it'
 import { StyleSheetManager, styled } from 'styled-components';
 
 import ButtonGroup from "./components/ButtonGroup";
@@ -12,7 +9,8 @@ import TemplateManager from './components/TemplateManager';
 import { TopbarButton } from './components/Buttons';
 import Preview from './components/Preview';
 import Diff from './components/Diff';
-import { markdownReplacer, resetCache, useCustomRoles } from './hooks/markdownReplacer';
+import { resetCache } from './hooks/markdownReplacer';
+import { useText } from './hooks/useText';
 
 if (!window.myst_editor?.isFresh) {
   resetCache();
@@ -112,17 +110,6 @@ const createExtraScopePlugin = (scope) => {
 
 const hideBodyScrollIf = val => document.documentElement.style.overflow = val ? "hidden" : "visible";
 
-function copyHtmlAsRichText(str) {
-  function listener(e) {
-    e.clipboardData.setData("text/html", str);
-    e.clipboardData.setData("text/plain", str);
-    e.preventDefault();
-  }
-  document.addEventListener("copy", listener);
-  document.execCommand("copy");
-  document.removeEventListener("copy", listener);
-};
-
 const MystEditor = ({
   name = "myst_editor_textarea",
   id = "myst_editor_textarea",
@@ -138,19 +125,8 @@ const MystEditor = ({
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
-  const [text, setText] = useState(initialText);
+  const text = useText(initialText, transforms, customRoles);
   const [alert, setAlert] = useState(null);
-  const [syncText, setSyncText] = useState(false);
-
-  const renderAndSanitize = (text) => {
-    return purify.sanitize(
-      markdownIt({ breaks: true, linkify: true })
-        .use(markdownitDocutils)
-        .use(markdownReplacer(transforms))
-        .use(useCustomRoles(customRoles))
-        .render(text)
-    )
-  }
 
   const alertFor = (alertText, secs) => {
     setAlert(alertText);
@@ -161,8 +137,8 @@ const MystEditor = ({
   }
 
   const copyHtml = () => {
-    copyHtmlAsRichText(renderAndSanitize(text))
-    alertFor("copied!", 2)
+    text.copy();
+    alertFor("copied!", 2);
   }
 
   const buttonActions = {
@@ -176,13 +152,6 @@ const MystEditor = ({
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen])
 
-  useEffect(() => {
-    if (!window.myst_editor) {
-      window.myst_editor = {};
-    }
-    window.myst_editor.text = text;
-  }, [text])
-
   return html`
   <div id="myst-css-namespace">
     <${StyleSheetManager} stylisPlugins=${[createExtraScopePlugin('#myst-css-namespace')]}>
@@ -194,14 +163,14 @@ const MystEditor = ({
           <//>
           <${TopbarRight}>
             <${TopbarButton} type="button" onClick=${(event) => printCallback(event)}>Export as PDF<//>
-            <${TemplateManager} templatelist=${templatelist} setText=${setText} setSyncText=${setSyncText}/>
+            <${TemplateManager} text=${text} templatelist=${templatelist} />
             <${Separator} />
             <${ButtonGroup} buttons=${buttonsRight} clickedId=${2} clickCallback=${(newMode) => setMode(newMode)}/>
           <//>
         <//>
         <${MystWrapper} fullscreen=${fullscreen}>
-          <${CodeMirror} mode=${mode} text=${text} setText=${setText} syncText=${syncText} setSyncText=${setSyncText} name=${name} id=${id} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts} highlights=${transforms}/>
-          <${Preview} $mode=${mode} dangerouslySetInnerHTML=${{ __html: renderAndSanitize(text) }}/>
+          <${CodeMirror} mode=${mode} text=${text} name=${name} id=${id} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts} highlights=${transforms}/>
+          <${Preview} $mode=${mode} dangerouslySetInnerHTML=${{ __html: text.renderAndSanitize() }}/>
           ${mode === 'Diff' ? html`<${Diff} oldText=${initialText} text=${text}/>` : "" }
         <//>
       <//>

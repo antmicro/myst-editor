@@ -69,7 +69,7 @@ const validateTemplConfig = templConfig => {
   return templConfig;
 }
 
-const TemplateManager = ({ setText, templatelist, setSyncText }) => {
+const TemplateManager = ({ text, templatelist }) => {
   const [template, setTemplate] = useState("");
   const [readyTemplates, setReadyTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -85,8 +85,8 @@ const TemplateManager = ({ setText, templatelist, setSyncText }) => {
 
   const changeDocumentTemplate = (template) => {
     setTemplate(readyTemplates[template].templatetext);
-    setText(readyTemplates[template].templatetext);
-    setSyncText(true);
+    text.set(readyTemplates[template].templatetext);
+    text.sync();
     setShowModal(false);
   }
 

@@ -124,7 +124,7 @@ const setEditorText = (editor, text) => {
   });
 }
 
-const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyncText, collaboration, spellcheckOpts, highlights }) => {
+const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheckOpts, highlights }) => {
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
 
@@ -132,13 +132,13 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
 
   useEffect(() => {
     const startState = EditorState.create({
-      doc: collaboration.enabled ? ytext.toString() : text,
+      doc: collaboration.enabled ? ytext.toString() : text.get(),
       extensions: ExtensionBuilder.basicSetup()
         .useHighlighter(highlights)
         .useSpellcheck(spellcheckOpts)
         .useCollaboration({enabled: collaboration.enabled || false, ytext, undoManager, provider, editorRef})
         .useComments({enabled: collaboration.commentsEnabled, ycomments})
-        .addUpdateListener(update => update.docChanged && setText(view.state.doc.toString()))
+        .addUpdateListener(update => update.docChanged && text.set(view.state.doc.toString()))
         .create()
     });
 
@@ -150,6 +150,7 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
     setInitialized(true);
 
     ycomments?.registerCodeMirror(view);
+
     
     return () => {
       if (collaboration.enabled) {
@@ -168,30 +169,23 @@ const CodeMirror = ({ text, setText, id, name, className, mode, syncText, setSyn
       provider.firstUser && 
       ready;
 
-    if (ytext && ytext.toString().length != 0) setText(ytext.toString());
+    if (ytext && ytext.toString().length != 0) text.set(ytext.toString());
 
     if (isFirstUser) {
       console.log('You are the first user in this document. Initiating...');
-      setEditorText(editorRef.current, text);
+      setEditorText(editorRef.current, text.get());
     }
     
-    ycomments?.updateMainCodeMirror();
-    
-  }, [ready, initialized]);
+    text.onSync(currentText => setEditorText(editorRef.current, currentText))
 
-  useEffect(() => {
-    if (syncText) {
-      console.log('setting text');
-      setEditorText(editorRef.current, text);
-      setSyncText(false);
-    }
-  }, [syncText]);
+    ycomments?.updateMainCodeMirror();    
+  }, [ready, initialized]);
 
   return html`
       <${CodeEditor} $mode=${mode} id="${id}-editor" class=${className}>
         ${collaboration.commentsEnabled ? ycommentsComponent() : ""}
       <//>
-      <${HiddenTextArea} value=${text} name=${name} id=${id}><//>
+      <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;
 };
 

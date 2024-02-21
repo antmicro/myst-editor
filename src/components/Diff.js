@@ -31,7 +31,7 @@ const Diff = ({ oldText, text }) => {
       }
       mergeView.current = initMergeView({
         old: oldText,
-        current: text,
+        current: text.get(),
       });
 
       leftRef.current.appendChild(mergeView.current.b.dom)
