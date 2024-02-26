@@ -4,6 +4,7 @@ import { styled } from 'styled-components';
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { ExtensionBuilder } from "../extensions";
+import { YComments } from "../comments/ycomments";
 
 const YCommentWrapper = styled.div`
     position:absolute; 
@@ -25,11 +26,12 @@ const YCommentWrapper = styled.div`
         background-color: var(--gray-500);
     }
 `
-const YComment = ({ ycomments, shownComments, commentId }) => {
+/** @param {{ ycomments: YComments }} */
+const YComment = ({ ycomments, commentId }) => {
   let cmref = useRef(null);
 
   const updateHeight = useCallback(
-    (update) => update.heightChanged && ycomments.syncHeight(commentId, cmref.current.clientHeight),
+    (update) => update.heightChanged && ycomments.updateHeight(commentId, cmref.current.clientHeight),
     [commentId]
   )
 
@@ -42,7 +44,7 @@ const YComment = ({ ycomments, shownComments, commentId }) => {
       state: EditorState.create({
         doc: ytext.toString(),
         extensions: ExtensionBuilder.minimalSetup()
-          .useCollaboration({ ytext, provider: ycomments.getProvider() })
+          .useCollaboration({ ytext, provider: ycomments.provider })
           .useDefaultHistory()
           .addUpdateListener(updateHeight)
           .create()
@@ -57,31 +59,21 @@ const YComment = ({ ycomments, shownComments, commentId }) => {
   }, [cmref])
 
   return html`
-    <${YCommentWrapper} top=${shownComments[commentId].top}>
-        <div style="display: ${shownComments[commentId].isShown ? 'block' : 'none'}" >
+    <${YCommentWrapper} top=${ycomments.display().offset(commentId)}>
+        <div style="display: ${ycomments.display().isShown(commentId) ? 'block' : 'none'}" >
           <div ref=${cmref}></div>
         </div>
     <//>`
 }
 
+/** @param {{ ycomments: YComments }} */
 export const YCommentsParent = ({ ycomments }) => {
-  let createCommentPopup = useCallback(
-    (commentId) => html`
-      <${YComment} 
-        key=${commentId}
-        commentId=${commentId}
-        ycomments=${ycomments}
-        shownComments=${ycomments.comments}
-      />`,
-    [ycomments, ycomments.comments]
-  );
+  let createWidget = ({ commentId }) => html`<${YComment} ...${{key: commentId, commentId, ycomments}}/>`
+  let createWidgets = () => ycomments.iterComments().map(createWidget)
+  let [widgets, setWidgets] = useState(createWidgets());
 
-  let [elems, setElems] = useState(Object.keys(ycomments.comments).map(createCommentPopup));
+  ycomments.display()
+    .onUpdate(() => setWidgets(createWidgets()));
 
-  useEffect(
-    () => setElems(Object.keys(ycomments.comments).map(createCommentPopup)), 
-    [ycomments.comments]
-  )
-
-  return html`${elems}`
+  return html`${widgets}`
 }

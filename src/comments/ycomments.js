@@ -2,35 +2,144 @@ import * as Y from "yjs";
 import { updateShownComments } from "./state";
 import { WebsocketProvider } from "y-websocket";
 
-const randomId = () => "comment-" + Math.random().toString().replace(".", "")
-
 /**
- * @typedef {{ height: number, isShown: boolean }} CommentInfo
+ * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
  * @typedef {{ [id: string]: CommentInfo }} AllCommentInfo
  */
+
+const randomId = () => "comment-" + Math.random().toString().replace(".", "")
+
+export class CommentPositionManager {
+  /** @param {Y.Doc} ydoc */
+  constructor(ydoc) {
+    /** @type {Y.Map<string>} A map from line numbers to comment ids */
+    this.commentPositions = ydoc.getMap(YComments.dataPath);
+  }
+
+  iter() {
+    return [...this.commentPositions.entries()]
+      .map(([commentId, lineNumber]) => ({ commentId, lineNumber: parseInt(lineNumber) }))
+  }
+
+  move(commentId, targetLine) {
+    if (targetLine > 0 && !this.isOccupied(targetLine)) {
+      this.commentPositions.set(commentId, targetLine);
+    }
+  }
+
+  shift(startLine, diff, maxLine) {
+    if (diff < 0) {
+      this.iter()
+        .filter(c => startLine + diff < c.lineNumber && c.lineNumber <= startLine)
+        .forEach(c => this.del(c.commentId));
+    }
+
+    this.iter()
+      .filter(c => c.lineNumber >= startLine)
+      .filter(c => c.lineNumber + diff <= maxLine)
+      .forEach(c => this.move(c.commentId, c.lineNumber + diff));
+  }
+
+  isOccupied(lineNumber) {
+    return this.iter()
+      .some(c => c.lineNumber == lineNumber)
+  }
+
+  get(commentId) { return this.commentPositions.get(commentId) }
+
+  set(commentId, lineNumber) { return this.commentPositions.set(commentId, lineNumber) }
+
+  del(commentId) { this.commentPositions.delete(commentId); }
+}
+
+export class DisplayManager {
+  constructor() {
+    this.comments = {};
+    this._onUpdate = () => { };
+  }
+
+  onUpdate(f) { this._onUpdate = f }
+
+  switchVisibility(commentId) {
+    const state = this.isShown(commentId);
+    const newState = !state;
+    this.setVisibility(commentId, newState);
+    return newState;
+  }
+
+  setVisibility(commentId, state) {
+    this.update(comments => {
+      if (!comments[commentId]) comments[commentId] = {}
+      comments[commentId].isShown = state;
+      return comments;
+    })
+  }
+
+  setHeight(commentId, height) {
+    this.update(ci => {
+      ci[commentId] ||= {};
+      ci[commentId].height = height;
+      return ci;
+    });
+  }
+
+  offset(commentId) {
+    return this.comments[commentId].top
+  }
+
+  isShown(commentId) {
+    if (this.comments[commentId]) {
+      return this.comments[commentId].isShown;
+    }
+    return true;
+  }
+
+  del(commentId) {
+    this.update(comments => {
+      delete comments[commentId];
+      return comments;
+    });
+  }
+
+  new(commentId) {
+    this.update(comments => {
+      comments[commentId] = { height: 18, isShown: false };
+      return comments;
+    });
+  }
+
+  update(f) {
+    if (f) this.comments = f(this.comments);
+    this._onUpdate();
+  }
+
+  show(commentId) { this.setVisibility(commentId, true) }
+}
+
+
 export class YComments {
   static commentsPrefix = "comments/";
 
   /** 
    * @param {Y.Doc} ydoc
-   * @param {(setter: (comments: AllCommentInfo) => AllCommentInfo) => void} setComments
    * @param {WebsocketProvider} provider
-   * @param {AllCommentInfo} comments
    */
-  constructor(ydoc, provider, setComments, comments) {
+  constructor(ydoc, provider) {
     this.ydoc = ydoc;
     this.provider = provider;
-    this.setComments = setComments;
-    this.comments = comments;
-
-    this.user = provider.awareness.getLocalState().user;
-
-    /** @type {Y.Map<string>} A map from line numbers to comment ids */
-    this.commentPositions = ydoc.getMap(YComments.dataPath);
 
     /** @type {EditorView} The main codemirror instance */
     this.mainCodeMirror = null;
+
+    this.positionManager = new CommentPositionManager(ydoc);
+    this.displayManager = new DisplayManager();
+
+    this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror())
   }
+
+  positions() { return this.positionManager }
+
+  display() { return this.displayManager }
 
   registerCodeMirror(cm) {
     this.mainCodeMirror = cm;
@@ -40,22 +149,9 @@ export class YComments {
     return this.ydoc.getText(YComments.commentsPrefix + commentId);
   }
 
-  getProvider() {
-    return this.provider;
-  }
-
-  switchVisibility(commentId) {
-    const state = this.isShown(commentId);
-    const newState = !state;
-
-    this.updateComments(comments => {
-      if (!comments[commentId]) comments[commentId] = {}
-
-      comments[commentId].isShown = newState;
-      return comments;
-    })
-
-    return newState;
+  delText(commentId) {
+    let text = this.getTextForComment(commentId);
+    if (text?.parent) text.delete();
   }
 
   isShown(commentId) {
@@ -101,44 +197,43 @@ export class YComments {
 
   newComment(lineNumber) {
     const newCommentId = randomId();
-    this.commentPositions.set(newCommentId, lineNumber.toString()); // Update YJS state
-    this.updateComments(comments => { // Update Preact state
-      comments[newCommentId] = { height: 18, isShown: false };
-      return comments;
-    });
-
-    return newCommentId
+    this.positions().set(newCommentId, lineNumber.toString());
+    this.display().new(newCommentId);
+    return newCommentId;
   }
 
   deleteComment(commentId) {
-    this.commentPositions.delete(commentId); // Update YJS state
-    this.updateComments(comments => { // Update Preact state
-      delete comments[commentId];
-      return comments;
-    });
+    this.positions().del(commentId);
+    this.display().del(commentId);
+    this.delText(commentId);
   }
 
   isEmpty(commentId) {
     return this.getTextForComment(commentId).length === 0;
   }
 
-  //////////////////////// SYNCHRONIZATION ////////////////////////
+  findCommentOn(lineNumber) {
+    return this.positions()
+      .iter()
+      .find(c => c.lineNumber == lineNumber);
+  }
 
-  /** Move Preact element to the `height` (relative to the main CodeMirror position) */
-  syncHeight(commentId, height) {
-    this.updateComments(ci => {
-      ci[commentId].height = height;
-      return ci;
-    });
+  //////////////////////// SYNCHRONIZATION ////////////////////////
+  updateHeight(commentId, height) {
+    this.display().setHeight(commentId, height);
     this.updateMainCodeMirror();
   }
 
   /** Look for comment boxes in the main `CodeMirror` instance */
   syncCommentLocations(update) {
-    this.updateComments( // sync comments locations
+    this.display().update( // sync comments locations
       (comments) => {
-        let boxes = update.view.dom.querySelectorAll(".comment-box");
-        boxes.forEach(box => comments[box.id].top = box.offsetTop);
+        update.view.dom
+          .querySelectorAll(".comment-box")
+          .forEach(box => {
+            comments[box.id] ||= {};
+            comments[box.id].top = box.offsetTop
+          });
         return comments;
       }
     )
@@ -146,30 +241,34 @@ export class YComments {
 
   /** Fetch comments which are in Y.js state but not in Preact */
   syncRemoteComments() {
-    this.updateComments(comments => {
-      this.iterYComments()
-        .filter(c => !comments[c.commentId])
-        .forEach(c => {
-          comments[c.commentId] = { isShown: true, height: 17 };
-          this.updateMainCodeMirror();
-        });
-      return comments;
-    });
-  }
+    this.display()
+      .update(comments => {
+        this.positions()
+          .iter()
+          .filter(c => !comments[c.commentId])
+          .forEach(c => {
+            comments[c.commentId] = { isShown: true, height: 17 };
+            this.updateMainCodeMirror();
+          });
+        return comments;
+      });
+      }
 
   /** Remove comments which are in Preact state but not in Y.js */
   removeLocalComments() {
-    this.updateComments(comments => {
-      let remoteComments = this.iterYComments()
-        .map(c => c.commentId);
+    let remoteComments = this.positions()
+      .iter()
+      .map(c => c.commentId);
 
-      for (let commentId in comments) {
-        if (!remoteComments.includes(commentId)) {
-          delete comments[commentId];
+    this.display()
+      .update(comments => {
+        for (let commentId in comments) {
+          if (!remoteComments.includes(commentId)) {
+            delete comments[commentId];
+          }
         }
-      }
-      return comments;
-    });
+        return comments;
+      });
   }
 
   /** Full synchronization between Y.js and Preact state */
@@ -179,24 +278,10 @@ export class YComments {
     this.removeLocalComments();
   }
 
-  //////////////////////// UTILITY ////////////////////////
-
-  updateComments(f) {
-    this.setComments(ci => {
-      const newCommentState = { ...f(ci) };
-      this.comments = newCommentState;
-      return newCommentState;
-    });
-  }
-
-  iterYComments() {
-    return [...this.commentPositions.entries()]
-    .map(([commentId, lineNumber]) => ({commentId, lineNumber: parseInt(lineNumber)}))
-  }
-
   iterComments() {
-    const addPreactState = ({lineNumber, commentId}) => ({ ...this.comments[commentId], lineNumber, commentId });
-    return this.iterYComments()
+    const addPreactState = ({ lineNumber, commentId }) => ({ ...this.displayManager.comments[commentId], lineNumber, commentId });
+    return this.positions()
+      .iter()
       .map(addPreactState);
   }
 

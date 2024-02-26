@@ -62,7 +62,7 @@ const moveComments = (transaction, ycomments) => {
     if (lineDiff != 0) {
       const docLines = transaction.state.doc.lines;
       const cursorLine = transaction.state.doc.lineAt(transaction.selection.main.from).number - lineDiff;
-      ycomments.moveComments(cursorLine, lineDiff, docLines);
+      ycomments.positions().shift(cursorLine, lineDiff, docLines);
     } 
   }
 }
