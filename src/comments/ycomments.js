@@ -154,46 +154,6 @@ export class YComments {
     if (text?.parent) text.delete();
   }
 
-  isShown(commentId) {
-    if (this.comments[commentId]) {
-      return this.comments[commentId].isShown;
-    }
-    return false;
-  }
-
-  isOccupied(lineNumber) {
-    return this.iterYComments()
-      .some(c => c.lineNumber == lineNumber)
-  }
-
-  getComment(commentId) {
-    return this.commentPositions.get(commentId)
-  }
-
-  moveComment(commentId, targetLine) {
-    if (targetLine > 0 && !this.isOccupied(targetLine)) {
-      this.commentPositions.set(commentId, targetLine);  
-    }
-  }
-
-  removeCommentsInRange(from, to) {
-    return this.iterYComments()
-      .filter(c => from < c.lineNumber && c.lineNumber <= to)
-      .forEach(c => this.commentPositions.delete(c.commentId));
-  }
-
-  moveComments(startLine, diff, maxLine) {
-    if (diff < 0) {
-      this.removeCommentsInRange(startLine + diff, startLine)
-    }
-
-    this.iterYComments()
-      .filter(c => c.lineNumber >= startLine)
-      .filter(c => c.lineNumber + diff <= maxLine)
-      .forEach(c => this.moveComment(c.commentId, c.lineNumber + diff));
-    
-    this.updateMainCodeMirror();
-  }
 
   newComment(lineNumber) {
     const newCommentId = randomId();
@@ -218,7 +178,6 @@ export class YComments {
       .find(c => c.lineNumber == lineNumber);
   }
 
-  //////////////////////// SYNCHRONIZATION ////////////////////////
   updateHeight(commentId, height) {
     this.display().setHeight(commentId, height);
     this.updateMainCodeMirror();
