@@ -25989,7 +25989,7 @@ class rq {
 }
 const Xg = class {
   constructor(e, n) {
-    this.ydoc = e, this.provider = n, this.mainCodeMirror = null, this.positionManager = new nq(e), this.displayManager = new rq(), this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
+    this.ydoc = e, this.provider = n, this.mainCodeMirror = null, this.positionManager = new nq(e), this.displayManager = new rq(), this.draggedComment = null, this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
   }
   positions() {
     return this.positionManager;
@@ -26132,19 +26132,26 @@ const sq = (t, e) => L.widget({
     return Boolean(this.commentId);
   }
   createGutterMarker() {
-    this.gutterMarker = document.createElement("div"), this.gutterMarker.classList.add(li.MAIN_CLASS), this.lineNumber && (this.gutterMarker.style.width = this.lineNumber.toString().length * 7 + "px");
+    this.gutterMarker = document.createElement("div"), this.gutterMarker.classList.add(li.MAIN_CLASS), this.lineNumber && (this.gutterMarker.style.width = this.lineNumber.toString().length * 7 + "px", this.gutterMarker.ondrop = () => this.ycomments.positions().move(this.ycomments.draggedComment, this.lineNumber), this.gutterMarker.ondragover = (e) => e.preventDefault());
   }
   addHoverEffects() {
     this.icon.onmouseenter = () => this.icon.classList.add(li.COMMENT_IMAGE_CLASS), this.icon.onmouseleave = () => this.icon.classList.remove(li.COMMENT_IMAGE_CLASS);
   }
+  enableDragEffects() {
+    this.icon.draggable = !0, this.icon.ondragstart = () => {
+      this.ycomments.draggedComment = this.commentId, this.ycomments.display().update();
+    }, this.icon.ondragend = () => {
+      this.ycomments.draggedComment = null, this.ycomments.display().update();
+    };
+  }
   createPopupIcon() {
-    this.icon = document.createElement("section"), this.icon.classList = li.ICON_CLASS, this.commentId || this.addHoverEffects();
+    this.icon = document.createElement("section"), this.icon.classList = li.ICON_CLASS, !this.draggedComment && !this.commentId && this.addHoverEffects();
   }
   markHasComments() {
     this.icon.classList.add(li.COMMENT_IMAGE_CLASS);
   }
   toDOM() {
-    return this.createGutterMarker(), this.createPopupIcon(), this.hasComments() && this.markHasComments(), this.gutterMarker.appendChild(this.icon), this.gutterMarker;
+    return this.createGutterMarker(), this.createPopupIcon(), this.hasComments() && (this.enableDragEffects(), this.markHasComments()), this.gutterMarker.appendChild(this.icon), this.gutterMarker;
   }
 };
 let oi = li;
@@ -26160,7 +26167,7 @@ const uq = (t, e, n) => {
   lineMarkerChange: (t) => t.transactions.some((e) => e.effects.some((n) => n.is(hh))),
   initialSpacer: () => new oi(null, null),
   domEventHandlers: {
-    mousedown(t, e) {
+    mouseup(t, e) {
       let n = t.state.facet(tu.reader), r = uq(t, e, n);
       !n.display().switchVisibility(r) && n.isEmpty(r) && n.deleteComment(r), t.dispatch({
         effects: hh.of(null)
@@ -26264,6 +26271,8 @@ const bq = ye.div`
     right: 0px;
     background-color: var(--gray-500);
 
+    ${(t) => t.fade ? "opacity: 0.4;" : ""}
+
     .cm-editor {
       background-color: var(--gray-500);
     }
@@ -26298,7 +26307,7 @@ const bq = ye.div`
       s.destroy();
     };
   }, [n]), Le`
-    <${bq} top=${t.display().offset(e)}>
+    <${bq} top=${t.display().offset(e)} fade=${t.draggedComment == e} >
         <div style="display: ${t.display().isShown(e) ? "block" : "none"}" >
           <div ref=${n}></div>
         </div>
