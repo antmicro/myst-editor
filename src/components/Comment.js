@@ -14,6 +14,8 @@ const YCommentWrapper = styled.div`
     right: 0px;
     background-color: var(--gray-500);
 
+    ${props => props.fade ? "opacity: 0.4;" : ""}
+
     .cm-editor {
       background-color: var(--gray-500);
     }
@@ -59,7 +61,7 @@ const YComment = ({ ycomments, commentId }) => {
   }, [cmref])
 
   return html`
-    <${YCommentWrapper} top=${ycomments.display().offset(commentId)}>
+    <${YCommentWrapper} top=${ycomments.display().offset(commentId)} fade=${ycomments.draggedComment == commentId} >
         <div style="display: ${ycomments.display().isShown(commentId) ? 'block' : 'none'}" >
           <div ref=${cmref}></div>
         </div>

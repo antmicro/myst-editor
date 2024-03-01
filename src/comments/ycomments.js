@@ -116,7 +116,6 @@ export class DisplayManager {
   show(commentId) { this.setVisibility(commentId, true) }
 }
 
-
 export class YComments {
   static commentsPrefix = "comments/";
 
@@ -133,6 +132,7 @@ export class YComments {
 
     this.positionManager = new CommentPositionManager(ydoc);
     this.displayManager = new DisplayManager();
+    this.draggedComment = null;
 
     this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror())
   }

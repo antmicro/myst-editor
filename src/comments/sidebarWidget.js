@@ -32,6 +32,8 @@ class CommentMarker extends GutterMarker {
     this.gutterMarker.classList.add(CommentMarker.MAIN_CLASS);
     if (this.lineNumber) {
       this.gutterMarker.style.width = (this.lineNumber.toString().length * 7) + "px";
+      this.gutterMarker.ondrop = () => this.ycomments.positions().move(this.ycomments.draggedComment, this.lineNumber);
+      this.gutterMarker.ondragover = e => e.preventDefault();
     }
   }
 
@@ -40,11 +42,23 @@ class CommentMarker extends GutterMarker {
     this.icon.onmouseleave = () => this.icon.classList.remove(CommentMarker.COMMENT_IMAGE_CLASS);
   }
 
+  enableDragEffects() {
+    this.icon.draggable = true;
+    this.icon.ondragstart = () => {
+      this.ycomments.draggedComment = this.commentId;
+      this.ycomments.display().update();
+    };
+    this.icon.ondragend = () => {
+      this.ycomments.draggedComment = null;
+      this.ycomments.display().update();
+    };
+  }
+
   createPopupIcon() {
     this.icon = document.createElement("section");
     this.icon.classList = CommentMarker.ICON_CLASS;
 
-    if (!this.commentId) {
+    if (!this.draggedComment && !this.commentId) {
       this.addHoverEffects();
     }
   }
@@ -58,6 +72,7 @@ class CommentMarker extends GutterMarker {
     this.createGutterMarker();
     this.createPopupIcon();
     if (this.hasComments()) {
+      this.enableDragEffects();
       this.markHasComments();
     }
     
@@ -89,7 +104,7 @@ const commentMarker = gutter({
   lineMarkerChange: (update) => update.transactions.some(t => t.effects.some(e => e.is(updateShownComments))),
   initialSpacer: () => { return new CommentMarker(null, null) },
   domEventHandlers: {
-    mousedown(view, line) {
+    mouseup(view, line) {
       let ycomments = view.state.facet(ycommentsFacet.reader);
       let commentId = getOrCreateComment(view, line, ycomments);
       let willBeVisible = ycomments.display().switchVisibility(commentId);
