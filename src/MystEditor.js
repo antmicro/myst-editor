@@ -2,6 +2,7 @@ import { render } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import { html } from 'htm/preact';
 import { StyleSheetManager, styled } from 'styled-components';
+import markdownItSourceMap from 'https://cdn.skypack.dev/markdown-it-source-map'
 
 import ButtonGroup from "./components/ButtonGroup";
 import CodeMirror from './components/CodeMirror';
