@@ -1,5 +1,5 @@
 import { html } from "htm/preact";
-import { useRef, useEffect, useState, useCallback } from 'preact/hooks'
+import { useRef, useEffect, useState, useCallback, useMemo } from 'preact/hooks'
 import { styled } from 'styled-components';
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
@@ -27,11 +27,26 @@ const YCommentWrapper = styled.div`
     .cm-gutter {
         background-color: var(--gray-500);
     }
+    
+    .cm-scroller {
+      overflow-x: unset;
+    }
+
+    .author-avatar {
+      border-radius: 50%;
+      height: 24px;
+      width: 24px;
+      box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 4px;
+      position: absolute;
+      transform: translateX(-30px);
+    }
 `
 /** @param {{ ycomments: YComments }} */
 const YComment = ({ ycomments, commentId }) => {
   let cmref = useRef(null);
 
+  const lineAuthors = useMemo(() => ycomments.lineAuthors(commentId), [commentId])
+  
   const updateHeight = useCallback(
     (update) => update.heightChanged && ycomments.updateHeight(commentId, cmref.current.clientHeight),
     [commentId]
@@ -46,9 +61,11 @@ const YComment = ({ ycomments, commentId }) => {
       state: EditorState.create({
         doc: ytext.toString(),
         extensions: ExtensionBuilder.minimalSetup()
+          .disable(["Mod-z", "Mod-y", "Mod-Z"])
           .useCollaboration({ ytext, provider: ycomments.provider })
           .useDefaultHistory()
           .addUpdateListener(updateHeight)
+          .showCommentLineAuthors(lineAuthors)
           .create()
       }),
       parent: cmref.current
@@ -62,7 +79,7 @@ const YComment = ({ ycomments, commentId }) => {
 
   return html`
     <${YCommentWrapper} top=${ycomments.display().offset(commentId)} fade=${ycomments.draggedComment == commentId} >
-        <div style="display: ${ycomments.display().isShown(commentId) ? 'block' : 'none'}" >
+        <div style="position:relative; display: ${ycomments.display().isShown(commentId) ? 'block' : 'none'}" >
           <div ref=${cmref}></div>
         </div>
     <//>`

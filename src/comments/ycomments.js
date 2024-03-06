@@ -9,6 +9,60 @@ import { WebsocketProvider } from "y-websocket";
 
 const randomId = () => "comment-" + Math.random().toString().replace(".", "")
 
+export class CommentLineAuthors {
+  constructor(ydoc, provider, commentId) {
+    this.user = provider.awareness.getLocalState().user;
+    /** @type {Y.Map<{name: string, color: string}>} A map from line numbers to information about the author */
+    this.lineMap = ydoc.getMap(commentId + "/commentLineAuthors");
+  }
+
+  markLineRange(from, to) {
+    for (let i = Math.max(1, from); i <= to; i++) {
+      this.lineMap.set(i.toString(), this.user);
+    }
+  }
+
+  get(lineNumber) {
+    return this.lineMap.get(lineNumber.toString())?.color
+  }
+
+  /** Find the first line which has the same author as `originalLineNumber` with no other authors in-between */
+  firstLineOfSection(originalLineNumber) {
+    let author = this.getAuthor(originalLineNumber);
+    return this.iterLineMap()
+      .filter(a => a.lineNumber <= originalLineNumber)
+      .reduceRight( // Go up until you find a line made by a different author
+        (prev, { name, lineNumber }) => (name==author) && (lineNumber==prev - 1) ? lineNumber : prev, 
+        originalLineNumber
+      )
+  }
+
+  getAuthor(lineNumber) {
+    return this.lineMap.get(lineNumber.toString())?.name
+  }
+
+  iterLineMap() {
+    return [...this.lineMap.entries()]
+      .map(([lineNumber, author]) => ({ lineNumber: parseInt(lineNumber), ...author }))
+      .sort((a1, a2) => a1.lineNumber - a2.lineNumber)
+  }
+
+  /** Move all line->author assignments by `diff`, starting from `startLine` */
+  shift(startLine, diff) {
+    this.iterLineMap()
+      .filter(a => a.lineNumber > startLine)
+      .filter(a => a.lineNumber + diff > 0)
+      .forEach(a => this.lineMap.set((a.lineNumber + diff).toString(), {name: a.name, color: a.color}));
+  }
+
+  /** Remove all information about authors after `maxLine` */
+  trim(maxLine) { 
+    this.iterLineMap()
+      .filter(a => a.lineNumber > maxLine)
+      .forEach(a => this.lineMap.delete(a.lineNumber.toString()))
+  }
+}
+
 export class CommentPositionManager {
   /** @param {Y.Doc} ydoc */
   constructor(ydoc) {
@@ -136,6 +190,8 @@ export class YComments {
 
     this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror())
   }
+
+  lineAuthors(commentId) { return new CommentLineAuthors(this.ydoc, this.provider, commentId) }
 
   positions() { return this.positionManager }
 

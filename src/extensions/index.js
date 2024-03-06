@@ -1,5 +1,5 @@
 import { highlightActiveLine, keymap } from "@codemirror/view"
-import { EditorState } from "@codemirror/state"
+import { EditorState, Prec } from "@codemirror/state"
 import { EditorView, basicSetup, minimalSetup } from "codemirror";
 import { yCollab } from "y-codemirror.next";
 import { markdown } from "@codemirror/lang-markdown";
@@ -7,6 +7,7 @@ import { indentWithTab, redo, history } from "@codemirror/commands";
 import spellcheck from "./spellchecker";
 import { customHighlighter } from "./customHighlights";
 import { commentExtension } from "../comments";
+import { commentAuthoring } from "../comments/lineAuthors";
 
 const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1)
@@ -49,6 +50,13 @@ export class ExtensionBuilder {
     ];
   }
 
+  disable(keys) {
+    this.base.push(Prec.highest(keymap.of(
+      keys.map(key => ({ key, run: () => true }))
+    )));
+    return this;
+  }
+
   addUpdateListener(f) {
     this.extensions.push(EditorView.updateListener.of(f));
     return this;
@@ -70,6 +78,11 @@ export class ExtensionBuilder {
     return this;
   }
 
+  showCommentLineAuthors(lineAuthors) {
+    this.important.push(commentAuthoring(lineAuthors));
+    return this;
+  }
+
   readonly() {
     this.extensions.push(
       EditorView.editable.of(false),
@@ -85,7 +98,7 @@ export class ExtensionBuilder {
 
   useCollaboration({ enabled=true, ytext, provider, undoManager, editorRef }) {
     if (!enabled) return this;
-    
+
     this.extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
 
     if (undoManager) {
