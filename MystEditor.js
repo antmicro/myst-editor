@@ -20015,7 +20015,7 @@ const P_ = (t) => (e) => e === "Both" ? Tr`
       max-width: 50%;` : e === t ? Tr`` : Tr`display: none;`, QL = P_("Preview"), EL = ye.div`
   background-color: white;
   padding: 20px;
-  min-height: 500px;
+  min-height: 150px;
   flex: 1;
   border: 1px solid var(--gray-400);
   border-left: 1px solid var(--gray-600);
