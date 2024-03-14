@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import { useState, useEffect } from 'preact/hooks';
+import { useState, useEffect, useReducer } from 'preact/hooks';
 import { html } from 'htm/preact';
 import { StyleSheetManager, styled } from 'styled-components';
 
@@ -11,6 +11,7 @@ import Preview from './components/Preview';
 import Diff from './components/Diff';
 import { resetCache } from './hooks/markdownReplacer';
 import { useText } from './hooks/useText';
+import Avatars from './components/Avatars';
 
 if (!window.myst_editor?.isFresh) {
   resetCache();
@@ -121,12 +122,15 @@ const MystEditor = ({
   collaboration = {},
   spellcheckOpts = { dict: "en_US", dictionaryPath: "/dictionaries" },
   customRoles = [],
-  transforms = []
+  transforms = [],
+  // this will create a bogus random avatar when no specific getAvatar function is provided
+  getAvatar = (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
   const text = useText(initialText, transforms, customRoles);
   const [alert, setAlert] = useState(null);
+  const [users, setUsers] = useReducer((_, currentUsers) => currentUsers.map(u => ({...u, avatarUrl: getAvatar(u.login)})), []);
 
   const alertFor = (alertText, secs) => {
     setAlert(alertText);
@@ -162,6 +166,7 @@ const MystEditor = ({
             ${alert && html`<${Alert}> ${alert} <//>`}
           <//>
           <${TopbarRight}>
+            <${Avatars} users=${users}/>
             <${TopbarButton} type="button" onClick=${(event) => printCallback(event)}>Export as PDF<//>
             <${TemplateManager} text=${text} templatelist=${templatelist} />
             <${Separator} />
@@ -169,7 +174,7 @@ const MystEditor = ({
           <//>
         <//>
         <${MystWrapper} fullscreen=${fullscreen}>
-          <${CodeMirror} mode=${mode} text=${text} name=${name} id=${id} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts} highlights=${transforms}/>
+          <${CodeMirror} setUsers=${setUsers} mode=${mode} text=${text} name=${name} id=${id} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts} highlights=${transforms}/>
           <${Preview} $mode=${mode} dangerouslySetInnerHTML=${{ __html: text.renderAndSanitize() }}/>
           ${mode === 'Diff' ? html`<${Diff} oldText=${initialText} text=${text}/>` : "" }
         <//>

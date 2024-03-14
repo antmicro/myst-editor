@@ -118,7 +118,7 @@ const setEditorText = (editor, text) => {
   });
 }
 
-const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheckOpts, highlights }) => {
+const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheckOpts, highlights, setUsers }) => {
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
 
@@ -172,8 +172,8 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
     }
     
     text.onSync(currentText => setEditorText(editorRef.current, currentText))
-
-    ycomments?.updateMainCodeMirror();    
+    ycomments?.updateMainCodeMirror();
+    provider.watchCollabolators(setUsers)
   }, [ready, initialized]);
 
   return html`

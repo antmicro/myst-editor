@@ -3,6 +3,17 @@ import * as awarenessProtocol from "y-protocols/awareness.js";
 import { WebsocketProvider } from 'y-websocket';
 import { useMemo, useState } from "preact/hooks";
 
+WebsocketProvider.prototype.watchCollabolators = function (hook) {
+  this.awareness.on('change', ({ added, removed }) => {
+    if (added || removed) {
+      let collabolators = Array.from(this.awareness.states)
+        .map(([key, { user }]) => ({ login: user.name, color: user.color }))
+        .reduce((curr, data) => { curr[data.login] = data; return curr }, {});
+      hook(Object.values(collabolators));
+    }
+  });
+}
+
 export default function useCollaboration(settings) {
   if (!settings.enabled) {
     return {};
