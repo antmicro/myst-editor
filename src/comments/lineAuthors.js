@@ -14,73 +14,6 @@ const lineAuthorsFacet = Facet.define({
 
 ////////////////////////////// LINE-COLORING //////////////////////////////
 
-const markAuthor = (author, lineNumber) => Decoration.line({
-  attributes: {
-    "data-line-number": lineNumber,
-    style: "background-color: " + author.color + "99"
-  }
-});
-
-/** 
- * Color every line of the editor which has an author
- * 
- * @param {EditorView} view 
- */
-function colorEditorLines(view) {
-  const lineAuthors = view.state.facet(lineAuthorsFacet);
-  const builder = new RangeSetBuilder();
-
-  for (let lineNumber = 1; lineNumber <= view.state.doc.lines; lineNumber++) {
-    const line = view.state.doc.line(lineNumber);
-    const author = lineAuthors.get(lineNumber);
-
-    if (author) builder.add(line.from, line.from, markAuthor(author, lineNumber));
-  }
-  return builder.finish();
-}
-
-/** 
- * Check which lines were changed and assign the current user as their author 
- * 
- * @param {Transaction} transaction 
- */
-const markLinesEditedInTransaction = (transaction) => {
-  const lineAuthors = transaction.state.facet(lineAuthorsFacet);
-
-  transaction.changes.iterChangedRanges((_a, _b, changeStart, changeEnd) => {
-    const startLine = transaction.newDoc.lineAt(changeStart);
-    const endLine = transaction.newDoc.lineAt(changeEnd);
-    const isWhitespace = transaction.newDoc.slice(changeStart, changeEnd).toString().trim().length == 0;
-    const lineDiff = transaction.state.doc.lines - transaction.startState.doc.lines;
-
-    if (lineDiff > 0) {
-      if (isWhitespace && !endLine.length) {
-        lineAuthors.insert(startLine.number + 1, lineDiff);
-      } else if (startLine.from == changeStart) {
-        lineAuthors.insert(startLine.number, lineDiff);
-      } else {
-        lineAuthors.insert(startLine.number, lineDiff);
-        lineAuthors.mark(endLine.number);
-      }
-    }
-
-    if (lineDiff < 0) {
-      const oldLine = transaction.startState.doc.length > changeEnd ? transaction.startState.doc.lineAt(changeEnd) : null;
-
-      if (isWhitespace && endLine.to == changeStart) {
-        lineAuthors.remove(startLine.number + 1, -lineDiff);
-      } else if (isWhitespace && !oldLine?.length) {
-        lineAuthors.remove(startLine.number, -lineDiff);
-      } else {
-        lineAuthors.remove(startLine.number + 1, -lineDiff);
-        lineAuthors.mark(startLine.number);
-      }
-    }
-
-    if (lineDiff == 0) lineAuthors.mark(startLine.number);
-  });
-}
-
 /** 
  * A CodeMirror extension. Colors line of the editor respective to their authors.
  *
@@ -89,7 +22,76 @@ const markLinesEditedInTransaction = (transaction) => {
 const commentLineHighlighter = ViewPlugin.fromClass(class {
   /** @param {EditorView} view */
   constructor(view) {
-    this.decorations = colorEditorLines(view);
+    this.decorations = this.colorEditorLines(view);
+  }
+
+  markAuthor(author, lineNumber) {
+    return Decoration.line({
+      attributes: {
+        "data-line-number": lineNumber,
+        style: "background-color: " + author.color + "99"
+      }
+    });
+  } 
+  
+  /** 
+   * Color every line of the editor which has an author
+   * 
+   * @param {EditorView} view 
+   */
+  colorEditorLines(view) {
+    const lineAuthors = view.state.facet(lineAuthorsFacet);
+    const builder = new RangeSetBuilder();
+  
+    for (let lineNumber = 1; lineNumber <= view.state.doc.lines; lineNumber++) {
+      const line = view.state.doc.line(lineNumber);
+      const author = lineAuthors.get(lineNumber);
+  
+      if (author) builder.add(line.from, line.from, this.markAuthor(author, lineNumber));
+    }
+    return builder.finish();
+  }
+  
+  /** 
+   * Check which lines were changed and assign the current user as their author 
+   * 
+   * @param {Transaction} transaction 
+   */
+  markLinesEditedInTransaction(transaction) {
+    const lineAuthors = transaction.state.facet(lineAuthorsFacet);
+  
+    transaction.changes.iterChangedRanges((_a, _b, changeStart, changeEnd) => {
+      const startLine = transaction.newDoc.lineAt(changeStart);
+      const endLine = transaction.newDoc.lineAt(changeEnd);
+      const isWhitespace = transaction.newDoc.slice(changeStart, changeEnd).toString().trim().length == 0;
+      const lineDiff = transaction.state.doc.lines - transaction.startState.doc.lines;
+  
+      if (lineDiff > 0) {
+        if (isWhitespace && !endLine.length) {
+          lineAuthors.insert(startLine.number + 1, lineDiff);
+        } else if (startLine.from == changeStart) {
+          lineAuthors.insert(startLine.number, lineDiff);
+        } else {
+          lineAuthors.insert(startLine.number, lineDiff);
+          lineAuthors.mark(endLine.number);
+        }
+      }
+  
+      if (lineDiff < 0) {
+        const oldLine = transaction.startState.doc.length > changeEnd ? transaction.startState.doc.lineAt(changeEnd) : null;
+  
+        if (isWhitespace && endLine.to == changeStart) {
+          lineAuthors.remove(startLine.number + 1, -lineDiff);
+        } else if (isWhitespace && !oldLine?.length) {
+          lineAuthors.remove(startLine.number, -lineDiff);
+        } else {
+          lineAuthors.remove(startLine.number + 1, -lineDiff);
+          lineAuthors.mark(startLine.number);
+        }
+      }
+  
+      if (lineDiff == 0) lineAuthors.mark(startLine.number);
+    });
   }
 
   /** @param {ViewUpdate} update */
@@ -97,9 +99,9 @@ const commentLineHighlighter = ViewPlugin.fromClass(class {
     if (update.docChanged || update.viewportChanged) {
       update.transactions
         .filter(isUserEvent)
-        .forEach(markLinesEditedInTransaction);
+        .forEach(t => this.markLinesEditedInTransaction(t));
       
-      this.decorations = colorEditorLines(update.view);
+      this.decorations = this.colorEditorLines(update.view);
     }
 
     update.view.dom.onmouseleave = () => update.view.dispatch({
