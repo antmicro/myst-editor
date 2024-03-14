@@ -321,7 +321,7 @@ function Xs(t, e) {
   var n = Ce.__H || (Ce.__H = { __: [], __h: [] });
   return t >= n.__.length && n.__.push({ __V: za }), n.__[t];
 }
-function qe(t) {
+function Xe(t) {
   return gs = 1, Rw(Mw, t);
 }
 function Rw(t, e, n) {
@@ -807,7 +807,7 @@ function A$() {
 }
 var $$ = vh, P$ = xh;
 function T$(t, e) {
-  var n = e(), r = qe({ h: { __: n, v: e } }), i = r[0].h, s = r[1];
+  var n = e(), r = Xe({ h: { __: n, v: e } }), i = r[0].h, s = r[1];
   return vh(function() {
     i.__ = n, i.v = e, Su(i) && s({ h: i });
   }, [t, n, e]), un(function() {
@@ -825,7 +825,7 @@ function Su(t) {
     return !0;
   }
 }
-var vi = { useState: qe, useId: YA, useReducer: Rw, useEffect: un, useLayoutEffect: vh, useInsertionEffect: $$, useTransition: A$, useDeferredValue: C$, useSyncExternalStore: T$, startTransition: Ww, useRef: pi, useImperativeHandle: WA, useMemo: Wt, useCallback: Dw, useContext: Zw, useDebugValue: Kf, version: "17.0.2", Children: e$, render: u$, hydrate: f$, unmountComponentAtNode: k$, createPortal: s$, createElement: hn, createContext: XA, createFactory: b$, cloneElement: w$, createRef: MA, Fragment: or, isValidElement: xh, isElement: P$, isFragment: y$, findDOMNode: v$, Component: Ln, PureComponent: td, memo: HA, forwardRef: JA, flushSync: S$, unstable_batchedUpdates: x$, StrictMode: _$, Suspense: Ua, SuspenseList: wo, lazy: n$, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: O$ };
+var vi = { useState: Xe, useId: YA, useReducer: Rw, useEffect: un, useLayoutEffect: vh, useInsertionEffect: $$, useTransition: A$, useDeferredValue: C$, useSyncExternalStore: T$, startTransition: Ww, useRef: pi, useImperativeHandle: WA, useMemo: Wt, useCallback: Dw, useContext: Zw, useDebugValue: Kf, version: "17.0.2", Children: e$, render: u$, hydrate: f$, unmountComponentAtNode: k$, createPortal: s$, createElement: hn, createContext: XA, createFactory: b$, cloneElement: w$, createRef: MA, Fragment: or, isValidElement: xh, isElement: P$, isFragment: y$, findDOMNode: v$, Component: Ln, PureComponent: td, memo: HA, forwardRef: JA, flushSync: S$, unstable_batchedUpdates: x$, StrictMode: _$, Suspense: Ua, SuspenseList: wo, lazy: n$, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: O$ };
 function Q$(t) {
   return t && t.__esModule && Object.prototype.hasOwnProperty.call(t, "default") ? t.default : t;
 }
@@ -909,7 +909,7 @@ function CO(t, e) {
     return !er(n, e);
   });
 }
-var _h = 1, ys = 1, Uw = 0, Ut = 0, Ne = 0, Ws = "";
+var _h = 1, ys = 1, Uw = 0, Ut = 0, qe = 0, Ws = "";
 function Ch(t, e, n, r, i, s, o, l) {
   return { value: t, root: e, parent: n, type: r, props: i, children: s, line: _h, column: ys, length: o, return: "", siblings: l };
 }
@@ -922,13 +922,13 @@ function Wi(t) {
   ko(t, t.siblings);
 }
 function I$() {
-  return Ne;
+  return qe;
 }
 function q$() {
-  return Ne = Ut > 0 ? Ge(Ws, --Ut) : 0, ys--, Ne === 10 && (ys = 1, _h--), Ne;
+  return qe = Ut > 0 ? Ge(Ws, --Ut) : 0, ys--, qe === 10 && (ys = 1, _h--), qe;
 }
 function an() {
-  return Ne = Ut < Uw ? Ge(Ws, Ut++) : 0, ys++, Ne === 10 && (ys = 1, _h++), Ne;
+  return qe = Ut < Uw ? Ge(Ws, Ut++) : 0, ys++, qe === 10 && (ys = 1, _h++), qe;
 }
 function mi() {
   return Ge(Ws, Ut);
@@ -981,23 +981,23 @@ function _u(t) {
   return zw(Ah(Ut - 1, id(t === 91 ? t + 2 : t === 40 ? t + 1 : t)));
 }
 function X$(t) {
-  for (; (Ne = mi()) && Ne < 33; )
+  for (; (qe = mi()) && qe < 33; )
     an();
-  return rd(t) > 2 || rd(Ne) > 3 ? "" : " ";
+  return rd(t) > 2 || rd(qe) > 3 ? "" : " ";
 }
 function W$(t, e) {
-  for (; --e && an() && !(Ne < 48 || Ne > 102 || Ne > 57 && Ne < 65 || Ne > 70 && Ne < 97); )
+  for (; --e && an() && !(qe < 48 || qe > 102 || qe > 57 && qe < 65 || qe > 70 && qe < 97); )
     ;
   return Ah(t, Ha() + (e < 6 && mi() == 32 && an() == 32));
 }
 function id(t) {
   for (; an(); )
-    switch (Ne) {
+    switch (qe) {
       case t:
         return Ut;
       case 34:
       case 39:
-        t !== 34 && t !== 39 && id(Ne);
+        t !== 34 && t !== 39 && id(qe);
         break;
       case 40:
         t === 41 && id(t);
@@ -1009,8 +1009,8 @@ function id(t) {
   return Ut;
 }
 function Y$(t, e) {
-  for (; an() && t + Ne !== 47 + 10; )
-    if (t + Ne === 42 + 42 && mi() === 47)
+  for (; an() && t + qe !== 47 + 10; )
+    if (t + qe === 42 + 42 && mi() === 47)
       break;
   return "/*" + Ah(e, Ut - 1) + "*" + Kp(t === 47 ? t : an());
 }
@@ -1761,7 +1761,7 @@ function cd() {
   return Zw(rm);
 }
 function QP(t) {
-  var e = qe(t.stylisPlugins), n = e[0], r = e[1], i = cd().styleSheet, s = Wt(function() {
+  var e = Xe(t.stylisPlugins), n = e[0], r = e[1], i = cd().styleSheet, s = Wt(function() {
     var a = i;
     return t.sheet ? a = t.sheet : t.target && (a = a.reconstructWithOptions({ target: t.target }, !1)), t.disableCSSOMInjection && (a = a.reconstructWithOptions({ useCSSOMInjection: !1 })), a;
   }, [t.disableCSSOMInjection, t.sheet, t.target, i]), o = Wt(function() {
@@ -2024,7 +2024,7 @@ const Th = ye.button`
   clickCallback: n,
   highlightActive: r = !0
 }) => {
-  const [i, s] = qe(e);
+  const [i, s] = Xe(e);
   return Le`
     ${t.map((o, l) => Le`
       <${LP} type="button" key=${o.label} name=${o.label} onClick=${() => {
@@ -4924,20 +4924,20 @@ function pT(t) {
   }
   return e;
 }
-class Xe extends Ae {
+class Be extends Ae {
   constructor() {
     super(...arguments), this.children = [], this.length = 0, this.prevAttrs = void 0, this.attrs = null, this.breakAfter = 0;
   }
   merge(e, n, r, i, s, o) {
     if (r) {
-      if (!(r instanceof Xe))
+      if (!(r instanceof Be))
         return !1;
       this.dom || r.transferDOM(this);
     }
     return i && this.setDeco(r ? r.attrs : null), Lk(this, e, n, r ? r.children.slice() : [], s, o), !0;
   }
   split(e) {
-    let n = new Xe();
+    let n = new Be();
     if (n.breakAfter = this.breakAfter, this.length == 0)
       return n;
     let { i: r, off: i } = this.childPos(e);
@@ -5017,7 +5017,7 @@ class Xe extends Ae {
     for (let r = 0, i = 0; r < e.children.length; r++) {
       let s = e.children[r], o = i + s.length;
       if (o >= n) {
-        if (s instanceof Xe)
+        if (s instanceof Be)
           return s;
         if (o > n)
           break;
@@ -5222,7 +5222,7 @@ class Mo {
     return !(e.breakAfter || e instanceof Qr && e.deco.endSide < 0);
   }
   getLine() {
-    return this.curLine || (this.content.push(this.curLine = new Xe()), this.atCursorPos = !0), this.curLine;
+    return this.curLine || (this.content.push(this.curLine = new Be()), this.atCursorPos = !0), this.curLine;
   }
   flushBuffer(e = this.bufferMarks) {
     this.pendingBuffer && (this.curLine.append(ha(new Ss(-1), e), e.length), this.pendingBuffer = 0);
@@ -5757,7 +5757,7 @@ class c0 extends Ae {
     return this.view.state.doc.length;
   }
   constructor(e) {
-    super(), this.view = e, this.decorations = [], this.dynamicDecorationMap = [], this.domChanged = null, this.hasComposition = null, this.markedForComposition = /* @__PURE__ */ new Set(), this.minWidth = 0, this.minWidthFrom = 0, this.minWidthTo = 0, this.impreciseAnchor = null, this.impreciseHead = null, this.forceSelection = !1, this.lastUpdate = Date.now(), this.setDOM(e.contentDOM), this.children = [new Xe()], this.children[0].setParent(this), this.updateDeco(), this.updateInner([new jt(0, 0, 0, e.state.doc.length)], 0, null);
+    super(), this.view = e, this.decorations = [], this.dynamicDecorationMap = [], this.domChanged = null, this.hasComposition = null, this.markedForComposition = /* @__PURE__ */ new Set(), this.minWidth = 0, this.minWidthFrom = 0, this.minWidthTo = 0, this.impreciseAnchor = null, this.impreciseHead = null, this.forceSelection = !1, this.lastUpdate = Date.now(), this.setDOM(e.contentDOM), this.children = [new Be()], this.children[0].setParent(this), this.updateDeco(), this.updateInner([new jt(0, 0, 0, e.state.doc.length)], 0, null);
   }
   update(e) {
     var n;
@@ -5813,7 +5813,7 @@ class c0 extends Ae {
     n.flags |= 8;
     for (let { deco: i } of e.marks)
       n = new hr(i, [n], n.length);
-    let r = new Xe();
+    let r = new Be();
     return r.append(n, 0), r;
   }
   fixCompositionDOM(e) {
@@ -5871,7 +5871,7 @@ class c0 extends Ae {
     let { view: e } = this, n = e.state.selection.main, r = Cc(e.root), { anchorNode: i, anchorOffset: s } = e.observer.selectionRange;
     if (!r || !n.empty || !n.assoc || !r.modify)
       return;
-    let o = Xe.find(this, n.head);
+    let o = Be.find(this, n.head);
     if (!o)
       return;
     let l = o.posAtStart;
@@ -5891,11 +5891,11 @@ class c0 extends Ae {
       return e;
     for (let i = e.offset; !r && i < n.childNodes.length; i++) {
       let s = Ae.get(n.childNodes[i]);
-      s instanceof Xe && (r = s.domAtPos(0));
+      s instanceof Be && (r = s.domAtPos(0));
     }
     for (let i = e.offset - 1; !r && i >= 0; i--) {
       let s = Ae.get(n.childNodes[i]);
-      s instanceof Xe && (r = s.domAtPos(s.length));
+      s instanceof Be && (r = s.domAtPos(s.length));
     }
     return r ? new ht(r.node, r.offset, !0) : e;
   }
@@ -5918,7 +5918,7 @@ class c0 extends Ae {
     let { i: n, off: r } = this.childCursor().findPos(e, -1);
     for (; n < this.children.length - 1; ) {
       let i = this.children[n];
-      if (r < i.length || i instanceof Xe)
+      if (r < i.length || i instanceof Be)
         break;
       n++, r = 0;
     }
@@ -5930,13 +5930,13 @@ class c0 extends Ae {
       let l = this.children[o], a = s - l.breakAfter, c = a - l.length;
       if (a < e)
         break;
-      c <= e && (c < e || l.covers(-1)) && (a > e || l.covers(1)) && (!r || l instanceof Xe && !(r instanceof Xe && n >= 0)) && (r = l, i = c), s = c;
+      c <= e && (c < e || l.covers(-1)) && (a > e || l.covers(1)) && (!r || l instanceof Be && !(r instanceof Be && n >= 0)) && (r = l, i = c), s = c;
     }
     return r ? r.coordsAt(e - i, n) : null;
   }
   coordsForChar(e) {
     let { i: n, off: r } = this.childPos(e, 1), i = this.children[n];
-    if (!(i instanceof Xe))
+    if (!(i instanceof Be))
       return null;
     for (; i.children.length; ) {
       let { i: l, off: a } = i.childPos(r, 1);
@@ -5987,7 +5987,7 @@ class c0 extends Ae {
   }
   measureTextSize() {
     for (let s of this.children)
-      if (s instanceof Xe) {
+      if (s instanceof Be) {
         let o = s.measureTextSize();
         if (o)
           return o;
@@ -6097,7 +6097,7 @@ function AT(t, e, n) {
     if (f instanceof hr)
       h.push({ node: u, deco: f.mark });
     else {
-      if (f instanceof Xe || u.nodeName == "DIV" && u.parentNode == t.contentDOM)
+      if (f instanceof Be || u.nodeName == "DIV" && u.parentNode == t.contentDOM)
         return { range: c, text: i, marks: h, line: u };
       if (u != t.contentDOM)
         h.push({ node: u, deco: new Rl({
@@ -6278,7 +6278,7 @@ function cv(t, e, n, r = -1) {
     }
   }
   if (!O || !t.docView.dom.contains(O)) {
-    let w = Xe.find(t.docView, d);
+    let w = Be.find(t.docView, d);
     if (!w)
       return f > a.top + a.height / 2 ? a.to : a.from;
     ({ node: O, offset: b } = Zd(w.dom, h, u));
@@ -6679,13 +6679,13 @@ function O0(t, e, n, r) {
   if (r == 2)
     return RT(t.state, e, n);
   {
-    let i = Xe.find(t.docView, e), s = t.state.doc.lineAt(i ? i.posAtEnd : e), o = i ? i.posAtStart : s.from, l = i ? i.posAtEnd : s.to;
+    let i = Be.find(t.docView, e), s = t.state.doc.lineAt(i ? i.posAtEnd : e), o = i ? i.posAtStart : s.from, l = i ? i.posAtEnd : s.to;
     return l < t.state.doc.length && l == s.to && l++, C.range(o, l);
   }
 }
 let pv = (t, e) => t >= e.top && t <= e.bottom, b0 = (t, e, n) => pv(e, n) && t >= n.left && t <= n.right;
 function HT(t, e, n, r) {
-  let i = Xe.find(t.docView, e);
+  let i = Be.find(t.docView, e);
   if (!i)
     return 1;
   let s = e - i.posAtStart;
@@ -19979,7 +19979,7 @@ class PL extends Wh {
 function TL(t) {
   if (!t.enabled)
     return {};
-  const e = Wt(() => new Js(), []), [n, r] = qe(!1), i = Wt(() => {
+  const e = Wt(() => new Js(), []), [n, r] = Xe(!1), i = Wt(() => {
     var a;
     const l = new PL((a = t.wsUrl) != null ? a : "ws://localhost:4444", t.room, e, {
       connect: !0,
@@ -26321,14 +26321,11 @@ const bq = ye.div`
     key: s,
     commentId: s,
     ycomments: t
-  }}/>`, n = () => t.iterComments().map(e), [r, i] = qe(n());
+  }}/>`, n = () => t.iterComments().map(e), [r, i] = Xe(n());
   return t.display().onUpdate(() => i(n())), Le`${r}`;
 };
 function kq(t, e) {
-  if (!t || !e)
-    return null;
-  let [n, r] = qe({});
-  return Wt(() => new Wo(t, e, r, n), []);
+  return !t || !e ? null : Wt(() => new Wo(t, e), []);
 }
 const vq = P_("Source"), NC = ye.div`
   border-radius: var(--border-radius);
@@ -26440,7 +26437,7 @@ const vq = P_("Source"), NC = ye.div`
   spellcheckOpts: o,
   highlights: l
 }) => {
-  const a = pi(null), [c, h] = qe(!1), {
+  const a = pi(null), [c, h] = Xe(!1), {
     provider: u,
     undoManager: f,
     ytext: d,
@@ -26617,7 +26614,7 @@ const vq = P_("Source"), NC = ye.div`
   text: t,
   templatelist: e
 }) => {
-  const [n, r] = qe(""), [i, s] = qe({}), [o, l] = qe(null), [a, c] = qe(!1), [h, u] = qe(!1), [f, d] = qe({
+  const [n, r] = Xe(""), [i, s] = Xe({}), [o, l] = Xe(null), [a, c] = Xe(!1), [h, u] = Xe(!1), [f, d] = Xe({
     error: null,
     message: null
   }), p = (y) => y.ok ? y : Promise.reject(`Invalid HTTP response: ${y.status}`), m = (y) => {
@@ -32656,7 +32653,7 @@ function Zg(t) {
   var e;
   e = t.input.charCodeAt(t.position), e === 10 ? t.position++ : e === 13 ? (t.position++, t.input.charCodeAt(t.position) === 10 && t.position++) : Y(t, "a line break is expected"), t.line += 1, t.lineStart = t.position, t.firstTabInLine = -1;
 }
-function Be(t, e, n) {
+function Ne(t, e, n) {
   for (var r = 0, i = t.input.charCodeAt(t.position); i !== 0; ) {
     for (; ki(i); )
       i === 9 && t.firstTabInLine === -1 && (t.firstTabInLine = t.position), i = t.input.charCodeAt(++t.position);
@@ -32695,7 +32692,7 @@ function RSe(t, e, n) {
       if (t.position === t.lineStart && fu(t) || n && ts(d))
         break;
       if (Bn(d))
-        if (a = t.line, c = t.lineStart, h = t.lineIndent, Be(t, !1, -1), t.lineIndent >= e) {
+        if (a = t.line, c = t.lineStart, h = t.lineIndent, Ne(t, !1, -1), t.lineIndent >= e) {
           l = !0, d = t.input.charCodeAt(t.position);
           continue;
         } else {
@@ -32718,7 +32715,7 @@ function DSe(t, e) {
       else
         return !0;
     else
-      Bn(n) ? (Zr(t, r, i, !0), Mg(t, Be(t, !1, e)), r = i = t.position) : t.position === t.lineStart && fu(t) ? Y(t, "unexpected end of the document within a single quoted scalar") : (t.position++, i = t.position);
+      Bn(n) ? (Zr(t, r, i, !0), Mg(t, Ne(t, !1, e)), r = i = t.position) : t.position === t.lineStart && fu(t) ? Y(t, "unexpected end of the document within a single quoted scalar") : (t.position++, i = t.position);
   Y(t, "unexpected end of the stream within a single quoted scalar");
 }
 function ZSe(t, e) {
@@ -32730,7 +32727,7 @@ function ZSe(t, e) {
       return Zr(t, n, t.position, !0), t.position++, !0;
     if (l === 92) {
       if (Zr(t, n, t.position, !0), l = t.input.charCodeAt(++t.position), Bn(l))
-        Be(t, !1, e);
+        Ne(t, !1, e);
       else if (l < 256 && j2[l])
         t.result += U2[l], t.position++;
       else if ((o = PSe(l)) > 0) {
@@ -32741,7 +32738,7 @@ function ZSe(t, e) {
         Y(t, "unknown escape sequence");
       n = r = t.position;
     } else
-      Bn(l) ? (Zr(t, n, r, !0), Mg(t, Be(t, !1, e)), n = r = t.position) : t.position === t.lineStart && fu(t) ? Y(t, "unexpected end of the document within a double quoted scalar") : (t.position++, r = t.position);
+      Bn(l) ? (Zr(t, n, r, !0), Mg(t, Ne(t, !1, e)), n = r = t.position) : t.position === t.lineStart && fu(t) ? Y(t, "unexpected end of the document within a double quoted scalar") : (t.position++, r = t.position);
   }
   Y(t, "unexpected end of the stream within a double quoted scalar");
 }
@@ -32754,9 +32751,9 @@ function MSe(t, e) {
   else
     return !1;
   for (t.anchor !== null && (t.anchorMap[t.anchor] = l), b = t.input.charCodeAt(++t.position); b !== 0; ) {
-    if (Be(t, !0, e), b = t.input.charCodeAt(t.position), b === h)
+    if (Ne(t, !0, e), b = t.input.charCodeAt(t.position), b === h)
       return t.position++, t.tag = o, t.anchor = a, t.kind = d ? "mapping" : "sequence", t.result = l, !0;
-    n ? b === 44 && Y(t, "expected the node content, but found ','") : Y(t, "missed comma between flow collection entries"), g = m = O = null, u = f = !1, b === 63 && (c = t.input.charCodeAt(t.position + 1), At(c) && (u = f = !0, t.position++, Be(t, !0, e))), r = t.line, i = t.lineStart, s = t.position, Bs(t, e, ph, !1, !0), g = t.tag, m = t.result, Be(t, !0, e), b = t.input.charCodeAt(t.position), (f || t.line === r) && b === 58 && (u = !0, b = t.input.charCodeAt(++t.position), Be(t, !0, e), Bs(t, e, ph, !1, !0), O = t.result), d ? ns(t, l, p, g, m, O, r, i, s) : u ? l.push(ns(t, null, p, g, m, O, r, i, s)) : l.push(m), Be(t, !0, e), b = t.input.charCodeAt(t.position), b === 44 ? (n = !0, b = t.input.charCodeAt(++t.position)) : n = !1;
+    n ? b === 44 && Y(t, "expected the node content, but found ','") : Y(t, "missed comma between flow collection entries"), g = m = O = null, u = f = !1, b === 63 && (c = t.input.charCodeAt(t.position + 1), At(c) && (u = f = !0, t.position++, Ne(t, !0, e))), r = t.line, i = t.lineStart, s = t.position, Bs(t, e, ph, !1, !0), g = t.tag, m = t.result, Ne(t, !0, e), b = t.input.charCodeAt(t.position), (f || t.line === r) && b === 58 && (u = !0, b = t.input.charCodeAt(++t.position), Ne(t, !0, e), Bs(t, e, ph, !1, !0), O = t.result), d ? ns(t, l, p, g, m, O, r, i, s) : u ? l.push(ns(t, null, p, g, m, O, r, i, s)) : l.push(m), Ne(t, !0, e), b = t.input.charCodeAt(t.position), b === 44 ? (n = !0, b = t.input.charCodeAt(++t.position)) : n = !1;
   }
   Y(t, "unexpected end of the stream within a flow collection");
 }
@@ -32812,11 +32809,11 @@ function sw(t, e) {
   if (t.firstTabInLine !== -1)
     return !1;
   for (t.anchor !== null && (t.anchorMap[t.anchor] = s), a = t.input.charCodeAt(t.position); a !== 0 && (t.firstTabInLine !== -1 && (t.position = t.firstTabInLine, Y(t, "tab characters must not be used in indentation")), !(a !== 45 || (o = t.input.charCodeAt(t.position + 1), !At(o)))); ) {
-    if (l = !0, t.position++, Be(t, !0, -1) && t.lineIndent <= e) {
+    if (l = !0, t.position++, Ne(t, !0, -1) && t.lineIndent <= e) {
       s.push(null), a = t.input.charCodeAt(t.position);
       continue;
     }
-    if (n = t.line, Bs(t, e, V2, !1, !0), s.push(t.result), Be(t, !0, -1), a = t.input.charCodeAt(t.position), (t.line === n || t.lineIndent > e) && a !== 0)
+    if (n = t.line, Bs(t, e, V2, !1, !0), s.push(t.result), Ne(t, !0, -1), a = t.input.charCodeAt(t.position), (t.line === n || t.lineIndent > e) && a !== 0)
       Y(t, "bad indentation of a sequence entry");
     else if (t.lineIndent < e)
       break;
@@ -32847,7 +32844,7 @@ function ISe(t, e, n) {
       else
         return t.tag = c, t.anchor = h, !0;
     }
-    if ((t.line === s || t.lineIndent > e) && (g && (o = t.line, l = t.lineStart, a = t.position), Bs(t, e, mh, !0, i) && (g ? p = t.result : m = t.result), g || (ns(t, u, f, d, p, m, o, l, a), d = p = m = null), Be(t, !0, -1), b = t.input.charCodeAt(t.position)), (t.line === s || t.lineIndent > e) && b !== 0)
+    if ((t.line === s || t.lineIndent > e) && (g && (o = t.line, l = t.lineStart, a = t.position), Bs(t, e, mh, !0, i) && (g ? p = t.result : m = t.result), g || (ns(t, u, f, d, p, m, o, l, a), d = p = m = null), Ne(t, !0, -1), b = t.input.charCodeAt(t.position)), (t.line === s || t.lineIndent > e) && b !== 0)
       Y(t, "bad indentation of a mapping entry");
     else if (t.lineIndent < e)
       break;
@@ -32890,13 +32887,13 @@ function BSe(t) {
     return !1;
   for (r = t.input.charCodeAt(++t.position), e = t.position; r !== 0 && !At(r) && !ts(r); )
     r = t.input.charCodeAt(++t.position);
-  return t.position === e && Y(t, "name of an alias node must contain at least one character"), n = t.input.slice(e, t.position), Vr.call(t.anchorMap, n) || Y(t, 'unidentified alias "' + n + '"'), t.result = t.anchorMap[n], Be(t, !0, -1), !0;
+  return t.position === e && Y(t, "name of an alias node must contain at least one character"), n = t.input.slice(e, t.position), Vr.call(t.anchorMap, n) || Y(t, 'unidentified alias "' + n + '"'), t.result = t.anchorMap[n], Ne(t, !0, -1), !0;
 }
 function Bs(t, e, n, r, i) {
   var s, o, l, a = 1, c = !1, h = !1, u, f, d, p, m, g;
-  if (t.listener !== null && t.listener("open", t), t.tag = null, t.anchor = null, t.kind = null, t.result = null, s = o = l = mh === n || V2 === n, r && Be(t, !0, -1) && (c = !0, t.lineIndent > e ? a = 1 : t.lineIndent === e ? a = 0 : t.lineIndent < e && (a = -1)), a === 1)
+  if (t.listener !== null && t.listener("open", t), t.tag = null, t.anchor = null, t.kind = null, t.result = null, s = o = l = mh === n || V2 === n, r && Ne(t, !0, -1) && (c = !0, t.lineIndent > e ? a = 1 : t.lineIndent === e ? a = 0 : t.lineIndent < e && (a = -1)), a === 1)
     for (; qSe(t) || NSe(t); )
-      Be(t, !0, -1) ? (c = !0, l = s, t.lineIndent > e ? a = 1 : t.lineIndent === e ? a = 0 : t.lineIndent < e && (a = -1)) : l = !1;
+      Ne(t, !0, -1) ? (c = !0, l = s, t.lineIndent > e ? a = 1 : t.lineIndent === e ? a = 0 : t.lineIndent < e && (a = -1)) : l = !1;
   if (l && (l = c || i), (a === 1 || mh === n) && (ph === n || Y2 === n ? m = e : m = e + 1, g = t.position - t.lineStart, a === 1 ? l && (sw(t, g) || ISe(t, g, m)) || MSe(t, m) ? h = !0 : (o && LSe(t, m) || DSe(t, m) || ZSe(t, m) ? h = !0 : BSe(t) ? (h = !0, (t.tag !== null || t.anchor !== null) && Y(t, "alias node should not have any properties")) : RSe(t, m, ph === n) && (h = !0, t.tag === null && (t.tag = "?")), t.anchor !== null && (t.anchorMap[t.anchor] = t.result)) : a === 0 && (h = l && sw(t, g))), t.tag === null)
     t.anchor !== null && (t.anchorMap[t.anchor] = t.result);
   else if (t.tag === "?") {
@@ -32920,7 +32917,7 @@ function Bs(t, e, n, r, i) {
 }
 function XSe(t) {
   var e = t.position, n, r, i, s = !1, o;
-  for (t.version = null, t.checkLineBreaks = t.legacy, t.tagMap = /* @__PURE__ */ Object.create(null), t.anchorMap = /* @__PURE__ */ Object.create(null); (o = t.input.charCodeAt(t.position)) !== 0 && (Be(t, !0, -1), o = t.input.charCodeAt(t.position), !(t.lineIndent > 0 || o !== 37)); ) {
+  for (t.version = null, t.checkLineBreaks = t.legacy, t.tagMap = /* @__PURE__ */ Object.create(null), t.anchorMap = /* @__PURE__ */ Object.create(null); (o = t.input.charCodeAt(t.position)) !== 0 && (Ne(t, !0, -1), o = t.input.charCodeAt(t.position), !(t.lineIndent > 0 || o !== 37)); ) {
     for (s = !0, o = t.input.charCodeAt(++t.position), n = t.position; o !== 0 && !At(o); )
       o = t.input.charCodeAt(++t.position);
     for (r = t.input.slice(n, t.position), i = [], r.length < 1 && Y(t, "directive name must not be less than one character in length"); o !== 0; ) {
@@ -32940,8 +32937,8 @@ function XSe(t) {
     }
     o !== 0 && Zg(t), Vr.call(rw, r) ? rw[r](t, r, i) : gh(t, 'unknown document directive "' + r + '"');
   }
-  if (Be(t, !0, -1), t.lineIndent === 0 && t.input.charCodeAt(t.position) === 45 && t.input.charCodeAt(t.position + 1) === 45 && t.input.charCodeAt(t.position + 2) === 45 ? (t.position += 3, Be(t, !0, -1)) : s && Y(t, "directives end mark is expected"), Bs(t, t.lineIndent - 1, mh, !1, !0), Be(t, !0, -1), t.checkLineBreaks && CSe.test(t.input.slice(e, t.position)) && gh(t, "non-ASCII line breaks are interpreted as content"), t.documents.push(t.result), t.position === t.lineStart && fu(t)) {
-    t.input.charCodeAt(t.position) === 46 && (t.position += 3, Be(t, !0, -1));
+  if (Ne(t, !0, -1), t.lineIndent === 0 && t.input.charCodeAt(t.position) === 45 && t.input.charCodeAt(t.position + 1) === 45 && t.input.charCodeAt(t.position + 2) === 45 ? (t.position += 3, Ne(t, !0, -1)) : s && Y(t, "directives end mark is expected"), Bs(t, t.lineIndent - 1, mh, !1, !0), Ne(t, !0, -1), t.checkLineBreaks && CSe.test(t.input.slice(e, t.position)) && gh(t, "non-ASCII line breaks are interpreted as content"), t.documents.push(t.result), t.position === t.lineStart && fu(t)) {
+    t.input.charCodeAt(t.position) === 46 && (t.position += 3, Ne(t, !0, -1));
     return;
   }
   if (t.position < t.length - 1)
@@ -34538,7 +34535,7 @@ const f2e = (t) => () => {
   };
   document.addEventListener("copy", e), document.execCommand("copy"), document.removeEventListener("copy", e);
 }, p2e = (t, e, n) => {
-  const [r, i] = qe(t), [s, o] = qe(!1), [l, a] = qe({
+  const [r, i] = Xe(t), [s, o] = Xe(!1), [l, a] = Xe({
     action: (h) => {
     }
   }), c = Wt(() => oxe({
@@ -34666,7 +34663,7 @@ const m2e = ye.div`
   customRoles: c = [],
   transforms: h = []
 }) => {
-  const [u, f] = qe(n), [d, p] = qe(!1), m = p2e(r, h, c), [g, O] = qe(null), b = (S, v) => {
+  const [u, f] = Xe(n), [d, p] = Xe(!1), m = p2e(r, h, c), [g, O] = Xe(null), b = (S, v) => {
     O(S), setTimeout(() => O(null), v * 1e3);
   }, w = {
     "Copy HTML": () => {
