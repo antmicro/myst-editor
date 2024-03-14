@@ -118,12 +118,12 @@ const setEditorText = (editor, text) => {
   });
 }
 
-const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheckOpts, highlights, setUsers }) => {
+const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheckOpts, highlights, setUsers, getAvatar }) => {
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
 
   const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
-  const ycomments = useComments(ydoc, provider);
+  const ycomments = useComments(ydoc, provider, getAvatar);
 
   useEffect(() => {
     const startState = EditorState.create({

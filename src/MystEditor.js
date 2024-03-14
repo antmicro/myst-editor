@@ -174,7 +174,7 @@ const MystEditor = ({
           <//>
         <//>
         <${MystWrapper} fullscreen=${fullscreen}>
-          <${CodeMirror} setUsers=${setUsers} mode=${mode} text=${text} name=${name} id=${id} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts} highlights=${transforms}/>
+          <${CodeMirror} setUsers=${setUsers} getAvatar=${getAvatar} mode=${mode} text=${text} name=${name} id=${id} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts} highlights=${transforms}/>
           <${Preview} $mode=${mode} dangerouslySetInnerHTML=${{ __html: text.renderAndSanitize() }}/>
           ${mode === 'Diff' ? html`<${Diff} oldText=${initialText} text=${text}/>` : "" }
         <//>

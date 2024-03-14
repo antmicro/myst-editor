@@ -10,15 +10,20 @@ import { WebsocketProvider } from "y-websocket";
 const randomId = () => "comment-" + Math.random().toString().replace(".", "")
 
 export class CommentLineAuthors {
-  constructor(/** @type {Y.Doc} */ ydoc, provider, commentId) {
+  constructor(/** @type {Y.Doc} */ ydoc, provider, getAvatar, commentId ) {
     this.user = provider.awareness.getLocalState().user;
-    /** @type {Y.Array<Y.Map<{name: string, color: string}>>} */
+    /** @type {Y.Array<Y.Map<{name: string, color: string, avatar?: string }>>} */
     this.lineAuthors = ydoc.getArray(commentId + "/commentLineAuthors");
     this.ydoc = ydoc;
+    this.getAvatar = getAvatar;
   }
 
   get(lineNumber) {
-    return this.lineAuthors.get(lineNumber - 1)?.get("author")
+    const authorData = this.lineAuthors.get(lineNumber - 1)?.get("author")
+    if (!authorData) return;
+
+    authorData.avatar = this.getAvatar(authorData.name);
+    return authorData
   }
 
   mark(line) {
@@ -167,9 +172,10 @@ export class YComments {
    * @param {Y.Doc} ydoc
    * @param {WebsocketProvider} provider
    */
-  constructor(ydoc, provider) {
+  constructor(ydoc, provider, getAvatar) {
     this.ydoc = ydoc;
     this.provider = provider;
+    this.getAvatar = getAvatar;
     
     /** @type {EditorView} The main codemirror instance */
     this.mainCodeMirror = null;
@@ -181,7 +187,7 @@ export class YComments {
     this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
   }
 
-  lineAuthors(commentId) { return new CommentLineAuthors(this.ydoc, this.provider, commentId) }
+  lineAuthors(commentId) { return new CommentLineAuthors(this.ydoc, this.provider, this.getAvatar, commentId) }
 
   positions() { return this.positionManager }
 

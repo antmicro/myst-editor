@@ -153,15 +153,11 @@ class AvatarMarker extends GutterMarker {
   }
 
   authorAvatar() {
-    const { name } = this.lineAuthors.get(this.lineNumber);
-    const avatar = document.createElement('img');
-    avatar.classList.add("author-avatar");
-    avatar.src = `/users/${name}.png`;
-    avatar.onerror = () => {
-      avatar.onerror = null;
-      avatar.src = `https://www.gravatar.com/avatar/${name}?size=24&default=identicon`;
-    }
-    return avatar;
+    const { avatar } = this.lineAuthors.get(this.lineNumber);
+    let avatarIcon = document.createElement("img");
+    avatarIcon.classList.add("author-avatar");
+    avatarIcon.src = avatar;
+    return avatarIcon;
   }
 
   toDOM() {
