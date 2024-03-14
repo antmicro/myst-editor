@@ -10,56 +10,46 @@ import { WebsocketProvider } from "y-websocket";
 const randomId = () => "comment-" + Math.random().toString().replace(".", "")
 
 export class CommentLineAuthors {
-  constructor(ydoc, provider, commentId) {
+  constructor(/** @type {Y.Doc} */ ydoc, provider, commentId) {
     this.user = provider.awareness.getLocalState().user;
-    /** @type {Y.Map<{name: string, color: string}>} A map from line numbers to information about the author */
-    this.lineMap = ydoc.getMap(commentId + "/commentLineAuthors");
-  }
-
-  markLineRange(from, to) {
-    for (let i = Math.max(1, from); i <= to; i++) {
-      this.lineMap.set(i.toString(), this.user);
-    }
+    /** @type {Y.Array<Y.Map<{name: string, color: string}>>} */
+    this.lineAuthors = ydoc.getArray(commentId + "/commentLineAuthors");
+    this.ydoc = ydoc;
   }
 
   get(lineNumber) {
-    return this.lineMap.get(lineNumber.toString())?.color
+    return this.lineAuthors.get(lineNumber - 1)?.get("author")
+  }
+
+  mark(line) {
+    while (line >= this.lineAuthors.length) {
+      this.lineAuthors.push([new Y.Map()])
+    }
+    
+    this.lineAuthors.get(line - 1).set("author", this.user);
+  }
+
+  remove(line, diff) {
+    this.lineAuthors.delete(line - 1, diff)
+  }
+
+  insert(line, diff) {
+    this.lineAuthors.insert(
+      line - 1,
+      [...Array(diff).keys()].map(_ => new Y.Map([["author", this.user]]))
+    )
   }
 
   /** Find the first line which has the same author as `originalLineNumber` with no other authors in-between */
   firstLineOfSection(originalLineNumber) {
-    let author = this.getAuthor(originalLineNumber);
-    return this.iterLineMap()
-      .filter(a => a.lineNumber <= originalLineNumber)
+    const author = this.get(originalLineNumber).name;
+    return this.lineAuthors
+      .slice(0, originalLineNumber)
+      .map((author, idx) => ({ ...author.get("author"), lineNumber: idx + 1 }))
       .reduceRight( // Go up until you find a line made by a different author
         (prev, { name, lineNumber }) => (name==author) && (lineNumber==prev - 1) ? lineNumber : prev, 
         originalLineNumber
       )
-  }
-
-  getAuthor(lineNumber) {
-    return this.lineMap.get(lineNumber.toString())?.name
-  }
-
-  iterLineMap() {
-    return [...this.lineMap.entries()]
-      .map(([lineNumber, author]) => ({ lineNumber: parseInt(lineNumber), ...author }))
-      .sort((a1, a2) => a1.lineNumber - a2.lineNumber)
-  }
-
-  /** Move all line->author assignments by `diff`, starting from `startLine` */
-  shift(startLine, diff) {
-    this.iterLineMap()
-      .filter(a => a.lineNumber > startLine)
-      .filter(a => a.lineNumber + diff > 0)
-      .forEach(a => this.lineMap.set((a.lineNumber + diff).toString(), {name: a.name, color: a.color}));
-  }
-
-  /** Remove all information about authors after `maxLine` */
-  trim(maxLine) { 
-    this.iterLineMap()
-      .filter(a => a.lineNumber > maxLine)
-      .forEach(a => this.lineMap.delete(a.lineNumber.toString()))
   }
 }
 
@@ -180,7 +170,7 @@ export class YComments {
   constructor(ydoc, provider) {
     this.ydoc = ydoc;
     this.provider = provider;
-
+    
     /** @type {EditorView} The main codemirror instance */
     this.mainCodeMirror = null;
 
@@ -188,7 +178,7 @@ export class YComments {
     this.displayManager = new DisplayManager();
     this.draggedComment = null;
 
-    this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror())
+    this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
   }
 
   lineAuthors(commentId) { return new CommentLineAuthors(this.ydoc, this.provider, commentId) }

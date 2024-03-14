@@ -14,31 +14,12 @@ const lineAuthorsFacet = Facet.define({
 
 ////////////////////////////// LINE-COLORING //////////////////////////////
 
-const markAuthor = (color, lineNumber) => Decoration.line({
+const markAuthor = (author, lineNumber) => Decoration.line({
   attributes: {
     "data-line-number": lineNumber,
-    style: "background-color: " + color + "99"
+    style: "background-color: " + author.color + "99"
   }
 });
-
-/** 
- * If a line was added/removed by the current user then move the remaining lines down/up
- * 
- * @param {Transaction} transaction 
- */
-const moveColors = (transaction) => {
-  const lineAuthors = transaction.state.facet(lineAuthorsFacet);
-
-  const lineDiff = transaction.state.doc.lines - transaction.startState.doc.lines;
-  if (lineDiff == 0) return;
-
-  const totalLines = transaction.startState.doc.lines;
-  lineAuthors.trim(totalLines)
-
-  const oldCursorPosition = transaction.startState.selection.main.from;
-  const oldLine = transaction.startState.doc.lineAt(oldCursorPosition);
-  lineAuthors.shift(oldLine.number, lineDiff);
-}
 
 /** 
  * Color every line of the editor which has an author
@@ -51,10 +32,9 @@ function colorEditorLines(view) {
 
   for (let lineNumber = 1; lineNumber <= view.state.doc.lines; lineNumber++) {
     const line = view.state.doc.line(lineNumber);
-    const color = lineAuthors.get(lineNumber);
-    const user = lineAuthors.getAuthor(lineNumber);
+    const author = lineAuthors.get(lineNumber);
 
-    if (color) builder.add(line.from, line.from, markAuthor(color, lineNumber, user));
+    if (author) builder.add(line.from, line.from, markAuthor(author, lineNumber));
   }
   return builder.finish();
 }
@@ -64,20 +44,40 @@ function colorEditorLines(view) {
  * 
  * @param {Transaction} transaction 
  */
-const markEditedLines = (transaction) => {
+const markLinesEditedInTransaction = (transaction) => {
   const lineAuthors = transaction.state.facet(lineAuthorsFacet);
-
-  const lineDiff = transaction.state.doc.lines - transaction.startState.doc.lines;
-  if (lineDiff < 0) return;
 
   transaction.changes.iterChangedRanges((_a, _b, changeStart, changeEnd) => {
     const startLine = transaction.newDoc.lineAt(changeStart);
     const endLine = transaction.newDoc.lineAt(changeEnd);
     const isWhitespace = transaction.newDoc.slice(changeStart, changeEnd).toString().trim().length == 0;
+    const lineDiff = transaction.state.doc.lines - transaction.startState.doc.lines;
 
-    if (isWhitespace && (!endLine.length || !startLine.length)) return;
+    if (lineDiff > 0) {
+      if (isWhitespace && !endLine.length) {
+        lineAuthors.insert(startLine.number + 1, lineDiff);
+      } else if (startLine.from == changeStart) {
+        lineAuthors.insert(startLine.number, lineDiff);
+      } else {
+        lineAuthors.insert(startLine.number, lineDiff);
+        lineAuthors.mark(endLine.number);
+      }
+    }
 
-    lineAuthors.markLineRange(startLine.number, endLine.number);
+    if (lineDiff < 0) {
+      const oldLine = transaction.startState.doc.length > changeEnd ? transaction.startState.doc.lineAt(changeEnd) : null;
+
+      if (isWhitespace && endLine.to == changeStart) {
+        lineAuthors.remove(startLine.number + 1, -lineDiff);
+      } else if (isWhitespace && !oldLine?.length) {
+        lineAuthors.remove(startLine.number, -lineDiff);
+      } else {
+        lineAuthors.remove(startLine.number + 1, -lineDiff);
+        lineAuthors.mark(startLine.number);
+      }
+    }
+
+    if (lineDiff == 0) lineAuthors.mark(startLine.number);
   });
 }
 
@@ -97,10 +97,8 @@ const commentLineHighlighter = ViewPlugin.fromClass(class {
     if (update.docChanged || update.viewportChanged) {
       update.transactions
         .filter(isUserEvent)
-        .forEach(tr => {
-          moveColors(tr);
-          markEditedLines(tr);
-        });
+        .forEach(markLinesEditedInTransaction);
+      
       this.decorations = colorEditorLines(update.view);
     }
 
@@ -155,13 +153,13 @@ class AvatarMarker extends GutterMarker {
   }
 
   authorAvatar() {
-    const author = this.lineAuthors.getAuthor(this.lineNumber);
+    const { name } = this.lineAuthors.get(this.lineNumber);
     const avatar = document.createElement('img');
     avatar.classList.add("author-avatar");
-    avatar.src = `/users/${author}.png`;
+    avatar.src = `/users/${name}.png`;
     avatar.onerror = () => {
       avatar.onerror = null;
-      avatar.src = `https://www.gravatar.com/avatar/${author}?size=24&default=identicon`;
+      avatar.src = `https://www.gravatar.com/avatar/${name}?size=24&default=identicon`;
     }
     return avatar;
   }
