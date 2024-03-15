@@ -26483,7 +26483,7 @@ const vq = T_("Source"), BC = me.div`
     };
   }, []), un(() => {
     const b = document.querySelectorAll("#myst-css-namespace").length, y = s.enabled && p.toString().length == 0 && f.awareness.getStates().size == b && f.firstUser && g;
-    p && p.toString().length != 0 && t.set(p.toString()), y && (console.log("You are the first user in this document. Initiating..."), jb(c.current, t.get())), t.onSync((w) => jb(c.current, w)), O == null || O.updateMainCodeMirror(), f.watchCollabolators(a);
+    p && p.toString().length != 0 && t.set(p.toString()), y && (console.log("You are the first user in this document. Initiating..."), jb(c.current, t.get())), t.onSync((w) => jb(c.current, w)), O == null || O.updateMainCodeMirror(), f == null || f.watchCollabolators(a);
   }, [g, h]), Te`
       <${BC} $mode=${i} id="${e}-editor" class=${r}>
         ${s.commentsEnabled ? Te`<${wq} ycomments=${O}/>` : ""}
