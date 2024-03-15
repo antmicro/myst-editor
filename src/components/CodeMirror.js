@@ -173,7 +173,7 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
     
     text.onSync(currentText => setEditorText(editorRef.current, currentText))
     ycomments?.updateMainCodeMirror();
-    provider.watchCollabolators(setUsers)
+    provider?.watchCollabolators(setUsers)
   }, [ready, initialized]);
 
   return html`
