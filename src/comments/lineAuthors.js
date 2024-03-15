@@ -1,4 +1,4 @@
-import { Decoration, EditorView, ViewPlugin, ViewUpdate, gutter, GutterMarker, BlockInfo, } from "@codemirror/view"
+import { Decoration, EditorView, ViewPlugin, ViewUpdate, gutter, GutterMarker, BlockInfo } from "@codemirror/view"
 import { RangeSetBuilder, Transaction } from "@codemirror/state"
 import { CommentLineAuthors } from "./ycomments";
 import { StateEffect, StateField } from "@codemirror/state"
