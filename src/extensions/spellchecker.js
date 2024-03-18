@@ -13,6 +13,9 @@ const errorHighlight = Decoration.mark({ class: "cm-error" });
 const dictReady = dict => Object.keys(dict.rules).length > 0;
 
 function doSpellcheck(/** @type {EditorView} */ view) {
+  let from = view.visibleRanges[0]?.from || 0;
+  let to = view.visibleRanges[0]?.to || undefined;
+
   const builder = new RangeSetBuilder();
   const dict = view.state.facet(dictionary)
 
@@ -21,10 +24,10 @@ function doSpellcheck(/** @type {EditorView} */ view) {
   }
 
   view.state.doc
-    .toString()
+    .sliceString(from, to)
     .replaceAll(
       /\w+/g,
-      (word, pos) => !dict.check(word) && builder.add(pos, pos + word.length, errorHighlight)
+      (word, pos) => !dict.check(word) && builder.add(from + pos, from + pos + word.length, errorHighlight)
     );
 
   return builder.finish()
