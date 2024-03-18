@@ -10,9 +10,13 @@ const defaultHighlights = [
   }
 ]
 
+/** @param {EditorView} view */
 function buildDecorations(view, highlights) {
+  let from = view.visibleRanges[0]?.from || 0;
+  let to = view.visibleRanges[0]?.to || undefined;
+
   const builder = new RangeSetBuilder();
-  const cmText = view.state.doc.toString();
+  const cmText = view.state.doc.sliceString(from, to);
 
   highlights
     .flatMap(hl =>
@@ -21,8 +25,8 @@ function buildDecorations(view, highlights) {
     .sort((a, b) => a.match.index - b.match.index)
     .forEach(({ hl, match }) =>
       builder.add(
-        match.index,
-        match.index + match[0].length,
+        from + match.index,
+        from + match.index + match[0].length,
         hl.cssClass
           ? Decoration.mark({ class: hl.cssClass })
           : Decoration.mark({ class: defaultDecorationClass })
