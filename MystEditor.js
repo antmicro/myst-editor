@@ -34724,6 +34724,8 @@ const kAe = (t) => () => {
 		margin-top: 5px; 
 		float: right; 
 		border: 3px solid;
+    height: 35px;
+    width: 35px;
 		margin: 5px 0px 5px 5px;
 	}`, _Ae = ({
   login: t,
