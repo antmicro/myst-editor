@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import { useState, useEffect, useReducer } from 'preact/hooks';
+import { useState, useEffect, useReducer, useRef } from 'preact/hooks';
 import { html } from 'htm/preact';
 import { StyleSheetManager, styled } from 'styled-components';
 
@@ -128,7 +128,10 @@ const MystEditor = ({
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
-  const text = useText(initialText, transforms, customRoles);
+
+  const preview = useRef(null);
+  const text = useText({ initialText, transforms, customRoles, preview });
+
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer((_, currentUsers) => currentUsers.map(u => ({...u, avatarUrl: getAvatar(u.login)})), []);
 
@@ -175,7 +178,7 @@ const MystEditor = ({
         <//>
         <${MystWrapper} fullscreen=${fullscreen}>
           <${CodeMirror} setUsers=${setUsers} getAvatar=${getAvatar} mode=${mode} text=${text} name=${name} id=${id} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts} highlights=${transforms}/>
-          <${Preview} $mode=${mode} dangerouslySetInnerHTML=${{ __html: text.renderAndSanitize() }}/>
+          <${Preview} $mode=${mode} ref=${preview}/>
           ${mode === 'Diff' ? html`<${Diff} oldText=${initialText} text=${text}/>` : "" }
         <//>
       <//>
