@@ -154,6 +154,7 @@ const MystEditor = ({
     "Refresh": () => {
       resetCache();
       alertFor("Rich links refreshed!", 1);
+      text.refresh();
     }
   }
 
