@@ -23,13 +23,6 @@ const copyHtmlAsRichText = (txt) => {
   document.removeEventListener("copy", listener);
 }
 
-/** Find out which chunks were modified. `null` return means that we're unable to compare chunks */
-const findModifiedChunks = (oldChunks, newChunks) => {
-  if (newChunks.length !== oldChunks.length) return null;
-  return newChunks.filter((newChunk, idx) => newChunk.hash !== oldChunks[idx].hash)
-}
-
-
 /** @param {{preview: { current: Element } }} */
 export const useText = ({ initialText, transforms, customRoles, preview }) => {
   const [text, setText] = useState(initialText);
@@ -43,35 +36,33 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
    */
   const [htmlChunks, updateHtmlChunks] = useReducer(
     (oldChunks, { newMarkdown, force = false }) => {
-      if (force) {
-        const newHtmlChunks = splitIntoChunks(newMarkdown);
-        setPreview(newHtmlChunks);
-        return newHtmlChunks;
+      let htmlLookup = {};
+      if (!force) {
+        htmlLookup = oldChunks.reduce(
+          (lookup, { hash, html }) => {
+            lookup[hash] = html;
+            return lookup;
+          },
+          {}
+        );
       }
 
-      const htmlLookup = oldChunks.reduce(
-        (lookup, { hash, html }) => {
-          lookup[hash] = html;
-          return lookup;
-        },
-        {}
-      );
+      const newChunks = splitIntoChunks(newMarkdown, htmlLookup);
 
-      const newHtmlChunks = splitIntoChunks(newMarkdown, htmlLookup);
+      if (newChunks.length !== oldChunks.length || force) { // We can't infer which chunks were modified, so we update the entire document
+        preview.current.innerHTML = newChunks.map(c => `<html-chunk id="html-chunk-${c.id}">` + c.html + "</html-chunk>").join("\n")
+        return newChunks;
+      }
 
-      const modifiedChunks = findModifiedChunks(oldChunks, newHtmlChunks);
-
-      if (modifiedChunks === null) { // We can't infer which chunks were modified, so we update the entire document
-        setPreview(newHtmlChunks);
-      } else {
-        modifiedChunks.forEach( // Go through every modified chunk and update its content
+      newChunks // Go through every modified chunk and update its content
+        .filter((newChunk, idx) => newChunk.hash !== oldChunks[idx].hash)
+        .forEach(
           chunk => preview.current
             .querySelector("html-chunk#html-chunk-" + chunk.id)
             .innerHTML = chunk.html
         )
-      }
 
-      return newHtmlChunks
+      return newChunks
     },
     []
   );
@@ -90,16 +81,10 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
       .split(/(?=\n#{1,3} )/g) // Perform a split without removing the delimeter
       .map((md, id) => {
         const hash = new IMurMurHash(md, 42).result();
-        const html = lookup[hash] || `<html-chunk id="html-chunk-${id}">` + purify.sanitize(markdown.render(md)) + "</html-chunk>";
+        const html = lookup[hash] || purify.sanitize(markdown.render(md));
         return { md, hash, id, html }
       }),
     [markdown]
-  )
-
-  /** Join chunks and put them inside preview. It is a costly operation as HTML will need to be re-rendered by the browser */
-  const setPreview = useCallback(
-    (newChunks) => preview.current.innerHTML = newChunks.map(c => c.html).join("\n"),
-    [preview]
   )
 
   useEffect(() => updateHtmlChunks({ newMarkdown: initialText }), [])
@@ -118,8 +103,8 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
         try {
           updateHtmlChunks({ newMarkdown });
         } catch (e) {
-          console.error(e)
-          updateHtmlChunks({ newMarkdown, force: true});
+          console.warn(e)
+          updateHtmlChunks({ newMarkdown, force: true });
         }
       });
     },
