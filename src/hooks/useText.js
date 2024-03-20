@@ -23,8 +23,8 @@ const copyHtmlAsRichText = (txt) => {
   document.removeEventListener("copy", listener);
 }
 
-/** Find out which chunks were changed. `null` return means that we're unable to compare chunks */
-const findChangedChunks = (oldChunks, newChunks) => {
+/** Find out which chunks were modified. `null` return means that we're unable to compare chunks */
+const findModifiedChunks = (oldChunks, newChunks) => {
   if (newChunks.length !== oldChunks.length) return null;
   return newChunks.filter((newChunk, idx) => newChunk.hash !== oldChunks[idx].hash)
 }
@@ -50,21 +50,21 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
       }
 
       const htmlLookup = oldChunks.reduce(
-        (newChunks, { hash, html }) => {
-          newChunks[hash] = html;
-          return newChunks;
+        (lookup, { hash, html }) => {
+          lookup[hash] = html;
+          return lookup;
         },
         {}
       );
 
       const newHtmlChunks = splitIntoChunks(newMarkdown, htmlLookup);
 
-      const changedChunks = findChangedChunks(oldChunks, newHtmlChunks);
+      const modifiedChunks = findModifiedChunks(oldChunks, newHtmlChunks);
 
-      if (changedChunks === null) { // We can't infer which chunks were changed, so we update the entire document
+      if (modifiedChunks === null) { // We can't infer which chunks were modified, so we update the entire document
         setPreview(newHtmlChunks);
       } else {
-        changedChunks.forEach( // Go through every changed chunk and update its content
+        modifiedChunks.forEach( // Go through every modified chunk and update its content
           chunk => preview.current
             .querySelector("html-chunk#html-chunk-" + chunk.id)
             .innerHTML = chunk.html
@@ -96,7 +96,7 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
     [markdown]
   )
 
-  /** Join chunks and put then inside preview. It is a costly operation as HTML will need to be re-rendered by the browser */
+  /** Join chunks and put them inside preview. It is a costly operation as HTML will need to be re-rendered by the browser */
   const setPreview = useCallback(
     (newChunks) => preview.current.innerHTML = newChunks.map(c => c.html).join("\n"),
     [preview]
