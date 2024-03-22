@@ -26220,7 +26220,6 @@ const gq = (t, e, n) => {
         const h = t.startState.doc.length > s ? t.startState.doc.lineAt(s) : null;
         a && l.to == i ? e.remove(o.number + 1, -c) : a && !(h != null && h.length) ? e.remove(o.number, -c) : (e.remove(o.number + 1, -c), e.mark(o.number));
       }
-      c == 0 && e.mark(o.number);
     });
   }
   update(t) {
