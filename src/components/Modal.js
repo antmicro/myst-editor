@@ -14,8 +14,8 @@ const Container = styled.section`
   transform: translate(50%, 0);
   top: 100%;
   position: absolute;
-  background-color: var(--white);
-  border: 1px solid var(--gray-600);
+  background-color: var(--icon-bg);
+  border: 1px solid var(--icon-border);
   border-radius: var(--border-radius);
 `;
 

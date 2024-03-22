@@ -6,18 +6,18 @@ const TooltipBox = styled.div`
   ${props => props.$orientation == 'left' && css`
     left: 0;
   `}
-  transform: ${props => props.$orientation == 'left' ? 'translateX(-105%)' : 'translate(-50%, 130%)'};
+  transform: ${props => props.$orientation == 'left' ? 'translateX(-105%)' : 'translate(-65%, 130%)'};
 `;
 
 const TooltipContent = styled.div`
   position: relative; 
-  background: var(--green-400);
-  color: #ffffff;
+  background: var(--alert);
+  color: var(--icon-color);
   font-family: 'Lato', sans-serif;
   text-align: left;
   padding: 10px 20px 10px 20px;
   border-radius: var(--border-radius);
-  border: solid var(--green-400);
+  border: solid var(--alert);
   border-width: 1px 1px 1px 1px;
   max-height: 40px;
   top: calc(100% + 11px);
@@ -34,12 +34,12 @@ const TooltipContent = styled.div`
       top: 50%;
       border-top: 15px solid transparent;
       border-bottom: 15px solid transparent;
-      border-left: 30px solid var(--green-400);
+      border-left: 30px solid var(--alert);
     ` : css`
       left: 50%;
       border-left: 15px solid transparent;
       border-right: 15px solid transparent;
-      border-bottom: 30px solid var(--green-400);
+      border-bottom: 30px solid var(--alert);
     `}
     transform: ${props => props.$orientation == 'left' ? 'translate(50%, -50%)' : 'translate(-50%, -100%)'};
   }

@@ -8,32 +8,26 @@ import { styled } from 'styled-components';
 const TemplateDropdownContent = styled.div`
   display: none;
   margin-left: 5px;
-  font-family: 'Lato', sans-serif;
+  margin-right: 5px;
   text-transform: uppercase;
-  font-size: 12px;
-  align-items: center;
-  justify-content: space-around;
   white-space: nowrap;
-  border: 1px solid var(--gray-900);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  color: var(--white);
-  background-color: var(--gray-800);
+  color: var(--icon-color);
+  background-color: var(--icon-bg);
   z-index: 20;
-  width: 100%;
 `;
 
 const TemplateButton = styled(DefaultButton)`
-  width: 100%!important;
-  color: var(--white);
-  border: 1px solid var(--gray-900)!important;
-  padding: 0 10px 0 10px!important;
-  margin-top: 0px;`;
+  width: 100%;
+  color: var(--icon-color);
+  border: 1px solid var(--icon-border);
+  padding: 0 10px 0 10px;
+  margin-top: 0px;
+  text-wrap: wrap;`;
 
 const Dropdown = styled.div`
   position: relative;
-  display: inline-block;
-  width: min-content;
-
   &:hover {
     div {
       display: inline-flex;
@@ -51,7 +45,7 @@ const ButtonTooltipFlex = styled.div`
 
 const TemplatesList = styled.div`
   position: absolute;
-  display: flex;
+  width: 100%;
   padding-top: 5px;
 `;
 

@@ -29,6 +29,10 @@ const CodeEditor = styled.div`
   border: 1px solid var(--gray-400);
   box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
 
+  .cm-gutters {
+    background-color: var(--gray-200)
+  }
+
   .comment-gutter-icon {
     height: 17px;
     width: 17px;
