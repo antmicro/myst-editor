@@ -89,8 +89,6 @@ const commentLineHighlighter = ViewPlugin.fromClass(class {
           lineAuthors.mark(startLine.number);
         }
       }
-  
-      if (lineDiff == 0) lineAuthors.mark(startLine.number);
     });
   }
 
