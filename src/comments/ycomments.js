@@ -211,6 +211,7 @@ export class YComments {
     const newCommentId = randomId();
     this.positions().set(newCommentId, lineNumber.toString());
     this.display().new(newCommentId);
+    this.lineAuthors(newCommentId).mark(1);
     return newCommentId;
   }
 
