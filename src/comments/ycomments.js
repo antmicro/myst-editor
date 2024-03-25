@@ -39,6 +39,12 @@ export class CommentLineAuthors {
   }
 
   insert(line, diff) {
+    if (line - 1 > this.lineAuthors.length) {
+      this.lineAuthors.push( // Adjust array length so that we can safely insert new elements at index `line-1`
+        [...Array(line - 1 - this.lineAuthors.length).keys()].map(_ => new Y.Map())
+      )
+    }
+
     this.lineAuthors.insert(
       line - 1,
       [...Array(diff).keys()].map(_ => new Y.Map([["author", this.user]]))
