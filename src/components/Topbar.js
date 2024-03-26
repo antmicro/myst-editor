@@ -61,6 +61,10 @@ const TopbarRight = styled.div`
   align-items: center;
   margin-right: 15px;
 
+  button[active] {
+    pointer-events: none;
+  }
+
   button.icon:not(disabled):hover {
     background-color: var(--icon-main-selected);
     border: 1px solid var(--icon-main-selected);

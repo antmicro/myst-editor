@@ -144,10 +144,10 @@ const Preview = styled.div`
     } 
 
     &.note, &.important, &.tip, &.hint, &.directive-unhandled, &.warning {
-      border: 3px solid var(--blue-400);
+      border: 3px solid var(--blue-200);
 
       & > header {
-        background-color: var(--blue-400);
+        background-color: var(--blue-200);
         display: flex;
 
         &::before {

@@ -35,8 +35,8 @@ const ModalButton = styled(DefaultButton)`
   margin-top: 0px;
 
   &:hover {
-    background-color: ${props => props.$negative ? 'var(--red-500)' : 'var(--green-400)'} !important;
-    border: 1px solid ${props => props.$negative ? 'var(--red-500)' : 'var(--green-400)'} !important;
+    background-color: ${props => props.$negative ? 'var(--red-500)' : 'var(--icon-main-active)'} !important;
+    border: 1px solid ${props => props.$negative ? 'var(--red-500)' : 'var(--icon-main-active)'} !important;
   }`;
 
 const Modal = ({changeDocumentTemplate, selectedTemplate, closeModal}) => {

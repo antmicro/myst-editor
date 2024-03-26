@@ -12,7 +12,8 @@
   --gray-100: #f9f9f9;
   --white: #fff;
   --blue-500: #0083e1; 
-  --blue-400: #c1e4ef;
+  --blue-200: #82CFE6;
+  --blue-100: #c1e4ef;
   --red-500: #e74a3c;
   --orange-500: #f59e0b;
   --green-500: #00af91;
@@ -23,11 +24,12 @@
   --navbar-bg: var(--gray-200);
   --icon-border: var(--gray-600);
   --icon-bg: var(--white);
-  --icon-main-selected: var(--blue-400);
+  --icon-main-selected: var(--blue-100);
+  --icon-main-active: var(--blue-200);
   --icon-selected: var(--gray-400);
   --icon-color: var(--dark-violet);
   --separator: var(--gray-500);
-  --alert: var(--blue-400);
+  --alert: var(--blue-100);
 }
 
 @media print {
