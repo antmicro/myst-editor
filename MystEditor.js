@@ -20115,10 +20115,10 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
     } 
 
     &.note, &.important, &.tip, &.hint, &.directive-unhandled, &.warning {
-      border: 3px solid var(--blue-400);
+      border: 3px solid var(--blue-200);
 
       & > header {
-        background-color: var(--blue-400);
+        background-color: var(--blue-200);
         display: flex;
 
         &::before {
@@ -34598,9 +34598,9 @@ const uAe = T$.exports, fAe = (t) => () => {
   border-radius: var(--border-radius);`, Yo = ge(gu)`
   padding: 0px 15px;
   margin: 5px;`, mAe = ge(gu)`
-  color: ${(t) => t.$active ? "white" : "var(--icon-color)"};
-  border: ${(t) => t.$active ? "1px solid var(--icon-main-selected)" : "1px solid var(--icon-border)"};
-  background-color: ${(t) => t.$active ? "var(--icon-main-selected)" : "var(--icon-bg)"};
+  color: ${(t) => t.active ? "white" : "var(--icon-color)"};
+  border: ${(t) => t.active ? "1px solid var(--icon-main-active)" : "1px solid var(--icon-border)"};
+  background-color: ${(t) => t.active ? "var(--icon-main-active)" : "var(--icon-bg)"};
   margin: 5px;
   width: 40px;`, Sw = ({
   buttons: t,
@@ -34613,7 +34613,7 @@ const uAe = T$.exports, fAe = (t) => () => {
     ${t.map((o, l) => re`
       <${mAe} className="icon" type="button" key=${o.label} name=${o.label} onClick=${() => {
     r && s(l), n(o.label);
-  }} $active=${l === i}>
+  }} active=${l === i}>
         <${o.icon}/>
       <//>`)}
   `;
@@ -34694,8 +34694,8 @@ const uAe = T$.exports, fAe = (t) => () => {
   margin-top: 0px;
 
   &:hover {
-    background-color: ${(t) => t.$negative ? "var(--red-500)" : "var(--green-400)"} !important;
-    border: 1px solid ${(t) => t.$negative ? "var(--red-500)" : "var(--green-400)"} !important;
+    background-color: ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
+    border: 1px solid ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
   }`, vAe = ({
   changeDocumentTemplate: t,
   selectedTemplate: e,
@@ -34912,6 +34912,10 @@ const uAe = T$.exports, fAe = (t) => () => {
   justify-content: flex-end;
   align-items: center;
   margin-right: 15px;
+
+  button[active] {
+    pointer-events: none;
+  }
 
   button.icon:not(disabled):hover {
     background-color: var(--icon-main-selected);
