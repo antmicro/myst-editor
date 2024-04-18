@@ -26564,6 +26564,8 @@ const R7 = Z_("Source"), jC = ge.div`
     ready: O
   } = M3(s), b = E7(g, d, c);
   return Ft(() => {
+    if (s.enabled && !O || h.current)
+      return;
     const y = te.create({
       doc: s.enabled ? m.toString() : t.get(),
       extensions: wi.basicSetup().useHighlighter(l).useSpellcheck(o).useCollaboration({
@@ -26583,7 +26585,7 @@ const R7 = Z_("Source"), jC = ge.div`
     return h.current = w, f(!0), b == null || b.registerCodeMirror(w), () => {
       s.enabled && (d.disconnect(), g.destroy()), w.destroy();
     };
-  }, []), Ft(() => {
+  }, [O]), Ft(() => {
     const y = document.querySelectorAll("#myst-css-namespace").length, w = s.enabled && m.toString().length == 0 && d.awareness.getStates().size == y && d.firstUser && O;
     m && m.toString().length != 0 && t.set(m.toString()), w && (console.log("You are the first user in this document. Initiating..."), J1(h.current, t.get())), t.onSync((S) => J1(h.current, S)), b == null || b.updateMainCodeMirror(), d == null || d.watchCollabolators(a);
   }, [O, u]), re`
