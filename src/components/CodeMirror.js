@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { html } from "htm/preact";
 import { EditorView } from "codemirror";
-import { EditorState } from "@codemirror/state";
+import { EditorState, StateEffect } from "@codemirror/state";
 import styled from 'styled-components';
 import useCollaboration from '../hooks/useCollaboration';
 import { adjustToMode } from './Preview';
@@ -130,6 +130,9 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
   const ycomments = useComments(ydoc, provider, getAvatar);
 
   useEffect(() => {
+    if (collaboration.enabled && !ready) return;
+    if (editorRef.current) return;
+
     const startState = EditorState.create({
       doc: collaboration.enabled ? ytext.toString() : text.get(),
       extensions: ExtensionBuilder.basicSetup()
@@ -158,7 +161,7 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
       }
       view.destroy();
     };
-  }, []);
+  }, [ready]);
 
   useEffect(() => {
     const mystEditorCount = document.querySelectorAll("#myst-css-namespace").length;
