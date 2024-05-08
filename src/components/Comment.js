@@ -70,7 +70,11 @@ const YComment = ({ ycomments, commentId }) => {
       }),
       parent: cmref.current
     });
-    view.focus();
+    
+    if (ycomments.newLocalComment) {
+      view.focus();
+      ycomments.newLocalComment = false;
+    }
 
     return () => {
       view.destroy();

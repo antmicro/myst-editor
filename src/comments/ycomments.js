@@ -185,6 +185,8 @@ export class YComments {
     
     /** @type {EditorView} The main codemirror instance */
     this.mainCodeMirror = null;
+    /** If `true`, it means that this user has just created a new comment */
+    this.newLocalComment = false;
 
     this.positionManager = new CommentPositionManager(ydoc);
     this.displayManager = new DisplayManager();
@@ -212,12 +214,12 @@ export class YComments {
     if (text?.parent) text.delete();
   }
 
-
   newComment(lineNumber) {
     const newCommentId = randomId();
     this.positions().set(newCommentId, lineNumber.toString());
     this.display().new(newCommentId);
     this.lineAuthors(newCommentId).mark(1);
+    this.newLocalComment = true;
     return newCommentId;
   }
 
