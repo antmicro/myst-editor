@@ -5,6 +5,8 @@ import { markdownReplacer, useCustomRoles } from './markdownReplacer';
 import { useCallback, useEffect, useMemo, useReducer, useState } from "preact/hooks";
 import IMurMurHash from 'imurmurhash';
 
+const countOccurences = (str, pattern) => (str?.match(pattern) || []).length
+
 const exposeText = (text) => () => {
   if (!window.myst_editor) {
     window.myst_editor = {};
@@ -79,6 +81,20 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
   const splitIntoChunks = useCallback(
     (newMarkdown, lookup = {}) => newMarkdown
       .split(/(?=\n#{1,3} )/g) // Perform a split without removing the delimeter
+      .reduce(
+        // Check if a chunk has a non-closed code section. If yes - join this and the next chunk
+        (chunks, newChunk) => {
+          const lastChunkIdx = chunks.length - 1;
+          const lastChunk = chunks[lastChunkIdx];
+          if (countOccurences(lastChunk, /\n```/g) % 2 != 0) {
+            chunks[lastChunkIdx] = lastChunk + newChunk
+          } else {
+            chunks.push(newChunk);
+          }
+          return chunks;
+        },
+        []
+      )
       .map((md, id) => {
         const hash = new IMurMurHash(md, 42).result();
         const html = lookup[hash] || purify.sanitize(markdown.render(md));
