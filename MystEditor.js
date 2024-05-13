@@ -26003,7 +26003,7 @@ class h7 {
 }
 const zg = class {
   constructor(e, n, r) {
-    this.ydoc = e, this.provider = n, this.getAvatar = r, this.mainCodeMirror = null, this.positionManager = new c7(e), this.displayManager = new h7(), this.draggedComment = null, this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
+    this.ydoc = e, this.provider = n, this.getAvatar = r, this.mainCodeMirror = null, this.newLocalComment = !1, this.positionManager = new c7(e), this.displayManager = new h7(), this.draggedComment = null, this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
   }
   lineAuthors(e) {
     return new a7(this.ydoc, this.provider, this.getAvatar, e);
@@ -26026,7 +26026,7 @@ const zg = class {
   }
   newComment(e) {
     const n = l7();
-    return this.positions().set(n, e.toString()), this.display().new(n), this.lineAuthors(n).mark(1), n;
+    return this.positions().set(n, e.toString()), this.display().new(n), this.lineAuthors(n).mark(1), this.newLocalComment = !0, n;
   }
   deleteComment(e) {
     this.positions().del(e), this.display().del(e), this.delText(e);
@@ -26416,7 +26416,7 @@ const P7 = ge.div`
       }),
       parent: n.current
     });
-    return o.focus(), () => {
+    return t.newLocalComment && (o.focus(), t.newLocalComment = !1), () => {
       o.destroy();
     };
   }, [n]), re`
