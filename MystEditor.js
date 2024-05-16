@@ -34497,14 +34497,14 @@ var hAe = P$(), T$ = { exports: {} };
     }, e = new n(), t.exports = n;
   })();
 })(T$);
-const uAe = T$.exports, fAe = (t) => () => {
+const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []).length, dAe = (t) => () => {
   window.myst_editor || (window.myst_editor = {}), window.myst_editor.text = t;
-}, dAe = (t) => {
+}, pAe = (t) => {
   const e = (n) => {
     n.clipboardData.setData("text/html", t), n.clipboardData.setData("text/plain", t), n.preventDefault();
   };
   document.addEventListener("copy", e), document.execCommand("copy"), document.removeEventListener("copy", e);
-}, pAe = ({
+}, mAe = ({
   initialText: t,
   transforms: e,
   customRoles: n,
@@ -34528,7 +34528,13 @@ const uAe = T$.exports, fAe = (t) => () => {
   }, []), f = Mt(() => sxe({
     breaks: !0,
     linkify: !0
-  }).use(_Ce).use(ECe(e)).use(ZCe(n)), []), d = tm((p, m = {}) => p.split(/(?=\n#{1,3} )/g).map((g, O) => {
+  }).use(_Ce).use(ECe(e)).use(ZCe(n)), []), d = tm((p, m = {}) => p.split(/(?=\n#{1,3} )/g).reduce(
+    (g, O) => {
+      const b = g.length - 1, y = g[b];
+      return fAe(y, /\n```/g) % 2 != 0 ? g[b] = y + O : g.push(O), g;
+    },
+    []
+  ).map((g, O) => {
     const b = new uAe(g, 42).result(), y = m[b] || hAe.sanitize(f.render(g));
     return {
       md: g,
@@ -34539,7 +34545,7 @@ const uAe = T$.exports, fAe = (t) => () => {
   }), [f]);
   return Ft(() => u({
     newMarkdown: t
-  }), []), Ft(fAe(i), [i]), Ft(() => {
+  }), []), Ft(dAe(i), [i]), Ft(() => {
     o && (a.action(i), l(!1));
   }, [o]), {
     set(p) {
@@ -34574,7 +34580,7 @@ const uAe = T$.exports, fAe = (t) => () => {
       });
     },
     copy() {
-      dAe(h.map((p) => p.html).join(`
+      pAe(h.map((p) => p.html).join(`
 `));
     }
   };
@@ -34599,7 +34605,7 @@ const uAe = T$.exports, fAe = (t) => () => {
   transition: 0.4s ease;
   border-radius: var(--border-radius);`, Yo = ge(gu)`
   padding: 0px 15px;
-  margin: 5px;`, mAe = ge(gu)`
+  margin: 5px;`, gAe = ge(gu)`
   color: ${(t) => t.active ? "white" : "var(--icon-color)"};
   border: ${(t) => t.active ? "1px solid var(--icon-main-active)" : "1px solid var(--icon-border)"};
   background-color: ${(t) => t.active ? "var(--icon-main-active)" : "var(--icon-bg)"};
@@ -34613,7 +34619,7 @@ const uAe = T$.exports, fAe = (t) => () => {
   const [i, s] = Xe(e);
   return re`
     ${t.map((o, l) => re`
-      <${mAe} className="icon" type="button" key=${o.label} name=${o.label} onClick=${() => {
+      <${gAe} className="icon" type="button" key=${o.label} name=${o.label} onClick=${() => {
     r && s(l), n(o.label);
   }} active=${l === i}>
         <${o.icon}/>
@@ -34648,7 +34654,7 @@ const uAe = T$.exports, fAe = (t) => () => {
       text-align: center;
       background-color: var(--icon-bg)
     }
-	}`, gAe = ({
+	}`, OAe = ({
   login: t,
   color: e,
   avatarUrl: n
@@ -34657,19 +34663,19 @@ const uAe = T$.exports, fAe = (t) => () => {
        key=${t}
        class="avatar"
        style="border-color: ${e}"
-  />`, OAe = ({
+  />`, bAe = ({
   n: t
 }) => re`
   <${Q$}>
     <span class="avatar placeholder">+${t}</span>
-  <//>`, bAe = ({
+  <//>`, yAe = ({
   users: t
 }) => re`
   <${Q$}>
-    ${t.length > Jf ? re`<${OAe} n=${t.length - Jf}/>` : ""}
+    ${t.length > Jf ? re`<${bAe} n=${t.length - Jf}/>` : ""}
     
-    ${t.filter((e, n) => n < Jf).map((e) => re`<${gAe} ...${e}/>`)}
-  <//>`, yAe = ge.section`
+    ${t.filter((e, n) => n < Jf).map((e) => re`<${OAe} ...${e}/>`)}
+  <//>`, wAe = ge.section`
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -34684,10 +34690,10 @@ const uAe = T$.exports, fAe = (t) => () => {
   background-color: var(--icon-bg);
   border: 1px solid var(--icon-border);
   border-radius: var(--border-radius);
-`, wAe = ge.h3`
+`, kAe = ge.h3`
   font-family: 'Lato', sans-serif;
   color: var(--gray-900);
-`, kAe = ge.div`
+`, vAe = ge.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -34698,25 +34704,25 @@ const uAe = T$.exports, fAe = (t) => () => {
   &:hover {
     background-color: ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
     border: 1px solid ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
-  }`, vAe = ({
+  }`, xAe = ({
   changeDocumentTemplate: t,
   selectedTemplate: e,
   closeModal: n
 }) => re`
-    <${yAe}>
-        <${wAe}>Are you sure you want to change the current template?<//>
-        <${kAe}>
+    <${wAe}>
+        <${kAe}>Are you sure you want to change the current template?<//>
+        <${vAe}>
             <${_w} type="button" onClick=${() => t(e)}>✓ Yes<//>
             <${_w} $negative type="button" onClick=${n}>x Cancel<//>
         <//>
     <//>
-  `, xAe = ge.div`
+  `, SAe = ge.div`
   position: absolute;
   ${(t) => t.$orientation == "left" && Rr`
     left: 0;
   `}
   transform: ${(t) => t.$orientation == "left" ? "translateX(-105%)" : "translate(-65%, 130%)"};
-`, SAe = ge.div`
+`, _Ae = ge.div`
   position: relative; 
   background: var(--alert);
   color: var(--icon-color);
@@ -34754,11 +34760,11 @@ const uAe = T$.exports, fAe = (t) => () => {
   tooltipOrientation: t,
   errorMessage: e
 }) => re`
-    <${xAe} $orientation=${t}>
-      <${SAe} $orientation=${t}>
+    <${SAe} $orientation=${t}>
+      <${_Ae} $orientation=${t}>
           ${e}
       <//>
-    <//>`, _Ae = ge.div`
+    <//>`, CAe = ge.div`
   display: none;
   margin-left: 5px;
   margin-right: 5px;
@@ -34775,7 +34781,7 @@ const uAe = T$.exports, fAe = (t) => () => {
   border: 1px solid var(--icon-border);
   padding: 0 10px 0 10px;
   margin-top: 0px;
-  text-wrap: wrap;`, CAe = ge.div`
+  text-wrap: wrap;`, AAe = ge.div`
   position: relative;
   &:hover {
     div {
@@ -34783,16 +34789,16 @@ const uAe = T$.exports, fAe = (t) => () => {
       flex-direction: column;
     }
   }
-`, AAe = ge.div`
+`, $Ae = ge.div`
   display: flex;
   flex-direction: row-reverse;
   border: 1px solid var(--gray-900);
   width: inherit;
-`, $Ae = ge.div`
+`, PAe = ge.div`
   position: absolute;
   width: 100%;
   padding-top: 5px;
-`, PAe = (t) => {
+`, TAe = (t) => {
   const e = ["id", "templatetext"];
   for (const n in t) {
     for (let r of e)
@@ -34800,7 +34806,7 @@ const uAe = T$.exports, fAe = (t) => () => {
     t[n].errorMessage && console.error(t[n].errorMessage);
   }
   return t;
-}, TAe = ({
+}, QAe = ({
   text: t,
   templatelist: e
 }) => {
@@ -34833,7 +34839,7 @@ const uAe = T$.exports, fAe = (t) => () => {
     }
     return y;
   };
-  return Ft(() => g(e).then(PAe).then(b).then(s), []), f.error ? re`
+  return Ft(() => g(e).then(TAe).then(b).then(s), []), f.error ? re`
         <${Yo} type="button" template=${n} onMouseEnter=${() => u(!0)} onMouseLeave=${() => u(!1)}>
           Templates
         <//>
@@ -34841,16 +34847,16 @@ const uAe = T$.exports, fAe = (t) => () => {
         <${Yo} type="button" template=${n} onMouseEnter=${() => u(!0)} onMouseLeave=${() => u(!1)}>
           Templates
         <//>` : re`
-    ${a && re`<${vAe} selectedTemplate=${o} closeModal=${() => {
+    ${a && re`<${xAe} selectedTemplate=${o} closeModal=${() => {
     c(!1), l(!1);
   }} changeDocumentTemplate=${m}/>`}
-    <${CAe}>
+    <${AAe}>
       <${Yo} type="button">Templates<//>
-      <${$Ae}>
-        <${_Ae}>
+      <${PAe}>
+        <${CAe}>
         ${Object.keys(i).map((y) => re`
             ${i[y].errorMessage ? re`
-              <${AAe}>
+              <${$Ae}>
                 <${h === y && Cw} tooltipOrientation="left" errorMessage="${i[y].errorMessage}"/>
                   <${Aw} type="button" onMouseEnter=${() => u(y)} onMouseLeave=${() => u(!1)}>${i[y].id}
                 <//>
@@ -34867,7 +34873,7 @@ const uAe = T$.exports, fAe = (t) => () => {
       <//>
     <//>
   `;
-}, QAe = ge.div`
+}, EAe = ge.div`
   z-index: 10;
   position: sticky;
   top: 0;
@@ -34897,18 +34903,18 @@ const uAe = T$.exports, fAe = (t) => () => {
       display: none;
     }
   }
-`, EAe = ge.div`
+`, RAe = ge.div`
   width: 100%;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   margin-left: 5px;
-`, RAe = ge(Yo)`
+`, DAe = ge(Yo)`
   pointer-events: none; 
   background-color: var(--alert);
   border: none;
   width: fit-content;
-`, DAe = ge.div`
+`, ZAe = ge.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
@@ -34923,66 +34929,66 @@ const uAe = T$.exports, fAe = (t) => () => {
     background-color: var(--icon-main-selected);
     border: 1px solid var(--icon-main-selected);
   }
-`, ZAe = ge.div`
+`, MAe = ge.div`
   border-left: 1px solid var(--separator);
   height: 40px;
   margin-right: 10px;
   margin-left: 10px;
-`, MAe = () => re`
+`, LAe = () => re`
   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
     <path d="M20.35 1.78003L12.61 9.51003" stroke-width="1.75"/>
     <path d="M14.88 1.08008H20.89V7.27008" stroke-width="1.75"/>
     <path d="M1.42999 20.3601L9.16999 12.6301" stroke-width="1.75"/>
     <path d="M6.90002 21.0601H0.890015V14.8701" stroke-width="1.75"/>
-  </svg>`, LAe = () => re`
+  </svg>`, IAe = () => re`
   <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none">
     <path d="M21.75 1V7.66H14.9" stroke-width="1.75"/>
     <path d="M21.65 12.5899C20.95 17.4199 16.78 21.1399 11.75 21.1399C6.23 21.1399 1.75 16.6599 1.75 11.1399C1.75 5.61989 6.23 1.13989 11.75 1.13989C16.24 1.13989 20.03 4.09989 21.3 8.16989" stroke-width="1.75"/>
-  </svg>`, IAe = () => re`
+  </svg>`, qAe = () => re`
   <svg xmlns="http://www.w3.org/2000/svg" width="26" height="18" viewBox="0 0 26 18" fill="none">
     <path d="M13.01 11.5902C14.5675 11.5902 15.83 10.3276 15.83 8.7702C15.83 7.21275 14.5675 5.9502 13.01 5.9502C11.4526 5.9502 10.1899 7.21275 10.1899 8.7702C10.1899 10.3276 11.4526 11.5902 13.01 11.5902Z" stroke-width="1.75"/>
     <path d="M23.4301 9.80018C23.4301 9.80018 13.75 24.5402 2.58997 9.80018L1.98999 8.95018L2.59998 8.10018C2.59998 8.10018 12.2799 -6.63982 23.4399 8.10018L24.01 8.90018L23.4301 9.80018Z" stroke-width="1.75"/>
-  </svg>`, qAe = () => re`
+  </svg>`, NAe = () => re`
   <svg xmlns="http://www.w3.org/2000/svg" width="21" height="15" viewBox="0 0 21 15" fill="none">
     <path d="M15.31 2.8501L19.56 7.1001L15.19 11.4801" stroke-width="1.75"/>
     <path d="M5.75 11.4801L1.5 7.2201L5.88 2.8501" stroke-width="1.75"/>
     <path d="M12.35 0.340088L8.72 13.9901"  stroke-width="1.75"/>
-  </svg>`, NAe = () => re`
+  </svg>`, BAe = () => re`
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22" fill="none">
     <path d="M13.99 1.04004H1.37V16.64H13.99V1.04004Z" stroke-width="1.75"/>
     <path class="inner-copy" d="M18.63 5.51001H6.01001V21.11H18.63V5.51001Z" stroke-width="1.75"/>
-  </svg>`, BAe = () => re`
+  </svg>`, XAe = () => re`
   <svg xmlns="http://www.w3.org/2000/svg" width="23" height="18" viewBox="0 0 23 18" fill="none">
     <path d="M21.84 1.65015H1.83997V16.6701H21.84V1.65015Z"  stroke-width="1.75"/>
     <path d="M11.84 1.83008V16.6701" stroke-width="1.75"/>
-  </svg>`, XAe = () => re`
+  </svg>`, WAe = () => re`
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
     <path d="M21.23 11.0801H10.29"  stroke-width="1.75"/>
     <path d="M17.86 6.71997L22.11 10.97L17.73 15.35"  stroke-width="1.75"/>
     <path d="M2.22998 5.09009H13.17"  stroke-width="1.75"/>
     <path d="M5.60999 9.44007L1.35999 5.19007L5.73999 0.820068" stroke-width="1.75"/>
-  </svg>`, WAe = [{
+  </svg>`, YAe = [{
   label: "Source",
-  icon: qAe
-}, {
-  label: "Preview",
-  icon: IAe
-}, {
-  label: "Both",
-  icon: BAe
-}, {
-  label: "Diff",
-  icon: XAe
-}], YAe = [{
-  label: "Fullscreen",
-  icon: MAe
-}, {
-  label: "Copy HTML",
   icon: NAe
 }, {
-  label: "Refresh",
+  label: "Preview",
+  icon: qAe
+}, {
+  label: "Both",
+  icon: XAe
+}, {
+  label: "Diff",
+  icon: WAe
+}], VAe = [{
+  label: "Fullscreen",
   icon: LAe
-}], VAe = ({
+}, {
+  label: "Copy HTML",
+  icon: BAe
+}, {
+  label: "Refresh",
+  icon: IAe
+}], jAe = ({
   shown: t,
   alert: e,
   users: n,
@@ -34992,29 +34998,29 @@ const uAe = T$.exports, fAe = (t) => () => {
   setMode: o,
   buttonActions: l
 }) => re`
-    <${QAe} $shown=${t}>
-          <${EAe}> 
-            <${Sw} buttons=${YAe} highlightActive=${!1} initialClickedId=${null} clickCallback=${(a) => l[a]()}/>
-            ${e && re`<${RAe}> ${e} <//>`}
+    <${EAe} $shown=${t}>
+          <${RAe}> 
+            <${Sw} buttons=${VAe} highlightActive=${!1} initialClickedId=${null} clickCallback=${(a) => l[a]()}/>
+            ${e && re`<${DAe}> ${e} <//>`}
           <//>
-          <${DAe}>
-            <${bAe} users=${n}/>
+          <${ZAe}>
+            <${yAe} users=${n}/>
             <${Yo} type="button" onClick=${s}>Export as PDF<//>
-            <${TAe} text=${r} templatelist=${i} />
-            <${ZAe} />
-            <${Sw} buttons=${WAe} clickedId=${2} clickCallback=${(a) => o(a)}/>
+            <${QAe} text=${r} templatelist=${i} />
+            <${MAe} />
+            <${Sw} buttons=${YAe} clickedId=${2} clickCallback=${(a) => o(a)}/>
           <//>
         <//>`;
 var $w;
 ($w = window.myst_editor) != null && $w.isFresh || (_$(), window.myst_editor = {
   isFresh: !0
 });
-const jAe = ge.div`
+const FAe = ge.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
   ${(t) => t.fullscreen && "position: fixed; left: 0; top: 0; z-index: 10;"}
-`, FAe = ge.div`
+`, zAe = ge.div`
   padding: 20px;
   display: flex;
   flex-flow: row wrap;
@@ -35022,14 +35028,14 @@ const jAe = ge.div`
   position: relative;
   background-color: white;
   ${(t) => t.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;"}
-`, zAe = (t) => {
+`, UAe = (t) => {
   const e = (n, r, i) => {
     n.type == "rule" && (n.props[0] = n.props[0].split(",").map((s) => `${t} ${s}`).join(","));
   };
   return Object.defineProperty(e, "name", {
     value: `scope-${t}`
   }), e;
-}, UAe = (t) => document.documentElement.style.overflow = t ? "hidden" : "visible", e$e = ({
+}, GAe = (t) => document.documentElement.style.overflow = t ? "hidden" : "visible", t$e = ({
   name: t = "myst_editor_textarea",
   id: e = "myst_editor_textarea",
   initialMode: n = "Both",
@@ -35046,7 +35052,7 @@ const jAe = ge.div`
   transforms: h = [],
   getAvatar: u = (f) => `https://secure.gravatar.com/avatar/${f}?s=30&d=identicon`
 }) => {
-  const [f, d] = Xe(n), [p, m] = Xe(!1), g = Er(null), O = pAe({
+  const [f, d] = Xe(n), [p, m] = Xe(!1), g = Er(null), O = mAe({
     initialText: r,
     transforms: h,
     customRoles: c,
@@ -35065,11 +35071,11 @@ const jAe = ge.div`
       _$(), v("Rich links refreshed!", 1), O.refresh();
     }
   };
-  return Ft(() => UAe(p), [p]), re`
+  return Ft(() => GAe(p), [p]), re`
   <div id="myst-css-namespace">
-    <${q2} stylisPlugins=${[zAe("#myst-css-namespace")]}>
-      <${jAe} fullscreen=${p}>
-        <${VAe} ...${{
+    <${q2} stylisPlugins=${[UAe("#myst-css-namespace")]}>
+      <${FAe} fullscreen=${p}>
+        <${jAe} ...${{
     shown: s,
     alert: b,
     users: w,
@@ -35079,7 +35085,7 @@ const jAe = ge.div`
     setMode: d,
     buttonActions: P
   }}/>
-        <${FAe} fullscreen=${p}>
+        <${zAe} fullscreen=${p}>
           <${Z7} setUsers=${S} getAvatar=${u} mode=${f} text=${O} name=${t} id=${e} collaboration=${l} spellcheckOpts=${a} highlights=${h}/>
           <${I3} $mode=${f} ref=${g}/>
           ${f === "Diff" ? re`<${rB} oldText=${r} text=${O}/>` : ""}
@@ -35089,7 +35095,7 @@ const jAe = ge.div`
   </div>`;
 };
 export {
-  e$e as default,
+  t$e as default,
   re as html,
   jo as render
 };
