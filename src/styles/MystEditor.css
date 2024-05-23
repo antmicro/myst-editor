@@ -37,3 +37,7 @@
     margin: 1.5cm !important;
   }
 }
+
+#myst-css-namespace .todo {
+  background-color: yellow;
+}

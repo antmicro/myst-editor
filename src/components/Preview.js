@@ -111,8 +111,14 @@ const Preview = styled.div`
   pre {
     white-space: pre-wrap;
     padding: 16px;
+    &>code {
+      padding: 0px;
+    }
   }
-
+  details > summary {
+    display: list-item;
+    cursor: pointer;
+  }
   aside {
     border-radius: var(--border-radius);
 
