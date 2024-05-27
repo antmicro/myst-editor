@@ -42,8 +42,8 @@ const Diff = ({ oldText, text }) => {
 
   return html`
   <div style="display:flex; width: 100%">
-    <${MergeViewCodeEditor} ref=${leftRef} $shown=${true}/>
-    <${MergeViewCodeEditor} ref=${rightRef} $shown=${true}/>
+    <${MergeViewCodeEditor} ref=${leftRef} />
+    <${MergeViewCodeEditor} ref=${rightRef} />
   </div>`
 }
 

@@ -10,7 +10,7 @@ const Topbar = styled.div`
   z-index: 10;
   position: sticky;
   top: 0;
-  display: ${props => props.$shown ? 'flex' : 'none'};
+  display: flex;
   width: 100%;
   height: 60px;
   background-color: var(--navbar-bg);
@@ -138,8 +138,8 @@ const buttonsLeft = [
     { label: 'Refresh', icon: RefreshIcon }
 ]
 
-export const EditorTopbar = ({shown, alert, users, text, templatelist, printCallback, setMode, buttonActions}) => html`
-    <${Topbar} $shown=${shown}>
+export const EditorTopbar = ({alert, users, text, templatelist, printCallback, setMode, buttonActions}) => html`
+    <${Topbar}>
           <${TopbarLeft}> 
             <${ButtonGroup} buttons=${buttonsLeft} highlightActive=${false} initialClickedId=${null} clickCallback=${(label) => buttonActions[label]()}/>
             ${alert && html`<${Alert}> ${alert} <//>`}

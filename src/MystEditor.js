@@ -102,7 +102,7 @@ const MystEditor = ({
   <div id="myst-css-namespace">
     <${StyleSheetManager} stylisPlugins=${[createExtraScopePlugin('#myst-css-namespace')]}>
       <${EditorParent} fullscreen=${fullscreen}>
-        <${EditorTopbar} ...${{shown: topbar, alert, users, text, templatelist, printCallback, setMode, buttonActions}}/>
+        ${topbar && html`<${EditorTopbar} ...${{alert, users, text, templatelist, printCallback, setMode, buttonActions}}/>` }
         <${MystWrapper} fullscreen=${fullscreen}>
           <${CodeMirror} setUsers=${setUsers} getAvatar=${getAvatar} mode=${mode} text=${text} name=${name} id=${id} collaboration=${collaboration} spellcheckOpts=${spellcheckOpts} highlights=${transforms}/>
           <${Preview} $mode=${mode} ref=${preview}/>
