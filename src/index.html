@@ -1,14 +1,21 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-  <title>MyST editor Demo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet"> 
-  <link rel="stylesheet" href="./styles/MystEditor.css">
-  <style>body { margin: 0 }</style>
-  <script type="module">
-    let exampleText = `# h1 is quite big
+    <title>MyST editor Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles/MystEditor.css" />
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+    <script type="module">
+      let exampleText = `# h1 is quite big
 
 ## [h2 which is a link](https://google.com)
 
@@ -101,95 +108,103 @@ HTML:
 
 * H{sub}\`2\`O
 * 4{sup}\`th\` of July
-* {abbr}\`CSS (Cascading Style Sheets)`
-    console.log("Welcome to the MyST editor demo. The right hand side should auto update.")
+* {abbr}\`CSS (Cascading Style Sheets)`;
+      console.log(
+        "Welcome to the MyST editor demo. The right hand side should auto update.",
+      );
 
-    import MystEditor, { html, render } from './MystEditor.js'
+      import MystEditor, { html, render } from "./MystEditor.js";
 
-    const exampleCallback = (event) => {
-      console.log(`Example callback fired on ${event.target}`)
-      window.print()
-    }
+      const exampleCallback = (event) => {
+        console.log(`Example callback fired on ${event.target}`);
+        window.print();
+      };
 
-    const usercolors = [
-      "#30bced",
-      "#60c771",
-      "#e6aa3a",
-      "#cbb63e",
-      "#ee6352",
-      "#9ac2c9",
-      "#8acb88",
-      "#14b2c4",
-    ];
+      const usercolors = [
+        "#30bced",
+        "#60c771",
+        "#e6aa3a",
+        "#cbb63e",
+        "#ee6352",
+        "#9ac2c9",
+        "#8acb88",
+        "#14b2c4",
+      ];
 
-    const room = '0';
-    const username = Math.floor(Math.random() * 1000).toString();
-    const color = usercolors[Math.floor(Math.random() * usercolors.length)];
+      const room = "0";
+      const username = Math.floor(Math.random() * 1000).toString();
+      const color = usercolors[Math.floor(Math.random() * usercolors.length)];
 
-    let exampleTransforms = [
-      {  // Other repo issue links
-        target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
-        transform: (match) => {
-          const [repo, issueId] = match.split('#');
-          return `<a href="https://github.com/${repo}/issues/${issueId}">${match}</a>`
-        }
-      },
-      { // Other repo PR links
-        target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
-        transform: (match) => {
-          const [repo, prid] = match.split("!");
-          return `<a href="https://github.com/${repo}/pull/${prid}">${match}</a>`
-        }
-      },
-      {  // Same repo issue links
-        target: /(^|(?<=\s))#\d+/g,
-        transform: (match) => {
-          const issueId = match.slice(1);
-          return `<a href="https://github.com/antmicro/myst-editor/issues/${issueId}">${match}</a>`
-        }
-      },
-      { // Same repo PR links
-        target: /(^|(?<=\s))!\d+/g,
-        transform: (match) => {
-          const prid = match.slice(1);
-          return `<a href="https://github.com/antmicro/myst-editor/pull/${prid}">${match}</a>`
-        }
-      },
-      { // User links
-        target: /@[0-9a-z\-]+/g,
-        transform: (match) => {
-          const user = match.slice(1,);
-          return `
+      let exampleTransforms = [
+        {
+          // Other repo issue links
+          target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
+          transform: (match) => {
+            const [repo, issueId] = match.split("#");
+            return `<a href="https://github.com/${repo}/issues/${issueId}">${match}</a>`;
+          },
+        },
+        {
+          // Other repo PR links
+          target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
+          transform: (match) => {
+            const [repo, prid] = match.split("!");
+            return `<a href="https://github.com/${repo}/pull/${prid}">${match}</a>`;
+          },
+        },
+        {
+          // Same repo issue links
+          target: /(^|(?<=\s))#\d+/g,
+          transform: (match) => {
+            const issueId = match.slice(1);
+            return `<a href="https://github.com/antmicro/myst-editor/issues/${issueId}">${match}</a>`;
+          },
+        },
+        {
+          // Same repo PR links
+          target: /(^|(?<=\s))!\d+/g,
+          transform: (match) => {
+            const prid = match.slice(1);
+            return `<a href="https://github.com/antmicro/myst-editor/pull/${prid}">${match}</a>`;
+          },
+        },
+        {
+          // User links
+          target: /@[0-9a-z\-]+/g,
+          transform: (match) => {
+            const user = match.slice(1);
+            return `
           <a href='https://github.com/${user}'>
             ${user}
-          </a>`
-        }
-      },
-    ]
-    render(
-      html`
-        <${MystEditor}
-          printCallback=${exampleCallback}
-          templatelist="linkedtemplatelist.json"
-          initialText=${exampleText}
-          id="textarea_id"
-          transforms=${exampleTransforms}
-          collaboration=${{
-            enabled: import.meta.env.VITE_COLLAB == 'ON',
-            commentsEnabled: import.meta.env.VITE_COLLAB == 'ON',
-            wsUrl: import.meta.env.VITE_WS_URL,
-            username,
-            room,
-            color,
-          }}
-          spellcheckOpts=${{
-             dict: "en_US",
-             dictionaryPath: "/myst-editor/dictionaries"
-          }}
-        />
-      `, document.getElementById("myst")
-    )
-  </script>
+          </a>`;
+          },
+        },
+      ];
+      render(
+        html`
+          <${MystEditor}
+            printCallback=${exampleCallback}
+            templatelist="linkedtemplatelist.json"
+            initialText=${exampleText}
+            id="textarea_id"
+            transforms=${exampleTransforms}
+            collaboration=${{
+              enabled: import.meta.env.VITE_COLLAB == "ON",
+              commentsEnabled: import.meta.env.VITE_COLLAB == "ON",
+              wsUrl: import.meta.env.VITE_WS_URL,
+              username,
+              room,
+              color,
+            }}
+            spellcheckOpts=${{
+              dict: "en_US",
+              dictionaryPath: "/myst-editor/dictionaries",
+            }}
+          />
+        `,
+        document.getElementById("myst"),
+      );
+    </script>
   </head>
   <body>
     <div id="myst"></div>

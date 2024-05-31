@@ -1,50 +1,46 @@
-import { MergeView } from "@codemirror/merge"
-import { useRef, useEffect } from 'preact/hooks'
-import { CodeEditor } from './CodeMirror';
+import { MergeView } from "@codemirror/merge";
+import { useRef, useEffect } from "preact/hooks";
+import { CodeEditor } from "./CodeMirror";
 import { html } from "htm/preact";
-import { styled } from 'styled-components';
+import { styled } from "styled-components";
 import { ExtensionBuilder } from "../extensions";
 
 const MergeViewCodeEditor = styled(CodeEditor)`
   width: 50%;
   display: block;
-`
+`;
 
 const initMergeView = ({ old, current }) => {
   const extensions = ExtensionBuilder.basicSetup().readonly().create();
   return new MergeView({
     a: { doc: old, extensions },
     b: { doc: current, extensions },
-    orientation: "b-a"
+    orientation: "b-a",
   });
-}
+};
 
 const Diff = ({ oldText, text }) => {
   let leftRef = useRef(null);
   let rightRef = useRef(null);
   let mergeView = useRef(null);
 
-  useEffect(
-    () => {
-      if (mergeView.current) {
-        return false;
-      }
-      mergeView.current = initMergeView({
-        old: oldText,
-        current: text.get(),
-      });
+  useEffect(() => {
+    if (mergeView.current) {
+      return false;
+    }
+    mergeView.current = initMergeView({
+      old: oldText,
+      current: text.get(),
+    });
 
-      leftRef.current.appendChild(mergeView.current.b.dom)
-      rightRef.current.appendChild(mergeView.current.a.dom)
-    },
-    []
-  )
+    leftRef.current.appendChild(mergeView.current.b.dom);
+    rightRef.current.appendChild(mergeView.current.a.dom);
+  }, []);
 
-  return html`
-  <div style="display:flex; width: 100%">
+  return html` <div style="display:flex; width: 100%">
     <${MergeViewCodeEditor} ref=${leftRef} />
     <${MergeViewCodeEditor} ref=${rightRef} />
-  </div>`
-}
+  </div>`;
+};
 
-export default Diff
+export default Diff;

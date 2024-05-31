@@ -1,13 +1,14 @@
 {
-    "Vue": {
+  "Vue": {
     "id": "Vue",
     "templatetext": "https://cdn.jsdelivr.net/npm/vue@3.2.45/README.md"
-    },
-    "React": {
+  },
+  "React": {
     "id": "React",
-    "templatetext" : "https://cdn.jsdelivr.net/npm/react@18.2.0/README.md"
-    },
-    "Svelte": {
+    "templatetext": "https://cdn.jsdelivr.net/npm/react@18.2.0/README.md"
+  },
+  "Svelte": {
     "id": "Svelte",
-    "templatetext": "https://cdn.jsdelivr.net/npm/svelte@3.53.1/README.md"}
+    "templatetext": "https://cdn.jsdelivr.net/npm/svelte@3.53.1/README.md"
+  }
 }

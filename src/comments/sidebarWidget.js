@@ -1,5 +1,5 @@
-import { gutter, GutterMarker, BlockInfo, EditorView } from "@codemirror/view"
-import { YComments } from './ycomments';
+import { gutter, GutterMarker, BlockInfo, EditorView } from "@codemirror/view";
+import { YComments } from "./ycomments";
 import { updateShownComments, ycommentsFacet } from "./state";
 
 class CommentMarker extends GutterMarker {
@@ -8,7 +8,7 @@ class CommentMarker extends GutterMarker {
   static COMMENT_IMAGE_CLASS = "comment-image";
 
   /**
-   * @param {BlockInfo} line 
+   * @param {BlockInfo} line
    * @param {EditorView} view
    */
   constructor(line, view) {
@@ -31,15 +31,21 @@ class CommentMarker extends GutterMarker {
     this.gutterMarker = document.createElement("div");
     this.gutterMarker.classList.add(CommentMarker.MAIN_CLASS);
     if (this.lineNumber) {
-      this.gutterMarker.style.width = (this.lineNumber.toString().length * 7) + "px";
-      this.gutterMarker.ondrop = () => this.ycomments.positions().move(this.ycomments.draggedComment, this.lineNumber);
-      this.gutterMarker.ondragover = e => e.preventDefault();
+      this.gutterMarker.style.width =
+        this.lineNumber.toString().length * 7 + "px";
+      this.gutterMarker.ondrop = () =>
+        this.ycomments
+          .positions()
+          .move(this.ycomments.draggedComment, this.lineNumber);
+      this.gutterMarker.ondragover = (e) => e.preventDefault();
     }
   }
 
   addHoverEffects() {
-    this.icon.onmouseenter = () => this.icon.classList.add(CommentMarker.COMMENT_IMAGE_CLASS);
-    this.icon.onmouseleave = () => this.icon.classList.remove(CommentMarker.COMMENT_IMAGE_CLASS);
+    this.icon.onmouseenter = () =>
+      this.icon.classList.add(CommentMarker.COMMENT_IMAGE_CLASS);
+    this.icon.onmouseleave = () =>
+      this.icon.classList.remove(CommentMarker.COMMENT_IMAGE_CLASS);
   }
 
   enableDragEffects() {
@@ -64,7 +70,7 @@ class CommentMarker extends GutterMarker {
   }
 
   markHasComments() {
-    this.icon.classList.add(CommentMarker.COMMENT_IMAGE_CLASS)
+    this.icon.classList.add(CommentMarker.COMMENT_IMAGE_CLASS);
   }
 
   /** Main function. Used to render the actual gutter marker */
@@ -75,14 +81,14 @@ class CommentMarker extends GutterMarker {
       this.enableDragEffects();
       this.markHasComments();
     }
-    
+
     this.gutterMarker.appendChild(this.icon);
     return this.gutterMarker;
   }
 }
 
-/** 
- * @param {YComments} ycomments 
+/**
+ * @param {YComments} ycomments
  * @param {EditorView} view
  */
 const getOrCreateComment = (view, line, ycomments) => {
@@ -93,16 +99,21 @@ const getOrCreateComment = (view, line, ycomments) => {
     return ycomments.newComment(lineNumber);
   }
 
-  return comment
-}
+  return comment;
+};
 
 /**  @type {import("@codemirror/state").Extension} */
 const commentMarker = gutter({
   lineMarker(view, line) {
-    return new CommentMarker(line, view)
+    return new CommentMarker(line, view);
   },
-  lineMarkerChange: (update) => update.transactions.some(t => t.effects.some(e => e.is(updateShownComments))),
-  initialSpacer: () => { return new CommentMarker(null, null) },
+  lineMarkerChange: (update) =>
+    update.transactions.some((t) =>
+      t.effects.some((e) => e.is(updateShownComments)),
+    ),
+  initialSpacer: () => {
+    return new CommentMarker(null, null);
+  },
   domEventHandlers: {
     mouseup(view, line) {
       let ycomments = view.state.facet(ycommentsFacet.reader);
@@ -114,11 +125,8 @@ const commentMarker = gutter({
       }
 
       view.dispatch({ effects: updateShownComments.of(null) });
-    }
-  }
-})
+    },
+  },
+});
 
-
-export { commentMarker }
-
-
+export { commentMarker };

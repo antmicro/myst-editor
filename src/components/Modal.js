@@ -1,6 +1,6 @@
-import { html } from 'htm/preact';
-import { styled } from 'styled-components';
-import DefaultButton from './Buttons';
+import { html } from "htm/preact";
+import { styled } from "styled-components";
+import DefaultButton from "./Buttons";
 
 const Container = styled.section`
   z-index: 2;
@@ -20,7 +20,7 @@ const Container = styled.section`
 `;
 
 const Heading = styled.h3`
-  font-family: 'Lato', sans-serif;
+  font-family: "Lato", sans-serif;
   color: var(--gray-900);
 `;
 
@@ -35,21 +35,34 @@ const ModalButton = styled(DefaultButton)`
   margin-top: 0px;
 
   &:hover {
-    background-color: ${props => props.$negative ? 'var(--red-500)' : 'var(--icon-main-active)'} !important;
-    border: 1px solid ${props => props.$negative ? 'var(--red-500)' : 'var(--icon-main-active)'} !important;
-  }`;
+    background-color: ${(props) =>
+      props.$negative
+        ? "var(--red-500)"
+        : "var(--icon-main-active)"} !important;
+    border: 1px solid
+      ${(props) =>
+        props.$negative
+          ? "var(--red-500)"
+          : "var(--icon-main-active)"} !important;
+  }
+`;
 
-const Modal = ({changeDocumentTemplate, selectedTemplate, closeModal}) => {
-
+const Modal = ({ changeDocumentTemplate, selectedTemplate, closeModal }) => {
   return html`
     <${Container}>
-        <${Heading}>Are you sure you want to change the current template?<//>
-        <${ButtonContainer}>
-            <${ModalButton} type="button" onClick=${ () => changeDocumentTemplate(selectedTemplate)}>✓ Yes<//>
-            <${ModalButton} $negative type="button" onClick=${closeModal}>x Cancel<//>
-        <//>
+      <${Heading}>Are you sure you want to change the current template?<//>
+      <${ButtonContainer}>
+        <${ModalButton}
+          type="button"
+          onClick=${() => changeDocumentTemplate(selectedTemplate)}
+          >✓ Yes<//
+        >
+        <${ModalButton} $negative type="button" onClick=${closeModal}
+          >x Cancel<//
+        >
+      <//>
     <//>
-  `
-}
+  `;
+};
 
 export default Modal;

@@ -10,6 +10,7 @@ stages:
 build:
   stage: build
   script:   
+    - npm run lint
     - yarn build
 
 ui-tests:

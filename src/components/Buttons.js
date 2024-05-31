@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const DefaultButton = styled.button`
   &:focus {
@@ -19,10 +19,12 @@ const DefaultButton = styled.button`
   align-items: center;
   padding: 0;
   transition: 0.4s ease;
-  border-radius: var(--border-radius);`;
+  border-radius: var(--border-radius);
+`;
 
 export const TopbarButton = styled(DefaultButton)`
   padding: 0px 15px;
-  margin: 5px;`;
+  margin: 5px;
+`;
 
 export default DefaultButton;

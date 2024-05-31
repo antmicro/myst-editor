@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from "preact/hooks";
 import { html } from "htm/preact";
 import { EditorView } from "codemirror";
 import { EditorState, StateEffect } from "@codemirror/state";
-import styled from 'styled-components';
-import useCollaboration from '../hooks/useCollaboration';
-import { adjustToMode } from './Preview';
-import { ExtensionBuilder } from '../extensions';
+import styled from "styled-components";
+import useCollaboration from "../hooks/useCollaboration";
+import { adjustToMode } from "./Preview";
+import { ExtensionBuilder } from "../extensions";
 import { YCommentsParent } from "../components/Comment";
-import useComments from '../hooks/useComments';
+import useComments from "../hooks/useComments";
 
 const adjust = adjustToMode("Source");
 
@@ -23,14 +23,14 @@ const CodeEditor = styled.div`
   color: black;
   position: relative;
 
-  ${props => adjust(props.$mode)}
+  ${(props) => adjust(props.$mode)}
 
   flex: 1;
   border: 1px solid var(--gray-400);
   box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
 
   .cm-gutters {
-    background-color: var(--gray-200)
+    background-color: var(--gray-200);
   }
 
   .comment-gutter-icon {
@@ -87,7 +87,7 @@ const CodeEditor = styled.div`
   }
 
   .cm-error {
-    text-decoration: underline red
+    text-decoration: underline red;
   }
 
   .cm-link {
@@ -111,22 +111,33 @@ const HiddenTextArea = styled.textarea`
   display: none;
 `;
 
-
 const setEditorText = (editor, text) => {
   editor.dispatch({
     changes: {
       from: 0,
       to: editor.state.doc.length,
       insert: text,
-    }
+    },
   });
-}
+};
 
-const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheckOpts, highlights, setUsers, getAvatar }) => {
+const CodeMirror = ({
+  text,
+  id,
+  name,
+  className,
+  mode,
+  collaboration,
+  spellcheckOpts,
+  highlights,
+  setUsers,
+  getAvatar,
+}) => {
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
 
-  const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
+  const { provider, undoManager, ytext, ydoc, ready } =
+    useCollaboration(collaboration);
   const ycomments = useComments(ydoc, provider, getAvatar);
 
   useEffect(() => {
@@ -138,22 +149,29 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
       extensions: ExtensionBuilder.basicSetup()
         .useHighlighter(highlights)
         .useSpellcheck(spellcheckOpts)
-        .useCollaboration({enabled: collaboration.enabled || false, ytext, undoManager, provider, editorRef})
-        .useComments({enabled: collaboration.commentsEnabled, ycomments})
-        .addUpdateListener(update => update.docChanged && text.set(view.state.doc.toString()))
-        .create()
+        .useCollaboration({
+          enabled: collaboration.enabled || false,
+          ytext,
+          undoManager,
+          provider,
+          editorRef,
+        })
+        .useComments({ enabled: collaboration.commentsEnabled, ycomments })
+        .addUpdateListener(
+          (update) => update.docChanged && text.set(view.state.doc.toString()),
+        )
+        .create(),
     });
 
     const view = new EditorView({
       state: startState,
-      parent: document.getElementById(id+'-editor')
+      parent: document.getElementById(id + "-editor"),
     });
     editorRef.current = view;
     setInitialized(true);
 
     ycomments?.registerCodeMirror(view);
 
-    
     return () => {
       if (collaboration.enabled) {
         provider.disconnect();
@@ -164,34 +182,37 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
   }, [ready]);
 
   useEffect(() => {
-    const mystEditorCount = document.querySelectorAll("#myst-css-namespace").length;
-    const isFirstUser = collaboration.enabled && 
-      ytext.toString().length == 0 && 
-      provider.awareness.getStates().size == mystEditorCount && 
-      provider.firstUser && 
+    const mystEditorCount = document.querySelectorAll(
+      "#myst-css-namespace",
+    ).length;
+    const isFirstUser =
+      collaboration.enabled &&
+      ytext.toString().length == 0 &&
+      provider.awareness.getStates().size == mystEditorCount &&
+      provider.firstUser &&
       ready;
 
     if (ytext && ytext.toString().length != 0) text.set(ytext.toString());
 
     if (isFirstUser) {
-      console.log('You are the first user in this document. Initiating...');
+      console.log("You are the first user in this document. Initiating...");
       setEditorText(editorRef.current, text.get());
     }
-    
-    text.onSync(currentText => setEditorText(editorRef.current, currentText))
+
+    text.onSync((currentText) => setEditorText(editorRef.current, currentText));
     ycomments?.updateMainCodeMirror();
-    provider?.watchCollabolators(setUsers)
+    provider?.watchCollabolators(setUsers);
   }, [ready, initialized]);
 
   return html`
-      <${CodeEditor} $mode=${mode} id="${id}-editor" class=${className}>
-        ${collaboration.commentsEnabled ? html`<${YCommentsParent} ycomments=${ycomments}/>` : ""}
-      <//>
-      <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
+    <${CodeEditor} $mode=${mode} id="${id}-editor" class=${className}>
+      ${collaboration.commentsEnabled
+        ? html`<${YCommentsParent} ycomments=${ycomments} />`
+        : ""}
+    <//>
+    <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;
 };
 
-export default CodeMirror
-export {
-  CodeEditor
-}
+export default CodeMirror;
+export { CodeEditor };

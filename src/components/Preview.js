@@ -1,16 +1,19 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from "styled-components";
 
 export const adjustToMode = (mainMode) => (mode) => {
   if (mode === "Both") {
     return css`
       display: block;
-      max-width: 50%;`
+      max-width: 50%;
+    `;
   } else if (mode === mainMode) {
-    return css``
+    return css``;
   } else {
-    return css`display: none;`
+    return css`
+      display: none;
+    `;
   }
-}
+};
 
 const adjust = adjustToMode("Preview");
 
@@ -27,7 +30,7 @@ const Preview = styled.div`
   vertical-align: top;
   color: var(--gray-900);
   word-break: unset;
-  ${props => adjust(props.$mode)}
+  ${(props) => adjust(props.$mode)}
 
   @media print {
     & {
@@ -47,7 +50,7 @@ const Preview = styled.div`
     a {
       display: inline;
     }
-    
+
     @media print {
       break-inside: avoid !important;
       text-align: justify !important;
@@ -66,7 +69,12 @@ const Preview = styled.div`
     }
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: bold;
     line-height: 1.5;
     margin: 1em 0;
@@ -97,7 +105,8 @@ const Preview = styled.div`
     border: 0 none;
   }
 
-  code, pre {
+  code,
+  pre {
     border-radius: var(--border-radius);
     background-color: var(--gray-200);
   }
@@ -111,7 +120,7 @@ const Preview = styled.div`
   pre {
     white-space: pre-wrap;
     padding: 16px;
-    &>code {
+    & > code {
       padding: 0px;
     }
   }
@@ -130,7 +139,8 @@ const Preview = styled.div`
         margin: 0rem 1.4rem 0.9rem 1.4rem;
       }
 
-      & > header, p {
+      & > header,
+      p {
         padding: 10px;
       }
       & > p {
@@ -147,9 +157,14 @@ const Preview = styled.div`
       .admonition {
         margin-top: 0.9rem;
       }
-    } 
+    }
 
-    &.note, &.important, &.tip, &.hint, &.directive-unhandled, &.warning {
+    &.note,
+    &.important,
+    &.tip,
+    &.hint,
+    &.directive-unhandled,
+    &.warning {
       border: 3px solid var(--blue-200);
 
       & > header {
@@ -176,7 +191,8 @@ const Preview = styled.div`
       }
     }
 
-    &.tip, &.hint {
+    &.tip,
+    &.hint {
       & > header::before {
         content: url("data:image/svg+xml,%3Csvg style='color: white' width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 0V2H8V0H7Z' fill='white'%3E%3C/path%3E%3Cpath d='M3.35355 3.64645L1.85355 2.14645L1.14645 2.85355L2.64645 4.35355L3.35355 3.64645Z' fill='white'%3E%3C/path%3E%3Cpath d='M12.3536 4.35355L13.8536 2.85355L13.1464 2.14645L11.6464 3.64645L12.3536 4.35355Z' fill='white'%3E%3C/path%3E%3Cpath d='M7.49998 3C5.52977 3 3.85938 4.44872 3.58075 6.39913L3.5707 6.46949C3.41148 7.58398 3.73042 8.64543 4.36009 9.45895C4.74345 9.95426 5 10.427 5 10.9013V12.5C5 12.7761 5.22386 13 5.5 13H9.5C9.77614 13 10 12.7761 10 12.5V10.9013C10 10.427 10.2565 9.95423 10.6399 9.45893C11.2696 8.64541 11.5885 7.58397 11.4293 6.4695L11.4192 6.39914C11.1406 4.44873 9.4702 3 7.49998 3Z' fill='white'%3E%3C/path%3E%3Cpath d='M0 8H2V7H0V8Z' fill='white'%3E%3C/path%3E%3Cpath d='M13 8H15V7H13V8Z' fill='white'%3E%3C/path%3E%3Cpath d='M6 15H9V14H6V15Z' fill='white'%3E%3C/path%3E%3C/svg%3E");
       }
@@ -190,13 +206,14 @@ const Preview = styled.div`
       content: url("data:image/svg+xml,%3Csvg style='color: white' xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath d='M18 16v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-5 0h-2v-2h2v2zm0-4h-2V8h2v4zm-1 10c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2z' fill='white'%3E%3C/path%3E%3C/svg%3E");
     }
 
-    &.directive-unhandled, &.directive-error {
+    &.directive-unhandled,
+    &.directive-error {
       margin-bottom: 1em;
 
       & > header {
         padding: 10px;
         color: var(--white);
-      
+
         mark {
           background: transparent;
           font-weight: bold;
@@ -205,17 +222,17 @@ const Preview = styled.div`
 
         code {
           background: transparent;
-          font-family: 'Lato', sans-serif;
+          font-family: "Lato", sans-serif;
           font-weight: bold;
           padding: 0;
-          margin-left: .3em;
+          margin-left: 0.3em;
         }
       }
 
       pre {
         background-color: var(--white);
         margin: 0;
-        font-family: 'Lato', sans-serif;
+        font-family: "Lato", sans-serif;
       }
     }
 
@@ -234,7 +251,9 @@ const Preview = styled.div`
     }
   }
 
-  sup, sub, numref {
+  sup,
+  sub,
+  numref {
     line-height: 0;
   }
 
@@ -258,13 +277,14 @@ const Preview = styled.div`
       padding: 0px;
     }
   }
-  ul, ol {
+  ul,
+  ol {
     list-style: revert;
     padding-left: 40px;
     padding-top: 0.5em;
   }
   /* Add some padding to the outermost ul */
-  &[class^="Preview"] > ul  {
+  &[class^="Preview"] > ul {
     padding-top: 0.5em;
     padding-bottom: 0.5em;
   }
@@ -280,7 +300,8 @@ const Preview = styled.div`
     border-spacing: 0;
     margin: 20px 0 20px 0;
   }
-  th, td {
+  th,
+  td {
     padding: 20px;
     text-align: left;
     border-right: 1px solid var(--gray-500);
