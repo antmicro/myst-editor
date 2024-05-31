@@ -151,13 +151,13 @@ let f = [{
   }
 }];
 u(d`
-        <${l}
-          printCallback=${m}
-          templatelist="linkedtemplatelist.json"
-          initialText=${c}
-          id="textarea_id"
-          transforms=${f}
-          collaboration=${{
+          <${l}
+            printCallback=${m}
+            templatelist="linkedtemplatelist.json"
+            initialText=${c}
+            id="textarea_id"
+            transforms=${f}
+            collaboration=${{
   enabled: {}.VITE_COLLAB == "ON",
   commentsEnabled: {}.VITE_COLLAB == "ON",
   wsUrl: {}.VITE_WS_URL,
@@ -165,9 +165,9 @@ u(d`
   room: p,
   color: g
 }}
-          spellcheckOpts=${{
+            spellcheckOpts=${{
   dict: "en_US",
   dictionaryPath: "/myst-editor/dictionaries"
 }}
-        />
-      `, document.getElementById("myst"));
+          />
+        `, document.getElementById("myst"));

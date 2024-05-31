@@ -19985,7 +19985,10 @@ function M3(t) {
 }
 const Z_ = (t) => (e) => e === "Both" ? Rr`
       display: block;
-      max-width: 50%;` : e === t ? Rr`` : Rr`display: none;`, L3 = Z_("Preview"), I3 = ge.div`
+      max-width: 50%;
+    ` : e === t ? Rr`` : Rr`
+      display: none;
+    `, L3 = Z_("Preview"), I3 = ge.div`
   background-color: white;
   padding: 20px;
   min-height: 150px;
@@ -20018,7 +20021,7 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
     a {
       display: inline;
     }
-    
+
     @media print {
       break-inside: avoid !important;
       text-align: justify !important;
@@ -20037,7 +20040,12 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
     }
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: bold;
     line-height: 1.5;
     margin: 1em 0;
@@ -20068,7 +20076,8 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
     border: 0 none;
   }
 
-  code, pre {
+  code,
+  pre {
     border-radius: var(--border-radius);
     background-color: var(--gray-200);
   }
@@ -20082,7 +20091,7 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
   pre {
     white-space: pre-wrap;
     padding: 16px;
-    &>code {
+    & > code {
       padding: 0px;
     }
   }
@@ -20101,7 +20110,8 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
         margin: 0rem 1.4rem 0.9rem 1.4rem;
       }
 
-      & > header, p {
+      & > header,
+      p {
         padding: 10px;
       }
       & > p {
@@ -20118,9 +20128,14 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
       .admonition {
         margin-top: 0.9rem;
       }
-    } 
+    }
 
-    &.note, &.important, &.tip, &.hint, &.directive-unhandled, &.warning {
+    &.note,
+    &.important,
+    &.tip,
+    &.hint,
+    &.directive-unhandled,
+    &.warning {
       border: 3px solid var(--blue-200);
 
       & > header {
@@ -20147,7 +20162,8 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
       }
     }
 
-    &.tip, &.hint {
+    &.tip,
+    &.hint {
       & > header::before {
         content: url("data:image/svg+xml,%3Csvg style='color: white' width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 0V2H8V0H7Z' fill='white'%3E%3C/path%3E%3Cpath d='M3.35355 3.64645L1.85355 2.14645L1.14645 2.85355L2.64645 4.35355L3.35355 3.64645Z' fill='white'%3E%3C/path%3E%3Cpath d='M12.3536 4.35355L13.8536 2.85355L13.1464 2.14645L11.6464 3.64645L12.3536 4.35355Z' fill='white'%3E%3C/path%3E%3Cpath d='M7.49998 3C5.52977 3 3.85938 4.44872 3.58075 6.39913L3.5707 6.46949C3.41148 7.58398 3.73042 8.64543 4.36009 9.45895C4.74345 9.95426 5 10.427 5 10.9013V12.5C5 12.7761 5.22386 13 5.5 13H9.5C9.77614 13 10 12.7761 10 12.5V10.9013C10 10.427 10.2565 9.95423 10.6399 9.45893C11.2696 8.64541 11.5885 7.58397 11.4293 6.4695L11.4192 6.39914C11.1406 4.44873 9.4702 3 7.49998 3Z' fill='white'%3E%3C/path%3E%3Cpath d='M0 8H2V7H0V8Z' fill='white'%3E%3C/path%3E%3Cpath d='M13 8H15V7H13V8Z' fill='white'%3E%3C/path%3E%3Cpath d='M6 15H9V14H6V15Z' fill='white'%3E%3C/path%3E%3C/svg%3E");
       }
@@ -20161,13 +20177,14 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
       content: url("data:image/svg+xml,%3Csvg style='color: white' xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath d='M18 16v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-5 0h-2v-2h2v2zm0-4h-2V8h2v4zm-1 10c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2z' fill='white'%3E%3C/path%3E%3C/svg%3E");
     }
 
-    &.directive-unhandled, &.directive-error {
+    &.directive-unhandled,
+    &.directive-error {
       margin-bottom: 1em;
 
       & > header {
         padding: 10px;
         color: var(--white);
-      
+
         mark {
           background: transparent;
           font-weight: bold;
@@ -20176,17 +20193,17 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
 
         code {
           background: transparent;
-          font-family: 'Lato', sans-serif;
+          font-family: "Lato", sans-serif;
           font-weight: bold;
           padding: 0;
-          margin-left: .3em;
+          margin-left: 0.3em;
         }
       }
 
       pre {
         background-color: var(--white);
         margin: 0;
-        font-family: 'Lato', sans-serif;
+        font-family: "Lato", sans-serif;
       }
     }
 
@@ -20205,7 +20222,9 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
     }
   }
 
-  sup, sub, numref {
+  sup,
+  sub,
+  numref {
     line-height: 0;
   }
 
@@ -20229,13 +20248,14 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
       padding: 0px;
     }
   }
-  ul, ol {
+  ul,
+  ol {
     list-style: revert;
     padding-left: 40px;
     padding-top: 0.5em;
   }
   /* Add some padding to the outermost ul */
-  &[class^="Preview"] > ul  {
+  &[class^="Preview"] > ul {
     padding-top: 0.5em;
     padding-bottom: 0.5em;
   }
@@ -20251,7 +20271,8 @@ const Z_ = (t) => (e) => e === "Both" ? Rr`
     border-spacing: 0;
     margin: 20px 0 20px 0;
   }
-  th, td {
+  th,
+  td {
     padding: 20px;
     text-align: left;
     border-right: 1px solid var(--gray-500);
@@ -26370,39 +26391,39 @@ class wi {
   }
 }
 const P7 = ge.div`
-    position:absolute; 
-    top:${(t) => t.top + 20}px; 
-    left: 75px;
-    z-index: 3; 
-    right: 0px;
+  position: absolute;
+  top: ${(t) => t.top + 20}px;
+  left: 75px;
+  z-index: 3;
+  right: 0px;
+  background-color: var(--gray-500);
+
+  ${(t) => t.fade ? "opacity: 0.4;" : ""}
+
+  .cm-editor {
     background-color: var(--gray-500);
+  }
 
-    ${(t) => t.fade ? "opacity: 0.4;" : ""}
+  .cm-ySelectionInfo {
+    z-index: 1004;
+  }
 
-    .cm-editor {
-      background-color: var(--gray-500);
-    }
+  .cm-gutter {
+    background-color: var(--gray-500);
+  }
 
-    .cm-ySelectionInfo {
-      z-index: 1004;
-    }
+  .cm-scroller {
+    overflow-x: unset;
+  }
 
-    .cm-gutter {
-        background-color: var(--gray-500);
-    }
-    
-    .cm-scroller {
-      overflow-x: unset;
-    }
-
-    .author-avatar {
-      border-radius: 50%;
-      height: 24px;
-      width: 24px;
-      box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 4px;
-      position: absolute;
-      transform: translateX(-30px);
-    }
+  .author-avatar {
+    border-radius: 50%;
+    height: 24px;
+    width: 24px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 4px;
+    position: absolute;
+    transform: translateX(-30px);
+  }
 `, T7 = ({
   ycomments: t,
   commentId: e
@@ -26425,12 +26446,16 @@ const P7 = ge.div`
     return t.newLocalComment && (o.focus(), t.newLocalComment = !1), () => {
       o.destroy();
     };
-  }, [n]), ne`
-    <${P7} top=${t.display().offset(e)} fade=${t.draggedComment == e} >
-        <div style="position:relative; display: ${t.display().isShown(e) ? "block" : "none"}" >
-          <div ref=${n}></div>
-        </div>
-    <//>`;
+  }, [n]), ne` <${P7}
+    top=${t.display().offset(e)}
+    fade=${t.draggedComment == e}
+  >
+    <div
+      style="position:relative; display: ${t.display().isShown(e) ? "block" : "none"}"
+    >
+      <div ref=${n}></div>
+    </div>
+  <//>`;
 }, Q7 = ({
   ycomments: t
 }) => {
@@ -26440,7 +26465,7 @@ const P7 = ge.div`
     key: s,
     commentId: s,
     ycomments: t
-  }}/>`, n = () => t.iterComments().map(e), [r, i] = Xe(n());
+  }} />`, n = () => t.iterComments().map(e), [r, i] = Xe(n());
   return t.display().onUpdate(() => i(n())), ne`${r}`;
 };
 function E7(t, e, n) {
@@ -26465,7 +26490,7 @@ const R7 = Z_("Source"), jC = ge.div`
   box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
 
   .cm-gutters {
-    background-color: var(--gray-200)
+    background-color: var(--gray-200);
   }
 
   .comment-gutter-icon {
@@ -26522,7 +26547,7 @@ const R7 = Z_("Source"), jC = ge.div`
   }
 
   .cm-error {
-    text-decoration: underline red
+    text-decoration: underline red;
   }
 
   .cm-link {
@@ -26595,10 +26620,10 @@ const R7 = Z_("Source"), jC = ge.div`
     const y = document.querySelectorAll("#myst-css-namespace").length, w = s.enabled && m.toString().length == 0 && d.awareness.getStates().size == y && d.firstUser && O;
     m && m.toString().length != 0 && t.set(m.toString()), w && (console.log("You are the first user in this document. Initiating..."), J1(h.current, t.get())), t.onSync((S) => J1(h.current, S)), b == null || b.updateMainCodeMirror(), d == null || d.watchCollabolators(a);
   }, [O, u]), ne`
-      <${jC} $mode=${i} id="${e}-editor" class=${r}>
-        ${s.commentsEnabled ? ne`<${Q7} ycomments=${b}/>` : ""}
-      <//>
-      <${D7} value=${t.get()} name=${n} id=${e}><//>
+    <${jC} $mode=${i} id="${e}-editor" class=${r}>
+      ${s.commentsEnabled ? ne`<${Q7} ycomments=${b} />` : ""}
+    <//>
+    <${D7} value=${t.get()} name=${n} id=${e}><//>
   `;
 };
 class Ze {
@@ -27481,8 +27506,7 @@ const py = ge(jC)`
       old: t,
       current: e.get()
     }), n.current.appendChild(i.current.b.dom), r.current.appendChild(i.current.a.dom);
-  }, []), ne`
-  <div style="display:flex; width: 100%">
+  }, []), ne` <div style="display:flex; width: 100%">
     <${py} ref=${n} />
     <${py} ref=${r} />
   </div>`;
@@ -34609,14 +34633,17 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   align-items: center;
   padding: 0;
   transition: 0.4s ease;
-  border-radius: var(--border-radius);`, Yo = ge(gu)`
+  border-radius: var(--border-radius);
+`, Yo = ge(gu)`
   padding: 0px 15px;
-  margin: 5px;`, gAe = ge(gu)`
+  margin: 5px;
+`, gAe = ge(gu)`
   color: ${(t) => t.active ? "white" : "var(--icon-color)"};
   border: ${(t) => t.active ? "1px solid var(--icon-main-active)" : "1px solid var(--icon-border)"};
   background-color: ${(t) => t.active ? "var(--icon-main-active)" : "var(--icon-bg)"};
   margin: 5px;
-  width: 40px;`, Sw = ({
+  width: 40px;
+`, Sw = ({
   buttons: t,
   initialClickedId: e = 2,
   clickCallback: n,
@@ -34624,24 +34651,30 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
 }) => {
   const [i, s] = Xe(e);
   return ne`
-    ${t.map((o, l) => ne`
-      <${gAe} className="icon" type="button" key=${o.label} name=${o.label} onClick=${() => {
+    ${t.map((o, l) => ne` <${gAe}
+          className="icon"
+          type="button"
+          key=${o.label}
+          name=${o.label}
+          onClick=${() => {
     r && s(l), n(o.label);
-  }} active=${l === i}>
-        <${o.icon}/>
-      <//>`)}
+  }}
+          active=${l === i}
+        >
+          <${o.icon} />
+        <//>`)}
   `;
 }, Jf = 4, Q$ = ge.div`
-	width: 200px;
+  width: 200px;
 
-	.avatar {
-		border-radius: 50%; 
-		margin-top: 5px; 
-		float: right; 
-		border: 3px solid;
+  .avatar {
+    border-radius: 50%;
+    margin-top: 5px;
+    float: right;
+    border: 3px solid;
     height: 35px;
     width: 35px;
-		margin: 5px 0px 5px -7px;
+    margin: 5px 0px 5px -7px;
     transition: 0.5s;
 
     &:hover {
@@ -34650,37 +34683,35 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
 
     &.placeholder {
       margin-left: -7px;
-      line-height: 30px; 
+      line-height: 30px;
       color: var(--icon-color);
-      border-color: var(--icon-border); 
-      font-family: 'Lato'; 
-      font-style: normal; 
+      border-color: var(--icon-border);
+      font-family: "Lato";
+      font-style: normal;
       font-size: small;
-      font-weight: 700; 
+      font-weight: 700;
       text-align: center;
-      background-color: var(--icon-bg)
+      background-color: var(--icon-bg);
     }
-	}`, OAe = ({
+  }
+`, OAe = ({
   login: t,
   color: e,
   avatarUrl: n
-}) => ne`
-  <img src=${n}
-       key=${t}
-       class="avatar"
-       style="border-color: ${e}"
+}) => ne` <img
+    src=${n}
+    key=${t}
+    class="avatar"
+    style="border-color: ${e}"
   />`, bAe = ({
   n: t
-}) => ne`
-  <${Q$}>
+}) => ne` <${Q$}>
     <span class="avatar placeholder">+${t}</span>
   <//>`, yAe = ({
   users: t
-}) => ne`
-  <${Q$}>
-    ${t.length > Jf ? ne`<${bAe} n=${t.length - Jf}/>` : ""}
-    
-    ${t.filter((e, n) => n < Jf).map((e) => ne`<${OAe} ...${e}/>`)}
+}) => ne` <${Q$}>
+    ${t.length > Jf ? ne`<${bAe} n=${t.length - Jf} />` : ""}
+    ${t.filter((e, n) => n < Jf).map((e) => ne`<${OAe} ...${e} />`)}
   <//>`, wAe = ge.section`
   z-index: 2;
   display: flex;
@@ -34697,7 +34728,7 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   border: 1px solid var(--icon-border);
   border-radius: var(--border-radius);
 `, kAe = ge.h3`
-  font-family: 'Lato', sans-serif;
+  font-family: "Lato", sans-serif;
   color: var(--gray-900);
 `, vAe = ge.div`
   display: flex;
@@ -34709,30 +34740,38 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
 
   &:hover {
     background-color: ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
-    border: 1px solid ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
-  }`, xAe = ({
+    border: 1px solid
+      ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
+  }
+`, xAe = ({
   changeDocumentTemplate: t,
   selectedTemplate: e,
   closeModal: n
 }) => ne`
     <${wAe}>
-        <${kAe}>Are you sure you want to change the current template?<//>
-        <${vAe}>
-            <${_w} type="button" onClick=${() => t(e)}>✓ Yes<//>
-            <${_w} $negative type="button" onClick=${n}>x Cancel<//>
-        <//>
+      <${kAe}>Are you sure you want to change the current template?<//>
+      <${vAe}>
+        <${_w}
+          type="button"
+          onClick=${() => t(e)}
+          >✓ Yes<//
+        >
+        <${_w} $negative type="button" onClick=${n}
+          >x Cancel<//
+        >
+      <//>
     <//>
   `, SAe = ge.div`
   position: absolute;
   ${(t) => t.$orientation == "left" && Rr`
-    left: 0;
-  `}
+      left: 0;
+    `}
   transform: ${(t) => t.$orientation == "left" ? "translateX(-105%)" : "translate(-65%, 130%)"};
 `, _Ae = ge.div`
-  position: relative; 
+  position: relative;
   background: var(--alert);
   color: var(--icon-color);
-  font-family: 'Lato', sans-serif;
+  font-family: "Lato", sans-serif;
   text-align: left;
   padding: 10px 20px 10px 20px;
   border-radius: var(--border-radius);
@@ -34741,36 +34780,33 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   max-height: 40px;
   top: calc(100% + 11px);
   ${(t) => t.$orientation == "bottom" && Rr`
-    left: 50%;
-  `}
+      left: 50%;
+    `}
   transform: ${(t) => t.$orientation == "left" ? "none" : "translateX(-25%)"};
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     ${(t) => t.$orientation == "left" ? Rr`
-      right: 0;
-      top: 50%;
-      border-top: 15px solid transparent;
-      border-bottom: 15px solid transparent;
-      border-left: 30px solid var(--alert);
-    ` : Rr`
-      left: 50%;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 30px solid var(--alert);
-    `}
+            right: 0;
+            top: 50%;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 30px solid var(--alert);
+          ` : Rr`
+            left: 50%;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 30px solid var(--alert);
+          `}
     transform: ${(t) => t.$orientation == "left" ? "translate(50%, -50%)" : "translate(-50%, -100%)"};
   }
 `, Cw = ({
   tooltipOrientation: t,
   errorMessage: e
-}) => ne`
-    <${SAe} $orientation=${t}>
-      <${_Ae} $orientation=${t}>
-          ${e}
-      <//>
-    <//>`, CAe = ge.div`
+}) => ne` <${SAe} $orientation=${t}>
+    <${_Ae} $orientation=${t}> ${e} <//>
+  <//>`, CAe = ge.div`
   display: none;
   margin-left: 5px;
   margin-right: 5px;
@@ -34787,7 +34823,8 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   border: 1px solid var(--icon-border);
   padding: 0 10px 0 10px;
   margin-top: 0px;
-  text-wrap: wrap;`, AAe = ge.div`
+  text-wrap: wrap;
+`, AAe = ge.div`
   position: relative;
   &:hover {
     div {
@@ -34845,36 +34882,60 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
     }
     return y;
   };
-  return Ft(() => g(e).then(TAe).then(b).then(s), []), f.error ? ne`
-        <${Yo} type="button" template=${n} onMouseEnter=${() => u(!0)} onMouseLeave=${() => u(!1)}>
-          Templates
-        <//>
-        <${h && Cw} tooltipOrientation="bottom" errorMessage=${f.message}/>` : Object.keys(i).length == 0 ? ne`
-        <${Yo} type="button" template=${n} onMouseEnter=${() => u(!0)} onMouseLeave=${() => u(!1)}>
-          Templates
-        <//>` : ne`
-    ${a && ne`<${xAe} selectedTemplate=${o} closeModal=${() => {
+  return Ft(() => g(e).then(TAe).then(b).then(s), []), f.error ? ne` <${Yo}
+        type="button"
+        template=${n}
+        onMouseEnter=${() => u(!0)}
+        onMouseLeave=${() => u(!1)}
+      >
+        Templates
+      <//>
+      <${h && Cw}
+        tooltipOrientation="bottom"
+        errorMessage=${f.message}
+      />` : Object.keys(i).length == 0 ? ne` <${Yo}
+      type="button"
+      template=${n}
+      onMouseEnter=${() => u(!0)}
+      onMouseLeave=${() => u(!1)}
+    >
+      Templates
+    <//>` : ne`
+    ${a && ne`<${xAe}
+      selectedTemplate=${o}
+      closeModal=${() => {
     c(!1), l(!1);
-  }} changeDocumentTemplate=${m}/>`}
+  }}
+      changeDocumentTemplate=${m}
+    />`}
     <${AAe}>
       <${Yo} type="button">Templates<//>
       <${PAe}>
         <${CAe}>
-        ${Object.keys(i).map((y) => ne`
-            ${i[y].errorMessage ? ne`
-              <${$Ae}>
-                <${h === y && Cw} tooltipOrientation="left" errorMessage="${i[y].errorMessage}"/>
-                  <${Aw} type="button" onMouseEnter=${() => u(y)} onMouseLeave=${() => u(!1)}>${i[y].id}
-                <//>
-              <//>
-            ` : ne`
-              <${Aw} type="button" 
-              onClick=${() => {
+          ${Object.keys(i).map((y) => ne`
+              ${i[y].errorMessage ? ne`
+                    <${$Ae}>
+                      <${h === y && Cw}
+                        tooltipOrientation="left"
+                        errorMessage="${i[y].errorMessage}"
+                      />
+                      <${Aw}
+                        type="button"
+                        onMouseEnter=${() => u(y)}
+                        onMouseLeave=${() => u(!1)}
+                        >${i[y].id}
+                      <//>
+                    <//>
+                  ` : ne`
+                    <${Aw}
+                      type="button"
+                      onClick=${() => {
     c(!0), l(y);
-  }}>${i[y].id}
-              <//>
-            `}
-          `)}      
+  }}
+                      >${i[y].id}
+                    <//>
+                  `}
+            `)}
         <//>
       <//>
     <//>
@@ -34892,7 +34953,7 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
     stroke: var(--icon-color);
     &.inner-copy {
       transition: 0.4s ease;
-      fill: var(--icon-bg)
+      fill: var(--icon-bg);
     }
   }
 
@@ -34900,7 +34961,7 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
     background-color: var(--icon-selected);
     border: 1px solid var(--icon-selected);
     .inner-copy {
-      fill: var(--icon-selected)
+      fill: var(--icon-selected);
     }
   }
 
@@ -34916,7 +34977,7 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   align-items: center;
   margin-left: 5px;
 `, DAe = ge(Yo)`
-  pointer-events: none; 
+  pointer-events: none;
   background-color: var(--alert);
   border: none;
   width: fit-content;
@@ -34940,39 +35001,93 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   height: 40px;
   margin-right: 10px;
   margin-left: 10px;
-`, LAe = () => ne`
-  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
-    <path d="M20.35 1.78003L12.61 9.51003" stroke-width="1.75"/>
-    <path d="M14.88 1.08008H20.89V7.27008" stroke-width="1.75"/>
-    <path d="M1.42999 20.3601L9.16999 12.6301" stroke-width="1.75"/>
-    <path d="M6.90002 21.0601H0.890015V14.8701" stroke-width="1.75"/>
-  </svg>`, IAe = () => ne`
-  <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none">
-    <path d="M21.75 1V7.66H14.9" stroke-width="1.75"/>
-    <path d="M21.65 12.5899C20.95 17.4199 16.78 21.1399 11.75 21.1399C6.23 21.1399 1.75 16.6599 1.75 11.1399C1.75 5.61989 6.23 1.13989 11.75 1.13989C16.24 1.13989 20.03 4.09989 21.3 8.16989" stroke-width="1.75"/>
-  </svg>`, qAe = () => ne`
-  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="18" viewBox="0 0 26 18" fill="none">
-    <path d="M13.01 11.5902C14.5675 11.5902 15.83 10.3276 15.83 8.7702C15.83 7.21275 14.5675 5.9502 13.01 5.9502C11.4526 5.9502 10.1899 7.21275 10.1899 8.7702C10.1899 10.3276 11.4526 11.5902 13.01 11.5902Z" stroke-width="1.75"/>
-    <path d="M23.4301 9.80018C23.4301 9.80018 13.75 24.5402 2.58997 9.80018L1.98999 8.95018L2.59998 8.10018C2.59998 8.10018 12.2799 -6.63982 23.4399 8.10018L24.01 8.90018L23.4301 9.80018Z" stroke-width="1.75"/>
-  </svg>`, NAe = () => ne`
-  <svg xmlns="http://www.w3.org/2000/svg" width="21" height="15" viewBox="0 0 21 15" fill="none">
-    <path d="M15.31 2.8501L19.56 7.1001L15.19 11.4801" stroke-width="1.75"/>
-    <path d="M5.75 11.4801L1.5 7.2201L5.88 2.8501" stroke-width="1.75"/>
-    <path d="M12.35 0.340088L8.72 13.9901"  stroke-width="1.75"/>
-  </svg>`, BAe = () => ne`
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22" fill="none">
-    <path d="M13.99 1.04004H1.37V16.64H13.99V1.04004Z" stroke-width="1.75"/>
-    <path class="inner-copy" d="M18.63 5.51001H6.01001V21.11H18.63V5.51001Z" stroke-width="1.75"/>
-  </svg>`, XAe = () => ne`
-  <svg xmlns="http://www.w3.org/2000/svg" width="23" height="18" viewBox="0 0 23 18" fill="none">
-    <path d="M21.84 1.65015H1.83997V16.6701H21.84V1.65015Z"  stroke-width="1.75"/>
-    <path d="M11.84 1.83008V16.6701" stroke-width="1.75"/>
-  </svg>`, WAe = () => ne`
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
-    <path d="M21.23 11.0801H10.29"  stroke-width="1.75"/>
-    <path d="M17.86 6.71997L22.11 10.97L17.73 15.35"  stroke-width="1.75"/>
-    <path d="M2.22998 5.09009H13.17"  stroke-width="1.75"/>
-    <path d="M5.60999 9.44007L1.35999 5.19007L5.73999 0.820068" stroke-width="1.75"/>
+`, LAe = () => ne` <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="22"
+    height="22"
+    viewBox="0 0 22 22"
+    fill="none"
+  >
+    <path d="M20.35 1.78003L12.61 9.51003" stroke-width="1.75" />
+    <path d="M14.88 1.08008H20.89V7.27008" stroke-width="1.75" />
+    <path d="M1.42999 20.3601L9.16999 12.6301" stroke-width="1.75" />
+    <path d="M6.90002 21.0601H0.890015V14.8701" stroke-width="1.75" />
+  </svg>`, IAe = () => ne` <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="23"
+    height="23"
+    viewBox="0 0 23 23"
+    fill="none"
+  >
+    <path d="M21.75 1V7.66H14.9" stroke-width="1.75" />
+    <path
+      d="M21.65 12.5899C20.95 17.4199 16.78 21.1399 11.75 21.1399C6.23 21.1399 1.75 16.6599 1.75 11.1399C1.75 5.61989 6.23 1.13989 11.75 1.13989C16.24 1.13989 20.03 4.09989 21.3 8.16989"
+      stroke-width="1.75"
+    />
+  </svg>`, qAe = () => ne` <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="26"
+    height="18"
+    viewBox="0 0 26 18"
+    fill="none"
+  >
+    <path
+      d="M13.01 11.5902C14.5675 11.5902 15.83 10.3276 15.83 8.7702C15.83 7.21275 14.5675 5.9502 13.01 5.9502C11.4526 5.9502 10.1899 7.21275 10.1899 8.7702C10.1899 10.3276 11.4526 11.5902 13.01 11.5902Z"
+      stroke-width="1.75"
+    />
+    <path
+      d="M23.4301 9.80018C23.4301 9.80018 13.75 24.5402 2.58997 9.80018L1.98999 8.95018L2.59998 8.10018C2.59998 8.10018 12.2799 -6.63982 23.4399 8.10018L24.01 8.90018L23.4301 9.80018Z"
+      stroke-width="1.75"
+    />
+  </svg>`, NAe = () => ne` <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="15"
+    viewBox="0 0 21 15"
+    fill="none"
+  >
+    <path d="M15.31 2.8501L19.56 7.1001L15.19 11.4801" stroke-width="1.75" />
+    <path d="M5.75 11.4801L1.5 7.2201L5.88 2.8501" stroke-width="1.75" />
+    <path d="M12.35 0.340088L8.72 13.9901" stroke-width="1.75" />
+  </svg>`, BAe = () => ne` <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="22"
+    viewBox="0 0 20 22"
+    fill="none"
+  >
+    <path d="M13.99 1.04004H1.37V16.64H13.99V1.04004Z" stroke-width="1.75" />
+    <path
+      class="inner-copy"
+      d="M18.63 5.51001H6.01001V21.11H18.63V5.51001Z"
+      stroke-width="1.75"
+    />
+  </svg>`, XAe = () => ne` <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="23"
+    height="18"
+    viewBox="0 0 23 18"
+    fill="none"
+  >
+    <path
+      d="M21.84 1.65015H1.83997V16.6701H21.84V1.65015Z"
+      stroke-width="1.75"
+    />
+    <path d="M11.84 1.83008V16.6701" stroke-width="1.75" />
+  </svg>`, WAe = () => ne` <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="16"
+    viewBox="0 0 24 16"
+    fill="none"
+  >
+    <path d="M21.23 11.0801H10.29" stroke-width="1.75" />
+    <path d="M17.86 6.71997L22.11 10.97L17.73 15.35" stroke-width="1.75" />
+    <path d="M2.22998 5.09009H13.17" stroke-width="1.75" />
+    <path
+      d="M5.60999 9.44007L1.35999 5.19007L5.73999 0.820068"
+      stroke-width="1.75"
+    />
   </svg>`, YAe = [{
   label: "Source",
   icon: NAe
@@ -35000,22 +35115,29 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   text: n,
   templatelist: r,
   printCallback: i,
-  setMode: s,
-  buttonActions: o
-}) => ne`
-    <${EAe}>
-          <${RAe}> 
-            <${Sw} buttons=${VAe} highlightActive=${!1} initialClickedId=${null} clickCallback=${(l) => o[l]()}/>
-            ${t && ne`<${DAe}> ${t} <//>`}
-          <//>
-          <${ZAe}>
-            <${yAe} users=${e}/>
-            <${Yo} type="button" onClick=${i}>Export as PDF<//>
-            <${QAe} text=${n} templatelist=${r} />
-            <${MAe} />
-            <${Sw} buttons=${YAe} clickedId=${2} clickCallback=${(l) => s(l)}/>
-          <//>
-        <//>`;
+  buttonActions: s
+}) => ne` <${EAe}>
+    <${RAe}>
+      <${Sw}
+        buttons=${VAe}
+        highlightActive=${!1}
+        initialClickedId=${null}
+        clickCallback=${(o) => s[o]()}
+      />
+      ${t && ne`<${DAe}> ${t} <//>`}
+    <//>
+    <${ZAe}>
+      <${yAe} users=${e} />
+      <${Yo} type="button" onClick=${i}>Export as PDF<//>
+      <${QAe} text=${n} templatelist=${r} />
+      <${MAe} />
+      <${Sw}
+        buttons=${YAe}
+        clickedId=${2}
+        clickCallback=${(o) => setMode(o)}
+      />
+    <//>
+  <//>`;
 var $w;
 ($w = window.myst_editor) != null && $w.isFresh || (_$(), window.myst_editor = {
   isFresh: !0
@@ -35076,11 +35198,13 @@ const FAe = ge.div`
       _$(), v("Rich links refreshed!", 1), O.refresh();
     }
   };
-  return Ft(() => GAe(p), [p]), ne`
-  <div id="myst-css-namespace">
-    <${q2} stylisPlugins=${[UAe("#myst-css-namespace")]}>
+  return Ft(() => GAe(p), [p]), ne` <div id="myst-css-namespace">
+    <${q2}
+      stylisPlugins=${[UAe("#myst-css-namespace")]}
+    >
       <${FAe} fullscreen=${p}>
-        ${s && ne`<${jAe} ...${{
+        ${s && ne`<${jAe}
+          ...${{
     alert: b,
     users: w,
     text: O,
@@ -35088,11 +35212,24 @@ const FAe = ge.div`
     printCallback: i,
     setMode: d,
     buttonActions: P
-  }}/>`}
+  }}
+        />`}
         <${zAe} fullscreen=${p}>
-          <${Z7} setUsers=${S} getAvatar=${u} mode=${f} text=${O} name=${t} id=${e} collaboration=${l} spellcheckOpts=${a} highlights=${h}/>
-          <${I3} $mode=${f} ref=${g}/>
-          ${f === "Diff" ? ne`<${rB} oldText=${r} text=${O}/>` : ""}
+          <${Z7}
+            ...${{
+    setUsers: S,
+    getAvatar: u,
+    mode: f,
+    text: O,
+    name: t,
+    id: e,
+    collaboration: l,
+    spellcheckOpts: a,
+    highlights: h
+  }}
+          />
+          <${I3} $mode=${f} ref=${g} />
+          ${f === "Diff" ? ne`<${rB} oldText=${r} text=${O} />` : ""}
         <//>
       <//>
     <//>
