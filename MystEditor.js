@@ -500,7 +500,7 @@ function tP(t) {
     return c(), a;
   }(t)), e), arguments, [])).length > 1 ? e : e[0];
 }
-var re = tP.bind(fn), _t = function() {
+var ne = tP.bind(fn), _t = function() {
   return _t = Object.assign || function(e) {
     for (var n, r = 1, i = arguments.length; r < i; r++) {
       n = arguments[r];
@@ -1906,13 +1906,13 @@ function Y2(t, e, n) {
       }(E, x, c2(x, j, Z) || ks), Le = Oe.as || A, me = {};
       for (var de in Oe)
         Oe[de] === void 0 || de[0] === "$" || de === "as" || de === "theme" || (de === "forwardedAs" ? me.as = Oe.forwardedAs : fe && !fe(de, Le) || (me[de] = Oe[de], fe || {}.NODE_ENV !== "development" || iP(de) || VO.has(de) || !hd.has(Le) || (VO.add(de), console.warn('styled-components: it looks like an unknown prop "'.concat(de, '" is being sent through to the DOM, which will likely trigger a React console error. If you would like automatic filtering of unknown props, you can opt-into that behavior via `<StyleSheetManager shouldForwardProp={...}>` (connect an API like `@emotion/is-prop-valid`) or consider using transient props (`$` prefix for automatic filtering.)')))));
-      var ne = function(ce, $t) {
+      var re = function(ce, $t) {
         var pe = pd(), Nt = ce.generateAndInjectStyles($t, pe.styleSheet, pe.stylis);
         return {}.NODE_ENV !== "production" && rd(Nt), Nt;
       }(T, Oe);
-      ({}).NODE_ENV !== "production" && v.warnTooManyClasses && v.warnTooManyClasses(ne);
+      ({}).NODE_ENV !== "production" && v.warnTooManyClasses && v.warnTooManyClasses(re);
       var wt = hi(X, U);
-      return ne && (wt += " " + ne), Oe.className && (wt += " " + Oe.className), me[Qu(Le) && !hd.has(Le) ? "class" : "className"] = wt, me.ref = P, fn(Le, me);
+      return re && (wt += " " + re), Oe.className && (wt += " " + Oe.className), me[Qu(Le) && !hd.has(Le) ? "class" : "className"] = wt, me.ref = P, fn(Le, me);
     }(y, w, S);
   }
   b.displayName = u;
@@ -10928,21 +10928,21 @@ function IE(t) {
         throw new RangeError(`Unrecognized record size: ${A}`);
     let F = a[Z], fe, Oe, Le = X - S;
     if (U - X <= i && (Oe = g(l.pos - v, E))) {
-      let me = new Uint16Array(Oe.size - Oe.skip), de = l.pos - Oe.size, ne = me.length;
+      let me = new Uint16Array(Oe.size - Oe.skip), de = l.pos - Oe.size, re = me.length;
       for (; l.pos > de; )
-        ne = O(Oe.start, me, ne);
+        re = O(Oe.start, me, re);
       fe = new Xr(me, U - Oe.start, r), Le = Oe.start - S;
     } else {
       let me = l.pos - A;
       l.next();
-      let de = [], ne = [], wt = Z >= o ? Z : -1, ce = 0, $t = U;
+      let de = [], re = [], wt = Z >= o ? Z : -1, ce = 0, $t = U;
       for (; l.pos > me; )
-        wt >= 0 && l.id == wt && l.size >= 0 ? (l.end <= $t - i && (p(de, ne, X, ce, l.end, $t, wt, j), ce = de.length, $t = l.end), l.next()) : T > 2500 ? f(X, me, de, ne) : u(X, me, de, ne, wt, T + 1);
-      if (wt >= 0 && ce > 0 && ce < de.length && p(de, ne, X, ce, X, $t, wt, j), de.reverse(), ne.reverse(), wt > -1 && ce > 0) {
+        wt >= 0 && l.id == wt && l.size >= 0 ? (l.end <= $t - i && (p(de, re, X, ce, l.end, $t, wt, j), ce = de.length, $t = l.end), l.next()) : T > 2500 ? f(X, me, de, re) : u(X, me, de, re, wt, T + 1);
+      if (wt >= 0 && ce > 0 && ce < de.length && p(de, re, X, ce, X, $t, wt, j), de.reverse(), re.reverse(), wt > -1 && ce > 0) {
         let pe = d(F);
-        fe = _m(F, de, ne, 0, de.length, 0, U - X, pe, pe);
+        fe = _m(F, de, re, 0, de.length, 0, U - X, pe, pe);
       } else
-        fe = m(F, de, ne, U - X, j - U);
+        fe = m(F, de, re, U - X, j - U);
     }
     x.push(fe), P.push(Le);
   }
@@ -26425,7 +26425,7 @@ const P7 = ge.div`
     return t.newLocalComment && (o.focus(), t.newLocalComment = !1), () => {
       o.destroy();
     };
-  }, [n]), re`
+  }, [n]), ne`
     <${P7} top=${t.display().offset(e)} fade=${t.draggedComment == e} >
         <div style="position:relative; display: ${t.display().isShown(e) ? "block" : "none"}" >
           <div ref=${n}></div>
@@ -26436,12 +26436,12 @@ const P7 = ge.div`
 }) => {
   let e = ({
     commentId: s
-  }) => re`<${T7} ...${{
+  }) => ne`<${T7} ...${{
     key: s,
     commentId: s,
     ycomments: t
   }}/>`, n = () => t.iterComments().map(e), [r, i] = Xe(n());
-  return t.display().onUpdate(() => i(n())), re`${r}`;
+  return t.display().onUpdate(() => i(n())), ne`${r}`;
 };
 function E7(t, e, n) {
   return !t || !e ? null : Mt(() => new Xo(t, e, n), []);
@@ -26594,9 +26594,9 @@ const R7 = Z_("Source"), jC = ge.div`
   }, [O]), Ft(() => {
     const y = document.querySelectorAll("#myst-css-namespace").length, w = s.enabled && m.toString().length == 0 && d.awareness.getStates().size == y && d.firstUser && O;
     m && m.toString().length != 0 && t.set(m.toString()), w && (console.log("You are the first user in this document. Initiating..."), J1(h.current, t.get())), t.onSync((S) => J1(h.current, S)), b == null || b.updateMainCodeMirror(), d == null || d.watchCollabolators(a);
-  }, [O, u]), re`
+  }, [O, u]), ne`
       <${jC} $mode=${i} id="${e}-editor" class=${r}>
-        ${s.commentsEnabled ? re`<${Q7} ycomments=${b}/>` : ""}
+        ${s.commentsEnabled ? ne`<${Q7} ycomments=${b}/>` : ""}
       <//>
       <${D7} value=${t.get()} name=${n} id=${e}><//>
   `;
@@ -27481,10 +27481,10 @@ const py = ge(jC)`
       old: t,
       current: e.get()
     }), n.current.appendChild(i.current.b.dom), r.current.appendChild(i.current.a.dom);
-  }, []), re`
+  }, []), ne`
   <div style="display:flex; width: 100%">
-    <${py} ref=${n} $shown=${!0}/>
-    <${py} ref=${r} $shown=${!0}/>
+    <${py} ref=${n} />
+    <${py} ref=${r} />
   </div>`;
 };
 var sA = { exports: {} }, ae = {}, Ag = { exports: {} };
@@ -34169,7 +34169,7 @@ function P$() {
   }
   var U = {};
   e.isSupported = typeof b == "function" && x && x.createHTMLDocument !== void 0 && X !== 9;
-  var A = JCe, j = eAe, F = tAe, fe = nAe, Oe = rAe, Le = sAe, me = oAe, de = iAe, ne = null, wt = J({}, [].concat(ln(ww), ln(Uf), ln(Gf), ln(Hf), ln(kw))), ce = null, $t = J({}, [].concat(ln(vw), ln(Kf), ln(xw), ln(Fa))), pe = Object.seal(Object.create(null, {
+  var A = JCe, j = eAe, F = tAe, fe = nAe, Oe = rAe, Le = sAe, me = oAe, de = iAe, re = null, wt = J({}, [].concat(ln(ww), ln(Uf), ln(Gf), ln(Hf), ln(kw))), ce = null, $t = J({}, [].concat(ln(vw), ln(Kf), ln(xw), ln(Fa))), pe = Object.seal(Object.create(null, {
     tagNameCheck: {
       writable: !0,
       configurable: !1,
@@ -34191,7 +34191,7 @@ function P$() {
   })), Nt = null, rn = null, Li = !0, br = !0, sn = !1, Ug = !0, Ii = !1, Kr = !1, Ou = !1, bu = !1, qi = !1, Kl = !1, Jl = !1, Gg = !0, Hg = !1, E$ = "user-content-", yu = !0, so = !1, Ni = {}, Bi = null, Kg = J({}, ["annotation-xml", "audio", "colgroup", "desc", "foreignobject", "head", "iframe", "math", "mi", "mn", "mo", "ms", "mtext", "noembed", "noframes", "noscript", "plaintext", "script", "style", "svg", "template", "thead", "title", "video", "xmp"]), Jg = null, eO = J({}, ["audio", "video", "img", "source", "image", "track"]), wu = null, tO = J({}, ["alt", "class", "for", "id", "label", "name", "pattern", "placeholder", "role", "summary", "title", "value", "style", "xmlns"]), ea = "http://www.w3.org/1998/Math/MathML", ta = "http://www.w3.org/2000/svg", Hn = "http://www.w3.org/1999/xhtml", Xi = Hn, ku = !1, vu = null, R$ = J({}, [ea, ta, Hn], Ff), Jr, D$ = ["application/xhtml+xml", "text/html"], Z$ = "text/html", Fe, Wi = null, M$ = r.createElement("form"), nO = function(_) {
     return _ instanceof RegExp || _ instanceof Function;
   }, xu = function(_) {
-    Wi && Wi === _ || ((!_ || Cr(_) !== "object") && (_ = {}), _ = ri(_), Jr = D$.indexOf(_.PARSER_MEDIA_TYPE) === -1 ? Jr = Z$ : Jr = _.PARSER_MEDIA_TYPE, Fe = Jr === "application/xhtml+xml" ? Ff : kc, ne = "ALLOWED_TAGS" in _ ? J({}, _.ALLOWED_TAGS, Fe) : wt, ce = "ALLOWED_ATTR" in _ ? J({}, _.ALLOWED_ATTR, Fe) : $t, vu = "ALLOWED_NAMESPACES" in _ ? J({}, _.ALLOWED_NAMESPACES, Ff) : R$, wu = "ADD_URI_SAFE_ATTR" in _ ? J(
+    Wi && Wi === _ || ((!_ || Cr(_) !== "object") && (_ = {}), _ = ri(_), Jr = D$.indexOf(_.PARSER_MEDIA_TYPE) === -1 ? Jr = Z$ : Jr = _.PARSER_MEDIA_TYPE, Fe = Jr === "application/xhtml+xml" ? Ff : kc, re = "ALLOWED_TAGS" in _ ? J({}, _.ALLOWED_TAGS, Fe) : wt, ce = "ALLOWED_ATTR" in _ ? J({}, _.ALLOWED_ATTR, Fe) : $t, vu = "ALLOWED_NAMESPACES" in _ ? J({}, _.ALLOWED_NAMESPACES, Ff) : R$, wu = "ADD_URI_SAFE_ATTR" in _ ? J(
       ri(tO),
       _.ADD_URI_SAFE_ATTR,
       Fe
@@ -34199,7 +34199,7 @@ function P$() {
       ri(eO),
       _.ADD_DATA_URI_TAGS,
       Fe
-    ) : eO, Bi = "FORBID_CONTENTS" in _ ? J({}, _.FORBID_CONTENTS, Fe) : Kg, Nt = "FORBID_TAGS" in _ ? J({}, _.FORBID_TAGS, Fe) : {}, rn = "FORBID_ATTR" in _ ? J({}, _.FORBID_ATTR, Fe) : {}, Ni = "USE_PROFILES" in _ ? _.USE_PROFILES : !1, Li = _.ALLOW_ARIA_ATTR !== !1, br = _.ALLOW_DATA_ATTR !== !1, sn = _.ALLOW_UNKNOWN_PROTOCOLS || !1, Ug = _.ALLOW_SELF_CLOSE_IN_ATTR !== !1, Ii = _.SAFE_FOR_TEMPLATES || !1, Kr = _.WHOLE_DOCUMENT || !1, qi = _.RETURN_DOM || !1, Kl = _.RETURN_DOM_FRAGMENT || !1, Jl = _.RETURN_TRUSTED_TYPE || !1, bu = _.FORCE_BODY || !1, Gg = _.SANITIZE_DOM !== !1, Hg = _.SANITIZE_NAMED_PROPS || !1, yu = _.KEEP_CONTENT !== !1, so = _.IN_PLACE || !1, de = _.ALLOWED_URI_REGEXP || de, Xi = _.NAMESPACE || Hn, pe = _.CUSTOM_ELEMENT_HANDLING || {}, _.CUSTOM_ELEMENT_HANDLING && nO(_.CUSTOM_ELEMENT_HANDLING.tagNameCheck) && (pe.tagNameCheck = _.CUSTOM_ELEMENT_HANDLING.tagNameCheck), _.CUSTOM_ELEMENT_HANDLING && nO(_.CUSTOM_ELEMENT_HANDLING.attributeNameCheck) && (pe.attributeNameCheck = _.CUSTOM_ELEMENT_HANDLING.attributeNameCheck), _.CUSTOM_ELEMENT_HANDLING && typeof _.CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements == "boolean" && (pe.allowCustomizedBuiltInElements = _.CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements), Ii && (br = !1), Kl && (qi = !0), Ni && (ne = J({}, ln(kw)), ce = [], Ni.html === !0 && (J(ne, ww), J(ce, vw)), Ni.svg === !0 && (J(ne, Uf), J(ce, Kf), J(ce, Fa)), Ni.svgFilters === !0 && (J(ne, Gf), J(ce, Kf), J(ce, Fa)), Ni.mathMl === !0 && (J(ne, Hf), J(ce, xw), J(ce, Fa))), _.ADD_TAGS && (ne === wt && (ne = ri(ne)), J(ne, _.ADD_TAGS, Fe)), _.ADD_ATTR && (ce === $t && (ce = ri(ce)), J(ce, _.ADD_ATTR, Fe)), _.ADD_URI_SAFE_ATTR && J(wu, _.ADD_URI_SAFE_ATTR, Fe), _.FORBID_CONTENTS && (Bi === Kg && (Bi = ri(Bi)), J(Bi, _.FORBID_CONTENTS, Fe)), yu && (ne["#text"] = !0), Kr && J(ne, ["html", "head", "body"]), ne.table && (J(ne, ["tbody"]), delete Nt.tbody), yt && yt(_), Wi = _);
+    ) : eO, Bi = "FORBID_CONTENTS" in _ ? J({}, _.FORBID_CONTENTS, Fe) : Kg, Nt = "FORBID_TAGS" in _ ? J({}, _.FORBID_TAGS, Fe) : {}, rn = "FORBID_ATTR" in _ ? J({}, _.FORBID_ATTR, Fe) : {}, Ni = "USE_PROFILES" in _ ? _.USE_PROFILES : !1, Li = _.ALLOW_ARIA_ATTR !== !1, br = _.ALLOW_DATA_ATTR !== !1, sn = _.ALLOW_UNKNOWN_PROTOCOLS || !1, Ug = _.ALLOW_SELF_CLOSE_IN_ATTR !== !1, Ii = _.SAFE_FOR_TEMPLATES || !1, Kr = _.WHOLE_DOCUMENT || !1, qi = _.RETURN_DOM || !1, Kl = _.RETURN_DOM_FRAGMENT || !1, Jl = _.RETURN_TRUSTED_TYPE || !1, bu = _.FORCE_BODY || !1, Gg = _.SANITIZE_DOM !== !1, Hg = _.SANITIZE_NAMED_PROPS || !1, yu = _.KEEP_CONTENT !== !1, so = _.IN_PLACE || !1, de = _.ALLOWED_URI_REGEXP || de, Xi = _.NAMESPACE || Hn, pe = _.CUSTOM_ELEMENT_HANDLING || {}, _.CUSTOM_ELEMENT_HANDLING && nO(_.CUSTOM_ELEMENT_HANDLING.tagNameCheck) && (pe.tagNameCheck = _.CUSTOM_ELEMENT_HANDLING.tagNameCheck), _.CUSTOM_ELEMENT_HANDLING && nO(_.CUSTOM_ELEMENT_HANDLING.attributeNameCheck) && (pe.attributeNameCheck = _.CUSTOM_ELEMENT_HANDLING.attributeNameCheck), _.CUSTOM_ELEMENT_HANDLING && typeof _.CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements == "boolean" && (pe.allowCustomizedBuiltInElements = _.CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements), Ii && (br = !1), Kl && (qi = !0), Ni && (re = J({}, ln(kw)), ce = [], Ni.html === !0 && (J(re, ww), J(ce, vw)), Ni.svg === !0 && (J(re, Uf), J(ce, Kf), J(ce, Fa)), Ni.svgFilters === !0 && (J(re, Gf), J(ce, Kf), J(ce, Fa)), Ni.mathMl === !0 && (J(re, Hf), J(ce, xw), J(ce, Fa))), _.ADD_TAGS && (re === wt && (re = ri(re)), J(re, _.ADD_TAGS, Fe)), _.ADD_ATTR && (ce === $t && (ce = ri(ce)), J(ce, _.ADD_ATTR, Fe)), _.ADD_URI_SAFE_ATTR && J(wu, _.ADD_URI_SAFE_ATTR, Fe), _.FORBID_CONTENTS && (Bi === Kg && (Bi = ri(Bi)), J(Bi, _.FORBID_CONTENTS, Fe)), yu && (re["#text"] = !0), Kr && J(re, ["html", "head", "body"]), re.table && (J(re, ["tbody"]), delete Nt.tbody), yt && yt(_), Wi = _);
   }, rO = J({}, ["mi", "mo", "mn", "ms", "mtext"]), iO = J({}, ["foreignobject", "desc", "title", "annotation-xml"]), L$ = J({}, ["title", "style", "font", "a", "script"]), na = J({}, Uf);
   J(na, Gf), J(na, HCe);
   var Su = J({}, Hf);
@@ -34295,10 +34295,10 @@ function P$() {
     var M = Fe(_.nodeName);
     if (Jn("uponSanitizeElement", _, {
       tagName: M,
-      allowedTags: ne
+      allowedTags: re
     }), _.hasChildNodes() && !oo(_.firstElementChild) && (!oo(_.content) || !oo(_.content.firstElementChild)) && mt(/<[/\w]/g, _.innerHTML) && mt(/<[/\w]/g, _.textContent) || M === "select" && mt(/<template/i, _.innerHTML))
       return Kn(_), !0;
-    if (!ne[M] || Nt[M]) {
+    if (!re[M] || Nt[M]) {
       if (!Nt[M] && cO(M) && (pe.tagNameCheck instanceof RegExp && mt(pe.tagNameCheck, M) || pe.tagNameCheck instanceof Function && pe.tagNameCheck(M)))
         return !1;
       if (yu && !Bi[M]) {
@@ -34403,7 +34403,7 @@ function P$() {
     if (Ou || xu(_), e.removed = [], typeof W == "string" && (so = !1), so) {
       if (W.nodeName) {
         var Ke = Fe(W.nodeName);
-        if (!ne[Ke] || Nt[Ke])
+        if (!re[Ke] || Nt[Ke])
           throw zf("root node is forbidden and cannot be sanitized in-place");
       }
     } else if (W instanceof o)
@@ -34428,7 +34428,7 @@ function P$() {
       return (ce.shadowroot || ce.shadowrootmod) && (ot = Z.call(n, ot, !0)), ot;
     }
     var ze = Kr ? $.outerHTML : $.innerHTML;
-    return Kr && ne["!doctype"] && $.ownerDocument && $.ownerDocument.doctype && $.ownerDocument.doctype.name && mt(lAe, $.ownerDocument.doctype.name) && (ze = "<!DOCTYPE " + $.ownerDocument.doctype.name + `>
+    return Kr && re["!doctype"] && $.ownerDocument && $.ownerDocument.doctype && $.ownerDocument.doctype.name && mt(lAe, $.ownerDocument.doctype.name) && (ze = "<!DOCTYPE " + $.ownerDocument.doctype.name + `>
 ` + ze), Ii && (ze = on(ze, A, " "), ze = on(ze, j, " "), ze = on(ze, F, " ")), w && Jl ? w.createHTML(ze) : ze;
   }, e.setConfig = function(W) {
     xu(W), Ou = !0;
@@ -34623,8 +34623,8 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   highlightActive: r = !0
 }) => {
   const [i, s] = Xe(e);
-  return re`
-    ${t.map((o, l) => re`
+  return ne`
+    ${t.map((o, l) => ne`
       <${gAe} className="icon" type="button" key=${o.label} name=${o.label} onClick=${() => {
     r && s(l), n(o.label);
   }} active=${l === i}>
@@ -34664,23 +34664,23 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   login: t,
   color: e,
   avatarUrl: n
-}) => re`
+}) => ne`
   <img src=${n}
        key=${t}
        class="avatar"
        style="border-color: ${e}"
   />`, bAe = ({
   n: t
-}) => re`
+}) => ne`
   <${Q$}>
     <span class="avatar placeholder">+${t}</span>
   <//>`, yAe = ({
   users: t
-}) => re`
+}) => ne`
   <${Q$}>
-    ${t.length > Jf ? re`<${bAe} n=${t.length - Jf}/>` : ""}
+    ${t.length > Jf ? ne`<${bAe} n=${t.length - Jf}/>` : ""}
     
-    ${t.filter((e, n) => n < Jf).map((e) => re`<${OAe} ...${e}/>`)}
+    ${t.filter((e, n) => n < Jf).map((e) => ne`<${OAe} ...${e}/>`)}
   <//>`, wAe = ge.section`
   z-index: 2;
   display: flex;
@@ -34714,7 +34714,7 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   changeDocumentTemplate: t,
   selectedTemplate: e,
   closeModal: n
-}) => re`
+}) => ne`
     <${wAe}>
         <${kAe}>Are you sure you want to change the current template?<//>
         <${vAe}>
@@ -34765,7 +34765,7 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
 `, Cw = ({
   tooltipOrientation: t,
   errorMessage: e
-}) => re`
+}) => ne`
     <${SAe} $orientation=${t}>
       <${_Ae} $orientation=${t}>
           ${e}
@@ -34845,29 +34845,29 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
     }
     return y;
   };
-  return Ft(() => g(e).then(TAe).then(b).then(s), []), f.error ? re`
+  return Ft(() => g(e).then(TAe).then(b).then(s), []), f.error ? ne`
         <${Yo} type="button" template=${n} onMouseEnter=${() => u(!0)} onMouseLeave=${() => u(!1)}>
           Templates
         <//>
-        <${h && Cw} tooltipOrientation="bottom" errorMessage=${f.message}/>` : Object.keys(i).length == 0 ? re`
+        <${h && Cw} tooltipOrientation="bottom" errorMessage=${f.message}/>` : Object.keys(i).length == 0 ? ne`
         <${Yo} type="button" template=${n} onMouseEnter=${() => u(!0)} onMouseLeave=${() => u(!1)}>
           Templates
-        <//>` : re`
-    ${a && re`<${xAe} selectedTemplate=${o} closeModal=${() => {
+        <//>` : ne`
+    ${a && ne`<${xAe} selectedTemplate=${o} closeModal=${() => {
     c(!1), l(!1);
   }} changeDocumentTemplate=${m}/>`}
     <${AAe}>
       <${Yo} type="button">Templates<//>
       <${PAe}>
         <${CAe}>
-        ${Object.keys(i).map((y) => re`
-            ${i[y].errorMessage ? re`
+        ${Object.keys(i).map((y) => ne`
+            ${i[y].errorMessage ? ne`
               <${$Ae}>
                 <${h === y && Cw} tooltipOrientation="left" errorMessage="${i[y].errorMessage}"/>
                   <${Aw} type="button" onMouseEnter=${() => u(y)} onMouseLeave=${() => u(!1)}>${i[y].id}
                 <//>
               <//>
-            ` : re`
+            ` : ne`
               <${Aw} type="button" 
               onClick=${() => {
     c(!0), l(y);
@@ -34883,7 +34883,7 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   z-index: 10;
   position: sticky;
   top: 0;
-  display: ${(t) => t.$shown ? "flex" : "none"};
+  display: flex;
   width: 100%;
   height: 60px;
   background-color: var(--navbar-bg);
@@ -34940,34 +34940,34 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   height: 40px;
   margin-right: 10px;
   margin-left: 10px;
-`, LAe = () => re`
+`, LAe = () => ne`
   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
     <path d="M20.35 1.78003L12.61 9.51003" stroke-width="1.75"/>
     <path d="M14.88 1.08008H20.89V7.27008" stroke-width="1.75"/>
     <path d="M1.42999 20.3601L9.16999 12.6301" stroke-width="1.75"/>
     <path d="M6.90002 21.0601H0.890015V14.8701" stroke-width="1.75"/>
-  </svg>`, IAe = () => re`
+  </svg>`, IAe = () => ne`
   <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none">
     <path d="M21.75 1V7.66H14.9" stroke-width="1.75"/>
     <path d="M21.65 12.5899C20.95 17.4199 16.78 21.1399 11.75 21.1399C6.23 21.1399 1.75 16.6599 1.75 11.1399C1.75 5.61989 6.23 1.13989 11.75 1.13989C16.24 1.13989 20.03 4.09989 21.3 8.16989" stroke-width="1.75"/>
-  </svg>`, qAe = () => re`
+  </svg>`, qAe = () => ne`
   <svg xmlns="http://www.w3.org/2000/svg" width="26" height="18" viewBox="0 0 26 18" fill="none">
     <path d="M13.01 11.5902C14.5675 11.5902 15.83 10.3276 15.83 8.7702C15.83 7.21275 14.5675 5.9502 13.01 5.9502C11.4526 5.9502 10.1899 7.21275 10.1899 8.7702C10.1899 10.3276 11.4526 11.5902 13.01 11.5902Z" stroke-width="1.75"/>
     <path d="M23.4301 9.80018C23.4301 9.80018 13.75 24.5402 2.58997 9.80018L1.98999 8.95018L2.59998 8.10018C2.59998 8.10018 12.2799 -6.63982 23.4399 8.10018L24.01 8.90018L23.4301 9.80018Z" stroke-width="1.75"/>
-  </svg>`, NAe = () => re`
+  </svg>`, NAe = () => ne`
   <svg xmlns="http://www.w3.org/2000/svg" width="21" height="15" viewBox="0 0 21 15" fill="none">
     <path d="M15.31 2.8501L19.56 7.1001L15.19 11.4801" stroke-width="1.75"/>
     <path d="M5.75 11.4801L1.5 7.2201L5.88 2.8501" stroke-width="1.75"/>
     <path d="M12.35 0.340088L8.72 13.9901"  stroke-width="1.75"/>
-  </svg>`, BAe = () => re`
+  </svg>`, BAe = () => ne`
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22" fill="none">
     <path d="M13.99 1.04004H1.37V16.64H13.99V1.04004Z" stroke-width="1.75"/>
     <path class="inner-copy" d="M18.63 5.51001H6.01001V21.11H18.63V5.51001Z" stroke-width="1.75"/>
-  </svg>`, XAe = () => re`
+  </svg>`, XAe = () => ne`
   <svg xmlns="http://www.w3.org/2000/svg" width="23" height="18" viewBox="0 0 23 18" fill="none">
     <path d="M21.84 1.65015H1.83997V16.6701H21.84V1.65015Z"  stroke-width="1.75"/>
     <path d="M11.84 1.83008V16.6701" stroke-width="1.75"/>
-  </svg>`, WAe = () => re`
+  </svg>`, WAe = () => ne`
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
     <path d="M21.23 11.0801H10.29"  stroke-width="1.75"/>
     <path d="M17.86 6.71997L22.11 10.97L17.73 15.35"  stroke-width="1.75"/>
@@ -34995,26 +34995,25 @@ const uAe = T$.exports, fAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   label: "Refresh",
   icon: IAe
 }], jAe = ({
-  shown: t,
-  alert: e,
-  users: n,
-  text: r,
-  templatelist: i,
-  printCallback: s,
-  setMode: o,
-  buttonActions: l
-}) => re`
-    <${EAe} $shown=${t}>
+  alert: t,
+  users: e,
+  text: n,
+  templatelist: r,
+  printCallback: i,
+  setMode: s,
+  buttonActions: o
+}) => ne`
+    <${EAe}>
           <${RAe}> 
-            <${Sw} buttons=${VAe} highlightActive=${!1} initialClickedId=${null} clickCallback=${(a) => l[a]()}/>
-            ${e && re`<${DAe}> ${e} <//>`}
+            <${Sw} buttons=${VAe} highlightActive=${!1} initialClickedId=${null} clickCallback=${(l) => o[l]()}/>
+            ${t && ne`<${DAe}> ${t} <//>`}
           <//>
           <${ZAe}>
-            <${yAe} users=${n}/>
-            <${Yo} type="button" onClick=${s}>Export as PDF<//>
-            <${QAe} text=${r} templatelist=${i} />
+            <${yAe} users=${e}/>
+            <${Yo} type="button" onClick=${i}>Export as PDF<//>
+            <${QAe} text=${n} templatelist=${r} />
             <${MAe} />
-            <${Sw} buttons=${YAe} clickedId=${2} clickCallback=${(a) => o(a)}/>
+            <${Sw} buttons=${YAe} clickedId=${2} clickCallback=${(l) => s(l)}/>
           <//>
         <//>`;
 var $w;
@@ -35077,12 +35076,11 @@ const FAe = ge.div`
       _$(), v("Rich links refreshed!", 1), O.refresh();
     }
   };
-  return Ft(() => GAe(p), [p]), re`
+  return Ft(() => GAe(p), [p]), ne`
   <div id="myst-css-namespace">
     <${q2} stylisPlugins=${[UAe("#myst-css-namespace")]}>
       <${FAe} fullscreen=${p}>
-        <${jAe} ...${{
-    shown: s,
+        ${s && ne`<${jAe} ...${{
     alert: b,
     users: w,
     text: O,
@@ -35090,11 +35088,11 @@ const FAe = ge.div`
     printCallback: i,
     setMode: d,
     buttonActions: P
-  }}/>
+  }}/>`}
         <${zAe} fullscreen=${p}>
           <${Z7} setUsers=${S} getAvatar=${u} mode=${f} text=${O} name=${t} id=${e} collaboration=${l} spellcheckOpts=${a} highlights=${h}/>
           <${I3} $mode=${f} ref=${g}/>
-          ${f === "Diff" ? re`<${rB} oldText=${r} text=${O}/>` : ""}
+          ${f === "Diff" ? ne`<${rB} oldText=${r} text=${O}/>` : ""}
         <//>
       <//>
     <//>
@@ -35102,6 +35100,6 @@ const FAe = ge.div`
 };
 export {
   t$e as default,
-  re as html,
+  ne as html,
   jo as render
 };
