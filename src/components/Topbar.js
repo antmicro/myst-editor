@@ -1,10 +1,19 @@
 import { styled } from "styled-components";
 import { html } from "htm/preact";
+import { useMemo } from "preact/hooks";
+import purify from "dompurify";
 
 import { TopbarButton } from "./Buttons";
 import ButtonGroup from "./ButtonGroup";
 import Avatars from "./Avatars";
 import TemplateManager from "./TemplateManager";
+
+const renderMdLinks = (title) =>
+  [...title.matchAll(/\[(.+)\]\(([^\s]+)\)/g)].reduce(
+    (prev, match) =>
+      prev.replace(match[0], `<a href="${match[2]}">${match[1]}</a>`),
+    title,
+  );
 
 const Topbar = styled.div`
   z-index: 10;
@@ -35,6 +44,17 @@ const Topbar = styled.div`
     & {
       display: none;
     }
+  }
+`;
+
+const Title = styled.div`
+  font-size: large;
+  font-family: "Lato", sans-serif;
+  white-space: nowrap;
+  margin-left: 10px;
+
+  a {
+    color: var(--blue-500);
   }
 `;
 
@@ -205,8 +225,13 @@ export const EditorTopbar = ({
   templatelist,
   printCallback,
   buttonActions,
-}) =>
-  html` <${Topbar}>
+  title,
+}) => {
+  const titleHtml = useMemo(() =>
+    purify.sanitize(renderMdLinks(title || ""), []),
+  );
+
+  return html` <${Topbar}>
     <${TopbarLeft}>
       <${ButtonGroup}
         buttons=${buttonsLeft}
@@ -215,6 +240,7 @@ export const EditorTopbar = ({
         clickCallback=${(label) => buttonActions[label]()}
       />
       ${alert && html`<${Alert}> ${alert} <//>`}
+      <${Title} dangerouslySetInnerHTML=${{ __html: titleHtml }} />
     <//>
     <${TopbarRight}>
       <${Avatars} users=${users} />
@@ -228,3 +254,4 @@ export const EditorTopbar = ({
       />
     <//>
   <//>`;
+};

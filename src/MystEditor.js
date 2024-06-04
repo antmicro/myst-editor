@@ -57,6 +57,7 @@ const hideBodyScrollIf = (val) =>
 const MystEditor = ({
   name = "myst_editor_textarea",
   id = "myst_editor_textarea",
+  title = null,
   initialMode = "Both",
   initialText = "",
   printCallback = window.print,
@@ -120,6 +121,7 @@ const MystEditor = ({
             printCallback,
             setMode,
             buttonActions,
+            title,
           }}
         />`}
         <${MystWrapper} fullscreen=${fullscreen}>
