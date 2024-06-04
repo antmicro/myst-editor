@@ -1,5 +1,5 @@
 import { render } from "preact";
-import { useState, useEffect, useReducer, useRef } from "preact/hooks";
+import { useState, useEffect, useReducer, useRef, useMemo } from "preact/hooks";
 import { html } from "htm/preact";
 import { StyleSheetManager, styled } from "styled-components";
 
@@ -54,13 +54,33 @@ const createExtraScopePlugin = (scope) => {
 const hideBodyScrollIf = (val) =>
   (document.documentElement.style.overflow = val ? "hidden" : "visible");
 
+const predefinedButtons = {
+  printToPdf: {
+    id: "print-to-pdf",
+    text: "Print to PDF",
+    action: window.print,
+  },
+  templateManager: { id: "template-manager" },
+  copyHtml: { id: "copy-html" },
+  fullscreen: { id: "fullscreen" },
+  refresh: { id: "refresh" },
+};
+
+const defaultButtons = [
+  predefinedButtons.fullscreen,
+  predefinedButtons.copyHtml,
+  predefinedButtons.refresh,
+  predefinedButtons.printToPdf,
+  predefinedButtons.templateManager,
+];
+
 const MystEditor = ({
   name = "myst_editor_textarea",
   id = "myst_editor_textarea",
   title = null,
   initialMode = "Both",
   initialText = "",
-  printCallback = window.print,
+  includeButtons = defaultButtons,
   topbar = true,
   templatelist,
   collaboration = {},
@@ -89,20 +109,27 @@ const MystEditor = ({
     setTimeout(() => setAlert(null), secs * 1000);
   };
 
-  const copyHtml = () => {
-    text.copy();
-    alertFor("copied!", 2);
-  };
-
   const buttonActions = {
-    "Copy HTML": copyHtml,
-    Fullscreen: () => setFullscreen((f) => !f),
-    Refresh: () => {
+    "copy-html": () => {
+      text.copy();
+      alertFor("copied!", 2);
+    },
+    fullscreen: () => setFullscreen((f) => !f),
+    refresh: () => {
       resetCache();
       alertFor("Rich links refreshed!", 1);
       text.refresh();
     },
   };
+
+  const buttons = useMemo(
+    () =>
+      includeButtons.map((b) => ({
+        ...b,
+        action: b.action || buttonActions[b.id],
+      })),
+    [],
+  );
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
 
@@ -118,10 +145,8 @@ const MystEditor = ({
             users,
             text,
             templatelist,
-            printCallback,
+            buttons,
             setMode,
-            buttonActions,
-            title,
           }}
         />`}
         <${MystWrapper} fullscreen=${fullscreen}>
@@ -149,4 +174,4 @@ const MystEditor = ({
 };
 
 export default MystEditor;
-export { html, render };
+export { html, render, defaultButtons, predefinedButtons };

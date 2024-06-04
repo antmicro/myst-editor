@@ -18,26 +18,27 @@ const GroupButton = styled(DefaultButton)`
 const ButtonGroup = ({
   buttons,
   initialClickedId = 2,
-  clickCallback,
   highlightActive = true,
 }) => {
   const [clickedId, setClickedId] = useState(initialClickedId);
 
   return html`
     ${buttons.map(
-      (buttonOptions, i) =>
+      (button, i) =>
         html` <${GroupButton}
           className="icon"
           type="button"
-          key=${buttonOptions.label}
-          name=${buttonOptions.label}
+          key=${button.id}
+          name=${button.id}
           onClick=${() => {
             highlightActive && setClickedId(i);
-            clickCallback(buttonOptions.label);
+            button.action();
           }}
           active=${i === clickedId}
         >
-          <${buttonOptions.icon} />
+          ${typeof button.icon == "function"
+            ? html`<${button.icon} />`
+            : html`<img src=${button.icon} />`}
         <//>`,
     )}
   `;

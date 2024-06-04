@@ -113,12 +113,11 @@ HTML:
         "Welcome to the MyST editor demo. The right hand side should auto update.",
       );
 
-      import MystEditor, { html, render } from "./MystEditor.js";
-
-      const exampleCallback = (event) => {
-        console.log(`Example callback fired on ${event.target}`);
-        window.print();
-      };
+      import MystEditor, {
+        html,
+        render,
+        defaultButtons,
+      } from "./MystEditor.js";
 
       const usercolors = [
         "#30bced",
@@ -183,7 +182,6 @@ HTML:
       render(
         html`
           <${MystEditor}
-            printCallback=${exampleCallback}
             templatelist="linkedtemplatelist.json"
             initialText=${exampleText}
             title="[MyST Editor](https://github.com/antmicro/myst-editor/) demo"
@@ -197,6 +195,12 @@ HTML:
               room,
               color,
             }}
+            includeButtons=${defaultButtons.concat([
+              {
+                text: "Custom button",
+                action: () => alert("Custom button action"),
+              },
+            ])}
             spellcheckOpts=${{
               dict: "en_US",
               dictionaryPath: "/myst-editor/dictionaries",

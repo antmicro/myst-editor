@@ -143,13 +143,17 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
       setSyncText(true);
     },
     refresh() {
-      updateHtmlChunks({ newMarkdown: text, force: true });
+      updateHtmlChunks({ newMarkdown: window.myst_editor.text, force: true });
     },
     onSync(action) {
       setOnSync({ action });
     },
     copy() {
-      copyHtmlAsRichText(htmlChunks.map((c) => c.html).join("\n"));
+      copyHtmlAsRichText(
+        splitIntoChunks(window.myst_editor.text)
+          .map((c) => c.html)
+          .join("\n"),
+      );
     },
   };
 };

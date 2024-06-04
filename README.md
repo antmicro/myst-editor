@@ -138,7 +138,7 @@ Here are the props you can pass to the MystEditor component:
 - `id` *(default: "myst_editor_textarea")* - changes the id of the textarea
 - `initialMode` *(default: "Both", possibleValues: "Source" | "Preview" | "Both")* - changes what is visible when you open the editor. By default you will see a split view with the text editor and preview.
 - `initialText` *(default: "")* - initial markdown text
-- `printCallback` *(default: window.print())* - gets called when you click the `Export to PDF` button
+- `includeButtons` *(default: defaultButtons)* - An array of button definitions. A button definition is an object which has an `action: () => void` and either `icon` or `text`. As an example, a button could be defined as `{ text: "Button title", action: () => alert('clicked!') }`
 - `topbar` *(default: true)* - whether to show the topbar
 - `templateList` - path/url to a JSON file containing your document templates. For an example see `public/linkedtemplatelist.json`.
 - `transforms` - [custom transforms](#custom-transforms)

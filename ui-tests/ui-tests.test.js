@@ -39,7 +39,7 @@ describe('UI Screenshots', () => {
         const driver = await mkDriver();
         try {
             await openMyst(driver);
-            const elem = await driver.findElement(By.name("Source"))
+            const elem = await driver.findElement(By.name("source"))
             await elem.click()
             await driver.takeScreenshot().then(saveScreenshot("source"))
         } finally {
@@ -51,7 +51,7 @@ describe('UI Screenshots', () => {
         const driver = await mkDriver();
         try {
             await openMyst(driver);
-            const elem = await driver.findElement(By.name("Preview"))
+            const elem = await driver.findElement(By.name("preview"))
             await elem.click()
             await driver.takeScreenshot().then(saveScreenshot("preview"))
         } finally {
@@ -72,7 +72,7 @@ describe('UI Screenshots', () => {
                 await lines[i].sendKeys(Key.BACK_SPACE);
             }
 
-            const elem = await driver.findElement(By.name("Diff"))
+            const elem = await driver.findElement(By.name("diff"))
             await elem.click()
             await driver.takeScreenshot().then(saveScreenshot("diff"))
         } finally {
