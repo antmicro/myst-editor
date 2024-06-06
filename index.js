@@ -155,6 +155,7 @@ u(d`
             printCallback=${m}
             templatelist="linkedtemplatelist.json"
             initialText=${c}
+            title="[MyST Editor](https://github.com/antmicro/myst-editor/) demo"
             id="textarea_id"
             transforms=${f}
             collaboration=${{
