@@ -1,30 +1,30 @@
 import "./MystEditor2.js";
-import l, { render as u, html as d } from "./MystEditor.js";
+import u, { render as l, html as d, defaultButtons as c } from "./MystEditor.js";
 (function() {
   const i = document.createElement("link").relList;
   if (i && i.supports && i.supports("modulepreload"))
     return;
-  for (const t of document.querySelectorAll('link[rel="modulepreload"]'))
-    n(t);
-  new MutationObserver((t) => {
-    for (const o of t)
+  for (const e of document.querySelectorAll('link[rel="modulepreload"]'))
+    n(e);
+  new MutationObserver((e) => {
+    for (const o of e)
       if (o.type === "childList")
         for (const a of o.addedNodes)
           a.tagName === "LINK" && a.rel === "modulepreload" && n(a);
   }).observe(document, { childList: !0, subtree: !0 });
-  function r(t) {
+  function r(e) {
     const o = {};
-    return t.integrity && (o.integrity = t.integrity), t.referrerpolicy && (o.referrerPolicy = t.referrerpolicy), t.crossorigin === "use-credentials" ? o.credentials = "include" : t.crossorigin === "anonymous" ? o.credentials = "omit" : o.credentials = "same-origin", o;
+    return e.integrity && (o.integrity = e.integrity), e.referrerpolicy && (o.referrerPolicy = e.referrerpolicy), e.crossorigin === "use-credentials" ? o.credentials = "include" : e.crossorigin === "anonymous" ? o.credentials = "omit" : o.credentials = "same-origin", o;
   }
-  function n(t) {
-    if (t.ep)
+  function n(e) {
+    if (e.ep)
       return;
-    t.ep = !0;
-    const o = r(t);
-    fetch(t.href, o);
+    e.ep = !0;
+    const o = r(e);
+    fetch(e.href, o);
   }
 })();
-let c = `# h1 is quite big
+let m = `# h1 is quite big
 
 ## [h2 which is a link](https://google.com)
 
@@ -119,42 +119,39 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const m = (e) => {
-  console.log(`Example callback fired on ${e.target}`), window.print();
-}, s = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], p = "0", h = Math.floor(Math.random() * 1e3).toString(), g = s[Math.floor(Math.random() * s.length)];
+const s = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], p = "0", h = Math.floor(Math.random() * 1e3).toString(), g = s[Math.floor(Math.random() * s.length)];
 let f = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
-  transform: (e) => {
-    const [i, r] = e.split("#");
-    return `<a href="https://github.com/${i}/issues/${r}">${e}</a>`;
+  transform: (t) => {
+    const [i, r] = t.split("#");
+    return `<a href="https://github.com/${i}/issues/${r}">${t}</a>`;
   }
 }, {
   target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
-  transform: (e) => {
-    const [i, r] = e.split("!");
-    return `<a href="https://github.com/${i}/pull/${r}">${e}</a>`;
+  transform: (t) => {
+    const [i, r] = t.split("!");
+    return `<a href="https://github.com/${i}/pull/${r}">${t}</a>`;
   }
 }, {
   target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
-  transform: (e) => `<a href="https://github.com/antmicro/myst-editor/issues/${e.slice(1)}">${e}</a>`
+  transform: (t) => `<a href="https://github.com/antmicro/myst-editor/issues/${t.slice(1)}">${t}</a>`
 }, {
   target: new RegExp("(^|(?<=\\s))!\\d+", "g"),
-  transform: (e) => `<a href="https://github.com/antmicro/myst-editor/pull/${e.slice(1)}">${e}</a>`
+  transform: (t) => `<a href="https://github.com/antmicro/myst-editor/pull/${t.slice(1)}">${t}</a>`
 }, {
   target: /@[0-9a-z\-]+/g,
-  transform: (e) => {
-    const i = e.slice(1);
+  transform: (t) => {
+    const i = t.slice(1);
     return `
           <a href='https://github.com/${i}'>
             ${i}
           </a>`;
   }
 }];
-u(d`
-          <${l}
-            printCallback=${m}
+l(d`
+          <${u}
             templatelist="linkedtemplatelist.json"
-            initialText=${c}
+            initialText=${m}
             title="[MyST Editor](https://github.com/antmicro/myst-editor/) demo"
             id="textarea_id"
             transforms=${f}
@@ -166,6 +163,10 @@ u(d`
   room: p,
   color: g
 }}
+            includeButtons=${c.concat([{
+  text: "Custom button",
+  action: () => alert("Custom button action")
+}])}
             spellcheckOpts=${{
   dict: "en_US",
   dictionaryPath: "/myst-editor/dictionaries"
