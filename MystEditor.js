@@ -26446,13 +26446,8 @@ const Q7 = me.div`
     return t.newLocalComment && (o.focus(), t.newLocalComment = !1), () => {
       o.destroy();
     };
-  }, [n]), ne` <${Q7}
-    top=${t.display().offset(e)}
-    fade=${t.draggedComment == e}
-  >
-    <div
-      style="position:relative; display: ${t.display().isShown(e) ? "block" : "none"}"
-    >
+  }, [n]), ne` <${Q7} top=${t.display().offset(e)} fade=${t.draggedComment == e}>
+    <div style="position:relative; display: ${t.display().isShown(e) ? "block" : "none"}">
       <div ref=${n}></div>
     </div>
   <//>`;
@@ -34697,12 +34692,7 @@ const fAe = E$.exports, dAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   login: t,
   color: e,
   avatarUrl: n
-}) => ne` <img
-    src=${n}
-    key=${t}
-    class="avatar"
-    style="border-color: ${e}"
-  />`, yAe = ({
+}) => ne` <img src=${n} key=${t} class="avatar" style="border-color: ${e}" />`, yAe = ({
   n: t
 }) => ne` <${R$}>
     <span class="avatar placeholder">+${t}</span>
@@ -34739,8 +34729,7 @@ const fAe = E$.exports, dAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
 
   &:hover {
     background-color: ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
-    border: 1px solid
-      ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
+    border: 1px solid ${(t) => t.$negative ? "var(--red-500)" : "var(--icon-main-active)"} !important;
   }
 `, SAe = ({
   changeDocumentTemplate: t,
@@ -34750,14 +34739,8 @@ const fAe = E$.exports, dAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
     <${kAe}>
       <${vAe}>Are you sure you want to change the current template?<//>
       <${xAe}>
-        <${Cw}
-          type="button"
-          onClick=${() => t(e)}
-          >✓ Yes<//
-        >
-        <${Cw} $negative type="button" onClick=${n}
-          >x Cancel<//
-        >
+        <${Cw} type="button" onClick=${() => t(e)}>✓ Yes<//>
+        <${Cw} $negative type="button" onClick=${n}>x Cancel<//>
       <//>
     <//>
   `, _Ae = me.div`
@@ -34889,10 +34872,7 @@ const fAe = E$.exports, dAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
       >
         Templates
       <//>
-      <${h && Aw}
-        tooltipOrientation="bottom"
-        errorMessage=${f.message}
-      />` : Object.keys(i).length == 0 ? ne` <${Vo}
+      <${h && Aw} tooltipOrientation="bottom" errorMessage=${f.message} />` : Object.keys(i).length == 0 ? ne` <${Vo}
       type="button"
       template=${n}
       onMouseEnter=${() => u(!0)}
@@ -34914,14 +34894,8 @@ const fAe = E$.exports, dAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
           ${Object.keys(i).map((y) => ne`
               ${i[y].errorMessage ? ne`
                     <${PAe}>
-                      <${h === y && Aw}
-                        tooltipOrientation="left"
-                        errorMessage="${i[y].errorMessage}"
-                      />
-                      <${$w}
-                        type="button"
-                        onMouseEnter=${() => u(y)}
-                        onMouseLeave=${() => u(!1)}
+                      <${h === y && Aw} tooltipOrientation="left" errorMessage="${i[y].errorMessage}" />
+                      <${$w} type="button" onMouseEnter=${() => u(y)} onMouseLeave=${() => u(!1)}
                         >${i[y].id}
                       <//>
                     <//>
@@ -35009,36 +34983,18 @@ const fAe = E$.exports, dAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   height: 40px;
   margin-right: 10px;
   margin-left: 10px;
-`, NAe = () => ne` <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="22"
-    height="22"
-    viewBox="0 0 22 22"
-    fill="none"
-  >
+`, NAe = () => ne` <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
     <path d="M20.35 1.78003L12.61 9.51003" stroke-width="1.75" />
     <path d="M14.88 1.08008H20.89V7.27008" stroke-width="1.75" />
     <path d="M1.42999 20.3601L9.16999 12.6301" stroke-width="1.75" />
     <path d="M6.90002 21.0601H0.890015V14.8701" stroke-width="1.75" />
-  </svg>`, BAe = () => ne` <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="23"
-    height="23"
-    viewBox="0 0 23 23"
-    fill="none"
-  >
+  </svg>`, BAe = () => ne` <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none">
     <path d="M21.75 1V7.66H14.9" stroke-width="1.75" />
     <path
       d="M21.65 12.5899C20.95 17.4199 16.78 21.1399 11.75 21.1399C6.23 21.1399 1.75 16.6599 1.75 11.1399C1.75 5.61989 6.23 1.13989 11.75 1.13989C16.24 1.13989 20.03 4.09989 21.3 8.16989"
       stroke-width="1.75"
     />
-  </svg>`, XAe = () => ne` <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="26"
-    height="18"
-    viewBox="0 0 26 18"
-    fill="none"
-  >
+  </svg>`, XAe = () => ne` <svg xmlns="http://www.w3.org/2000/svg" width="26" height="18" viewBox="0 0 26 18" fill="none">
     <path
       d="M13.01 11.5902C14.5675 11.5902 15.83 10.3276 15.83 8.7702C15.83 7.21275 14.5675 5.9502 13.01 5.9502C11.4526 5.9502 10.1899 7.21275 10.1899 8.7702C10.1899 10.3276 11.4526 11.5902 13.01 11.5902Z"
       stroke-width="1.75"
@@ -35047,55 +35003,21 @@ const fAe = E$.exports, dAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
       d="M23.4301 9.80018C23.4301 9.80018 13.75 24.5402 2.58997 9.80018L1.98999 8.95018L2.59998 8.10018C2.59998 8.10018 12.2799 -6.63982 23.4399 8.10018L24.01 8.90018L23.4301 9.80018Z"
       stroke-width="1.75"
     />
-  </svg>`, WAe = () => ne` <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="21"
-    height="15"
-    viewBox="0 0 21 15"
-    fill="none"
-  >
+  </svg>`, WAe = () => ne` <svg xmlns="http://www.w3.org/2000/svg" width="21" height="15" viewBox="0 0 21 15" fill="none">
     <path d="M15.31 2.8501L19.56 7.1001L15.19 11.4801" stroke-width="1.75" />
     <path d="M5.75 11.4801L1.5 7.2201L5.88 2.8501" stroke-width="1.75" />
     <path d="M12.35 0.340088L8.72 13.9901" stroke-width="1.75" />
-  </svg>`, YAe = () => ne` <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="22"
-    viewBox="0 0 20 22"
-    fill="none"
-  >
+  </svg>`, YAe = () => ne` <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22" fill="none">
     <path d="M13.99 1.04004H1.37V16.64H13.99V1.04004Z" stroke-width="1.75" />
-    <path
-      class="inner-copy"
-      d="M18.63 5.51001H6.01001V21.11H18.63V5.51001Z"
-      stroke-width="1.75"
-    />
-  </svg>`, VAe = () => ne` <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="23"
-    height="18"
-    viewBox="0 0 23 18"
-    fill="none"
-  >
-    <path
-      d="M21.84 1.65015H1.83997V16.6701H21.84V1.65015Z"
-      stroke-width="1.75"
-    />
+    <path class="inner-copy" d="M18.63 5.51001H6.01001V21.11H18.63V5.51001Z" stroke-width="1.75" />
+  </svg>`, VAe = () => ne` <svg xmlns="http://www.w3.org/2000/svg" width="23" height="18" viewBox="0 0 23 18" fill="none">
+    <path d="M21.84 1.65015H1.83997V16.6701H21.84V1.65015Z" stroke-width="1.75" />
     <path d="M11.84 1.83008V16.6701" stroke-width="1.75" />
-  </svg>`, jAe = () => ne` <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="16"
-    viewBox="0 0 24 16"
-    fill="none"
-  >
+  </svg>`, jAe = () => ne` <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
     <path d="M21.23 11.0801H10.29" stroke-width="1.75" />
     <path d="M17.86 6.71997L22.11 10.97L17.73 15.35" stroke-width="1.75" />
     <path d="M2.22998 5.09009H13.17" stroke-width="1.75" />
-    <path
-      d="M5.60999 9.44007L1.35999 5.19007L5.73999 0.820068"
-      stroke-width="1.75"
-    />
+    <path d="M5.60999 9.44007L1.35999 5.19007L5.73999 0.820068" stroke-width="1.75" />
   </svg>`, FAe = {
   fullscreen: NAe,
   "copy-html": YAe,
@@ -35131,11 +35053,7 @@ const fAe = E$.exports, dAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   })).filter((u) => u.icon), []), h = rt(() => s.filter((u) => u.text && u.id !== "template-manager"), []);
   return ne` <${DAe}>
     <${MAe}>
-      <${_w}
-        buttons=${c}
-        highlightActive=${!1}
-        initialClickedId=${null}
-      />
+      <${_w} buttons=${c} highlightActive=${!1} initialClickedId=${null} />
       ${t && ne`<${LAe}> ${t} <//>`}
       <${ZAe} dangerouslySetInnerHTML=${{
     __html: l
@@ -35144,9 +35062,7 @@ const fAe = E$.exports, dAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
     <${IAe}>
       <${wAe} users=${e} />
 
-      ${h.map((u) => ne`<${Vo} type="button" onClick=${u.action}
-            >${u.text}<//
-          >`)}
+      ${h.map((u) => ne`<${Vo} type="button" onClick=${u.action}>${u.text}<//>`)}
       ${s.find((u) => u.id === "template-manager") && ne`<${EAe} text=${n} templatelist=${i} />`}
 
       <${qAe} />
@@ -35237,9 +35153,7 @@ const UAe = me.div`
     action: T.action || P[T.id]
   })), []);
   return Ft(() => KAe(m), [m]), ne` <div id="myst-css-namespace">
-    <${B2}
-      stylisPlugins=${[HAe("#myst-css-namespace")]}
-    >
+    <${B2} stylisPlugins=${[HAe("#myst-css-namespace")]}>
       <${UAe} fullscreen=${m}>
         ${o && ne`<${zAe}
           ...${{
