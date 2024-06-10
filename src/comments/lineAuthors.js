@@ -1,19 +1,10 @@
-import {
-  Decoration,
-  EditorView,
-  ViewPlugin,
-  ViewUpdate,
-  gutter,
-  GutterMarker,
-  BlockInfo,
-} from "@codemirror/view";
+import { Decoration, EditorView, ViewPlugin, ViewUpdate, gutter, GutterMarker, BlockInfo } from "@codemirror/view";
 import { RangeSetBuilder, Transaction } from "@codemirror/state";
 import { CommentLineAuthors } from "./ycomments";
 import { StateEffect, StateField } from "@codemirror/state";
 import { Facet } from "@codemirror/state";
 
-const isUserEvent = (transaction) =>
-  ["input", "delete", "undo", "redo"].some((ev) => transaction.isUserEvent(ev));
+const isUserEvent = (transaction) => ["input", "delete", "undo", "redo"].some((ev) => transaction.isUserEvent(ev));
 
 /** @type {Facet<CommentLineAuthors, CommentLineAuthors>} */
 const lineAuthorsFacet = Facet.define({
@@ -53,20 +44,11 @@ const commentLineHighlighter = ViewPlugin.fromClass(
       const lineAuthors = view.state.facet(lineAuthorsFacet);
       const builder = new RangeSetBuilder();
 
-      for (
-        let lineNumber = 1;
-        lineNumber <= view.state.doc.lines;
-        lineNumber++
-      ) {
+      for (let lineNumber = 1; lineNumber <= view.state.doc.lines; lineNumber++) {
         const line = view.state.doc.line(lineNumber);
         const author = lineAuthors.get(lineNumber);
 
-        if (author)
-          builder.add(
-            line.from,
-            line.from,
-            this.markAuthor(author, lineNumber),
-          );
+        if (author) builder.add(line.from, line.from, this.markAuthor(author, lineNumber));
       }
       return builder.finish();
     }
@@ -79,56 +61,46 @@ const commentLineHighlighter = ViewPlugin.fromClass(
     markLinesEditedInTransaction(transaction) {
       const lineAuthors = transaction.state.facet(lineAuthorsFacet);
 
-      transaction.changes.iterChangedRanges(
-        (_a, _b, changeStart, changeEnd) => {
-          const startLine = transaction.newDoc.lineAt(changeStart);
-          const endLine = transaction.newDoc.lineAt(changeEnd);
-          const isWhitespace =
-            transaction.newDoc.slice(changeStart, changeEnd).toString().trim()
-              .length == 0;
-          const lineDiff =
-            transaction.state.doc.lines - transaction.startState.doc.lines;
+      transaction.changes.iterChangedRanges((_a, _b, changeStart, changeEnd) => {
+        const startLine = transaction.newDoc.lineAt(changeStart);
+        const endLine = transaction.newDoc.lineAt(changeEnd);
+        const isWhitespace = transaction.newDoc.slice(changeStart, changeEnd).toString().trim().length == 0;
+        const lineDiff = transaction.state.doc.lines - transaction.startState.doc.lines;
 
-          if (lineDiff > 0) {
-            if (isWhitespace && !endLine.length) {
-              lineAuthors.insert(startLine.number + 1, lineDiff);
-            } else if (startLine.from == changeStart) {
-              lineAuthors.insert(startLine.number, lineDiff);
-            } else {
-              lineAuthors.insert(startLine.number, lineDiff);
-              lineAuthors.mark(endLine.number);
-            }
+        if (lineDiff > 0) {
+          if (isWhitespace && !endLine.length) {
+            lineAuthors.insert(startLine.number + 1, lineDiff);
+          } else if (startLine.from == changeStart) {
+            lineAuthors.insert(startLine.number, lineDiff);
+          } else {
+            lineAuthors.insert(startLine.number, lineDiff);
+            lineAuthors.mark(endLine.number);
           }
+        }
 
-          if (lineDiff < 0) {
-            const oldLine =
-              transaction.startState.doc.length > changeEnd
-                ? transaction.startState.doc.lineAt(changeEnd)
-                : null;
+        if (lineDiff < 0) {
+          const oldLine = transaction.startState.doc.length > changeEnd ? transaction.startState.doc.lineAt(changeEnd) : null;
 
-            if (isWhitespace && endLine.to == changeStart) {
-              lineAuthors.remove(startLine.number + 1, -lineDiff);
-            } else if (isWhitespace && !oldLine?.length) {
-              lineAuthors.remove(startLine.number, -lineDiff);
-            } else {
-              lineAuthors.remove(startLine.number + 1, -lineDiff);
-              lineAuthors.mark(startLine.number);
-            }
-          }
-
-          if (lineDiff == 0 && !lineAuthors.get(startLine.number)) {
+          if (isWhitespace && endLine.to == changeStart) {
+            lineAuthors.remove(startLine.number + 1, -lineDiff);
+          } else if (isWhitespace && !oldLine?.length) {
+            lineAuthors.remove(startLine.number, -lineDiff);
+          } else {
+            lineAuthors.remove(startLine.number + 1, -lineDiff);
             lineAuthors.mark(startLine.number);
           }
-        },
-      );
+        }
+
+        if (lineDiff == 0 && !lineAuthors.get(startLine.number)) {
+          lineAuthors.mark(startLine.number);
+        }
+      });
     }
 
     /** @param {ViewUpdate} update */
     update(update) {
       if (update.docChanged || update.viewportChanged) {
-        update.transactions
-          .filter(isUserEvent)
-          .forEach((t) => this.markLinesEditedInTransaction(t));
+        update.transactions.filter(isUserEvent).forEach((t) => this.markLinesEditedInTransaction(t));
 
         this.decorations = this.colorEditorLines(update.view);
       }
@@ -167,9 +139,7 @@ const lineWithAuthorAvatar = StateField.define({
   },
   update(_oldState, transaction) {
     const lineAuthors = transaction.state.facet(lineAuthorsFacet);
-    const selectedLineNumber = transaction.effects.find((e) =>
-      e.is(hoveredLine),
-    )?.value;
+    const selectedLineNumber = transaction.effects.find((e) => e.is(hoveredLine))?.value;
     if (selectedLineNumber) {
       return lineAuthors.firstLineOfSection(selectedLineNumber);
     }
@@ -208,9 +178,7 @@ class AvatarMarker extends GutterMarker {
 /** The gutter marker which contains the avatar  */
 const commentAuthorMarker = gutter({
   lineMarker: (view, line) => new AvatarMarker(line, view),
-  lineMarkerChange: (update) =>
-    update.startState.field(lineWithAuthorAvatar) !=
-    update.state.field(lineWithAuthorAvatar),
+  lineMarkerChange: (update) => update.startState.field(lineWithAuthorAvatar) != update.state.field(lineWithAuthorAvatar),
   initialSpacer: () => new AvatarMarker(null, null),
 });
 

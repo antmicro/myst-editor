@@ -1,9 +1,4 @@
-import {
-  Decoration,
-  EditorView,
-  ViewPlugin,
-  ViewUpdate,
-} from "@codemirror/view";
+import { Decoration, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
 
 const defaultDecorationClass = "cm-link";
@@ -25,17 +20,13 @@ function buildDecorations(view, highlights) {
   const cmText = view.state.doc.sliceString(from, to);
 
   highlights
-    .flatMap((hl) =>
-      [...cmText.matchAll(hl.target)].map((match) => ({ match, hl })),
-    )
+    .flatMap((hl) => [...cmText.matchAll(hl.target)].map((match) => ({ match, hl })))
     .sort((a, b) => a.match.index - b.match.index)
     .forEach(({ hl, match }) =>
       builder.add(
         from + match.index,
         from + match.index + match[0].length,
-        hl.cssClass
-          ? Decoration.mark({ class: hl.cssClass })
-          : Decoration.mark({ class: defaultDecorationClass }),
+        hl.cssClass ? Decoration.mark({ class: hl.cssClass }) : Decoration.mark({ class: defaultDecorationClass }),
       ),
     );
 
@@ -59,8 +50,7 @@ const customHighlighter = (highlights) => {
       }
 
       update(/** @type {ViewUpdate} */ update) {
-        if (update.docChanged || update.viewportChanged)
-          this.decorations = buildDecorations(update.view, allHighlights);
+        if (update.docChanged || update.viewportChanged) this.decorations = buildDecorations(update.view, allHighlights);
       }
     },
     {

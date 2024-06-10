@@ -8,10 +8,7 @@ const TooltipBox = styled.div`
     css`
       left: 0;
     `}
-  transform: ${(props) =>
-    props.$orientation == "left"
-      ? "translateX(-105%)"
-      : "translate(-65%, 130%)"};
+  transform: ${(props) => (props.$orientation == "left" ? "translateX(-105%)" : "translate(-65%, 130%)")};
 `;
 
 const TooltipContent = styled.div`
@@ -31,8 +28,7 @@ const TooltipContent = styled.div`
     css`
       left: 50%;
     `}
-  transform: ${(props) =>
-    props.$orientation == "left" ? "none" : "translateX(-25%)"};
+  transform: ${(props) => (props.$orientation == "left" ? "none" : "translateX(-25%)")};
 
   &::before {
     content: "";
@@ -52,10 +48,7 @@ const TooltipContent = styled.div`
             border-right: 15px solid transparent;
             border-bottom: 30px solid var(--alert);
           `}
-    transform: ${(props) =>
-      props.$orientation == "left"
-        ? "translate(50%, -50%)"
-        : "translate(-50%, -100%)"};
+    transform: ${(props) => (props.$orientation == "left" ? "translate(50%, -50%)" : "translate(-50%, -100%)")};
   }
 `;
 

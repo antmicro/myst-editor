@@ -1,11 +1,5 @@
 import { html } from "htm/preact";
-import {
-  useRef,
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-} from "preact/hooks";
+import { useRef, useEffect, useState, useCallback, useMemo } from "preact/hooks";
 import { styled } from "styled-components";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
@@ -51,17 +45,9 @@ const YCommentWrapper = styled.div`
 const YComment = ({ ycomments, commentId }) => {
   let cmref = useRef(null);
 
-  const lineAuthors = useMemo(
-    () => ycomments.lineAuthors(commentId),
-    [commentId],
-  );
+  const lineAuthors = useMemo(() => ycomments.lineAuthors(commentId), [commentId]);
 
-  const updateHeight = useCallback(
-    (update) =>
-      update.heightChanged &&
-      ycomments.updateHeight(commentId, cmref.current.clientHeight),
-    [commentId],
-  );
+  const updateHeight = useCallback((update) => update.heightChanged && ycomments.updateHeight(commentId, cmref.current.clientHeight), [commentId]);
 
   useEffect(() => {
     if (!cmref.current) {
@@ -92,17 +78,8 @@ const YComment = ({ ycomments, commentId }) => {
     };
   }, [cmref]);
 
-  return html` <${YCommentWrapper}
-    top=${ycomments.display().offset(commentId)}
-    fade=${ycomments.draggedComment == commentId}
-  >
-    <div
-      style="position:relative; display: ${ycomments
-        .display()
-        .isShown(commentId)
-        ? "block"
-        : "none"}"
-    >
+  return html` <${YCommentWrapper} top=${ycomments.display().offset(commentId)} fade=${ycomments.draggedComment == commentId}>
+    <div style="position:relative; display: ${ycomments.display().isShown(commentId) ? "block" : "none"}">
       <div ref=${cmref}></div>
     </div>
   <//>`;
@@ -110,8 +87,7 @@ const YComment = ({ ycomments, commentId }) => {
 
 /** @param {{ ycomments: YComments }} */
 export const YCommentsParent = ({ ycomments }) => {
-  let createWidget = ({ commentId }) =>
-    html`<${YComment} ...${{ key: commentId, commentId, ycomments }} />`;
+  let createWidget = ({ commentId }) => html`<${YComment} ...${{ key: commentId, commentId, ycomments }} />`;
   let createWidgets = () => ycomments.iterComments().map(createWidget);
   let [widgets, setWidgets] = useState(createWidgets());
 

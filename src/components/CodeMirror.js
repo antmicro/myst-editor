@@ -121,23 +121,11 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({
-  text,
-  id,
-  name,
-  className,
-  mode,
-  collaboration,
-  spellcheckOpts,
-  highlights,
-  setUsers,
-  getAvatar,
-}) => {
+const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheckOpts, highlights, setUsers, getAvatar }) => {
   const editorRef = useRef(null);
   const [initialized, setInitialized] = useState(false);
 
-  const { provider, undoManager, ytext, ydoc, ready } =
-    useCollaboration(collaboration);
+  const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
   const ycomments = useComments(ydoc, provider, getAvatar);
 
   useEffect(() => {
@@ -157,9 +145,7 @@ const CodeMirror = ({
           editorRef,
         })
         .useComments({ enabled: collaboration.commentsEnabled, ycomments })
-        .addUpdateListener(
-          (update) => update.docChanged && text.set(view.state.doc.toString()),
-        )
+        .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString()))
         .create(),
     });
 
@@ -182,15 +168,9 @@ const CodeMirror = ({
   }, [ready]);
 
   useEffect(() => {
-    const mystEditorCount = document.querySelectorAll(
-      "#myst-css-namespace",
-    ).length;
+    const mystEditorCount = document.querySelectorAll("#myst-css-namespace").length;
     const isFirstUser =
-      collaboration.enabled &&
-      ytext.toString().length == 0 &&
-      provider.awareness.getStates().size == mystEditorCount &&
-      provider.firstUser &&
-      ready;
+      collaboration.enabled && ytext.toString().length == 0 && provider.awareness.getStates().size == mystEditorCount && provider.firstUser && ready;
 
     if (ytext && ytext.toString().length != 0) text.set(ytext.toString());
 
@@ -206,9 +186,7 @@ const CodeMirror = ({
 
   return html`
     <${CodeEditor} $mode=${mode} id="${id}-editor" class=${className}>
-      ${collaboration.commentsEnabled
-        ? html`<${YCommentsParent} ycomments=${ycomments} />`
-        : ""}
+      ${collaboration.commentsEnabled ? html`<${YCommentsParent} ycomments=${ycomments} />` : ""}
     <//>
     <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;

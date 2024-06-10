@@ -31,21 +31,15 @@ class CommentMarker extends GutterMarker {
     this.gutterMarker = document.createElement("div");
     this.gutterMarker.classList.add(CommentMarker.MAIN_CLASS);
     if (this.lineNumber) {
-      this.gutterMarker.style.width =
-        this.lineNumber.toString().length * 7 + "px";
-      this.gutterMarker.ondrop = () =>
-        this.ycomments
-          .positions()
-          .move(this.ycomments.draggedComment, this.lineNumber);
+      this.gutterMarker.style.width = this.lineNumber.toString().length * 7 + "px";
+      this.gutterMarker.ondrop = () => this.ycomments.positions().move(this.ycomments.draggedComment, this.lineNumber);
       this.gutterMarker.ondragover = (e) => e.preventDefault();
     }
   }
 
   addHoverEffects() {
-    this.icon.onmouseenter = () =>
-      this.icon.classList.add(CommentMarker.COMMENT_IMAGE_CLASS);
-    this.icon.onmouseleave = () =>
-      this.icon.classList.remove(CommentMarker.COMMENT_IMAGE_CLASS);
+    this.icon.onmouseenter = () => this.icon.classList.add(CommentMarker.COMMENT_IMAGE_CLASS);
+    this.icon.onmouseleave = () => this.icon.classList.remove(CommentMarker.COMMENT_IMAGE_CLASS);
   }
 
   enableDragEffects() {
@@ -107,10 +101,7 @@ const commentMarker = gutter({
   lineMarker(view, line) {
     return new CommentMarker(line, view);
   },
-  lineMarkerChange: (update) =>
-    update.transactions.some((t) =>
-      t.effects.some((e) => e.is(updateShownComments)),
-    ),
+  lineMarkerChange: (update) => update.transactions.some((t) => t.effects.some((e) => e.is(updateShownComments))),
   initialSpacer: () => {
     return new CommentMarker(null, null);
   },

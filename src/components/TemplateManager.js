@@ -54,13 +54,10 @@ const validateTemplConfig = (templConfig) => {
   const requiredFields = ["id", "templatetext"];
   for (const key in templConfig) {
     for (let field of requiredFields) {
-      if (!templConfig[key][field])
-        templConfig[key].errorMessage =
-          `Configuration of template ${key} is lacking '${field}'`;
+      if (!templConfig[key][field]) templConfig[key].errorMessage = `Configuration of template ${key} is lacking '${field}'`;
     }
 
-    if (templConfig[key].errorMessage)
-      console.error(templConfig[key].errorMessage);
+    if (templConfig[key].errorMessage) console.error(templConfig[key].errorMessage);
   }
 
   return templConfig;
@@ -78,10 +75,7 @@ const TemplateManager = ({ text, templatelist }) => {
     message: null,
   });
 
-  const checkResponseStatus = (response) =>
-    response.ok
-      ? response
-      : Promise.reject(`Invalid HTTP response: ${response.status}`);
+  const checkResponseStatus = (response) => (response.ok ? response : Promise.reject(`Invalid HTTP response: ${response.status}`));
 
   const changeDocumentTemplate = (template) => {
     setTemplate(readyTemplates[template].templatetext);
@@ -124,26 +118,14 @@ const TemplateManager = ({ text, templatelist }) => {
     for (const templateName in templatesConfig) {
       const templateUrl = templatesConfig[templateName].templatetext;
       await loadTemplateFromURL(templateUrl)
-        .then(
-          (templateText) =>
-            (templatesConfig[templateName].templatetext = templateText),
-        )
-        .catch(
-          (err) => (templatesConfig[templateName].errorMessage ??= err.message),
-        );
+        .then((templateText) => (templatesConfig[templateName].templatetext = templateText))
+        .catch((err) => (templatesConfig[templateName].errorMessage ??= err.message));
     }
 
     return templatesConfig;
   };
 
-  useEffect(
-    () =>
-      getTemplateConfig(templatelist)
-        .then(validateTemplConfig)
-        .then(fillTemplatesWithFetchedData)
-        .then(setReadyTemplates),
-    [],
-  );
+  useEffect(() => getTemplateConfig(templatelist).then(validateTemplConfig).then(fillTemplatesWithFetchedData).then(setReadyTemplates), []);
 
   if (generalErr.error) {
     return html` <${TopbarButton}
@@ -154,10 +136,7 @@ const TemplateManager = ({ text, templatelist }) => {
       >
         Templates
       <//>
-      <${showTooltip && Tooltip}
-        tooltipOrientation="bottom"
-        errorMessage=${generalErr.message}
-      />`;
+      <${showTooltip && Tooltip} tooltipOrientation="bottom" errorMessage=${generalErr.message} />`;
   }
 
   if (Object.keys(readyTemplates).length == 0) {
@@ -190,14 +169,8 @@ const TemplateManager = ({ text, templatelist }) => {
               ${readyTemplates[key].errorMessage
                 ? html`
                     <${ButtonTooltipFlex}>
-                      <${showTooltip === key && Tooltip}
-                        tooltipOrientation="left"
-                        errorMessage="${readyTemplates[key].errorMessage}"
-                      />
-                      <${TemplateButton}
-                        type="button"
-                        onMouseEnter=${() => setShowTooltip(key)}
-                        onMouseLeave=${() => setShowTooltip(false)}
+                      <${showTooltip === key && Tooltip} tooltipOrientation="left" errorMessage="${readyTemplates[key].errorMessage}" />
+                      <${TemplateButton} type="button" onMouseEnter=${() => setShowTooltip(key)} onMouseLeave=${() => setShowTooltip(false)}
                         >${readyTemplates[key].id}
                       <//>
                     <//>

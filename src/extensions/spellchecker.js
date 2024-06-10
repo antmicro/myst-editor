@@ -1,9 +1,4 @@
-import {
-  Decoration,
-  EditorView,
-  ViewPlugin,
-  ViewUpdate,
-} from "@codemirror/view";
+import { Decoration, EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { Facet, RangeSetBuilder } from "@codemirror/state";
 import Typo from "typo-js";
 
@@ -30,12 +25,7 @@ function doSpellcheck(/** @type {EditorView} */ view) {
 
   view.state.doc
     .sliceString(from, to)
-    .replaceAll(
-      /\w+/g,
-      (word, pos) =>
-        !dict.check(word) &&
-        builder.add(from + pos, from + pos + word.length, errorHighlight),
-    );
+    .replaceAll(/\w+/g, (word, pos) => !dict.check(word) && builder.add(from + pos, from + pos + word.length, errorHighlight));
 
   return builder.finish();
 }
@@ -47,8 +37,7 @@ const spellcheckExtension = ViewPlugin.fromClass(
     }
 
     update(/** @type {ViewUpdate} */ update) {
-      if (update.docChanged || update.viewportChanged)
-        this.decorations = doSpellcheck(update.view);
+      if (update.docChanged || update.viewportChanged) this.decorations = doSpellcheck(update.view);
     }
   },
   {
@@ -63,8 +52,5 @@ export default function spellcheck(opts) {
 
   let { dict = "en_US", dictionaryPath = "/dictionaries" } = opts;
 
-  return [
-    dictionary.of(new Typo(dict, null, null, { dictionaryPath })),
-    spellcheckExtension,
-  ];
+  return [dictionary.of(new Typo(dict, null, null, { dictionaryPath })), spellcheckExtension];
 }

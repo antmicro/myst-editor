@@ -35,15 +35,8 @@ const ModalButton = styled(DefaultButton)`
   margin-top: 0px;
 
   &:hover {
-    background-color: ${(props) =>
-      props.$negative
-        ? "var(--red-500)"
-        : "var(--icon-main-active)"} !important;
-    border: 1px solid
-      ${(props) =>
-        props.$negative
-          ? "var(--red-500)"
-          : "var(--icon-main-active)"} !important;
+    background-color: ${(props) => (props.$negative ? "var(--red-500)" : "var(--icon-main-active)")} !important;
+    border: 1px solid ${(props) => (props.$negative ? "var(--red-500)" : "var(--icon-main-active)")} !important;
   }
 `;
 
@@ -52,14 +45,8 @@ const Modal = ({ changeDocumentTemplate, selectedTemplate, closeModal }) => {
     <${Container}>
       <${Heading}>Are you sure you want to change the current template?<//>
       <${ButtonContainer}>
-        <${ModalButton}
-          type="button"
-          onClick=${() => changeDocumentTemplate(selectedTemplate)}
-          >✓ Yes<//
-        >
-        <${ModalButton} $negative type="button" onClick=${closeModal}
-          >x Cancel<//
-        >
+        <${ModalButton} type="button" onClick=${() => changeDocumentTemplate(selectedTemplate)}>✓ Yes<//>
+        <${ModalButton} $negative type="button" onClick=${closeModal}>x Cancel<//>
       <//>
     <//>
   `;

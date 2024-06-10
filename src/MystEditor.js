@@ -19,8 +19,7 @@ const EditorParent = styled.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
-  ${(props) =>
-    props.fullscreen && "position: fixed; left: 0; top: 0; z-index: 10;"}
+  ${(props) => props.fullscreen && "position: fixed; left: 0; top: 0; z-index: 10;"}
 `;
 
 const MystWrapper = styled.div`
@@ -30,9 +29,7 @@ const MystWrapper = styled.div`
   width: 100%;
   position: relative;
   background-color: white;
-  ${(props) =>
-    props.fullscreen &&
-    "box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;"}
+  ${(props) => props.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;"}
 `;
 
 const createExtraScopePlugin = (scope) => {
@@ -51,8 +48,7 @@ const createExtraScopePlugin = (scope) => {
   return plugin;
 };
 
-const hideBodyScrollIf = (val) =>
-  (document.documentElement.style.overflow = val ? "hidden" : "visible");
+const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val ? "hidden" : "visible");
 
 const predefinedButtons = {
   printToPdf: {
@@ -88,8 +84,7 @@ const MystEditor = ({
   customRoles = [],
   transforms = [],
   // this will create a bogus random avatar when no specific getAvatar function is provided
-  getAvatar = (login) =>
-    `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
+  getAvatar = (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
@@ -98,11 +93,7 @@ const MystEditor = ({
   const text = useText({ initialText, transforms, customRoles, preview });
 
   const [alert, setAlert] = useState(null);
-  const [users, setUsers] = useReducer(
-    (_, currentUsers) =>
-      currentUsers.map((u) => ({ ...u, avatarUrl: getAvatar(u.login) })),
-    [],
-  );
+  const [users, setUsers] = useReducer((_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: getAvatar(u.login) })), []);
 
   const alertFor = (alertText, secs) => {
     setAlert(alertText);
@@ -134,9 +125,7 @@ const MystEditor = ({
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
 
   return html` <div id="myst-css-namespace">
-    <${StyleSheetManager}
-      stylisPlugins=${[createExtraScopePlugin("#myst-css-namespace")]}
-    >
+    <${StyleSheetManager} stylisPlugins=${[createExtraScopePlugin("#myst-css-namespace")]}>
       <${EditorParent} fullscreen=${fullscreen}>
         ${topbar &&
         html`<${EditorTopbar}
@@ -164,9 +153,7 @@ const MystEditor = ({
             }}
           />
           <${Preview} $mode=${mode} ref=${preview} />
-          ${mode === "Diff"
-            ? html`<${Diff} oldText=${initialText} text=${text} />`
-            : ""}
+          ${mode === "Diff" ? html`<${Diff} oldText=${initialText} text=${text} />` : ""}
         <//>
       <//>
     <//>

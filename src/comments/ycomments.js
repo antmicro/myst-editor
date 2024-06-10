@@ -42,9 +42,7 @@ export class CommentLineAuthors {
     if (line - 1 > this.lineAuthors.length) {
       this.lineAuthors.push(
         // Adjust array length so that we can safely insert new elements at index `line-1`
-        [...Array(line - 1 - this.lineAuthors.length).keys()].map(
-          (_) => new Y.Map(),
-        ),
+        [...Array(line - 1 - this.lineAuthors.length).keys()].map((_) => new Y.Map()),
       );
     }
 
@@ -62,8 +60,7 @@ export class CommentLineAuthors {
       .map((author, idx) => ({ ...author.get("author"), lineNumber: idx + 1 }))
       .reduceRight(
         // Go up until you find a line made by a different author
-        (prev, { name, lineNumber }) =>
-          name == author && lineNumber == prev - 1 ? lineNumber : prev,
+        (prev, { name, lineNumber }) => (name == author && lineNumber == prev - 1 ? lineNumber : prev),
         originalLineNumber,
       );
   }
@@ -77,12 +74,10 @@ export class CommentPositionManager {
   }
 
   iter() {
-    return [...this.commentPositions.entries()].map(
-      ([commentId, lineNumber]) => ({
-        commentId,
-        lineNumber: parseInt(lineNumber),
-      }),
-    );
+    return [...this.commentPositions.entries()].map(([commentId, lineNumber]) => ({
+      commentId,
+      lineNumber: parseInt(lineNumber),
+    }));
   }
 
   move(commentId, targetLine) {
@@ -94,9 +89,7 @@ export class CommentPositionManager {
   shift(startLine, diff, maxLine) {
     if (diff < 0) {
       this.iter()
-        .filter(
-          (c) => startLine + diff < c.lineNumber && c.lineNumber <= startLine,
-        )
+        .filter((c) => startLine + diff < c.lineNumber && c.lineNumber <= startLine)
         .forEach((c) => this.del(c.commentId));
     }
 
@@ -212,18 +205,11 @@ export class YComments {
     this.displayManager = new DisplayManager();
     this.draggedComment = null;
 
-    this.positionManager.commentPositions.observeDeep(() =>
-      this.updateMainCodeMirror(),
-    );
+    this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
   }
 
   lineAuthors(commentId) {
-    return new CommentLineAuthors(
-      this.ydoc,
-      this.provider,
-      this.getAvatar,
-      commentId,
-    );
+    return new CommentLineAuthors(this.ydoc, this.provider, this.getAvatar, commentId);
   }
 
   positions() {
@@ -341,9 +327,7 @@ export class YComments {
     if (this.mainCodeMirror) {
       this.mainCodeMirror.dispatch({ effects: updateShownComments.of(null) });
     } else {
-      console.warn(
-        "[YComments] Failed to update the main CodeMirror instance since it doesn't exist.",
-      );
+      console.warn("[YComments] Failed to update the main CodeMirror instance since it doesn't exist.");
     }
   }
 }

@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "host": "vite --host",
     "server": "cd bin && npm install && node server.js",
-    "lint": "prettier --check src",
-    "format": "prettier --write src",
+    "lint": "prettier --check src --print-width 150",
+    "format": "prettier --write src --print-width 150",
     "ui-test": "vitest --dir ui-tests"
   },
   "dependencies": {

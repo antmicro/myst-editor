@@ -1,11 +1,6 @@
 import { EditorView } from "@codemirror/view";
 import { Decoration, WidgetType } from "@codemirror/view";
-import {
-  RangeSetBuilder,
-  RangeSet,
-  StateField,
-  Transaction,
-} from "@codemirror/state";
+import { RangeSetBuilder, RangeSet, StateField, Transaction } from "@codemirror/state";
 import { ycommentsFacet, updateShownComments } from "./state";
 import { YComments } from "./ycomments";
 
@@ -36,16 +31,13 @@ const commentWidget = (height, commentId) =>
     block: true,
   });
 
-const sortByLine = (commentA, commentB) =>
-  commentA.lineNumber - commentB.lineNumber;
+const sortByLine = (commentA, commentB) => commentA.lineNumber - commentB.lineNumber;
 
 /**
  * @param {Transaction} transaction
  * @returns {RangeSet<Decoration>}
  */
-const shouldUpdateTextWidget = (transaction) =>
-  transaction.docChanged ||
-  transaction.effects.some((eff) => eff.is(updateShownComments));
+const shouldUpdateTextWidget = (transaction) => transaction.docChanged || transaction.effects.some((eff) => eff.is(updateShownComments));
 
 /** @param {Transaction} transaction */
 const buildTextareaWidgets = (transaction) => [
@@ -55,9 +47,7 @@ const buildTextareaWidgets = (transaction) => [
       builder.add(mountPoint, mountPoint, commentWidget(height, commentId));
     } catch (e) {
       console.warn(e);
-      console.warn(
-        `An error occured when rendering comment ${commentId}. Comment will not be shown.`,
-      );
+      console.warn(`An error occured when rendering comment ${commentId}. Comment will not be shown.`);
     }
     return builder;
   },
@@ -70,13 +60,10 @@ const buildTextareaWidgets = (transaction) => [
  */
 const moveComments = (transaction, ycomments) => {
   if (transaction.isUserEvent("input") || transaction.isUserEvent("delete")) {
-    const lineDiff =
-      transaction.state.doc.lines - transaction.startState.doc.lines;
+    const lineDiff = transaction.state.doc.lines - transaction.startState.doc.lines;
     if (lineDiff != 0) {
       const docLines = transaction.state.doc.lines;
-      const cursorLine =
-        transaction.state.doc.lineAt(transaction.selection.main.from).number -
-        lineDiff;
+      const cursorLine = transaction.state.doc.lineAt(transaction.selection.main.from).number - lineDiff;
       ycomments.positions().shift(cursorLine, lineDiff, docLines);
     }
   }

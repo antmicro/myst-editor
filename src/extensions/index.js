@@ -43,18 +43,11 @@ export class ExtensionBuilder {
   }
 
   static defaultPlugins() {
-    return [
-      EditorView.lineWrapping,
-      markdown(),
-      highlightActiveLine(),
-      keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
-    ];
+    return [EditorView.lineWrapping, markdown(), highlightActiveLine(), keymap.of([indentWithTab, { key: "Mod-Z", run: redo }])];
   }
 
   disable(keys) {
-    this.base.push(
-      Prec.highest(keymap.of(keys.map((key) => ({ key, run: () => true })))),
-    );
+    this.base.push(Prec.highest(keymap.of(keys.map((key) => ({ key, run: () => true })))));
     return this;
   }
 
@@ -85,10 +78,7 @@ export class ExtensionBuilder {
   }
 
   readonly() {
-    this.extensions.push(
-      EditorView.editable.of(false),
-      EditorState.readOnly.of(true),
-    );
+    this.extensions.push(EditorView.editable.of(false), EditorState.readOnly.of(true));
     return this;
   }
 
@@ -97,29 +87,17 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useCollaboration({
-    enabled = true,
-    ytext,
-    provider,
-    undoManager,
-    editorRef,
-  }) {
+  useCollaboration({ enabled = true, ytext, provider, undoManager, editorRef }) {
     if (!enabled) return this;
 
     this.extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
 
     if (undoManager) {
       undoManager.on("stack-item-added", (event) => {
-        event.stackItem.meta.set(
-          "cursor-location",
-          getRelativeCursorLocation(editorRef.current),
-        );
+        event.stackItem.meta.set("cursor-location", getRelativeCursorLocation(editorRef.current));
       });
       undoManager.on("stack-item-popped", (event) => {
-        restoreCursorLocation(
-          editorRef.current,
-          event.stackItem.meta.get("cursor-location"),
-        );
+        restoreCursorLocation(editorRef.current, event.stackItem.meta.get("cursor-location"));
       });
 
       this.extensions.push(

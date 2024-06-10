@@ -4,10 +4,7 @@
     <title>MyST editor Demo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lato&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles/MystEditor.css" />
     <style>
       body {
@@ -109,26 +106,11 @@ HTML:
 * H{sub}\`2\`O
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
-      console.log(
-        "Welcome to the MyST editor demo. The right hand side should auto update.",
-      );
+      console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
 
-      import MystEditor, {
-        html,
-        render,
-        defaultButtons,
-      } from "./MystEditor.js";
+      import MystEditor, { html, render, defaultButtons } from "./MystEditor.js";
 
-      const usercolors = [
-        "#30bced",
-        "#60c771",
-        "#e6aa3a",
-        "#cbb63e",
-        "#ee6352",
-        "#9ac2c9",
-        "#8acb88",
-        "#14b2c4",
-      ];
+      const usercolors = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"];
 
       const room = "0";
       const username = Math.floor(Math.random() * 1000).toString();

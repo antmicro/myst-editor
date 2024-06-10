@@ -26,18 +26,13 @@ export default function useCollaboration(settings) {
   const [ready, setReady] = useState(false);
 
   const provider = useMemo(() => {
-    const prov = new WebsocketProvider(
-      settings.wsUrl ?? "ws://localhost:4444",
-      settings.room,
-      ydoc,
-      {
-        connect: true,
-        params: {},
-        WebSocketPolyfill: WebSocket,
-        awareness: new awarenessProtocol.Awareness(ydoc),
-        maxBackoffTime: 2500,
-      },
-    );
+    const prov = new WebsocketProvider(settings.wsUrl ?? "ws://localhost:4444", settings.room, ydoc, {
+      connect: true,
+      params: {},
+      WebSocketPolyfill: WebSocket,
+      awareness: new awarenessProtocol.Awareness(ydoc),
+      maxBackoffTime: 2500,
+    });
 
     prov.awareness.setLocalStateField("user", {
       name: settings.username,

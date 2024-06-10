@@ -2,13 +2,7 @@ import markdownitDocutils from "markdown-it-docutils";
 import purify from "dompurify";
 import markdownIt from "markdown-it";
 import { markdownReplacer, useCustomRoles } from "./markdownReplacer";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState,
-} from "preact/hooks";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "preact/hooks";
 import IMurMurHash from "imurmurhash";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
@@ -42,49 +36,32 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
    *
    * @type {[{ md: string, html: string }[], Dispatch<{newMarkdown: string, force: boolean }>]}
    */
-  const [htmlChunks, updateHtmlChunks] = useReducer(
-    (oldChunks, { newMarkdown, force = false }) => {
-      let htmlLookup = {};
-      if (!force) {
-        htmlLookup = oldChunks.reduce((lookup, { hash, html }) => {
-          lookup[hash] = html;
-          return lookup;
-        }, {});
-      }
+  const [htmlChunks, updateHtmlChunks] = useReducer((oldChunks, { newMarkdown, force = false }) => {
+    let htmlLookup = {};
+    if (!force) {
+      htmlLookup = oldChunks.reduce((lookup, { hash, html }) => {
+        lookup[hash] = html;
+        return lookup;
+      }, {});
+    }
 
-      const newChunks = splitIntoChunks(newMarkdown, htmlLookup);
+    const newChunks = splitIntoChunks(newMarkdown, htmlLookup);
 
-      if (newChunks.length !== oldChunks.length || force) {
-        // We can't infer which chunks were modified, so we update the entire document
-        preview.current.innerHTML = newChunks
-          .map(
-            (c) =>
-              `<html-chunk id="html-chunk-${c.id}">` + c.html + "</html-chunk>",
-          )
-          .join("\n");
-        return newChunks;
-      }
-
-      newChunks // Go through every modified chunk and update its content
-        .filter((newChunk, idx) => newChunk.hash !== oldChunks[idx].hash)
-        .forEach(
-          (chunk) =>
-            (preview.current.querySelector(
-              "html-chunk#html-chunk-" + chunk.id,
-            ).innerHTML = chunk.html),
-        );
-
+    if (newChunks.length !== oldChunks.length || force) {
+      // We can't infer which chunks were modified, so we update the entire document
+      preview.current.innerHTML = newChunks.map((c) => `<html-chunk id="html-chunk-${c.id}">` + c.html + "</html-chunk>").join("\n");
       return newChunks;
-    },
-    [],
-  );
+    }
+
+    newChunks // Go through every modified chunk and update its content
+      .filter((newChunk, idx) => newChunk.hash !== oldChunks[idx].hash)
+      .forEach((chunk) => (preview.current.querySelector("html-chunk#html-chunk-" + chunk.id).innerHTML = chunk.html));
+
+    return newChunks;
+  }, []);
 
   const markdown = useMemo(
-    () =>
-      markdownIt({ breaks: true, linkify: true })
-        .use(markdownitDocutils)
-        .use(markdownReplacer(transforms))
-        .use(useCustomRoles(customRoles)),
+    () => markdownIt({ breaks: true, linkify: true }).use(markdownitDocutils).use(markdownReplacer(transforms)).use(useCustomRoles(customRoles)),
     [],
   );
 

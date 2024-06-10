@@ -12,8 +12,7 @@ import { Role, rolePlugin } from "markdown-it-docutils";
 
 const cachePrefix = "myst-editor/";
 const getCached = (key) => sessionStorage.getItem(cachePrefix + key);
-const setCached = (key, value) =>
-  sessionStorage.setItem(cachePrefix + key, value);
+const setCached = (key, value) => sessionStorage.setItem(cachePrefix + key, value);
 
 const resetCache = () => {
   for (var key in sessionStorage) {
@@ -35,9 +34,7 @@ function waitForElementWithId(id) {
 
     document
       .querySelectorAll("#myst-css-namespace")
-      .forEach((editorInstance) =>
-        observer.observe(editorInstance, { childList: true, subtree: true }),
-      );
+      .forEach((editorInstance) => observer.observe(editorInstance, { childList: true, subtree: true }));
   });
 }
 
@@ -102,8 +99,7 @@ const overloadTransform = ({ transform: originalTransform, target }) => ({
  * @param {string} txt
  * @param {Transform} transform
  */
-const applyTransform = (txt, { transform, target }) =>
-  txt.replaceAll(target, transform);
+const applyTransform = (txt, { transform, target }) => txt.replaceAll(target, transform);
 
 /**
  * @param {Transform[]} transforms
@@ -113,9 +109,7 @@ const markdownReplacer = (transforms) => (markdownIt) => {
   const defaultRender = markdownIt.renderer.rules.text;
   markdownIt.renderer.rules.text = function (...args) {
     const defaultOutput = defaultRender(...args);
-    return transforms
-      .map(overloadTransform)
-      .reduce(applyTransform, defaultOutput);
+    return transforms.map(overloadTransform).reduce(applyTransform, defaultOutput);
   };
 };
 
@@ -170,8 +164,7 @@ const useCustomRoles = (transforms) => (markdownIt) => {
 
   // Usually a markdownIt renderer rule would escape all html code. Here we create a rule
   // which explicitly does nothing so that all html returned by transforms is rendered.
-  markdownIt.renderer.rules[CUSTOM_ROLE_RULE] = (tokens, idx) =>
-    tokens[idx].content;
+  markdownIt.renderer.rules[CUSTOM_ROLE_RULE] = (tokens, idx) => tokens[idx].content;
   markdownIt.use(rolePlugin, { roles: customRoles });
 };
 
