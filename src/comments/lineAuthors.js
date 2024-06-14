@@ -30,7 +30,10 @@ const commentLineHighlighter = ViewPlugin.fromClass(
       return Decoration.line({
         attributes: {
           "data-line-number": lineNumber,
-          style: "background-color: " + author.color + "99",
+          style: `
+            background-color: ${author.color + "99"};
+            border-left: 2px solid ${author.color + "99"};
+          `,
         },
       });
     }

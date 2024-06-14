@@ -204,6 +204,7 @@ export class YComments {
     this.positionManager = new CommentPositionManager(ydoc);
     this.displayManager = new DisplayManager();
     this.draggedComment = null;
+    this.commentWithPopup = null;
 
     this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
   }
@@ -222,6 +223,14 @@ export class YComments {
 
   registerCodeMirror(cm) {
     this.mainCodeMirror = cm;
+  }
+
+  /**
+   * The editor's left gutter width varies depending on screen size, line count and other factors.
+   * We need to measure it before rendering a comment so that we can align it with the editor.
+   * */
+  marginLeft() {
+    return this.mainCodeMirror.dom.querySelector(".cm-gutters").offsetWidth;
   }
 
   getTextForComment(commentId) {
@@ -256,6 +265,14 @@ export class YComments {
     return this.positions()
       .iter()
       .find((c) => c.lineNumber == lineNumber);
+  }
+
+  parentLineHeight(commentId) {
+    let elem = this.mainCodeMirror.dom.querySelector("#" + commentId)?.previousSibling;
+    if (elem) return elem.clientHeight;
+
+    let parentLineNumber = this.positionManager.get(commentId);
+    return [...this.mainCodeMirror.dom.querySelectorAll(`.cm-gutterElement`)].find((e) => e.textContent == parentLineNumber).clientHeight;
   }
 
   updateHeight(commentId, height) {

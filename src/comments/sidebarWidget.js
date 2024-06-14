@@ -30,6 +30,7 @@ class CommentMarker extends GutterMarker {
   createGutterMarker() {
     this.gutterMarker = document.createElement("div");
     this.gutterMarker.classList.add(CommentMarker.MAIN_CLASS);
+
     if (this.lineNumber) {
       this.gutterMarker.style.width = this.lineNumber.toString().length * 7 + "px";
       this.gutterMarker.ondrop = () => this.ycomments.positions().move(this.ycomments.draggedComment, this.lineNumber);
@@ -37,29 +38,19 @@ class CommentMarker extends GutterMarker {
     }
   }
 
-  addHoverEffects() {
-    this.icon.onmouseenter = () => this.icon.classList.add(CommentMarker.COMMENT_IMAGE_CLASS);
-    this.icon.onmouseleave = () => this.icon.classList.remove(CommentMarker.COMMENT_IMAGE_CLASS);
-  }
-
-  enableDragEffects() {
-    this.icon.draggable = true;
-    this.icon.ondragstart = () => {
-      this.ycomments.draggedComment = this.commentId;
-      this.ycomments.display().update();
-    };
-    this.icon.ondragend = () => {
-      this.ycomments.draggedComment = null;
-      this.ycomments.display().update();
-    };
-  }
-
   createPopupIcon() {
     this.icon = document.createElement("section");
     this.icon.classList = CommentMarker.ICON_CLASS;
 
     if (!this.draggedComment && !this.commentId) {
-      this.addHoverEffects();
+      this.icon.onmouseenter = () => this.icon.classList.add(CommentMarker.COMMENT_IMAGE_CLASS);
+      this.icon.onmouseleave = () => this.icon.classList.remove(CommentMarker.COMMENT_IMAGE_CLASS);
+    } else {
+      this.icon.onmouseup = () => this.ycomments.display().switchVisibility(this.commentId);
+      this.icon.onmouseenter = () => {
+        this.ycomments.commentWithPopup = this.commentId;
+        this.ycomments.updateMainCodeMirror();
+      };
     }
   }
 
@@ -72,7 +63,6 @@ class CommentMarker extends GutterMarker {
     this.createGutterMarker();
     this.createPopupIcon();
     if (this.hasComments()) {
-      this.enableDragEffects();
       this.markHasComments();
     }
 
@@ -109,11 +99,7 @@ const commentMarker = gutter({
     mouseup(view, line) {
       let ycomments = view.state.facet(ycommentsFacet.reader);
       let commentId = getOrCreateComment(view, line, ycomments);
-      let willBeVisible = ycomments.display().switchVisibility(commentId);
-
-      if (!willBeVisible && ycomments.isEmpty(commentId)) {
-        ycomments.deleteComment(commentId);
-      }
+      ycomments.display().switchVisibility(commentId);
 
       view.dispatch({ effects: updateShownComments.of(null) });
     },

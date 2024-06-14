@@ -5,11 +5,14 @@ import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { ExtensionBuilder } from "../extensions";
 import { YComments } from "../comments/ycomments";
+import commentIcon from "../icons/comment.svg?url";
+import trashcanIcon from "../icons/trashcan.svg?url";
 
 const YCommentWrapper = styled.div`
   position: absolute;
   top: ${(props) => props.top + 20}px;
-  left: 75px;
+  left: ${(props) => props.left + 19}px;
+
   z-index: 3;
   right: 0px;
   background-color: var(--gray-500);
@@ -24,8 +27,15 @@ const YCommentWrapper = styled.div`
     z-index: 1004;
   }
 
-  .cm-gutter {
-    background-color: var(--gray-500);
+  .cm-gutters {
+    display: none;
+  }
+
+  .cm-content {
+    padding: 0px;
+  }
+  .cm-line {
+    line-height: 1.5em;
   }
 
   .cm-scroller {
@@ -48,6 +58,8 @@ const YComment = ({ ycomments, commentId }) => {
   const lineAuthors = useMemo(() => ycomments.lineAuthors(commentId), [commentId]);
 
   const updateHeight = useCallback((update) => update.heightChanged && ycomments.updateHeight(commentId, cmref.current.clientHeight), [commentId]);
+
+  const parentHeight = ycomments.parentLineHeight(commentId) + 4;
 
   useEffect(() => {
     if (!cmref.current) {
@@ -78,11 +90,113 @@ const YComment = ({ ycomments, commentId }) => {
     };
   }, [cmref]);
 
-  return html` <${YCommentWrapper} top=${ycomments.display().offset(commentId)} fade=${ycomments.draggedComment == commentId}>
-    <div style="position:relative; display: ${ycomments.display().isShown(commentId) ? "block" : "none"}">
-      <div ref=${cmref}></div>
+  const popupIcon = useRef(null);
+  useEffect(() => {
+    if (!popupIcon.current) return;
+
+    popupIcon.current.onmouseup = () => {
+      ycomments.display().switchVisibility(commentId);
+      ycomments.updateMainCodeMirror();
+    };
+
+    popupIcon.current.ondragstart = () => {
+      ycomments.draggedComment = commentId;
+      ycomments.display().update();
+    };
+
+    popupIcon.current.ondragend = () => {
+      ycomments.draggedComment = null;
+      ycomments.display().update();
+    };
+  }, [popupIcon.current]);
+
+  return html` <${YCommentWrapper}
+    left=${ycomments.marginLeft()}
+    top=${ycomments.display().offset(commentId)}
+    fade=${ycomments.draggedComment == commentId}
+  >
+    <div style="position:relative">
+      ${ycomments.commentWithPopup == commentId &&
+      html`
+        <${YCommentPopup}
+          shift=${parentHeight}
+          onMouseLeave=${() => {
+            ycomments.commentWithPopup = null;
+            ycomments.updateMainCodeMirror();
+          }}
+        >
+          <img class="comment-icon" ref=${popupIcon} src=${commentIcon} />
+
+          <svg width="3" height="22" viewBox="0 10 2 18" fill="none">
+            <path d="M1 1V25" stroke="#DDDDDD" stroke-width="0.75" stroke-linecap="round" />
+          </svg>
+
+          <${DeleteButton} onClick=${() => ycomments.deleteComment(commentId)} />
+        <//>
+      `}
+
+      <div style="display: ${ycomments.display().isShown(commentId) ? "block" : "none"}" ref=${cmref}></div>
     </div>
   <//>`;
+};
+
+const YCommentPopup = styled.div`
+  width: 114px;
+  height: 25px;
+  border-radius: 2px;
+  position: absolute;
+  background-color: white;
+  border: 1px solid var(--icon-border);
+  z-index: 30000000;
+  left: -70px;
+  top: ${(props) => -props.shift}px;
+  box-shadow: 0 0 3px #ccc;
+
+  .comment-icon {
+    height: 21px;
+    padding: 2px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+`;
+
+const PopupButton = styled.div`
+  display: inline-flex;
+  cursor: pointer;
+  position: absolute;
+  padding-left: 5px;
+  padding-right: 5px;
+
+  &:hover {
+    background-color: #e7473c15;
+  }
+
+  img {
+    height: 20px;
+  }
+
+  .delete-btn {
+    color: #e7473c;
+    line-height: 25px;
+    font-size: 0.8em;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  .delete-icon {
+    width: 11px;
+    margin-top: 2px;
+    margin-left: 5px;
+  }
+`;
+
+const DeleteButton = ({ onClick }) => {
+  return html`
+    <${PopupButton} onClick=${onClick}>
+      <img class="delete-icon" src=${trashcanIcon} />
+      <span class="delete-btn"> DELETE </span>
+    <//>
+  `;
 };
 
 /** @param {{ ycomments: YComments }} */
@@ -93,5 +207,5 @@ export const YCommentsParent = ({ ycomments }) => {
 
   ycomments.display().onUpdate(() => setWidgets(createWidgets()));
 
-  return html`${widgets}`;
+  return html` ${widgets} `;
 };
