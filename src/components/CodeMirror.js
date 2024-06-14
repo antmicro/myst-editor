@@ -39,6 +39,10 @@ const CodeEditor = styled.div`
     cursor: pointer;
   }
 
+  .cm-ySelectionCaret {
+    position: fixed;
+  }
+
   .comment-image {
     position: absolute;
     display: inline;
