@@ -26443,7 +26443,7 @@ const Q7 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
   commentId: e
 }) => {
   let n = ir(null);
-  const r = rt(() => t.lineAuthors(e), [e]), i = ng((l) => l.heightChanged && t.updateHeight(e, n.current.clientHeight), [e]), s = t.parentLineHeight(e) + 4;
+  const r = rt(() => t.lineAuthors(e), [e]), i = ng((l) => l.heightChanged && t.updateHeight(e, n.current.clientHeight), [e]), s = t.parentLineHeight(e) + 3.8;
   It(() => {
     if (!n.current)
       return;
@@ -26485,7 +26485,7 @@ const Q7 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
         >
           <img class="comment-icon" ref=${o} src=${Q7} />
 
-          <svg width="3" height="22" viewBox="0 10 2 18" fill="none">
+          <svg width="3" height="22" viewBox="0 10 2 19" fill="none">
             <path d="M1 1V25" stroke="#DDDDDD" stroke-width="0.75" stroke-linecap="round" />
           </svg>
 
@@ -26504,14 +26504,14 @@ const Q7 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
   background-color: white;
   border: 1px solid var(--icon-border);
   z-index: 30000000;
-  left: -70px;
+  left: -66px;
   top: ${(t) => -t.shift}px;
   box-shadow: 0 0 3px #ccc;
   box-sizing: content-box;
 
   .comment-icon {
-    height: 21px;
-    padding: 2px;
+    height: 20px;
+    padding: 3px;
     margin-left: 10px;
     margin-right: 10px;
   }
