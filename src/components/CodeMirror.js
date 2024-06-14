@@ -110,6 +110,10 @@ const CodeEditor = styled.div`
   .cm-mono {
     color: #219;
   }
+
+  [title="Fold line"] {
+    user-select: none;
+  }
 `;
 
 const HiddenTextArea = styled.textarea`
