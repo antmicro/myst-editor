@@ -26068,12 +26068,12 @@ const Um = class {
     return this.positions().iter().find((n) => n.lineNumber == e);
   }
   parentLineHeight(e) {
-    var i;
+    var i, s;
     let n = (i = this.mainCodeMirror.dom.querySelector("#" + e)) == null ? void 0 : i.previousSibling;
     if (n)
       return n.clientHeight;
     let r = this.positionManager.get(e);
-    return [...this.mainCodeMirror.dom.querySelectorAll(".cm-gutterElement")].find((s) => s.textContent == r).clientHeight;
+    return (s = [...this.mainCodeMirror.dom.querySelectorAll(".cm-gutterElement")].find((o) => o.textContent == r)) == null ? void 0 : s.clientHeight;
   }
   updateHeight(e, n) {
     this.display().setHeight(e, n), this.updateMainCodeMirror();
@@ -26234,7 +26234,7 @@ const w7 = (t, e, n) => {
         "data-line-number": e,
         style: `
             background-color: ${t.color + "99"};
-            border-left: 2px solid ${t.color + "99"};
+            border-left: 2px solid ${t.color};
           `
       }
     });
@@ -26507,12 +26507,17 @@ const Q7 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
   left: -70px;
   top: ${(t) => -t.shift}px;
   box-shadow: 0 0 3px #ccc;
+  box-sizing: content-box;
 
   .comment-icon {
     height: 21px;
     padding: 2px;
     margin-left: 10px;
     margin-right: 10px;
+  }
+
+  svg {
+    box-sizing: content-box;
   }
 `, Z7 = ae.div`
   display: inline-flex;
@@ -26532,15 +26537,17 @@ const Q7 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
   .delete-btn {
     color: #e7473c;
     line-height: 25px;
-    font-size: 0.8em;
+    font-size: 10px;
     margin-left: 5px;
     margin-right: 5px;
+    box-sizing: content-box;
   }
 
   .delete-icon {
     width: 11px;
     margin-top: 2px;
     margin-left: 5px;
+    box-sizing: content-box;
   }
 `, L7 = ({
   onClick: t
