@@ -59,7 +59,7 @@ const YComment = ({ ycomments, commentId }) => {
 
   const updateHeight = useCallback((update) => update.heightChanged && ycomments.updateHeight(commentId, cmref.current.clientHeight), [commentId]);
 
-  const parentHeight = ycomments.parentLineHeight(commentId) + 4;
+  const parentHeight = ycomments.parentLineHeight(commentId) + 3.8;
 
   useEffect(() => {
     if (!cmref.current) {
@@ -127,7 +127,7 @@ const YComment = ({ ycomments, commentId }) => {
         >
           <img class="comment-icon" ref=${popupIcon} src=${commentIcon} />
 
-          <svg width="3" height="22" viewBox="0 10 2 18" fill="none">
+          <svg width="3" height="22" viewBox="0 10 2 19" fill="none">
             <path d="M1 1V25" stroke="#DDDDDD" stroke-width="0.75" stroke-linecap="round" />
           </svg>
 
@@ -148,14 +148,14 @@ const YCommentPopup = styled.div`
   background-color: white;
   border: 1px solid var(--icon-border);
   z-index: 30000000;
-  left: -70px;
+  left: -66px;
   top: ${(props) => -props.shift}px;
   box-shadow: 0 0 3px #ccc;
   box-sizing: content-box;
 
   .comment-icon {
-    height: 21px;
-    padding: 2px;
+    height: 20px;
+    padding: 3px;
     margin-left: 10px;
     margin-right: 10px;
   }
