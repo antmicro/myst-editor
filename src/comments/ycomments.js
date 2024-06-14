@@ -272,7 +272,7 @@ export class YComments {
     if (elem) return elem.clientHeight;
 
     let parentLineNumber = this.positionManager.get(commentId);
-    return [...this.mainCodeMirror.dom.querySelectorAll(`.cm-gutterElement`)].find((e) => e.textContent == parentLineNumber).clientHeight;
+    return [...this.mainCodeMirror.dom.querySelectorAll(`.cm-gutterElement`)].find((e) => e.textContent == parentLineNumber)?.clientHeight;
   }
 
   updateHeight(commentId, height) {

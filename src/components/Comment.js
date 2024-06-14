@@ -151,12 +151,17 @@ const YCommentPopup = styled.div`
   left: -70px;
   top: ${(props) => -props.shift}px;
   box-shadow: 0 0 3px #ccc;
+  box-sizing: content-box;
 
   .comment-icon {
     height: 21px;
     padding: 2px;
     margin-left: 10px;
     margin-right: 10px;
+  }
+
+  svg {
+    box-sizing: content-box;
   }
 `;
 
@@ -178,15 +183,17 @@ const PopupButton = styled.div`
   .delete-btn {
     color: #e7473c;
     line-height: 25px;
-    font-size: 0.8em;
+    font-size: 10px;
     margin-left: 5px;
     margin-right: 5px;
+    box-sizing: content-box;
   }
 
   .delete-icon {
     width: 11px;
     margin-top: 2px;
     margin-left: 5px;
+    box-sizing: content-box;
   }
 `;
 
