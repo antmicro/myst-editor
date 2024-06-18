@@ -26478,6 +26478,7 @@ const Q7 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
     <div style="position:relative">
       ${t.commentWithPopup == e && te`
         <${M7}
+          left=${t.marginLeft()}
           shift=${s}
           onMouseLeave=${() => {
     t.commentWithPopup = null, t.updateMainCodeMirror();
@@ -26504,7 +26505,7 @@ const Q7 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
   background-color: white;
   border: 1px solid var(--icon-border);
   z-index: 30000000;
-  left: -66px;
+  left: ${(t) => -t.left - 13}px;
   top: ${(t) => -t.shift}px;
   box-shadow: 0 0 3px #ccc;
   box-sizing: content-box;
