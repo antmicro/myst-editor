@@ -155,7 +155,7 @@ export class DisplayManager {
 
   isShown(commentId) {
     if (this.comments[commentId]) {
-      return this.comments[commentId].isShown;
+      return this.comments[commentId].isShown && this.comments[commentId].top;
     }
     return true;
   }
