@@ -119,6 +119,7 @@ const YComment = ({ ycomments, commentId }) => {
       ${ycomments.commentWithPopup == commentId &&
       html`
         <${YCommentPopup}
+          left=${ycomments.marginLeft()}
           shift=${parentHeight}
           onMouseLeave=${() => {
             ycomments.commentWithPopup = null;
@@ -148,7 +149,7 @@ const YCommentPopup = styled.div`
   background-color: white;
   border: 1px solid var(--icon-border);
   z-index: 30000000;
-  left: -66px;
+  left: ${(props) => -props.left - 13}px;
   top: ${(props) => -props.shift}px;
   box-shadow: 0 0 3px #ccc;
   box-sizing: content-box;
