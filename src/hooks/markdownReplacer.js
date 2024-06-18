@@ -22,29 +22,27 @@ const resetCache = () => {
   }
 };
 
-function waitForElementWithId(id) {
+function waitForElementWithId(id, editorParent) {
   return new Promise((resolve) => {
     const observer = new MutationObserver(() => {
-      const elem = document.getElementById(id);
+      const elem = editorParent.getElementById(id);
       if (elem) {
         observer.disconnect();
         resolve(elem);
       }
     });
 
-    document
-      .querySelectorAll("#myst-css-namespace")
-      .forEach((editorInstance) => observer.observe(editorInstance, { childList: true, subtree: true }));
+    observer.observe(editorParent, { childList: true, subtree: true });
   });
 }
 
-const fillPlaceholder = (placeholderId, html) => {
-  const placeholder = document.getElementById(placeholderId);
+const fillPlaceholder = (placeholderId, html, editorParent) => {
+  const placeholder = editorParent.getElementById(placeholderId);
   if (placeholder) placeholder.outerHTML = html;
 };
 
-const cancelTransform = (placeholderId) => {
-  const el = document.getElementById(placeholderId);
+const cancelTransform = (placeholderId, editorParent) => {
+  const el = editorParent.getElementById(placeholderId);
   if (el) el.outerHTML = el.innerHTML;
 };
 
@@ -55,18 +53,18 @@ const cancelTransform = (placeholderId) => {
  * @param {Promise<string>} promise
  * @returns {string}
  */
-const createTransformPlaceholder = (input, promise) => {
+const createTransformPlaceholder = (input, promise, editorParent) => {
   const placeholderId = "placeholder-" + Math.random().toString().slice(2);
 
   promise
-    .then(waitForElementWithId(placeholderId))
+    .then(waitForElementWithId(placeholderId, editorParent))
     .then((result) => {
       setCached(input, result);
-      fillPlaceholder(placeholderId, result);
+      fillPlaceholder(placeholderId, result, editorParent);
     })
     .catch((err) => {
       console.error(err);
-      cancelTransform(placeholderId);
+      cancelTransform(placeholderId, editorParent);
       setCached(input, input);
     });
 
@@ -79,7 +77,7 @@ const createTransformPlaceholder = (input, promise) => {
  * @param {Transform}
  * @returns {Transform}
  */
-const overloadTransform = ({ transform: originalTransform, target }) => ({
+const overloadTransform = ({ transform: originalTransform, target }, editorParent) => ({
   target,
   transform: (input) => {
     const cached = getCached(input);
@@ -88,7 +86,7 @@ const overloadTransform = ({ transform: originalTransform, target }) => ({
     let transformResult = originalTransform(input);
 
     if (typeof transformResult.then == "function") {
-      return createTransformPlaceholder(input, transformResult);
+      return createTransformPlaceholder(input, transformResult, editorParent);
     }
 
     return transformResult;
@@ -105,11 +103,11 @@ const applyTransform = (txt, { transform, target }) => txt.replaceAll(target, tr
  * @param {Transform[]} transforms
  * @returns {function(MarkdownIt): void}
  */
-const markdownReplacer = (transforms) => (markdownIt) => {
+const markdownReplacer = (transforms, editorParent) => (markdownIt) => {
   const defaultRender = markdownIt.renderer.rules.text;
   markdownIt.renderer.rules.text = function (...args) {
     const defaultOutput = defaultRender(...args);
-    return transforms.map(overloadTransform).reduce(applyTransform, defaultOutput);
+    return transforms.map((t) => overloadTransform(t, editorParent)).reduce(applyTransform, defaultOutput);
   };
 };
 
@@ -146,9 +144,9 @@ const toDocutilsRole = ({ target, transform }) => {
  *  @param { Transform[] }
  *  @returns {{ [rolename: string]: Role }}
  */
-const asDocutilsRoles = (transforms) =>
+const asDocutilsRoles = (transforms, editorParent) =>
   transforms
-    .map(overloadTransform)
+    .map((t) => overloadTransform(t, editorParent))
     .map(toDocutilsRole)
     .reduce((roles, { name, role }) => {
       roles[name] = role;
@@ -159,8 +157,8 @@ const asDocutilsRoles = (transforms) =>
  *  @param { Transform[] } transforms
  *  @returns {function(MarkdownIt): void}
  */
-const useCustomRoles = (transforms) => (markdownIt) => {
-  const customRoles = asDocutilsRoles(transforms);
+const useCustomRoles = (transforms, editorParent) => (markdownIt) => {
+  const customRoles = asDocutilsRoles(transforms, editorParent);
 
   // Usually a markdownIt renderer rule would escape all html code. Here we create a rule
   // which explicitly does nothing so that all html returned by transforms is rendered.

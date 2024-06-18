@@ -28,7 +28,7 @@ const copyHtmlAsRichText = (txt) => {
 };
 
 /** @param {{preview: { current: Element } }} */
-export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak }) => {
+export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak, parent }) => {
   const [text, setText] = useState(initialText);
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
@@ -66,8 +66,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   const markdown = useMemo(() => {
     const md = markdownIt({ breaks: true, linkify: true })
       .use(markdownitDocutils)
-      .use(markdownReplacer(transforms))
-      .use(useCustomRoles(customRoles))
+      .use(markdownReplacer(transforms, parent))
+      .use(useCustomRoles(customRoles, parent))
       .use(markdownItMermaid);
     if (backslashLineBreak) md.use(backslashLineBreakPlugin);
     return md;

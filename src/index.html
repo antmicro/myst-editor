@@ -108,7 +108,7 @@ HTML:
 * {abbr}\`CSS (Cascading Style Sheets)`;
       console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
 
-      import MystEditor, { html, render, defaultButtons } from "./MystEditor.js";
+      import MystEditor, { defaultButtons } from "./MystEditor.js";
 
       const usercolors = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"];
 
@@ -172,36 +172,35 @@ HTML:
           transform: (match) => new Promise((r) => r(new Date().toLocaleString("en-GB", { timeZone: "UTC" }))),
         },
       ];
-      render(
-        html`
-          <${MystEditor}
-            templatelist="linkedtemplatelist.json"
-            initialText=${exampleText}
-            title="[MyST Editor](https://github.com/antmicro/myst-editor/) demo"
-            id="textarea_id"
-            transforms=${exampleTransforms}
-            collaboration=${{
-              enabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
-              commentsEnabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
-              wsUrl: import.meta.env.VITE_WS_URL || urlParams.get("collab_server"),
-              resolvingCommentsEnabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
-              username,
-              room,
-              color,
-            }}
-            customRoles=${exampleCustomRoles}
-            includeButtons=${defaultButtons.concat([
-              {
-                text: "Custom button",
-                action: () => alert("Custom button action"),
-              },
-            ])}
-            spellcheckOpts=${{
-              dict: "en_US",
-              dictionaryPath: "/myst-editor/dictionaries",
-            }}
-          />
-        `,
+
+      MystEditor(
+        {
+          templatelist: "linkedtemplatelist.json",
+          initialText: exampleText,
+          title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
+          id: "textarea_id",
+          transforms: exampleTransforms,
+          collaboration: {
+            enabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
+            commentsEnabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
+            resolvingCommentsEnabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
+            wsUrl: import.meta.env.VITE_WS_URL || urlParams.get("collab_server"),
+            username,
+            room,
+            color,
+          },
+          customRoles: exampleCustomRoles,
+          includeButtons: defaultButtons.concat([
+            {
+              text: "Custom button",
+              action: () => alert("Custom button action"),
+            },
+          ]),
+          spellcheckOpts: {
+            dict: "en_US",
+            dictionaryPath: "/myst-editor/dictionaries",
+          },
+        },
         document.getElementById("myst"),
       );
     </script>

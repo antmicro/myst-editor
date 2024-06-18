@@ -122,12 +122,13 @@ const MystEditor = ({
   // this will create a bogus random avatar when no specific getAvatar function is provided
   getAvatar = (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
   backslashLineBreak = true,
+  parent,
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
 
   const preview = useRef(null);
-  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak });
+  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak, parent });
 
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer((_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: getAvatar(u.login) })), []);
@@ -164,8 +165,8 @@ const MystEditor = ({
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
 
-  return html` <div id="myst-css-namespace">
-    <${StyleSheetManager} stylisPlugins=${[createExtraScopePlugin("#myst-css-namespace")]}>
+  return html` <div style="all: initial" id="myst-css-namespace">
+    <${StyleSheetManager} target=${parent} stylisPlugins=${[createExtraScopePlugin("#myst-css-namespace")]}>
       <${EditorParent} mode=${mode} fullscreen=${fullscreen}>
         ${topbar &&
         html`<${EditorTopbar}
@@ -213,5 +214,12 @@ const MystEditor = ({
   </div>`;
 };
 
-export default MystEditor;
-export { html, render, defaultButtons, predefinedButtons };
+export default (params, target) => {
+  target.attachShadow({
+    mode: "open",
+  });
+  params.parent = target.shadowRoot;
+  render(html`<${MystEditor} ...${params} />`, target.shadowRoot);
+};
+
+export { defaultButtons, predefinedButtons };
