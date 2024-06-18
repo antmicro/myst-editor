@@ -26604,10 +26604,6 @@ const q7 = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewB
     cursor: pointer;
   }
 
-  .cm-ySelectionCaret {
-    position: fixed;
-  }
-
   .comment-image {
     position: absolute;
     display: inline;
@@ -26654,6 +26650,10 @@ const q7 = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewB
 
   .cm-editor {
     outline: 0;
+  }
+
+  .cm-scroller {
+    overflow: visible;
   }
 
   .cm-error {
