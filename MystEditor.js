@@ -26010,7 +26010,7 @@ class f7 {
     return this.comments[e].top;
   }
   isShown(e) {
-    return this.comments[e] ? this.comments[e].isShown : !0;
+    return this.comments[e] ? this.comments[e].isShown && this.comments[e].top : !0;
   }
   del(e) {
     this.update((n) => (delete n[e], n));
