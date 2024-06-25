@@ -28,6 +28,7 @@ const copyHtmlAsRichText = (txt) => {
 /** @param {{preview: { current: Element } }} */
 export const useText = ({ initialText, transforms, customRoles, preview }) => {
   const [text, setText] = useState(initialText);
+  const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
   const [onSync, setOnSync] = useState({ action: (text) => {} });
 
@@ -92,7 +93,7 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
     [markdown],
   );
 
-  useEffect(() => updateHtmlChunks({ newMarkdown: initialText }), []);
+  useEffect(() => readyToRender && updateHtmlChunks({ newMarkdown: text }), [readyToRender]);
   useEffect(exposeText(text), [text]);
   useEffect(() => {
     if (syncText) {
@@ -124,6 +125,9 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
     },
     onSync(action) {
       setOnSync({ action });
+    },
+    readyToRender() {
+      setReadyToRender(true);
     },
     copy() {
       copyHtmlAsRichText(

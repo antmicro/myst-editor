@@ -114,6 +114,20 @@ const CodeEditor = styled.div`
   [title="Fold line"] {
     user-select: none;
   }
+
+  .editor-msg {
+    padding: 10px;
+    border-radius: 2px;
+    text-align: center;
+
+    &.collab-error {
+      background-color: var(--red-500);
+    }
+
+    &.collab-notif {
+      background-color: var(--blue-100);
+    }
+  }
 `;
 
 const HiddenTextArea = styled.textarea`
@@ -132,14 +146,35 @@ const setEditorText = (editor, text) => {
 
 const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheckOpts, highlights, setUsers, getAvatar }) => {
   const editorRef = useRef(null);
-  const [initialized, setInitialized] = useState(false);
-
-  const { provider, undoManager, ytext, ydoc, ready } = useCollaboration(collaboration);
+  const editorMountpoint = useRef(null);
+  const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration);
   const ycomments = useComments(ydoc, provider, getAvatar);
+
+  useEffect(() => {
+    if (collaboration.enabled && error) {
+      text.readyToRender();
+      editorRef.current?.destroy();
+
+      const view = new EditorView({
+        state: EditorState.create({
+          doc: text.get(),
+          extensions: ExtensionBuilder.basicSetup().useHighlighter(highlights).useSpellcheck(spellcheckOpts).readonly().create(),
+        }),
+        parent: editorMountpoint.current,
+      });
+
+      view.dom.style.opacity = "0.5";
+    }
+  }, [error]);
 
   useEffect(() => {
     if (collaboration.enabled && !ready) return;
     if (editorRef.current) return;
+    if (error) return;
+
+    if (collaboration.enabled) text.set(ytext.toString());
+
+    text.readyToRender();
 
     const startState = EditorState.create({
       doc: collaboration.enabled ? ytext.toString() : text.get(),
@@ -160,12 +195,13 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
 
     const view = new EditorView({
       state: startState,
-      parent: document.getElementById(id + "-editor"),
+      parent: editorMountpoint.current,
     });
     editorRef.current = view;
-    setInitialized(true);
 
     ycomments?.registerCodeMirror(view);
+    provider?.watchCollabolators(setUsers);
+    text.onSync((currentText) => setEditorText(view, currentText));
 
     return () => {
       if (collaboration.enabled) {
@@ -176,26 +212,11 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
     };
   }, [ready]);
 
-  useEffect(() => {
-    const mystEditorCount = document.querySelectorAll("#myst-css-namespace").length;
-    const isFirstUser =
-      collaboration.enabled && ytext.toString().length == 0 && provider.awareness.getStates().size == mystEditorCount && provider.firstUser && ready;
-
-    if (ytext && ytext.toString().length != 0) text.set(ytext.toString());
-
-    if (isFirstUser) {
-      console.log("You are the first user in this document. Initiating...");
-      setEditorText(editorRef.current, text.get());
-    }
-
-    text.onSync((currentText) => setEditorText(editorRef.current, currentText));
-    ycomments?.updateMainCodeMirror();
-    provider?.watchCollabolators(setUsers);
-  }, [ready, initialized]);
-
   return html`
-    <${CodeEditor} $mode=${mode} id="${id}-editor" class=${className}>
-      ${collaboration.commentsEnabled ? html`<${YCommentsParent} ycomments=${ycomments} />` : ""}
+    <${CodeEditor} ref=${editorMountpoint} $mode=${mode} id="${id}-editor" class=${className}>
+      ${error && html`<div class="editor-msg collab-error">No connection to the collaboration server</div>`}
+      ${collaboration.enabled && !ready && !error && html`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
+      ${collaboration.commentsEnabled && !error ? html`<${YCommentsParent} ycomments=${ycomments} />` : ""}
     <//>
     <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;

@@ -1,7 +1,7 @@
 import * as Y from "yjs";
 import * as awarenessProtocol from "y-protocols/awareness.js";
 import { WebsocketProvider } from "y-websocket";
-import { useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 
 WebsocketProvider.prototype.watchCollabolators = function (hook) {
   this.awareness.on("change", ({ added, removed }) => {
@@ -23,7 +23,9 @@ export default function useCollaboration(settings) {
   }
 
   const ydoc = useMemo(() => new Y.Doc(), []);
-  const [ready, setReady] = useState(false);
+  const [synced, setSynced] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const [error, setError] = useState(false);
 
   const provider = useMemo(() => {
     const prov = new WebsocketProvider(settings.wsUrl ?? "ws://localhost:4444", settings.room, ydoc, {
@@ -39,16 +41,9 @@ export default function useCollaboration(settings) {
       color: settings.color,
     });
 
-    prov.on("status", ({ status }) => {
-      if (status != "connected") return;
-
-      prov.on("sync", (isSynced) => {
-        if (!isSynced) return;
-
-        prov.firstUser = true;
-        setReady(true);
-      });
-    });
+    prov.ws.onerror = () => setError(true);
+    prov.on("sync", setSynced);
+    prov.on("status", ({ status }) => setConnected(status == "connected"));
 
     return prov;
   }, []);
@@ -64,11 +59,14 @@ export default function useCollaboration(settings) {
     [],
   );
 
+  useEffect(() => !provider.ws && setError(true), [connected]);
+
   return {
     provider,
     undoManager,
     ytext,
     ydoc,
-    ready,
+    error,
+    ready: synced && connected,
   };
 }
