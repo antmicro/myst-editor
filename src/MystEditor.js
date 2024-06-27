@@ -136,6 +136,7 @@ const MystEditor = ({
             templatelist,
             buttons,
             setMode,
+            title,
           }}
         />`}
         <${MystWrapper} fullscreen=${fullscreen}>
