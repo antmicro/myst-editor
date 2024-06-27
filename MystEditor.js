@@ -35309,7 +35309,8 @@ const t$e = ae.div`
     text: b,
     templatelist: l,
     buttons: D,
-    setMode: p
+    setMode: p,
+    title: n
   }}
         />`}
         <${n$e} fullscreen=${g}>
