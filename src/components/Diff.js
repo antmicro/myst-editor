@@ -42,5 +42,6 @@ const Diff = ({ oldText, text }) => {
     <${MergeViewCodeEditor} ref=${rightRef} />
   </div>`;
 };
+Diff.defaultProps = { className: "diff" };
 
 export default Diff;

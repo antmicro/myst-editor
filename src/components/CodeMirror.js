@@ -1,16 +1,13 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useRef } from "preact/hooks";
 import { html } from "htm/preact";
 import { EditorView } from "codemirror";
-import { EditorState, StateEffect } from "@codemirror/state";
+import { EditorState } from "@codemirror/state";
 import styled from "styled-components";
 import useCollaboration from "../hooks/useCollaboration";
-import { adjustToMode } from "./Preview";
 import { ExtensionBuilder } from "../extensions";
 import { YCommentsParent } from "../components/Comment";
 import useComments from "../hooks/useComments";
 import commentIcon from "../icons/comment.svg?raw";
-
-const adjust = adjustToMode("Source");
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -23,9 +20,6 @@ const CodeEditor = styled.div`
   min-height: 500px;
   color: black;
   position: relative;
-
-  ${(props) => adjust(props.$mode)}
-
   flex: 1;
   box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
 
@@ -144,7 +138,7 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheckOpts, highlights, setUsers, getAvatar }) => {
+const CodeMirror = ({ text, id, name, mode, collaboration, spellcheckOpts, highlights, setUsers, getAvatar }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
   const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration);
@@ -213,7 +207,7 @@ const CodeMirror = ({ text, id, name, className, mode, collaboration, spellcheck
   }, [ready]);
 
   return html`
-    <${CodeEditor} ref=${editorMountpoint} $mode=${mode} id="${id}-editor" class=${className}>
+    <${CodeEditor} className="main-editor" ref=${editorMountpoint} $mode=${mode} id="${id}-editor">
       ${error && html`<div class="editor-msg collab-error">No connection to the collaboration server</div>`}
       ${collaboration.enabled && !ready && !error && html`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
       ${collaboration.commentsEnabled && !error ? html`<${YCommentsParent} ycomments=${ycomments} />` : ""}

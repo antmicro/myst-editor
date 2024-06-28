@@ -20,6 +20,18 @@ const EditorParent = styled.div`
   flex-flow: row wrap;
   width: 100%;
   ${(props) => props.fullscreen && "position: fixed; left: 0; top: 0; z-index: 10;"}
+  ${(props) => {
+    switch (props.mode) {
+      case "Preview":
+        return ".main-editor { display: none }";
+      case "Source":
+        return ".preview { display: none }";
+      case "Diff":
+        return ".main-editor { display: none }; .preview { display: none }";
+      default:
+        return ``;
+    }
+  }}
 `;
 
 const MystWrapper = styled.div`
@@ -31,6 +43,7 @@ const MystWrapper = styled.div`
   background-color: white;
   ${(props) => props.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;"}
 `;
+MystWrapper.defaultProps = { className: "myst-editor-wrapper" };
 
 const createExtraScopePlugin = (scope) => {
   const plugin = (element, index, children) => {
@@ -126,7 +139,7 @@ const MystEditor = ({
 
   return html` <div id="myst-css-namespace">
     <${StyleSheetManager} stylisPlugins=${[createExtraScopePlugin("#myst-css-namespace")]}>
-      <${EditorParent} fullscreen=${fullscreen}>
+      <${EditorParent} mode=${mode} fullscreen=${fullscreen}>
         ${topbar &&
         html`<${EditorTopbar}
           ...${{
@@ -153,8 +166,8 @@ const MystEditor = ({
               highlights: transforms,
             }}
           />
-          <${Preview} $mode=${mode} ref=${preview} />
-          ${mode === "Diff" ? html`<${Diff} oldText=${initialText} text=${text} />` : ""}
+          <${Preview} ref=${preview} />
+          ${mode === "Diff" && html`<${Diff} oldText=${initialText} text=${text} />`}
         <//>
       <//>
     <//>

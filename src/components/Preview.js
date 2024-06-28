@@ -1,21 +1,4 @@
-import styled, { css } from "styled-components";
-
-export const adjustToMode = (mainMode) => (mode) => {
-  if (mode === "Both") {
-    return css`
-      display: block;
-      max-width: 50%;
-    `;
-  } else if (mode === mainMode) {
-    return css``;
-  } else {
-    return css`
-      display: none;
-    `;
-  }
-};
-
-const adjust = adjustToMode("Preview");
+import styled from "styled-components";
 
 const Preview = styled.div`
   background-color: white;
@@ -30,7 +13,6 @@ const Preview = styled.div`
   vertical-align: top;
   color: var(--gray-900);
   word-break: unset;
-  ${(props) => adjust(props.$mode)}
 
   @media print {
     & {
@@ -348,5 +330,6 @@ const Preview = styled.div`
     }
   }
 `;
+Preview.defaultProps = { className: "preview" };
 
 export default Preview;
