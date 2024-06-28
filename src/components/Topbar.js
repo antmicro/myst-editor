@@ -3,7 +3,7 @@ import { html } from "htm/preact";
 import { useMemo } from "preact/hooks";
 import purify from "dompurify";
 
-import { TopbarButton } from "./Buttons";
+import DefaultButton from "./Buttons";
 import ButtonGroup from "./ButtonGroup";
 import Avatars from "./Avatars";
 import TemplateManager from "./TemplateManager";
@@ -62,7 +62,9 @@ const TopbarLeft = styled.div`
   margin-left: 5px;
 `;
 
-const Alert = styled(TopbarButton)`
+const Alert = styled(DefaultButton)`
+  padding: 0px 15px;
+  margin: 5px;
   pointer-events: none;
   background-color: var(--alert);
   border: none;
@@ -149,10 +151,27 @@ const DiffIcon = () =>
     <path d="M5.60999 9.44007L1.35999 5.19007L5.73999 0.820068" stroke-width="1.75" />
   </svg>`;
 
+const PrintPDFIcon = () =>
+  html`<svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path stroke-width="0.2" d="M21 12.4286V11H16.7143V18.1429H18.1429V15.2857H20.2857V13.8571H18.1429V12.4286H21Z" fill="#332D37" />
+    <path
+      stroke-width="0.2"
+      d="M13.1428 18.1429H10.2857V11H13.1428C14.3571 11 15.2857 11.9286 15.2857 13.1429V16C15.2857 17.2143 14.3571 18.1429 13.1428 18.1429ZM11.7143 16.7143H13.1428C13.5714 16.7143 13.8571 16.4286 13.8571 16V13.1429C13.8571 12.7143 13.5714 12.4286 13.1428 12.4286H11.7143V16.7143Z"
+      fill="#332D37"
+    />
+    <path
+      stroke-width="0.2"
+      d="M7.42855 11H3.85712V18.1429H5.28569V16H7.42855C8.21426 16 8.85712 15.3571 8.85712 14.5714V12.4286C8.85712 11.6429 8.21426 11 7.42855 11ZM5.28569 14.5714V12.4286H7.42855V14.5714H5.28569Z"
+      fill="#332D37"
+    />
+    <path d="M14 21H9.5H1V1H9M15 10V7.5M9 1H9.5L15 6.5V7.5M9 1V7.5H15" stroke="#332D37" stroke-width="1.75" />
+  </svg> `;
+
 const icons = {
   fullscreen: FullscreenIcon,
   "copy-html": CopyIcon,
   refresh: RefreshIcon,
+  "print-to-pdf": PrintPDFIcon,
 };
 
 export const EditorTopbar = ({ alert, users, text, setMode, templatelist, buttons, title }) => {
@@ -169,14 +188,13 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
   return html` <${Topbar}>
     <${TopbarLeft}>
       <${ButtonGroup} buttons=${buttonsLeft} highlightActive=${false} initialClickedId=${null} />
+      ${buttons.find((b) => b.id === "template-manager") && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
       ${alert && html`<${Alert}> ${alert} <//>`}
       <${Title} dangerouslySetInnerHTML=${{ __html: titleHtml }} />
     <//>
     <${TopbarRight}>
       <${Avatars} users=${users} />
-
-      ${textButtons.map((b) => html`<${TopbarButton} type="button" onClick=${b.action}>${b.text}<//>`)}
-      ${buttons.find((b) => b.id === "template-manager") && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
+      ${textButtons.map((b) => html`<${DefaultButton} type="button" onClick=${b.action}>${b.text}<//>`)}
 
       <${Separator} />
       <${ButtonGroup} buttons=${editorModeButtons} clickedId=${2} />

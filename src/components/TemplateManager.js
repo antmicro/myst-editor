@@ -2,8 +2,9 @@ import { html } from "htm/preact";
 import { useState, useEffect } from "preact/hooks";
 import Modal from "./Modal.js";
 import Tooltip from "./Tooltip.js";
-import DefaultButton, { TopbarButton } from "./Buttons.js";
+import DefaultButton from "./Buttons.js";
 import { styled } from "styled-components";
+import { TopbarButton } from "./ButtonGroup.js";
 
 const TemplateDropdownContent = styled.div`
   display: none;
@@ -15,11 +16,20 @@ const TemplateDropdownContent = styled.div`
   border-radius: var(--border-radius);
   color: var(--icon-color);
   background-color: var(--icon-bg);
+  width: 210%;
   z-index: 20;
 `;
 
+const TemplateIcon = () =>
+  html`<svg width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 16L11 16" stroke="#332D37" stroke-width="1.75" />
+    <path d="M1 21H10H19V12V6.5L13.5 1H1V6.5V12V21Z" stroke="#332D37" stroke-width="1.75" stroke-dasharray="6 3" />
+    <path d="M5 12L15 12" stroke="#332D37" stroke-width="1.75" />
+    <path d="M5 8L15 8" stroke="#332D37" stroke-width="1.75" />
+  </svg> `;
+
 const TemplateButton = styled(DefaultButton)`
-  width: 100%;
+  width: 90%;
   color: var(--icon-color);
   border: 1px solid var(--icon-border);
   padding: 0 10px 0 10px;
@@ -134,7 +144,7 @@ const TemplateManager = ({ text, templatelist }) => {
         onMouseEnter=${() => setShowTooltip(true)}
         onMouseLeave=${() => setShowTooltip(false)}
       >
-        Templates
+        <${TemplateIcon} />
       <//>
       <${showTooltip && Tooltip} tooltipOrientation="bottom" errorMessage=${generalErr.message} />`;
   }
@@ -146,7 +156,7 @@ const TemplateManager = ({ text, templatelist }) => {
       onMouseEnter=${() => setShowTooltip(true)}
       onMouseLeave=${() => setShowTooltip(false)}
     >
-      Templates
+      <${TemplateIcon} />
     <//>`;
   }
 
@@ -161,7 +171,7 @@ const TemplateManager = ({ text, templatelist }) => {
       changeDocumentTemplate=${changeDocumentTemplate}
     />`}
     <${Dropdown}>
-      <${TopbarButton} type="button">Templates<//>
+      <${TopbarButton} className="icon" type="button"><${TemplateIcon} /><//>
       <${TemplatesList}>
         <${TemplateDropdownContent}>
           ${Object.keys(readyTemplates).map(

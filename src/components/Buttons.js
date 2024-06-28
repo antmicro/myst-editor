@@ -20,11 +20,11 @@ const DefaultButton = styled.button`
   padding: 0;
   transition: 0.4s ease;
   border-radius: var(--border-radius);
-`;
 
-export const TopbarButton = styled(DefaultButton)`
-  padding: 0px 15px;
-  margin: 5px;
+  &:not(:has(svg)) {
+    padding: 0px 15px;
+    margin: 5px;
+  }
 `;
 
 export default DefaultButton;

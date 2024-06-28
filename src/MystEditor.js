@@ -66,8 +66,7 @@ const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val
 const predefinedButtons = {
   printToPdf: {
     id: "print-to-pdf",
-    text: "Print to PDF",
-    action: window.print,
+    action: () => window.print(),
   },
   templateManager: { id: "template-manager" },
   copyHtml: { id: "copy-html" },
