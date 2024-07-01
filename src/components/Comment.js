@@ -7,6 +7,7 @@ import { ExtensionBuilder } from "../extensions";
 import { YComments } from "../comments/ycomments";
 import commentIcon from "../icons/comment.svg?url";
 import trashcanIcon from "../icons/trashcan.svg?url";
+import resolveIcon from "../icons/resolve.svg?url";
 
 const YCommentWrapper = styled.div`
   position: absolute;
@@ -132,7 +133,8 @@ const YComment = ({ ycomments, commentId }) => {
             <path d="M1 1V25" stroke="#DDDDDD" stroke-width="0.75" stroke-linecap="round" />
           </svg>
 
-          <${DeleteButton} onClick=${() => ycomments.deleteComment(commentId)} />
+          <${PopupButton} icon=${trashcanIcon} bgOnHover=${"#e7473c15"} text="DELETE" onClick=${() => ycomments.deleteComment(commentId)} />
+          <${PopupButton} icon=${resolveIcon} bgOnHover=${"#AAE17320"} text="RESOLVE" onClick=${() => ycomments.resolveComment(commentId)} />
         <//>
       `}
 
@@ -142,7 +144,7 @@ const YComment = ({ ycomments, commentId }) => {
 };
 
 const YCommentPopup = styled.div`
-  width: 114px;
+  width: fit-content;
   height: 25px;
   border-radius: 2px;
   position: absolute;
@@ -161,27 +163,32 @@ const YCommentPopup = styled.div`
     margin-right: 10px;
   }
 
+  .resolve-icon {
+    height: 20px;
+    padding: 3px;
+  }
+
   svg {
     box-sizing: content-box;
   }
 `;
 
-const PopupButton = styled.div`
+const PopupButtonWrapper = styled.div`
   display: inline-flex;
   cursor: pointer;
-  position: absolute;
   padding-left: 5px;
   padding-right: 5px;
 
   &:hover {
-    background-color: #e7473c15;
+    background-color: ${(props) => props.bgOnHover};
   }
 
   img {
     height: 20px;
   }
 
-  .delete-btn {
+  .delete-btn,
+  .resolve-btn {
     color: #e7473c;
     line-height: 25px;
     font-size: 10px;
@@ -190,7 +197,8 @@ const PopupButton = styled.div`
     box-sizing: content-box;
   }
 
-  .delete-icon {
+  .delete-icon,
+  resolve-icon {
     width: 11px;
     margin-top: 2px;
     margin-left: 5px;
@@ -198,11 +206,11 @@ const PopupButton = styled.div`
   }
 `;
 
-const DeleteButton = ({ onClick }) => {
+const PopupButton = ({ icon, onClick, text, bgOnHover }) => {
   return html`
-    <${PopupButton} onClick=${onClick}>
-      <img class="delete-icon" src=${trashcanIcon} />
-      <span class="delete-btn"> DELETE </span>
+    <${PopupButtonWrapper} bgOnHover=${bgOnHover} onClick=${onClick}>
+      <img class="resolve-icon" src=${icon} />
+      <span class="resolve-btn"> ${text} </span>
     <//>
   `;
 };
