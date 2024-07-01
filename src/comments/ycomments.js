@@ -4,11 +4,26 @@ import { WebsocketProvider } from "y-websocket";
 
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
- * @typedef {{ [id: string]: CommentInfo }} AllCommentInfo
+ * This is the "local" state of all comments:
+ *  * `height` - Number of lines in the comment. We need to know this in order to create a
+ *               placeholder for the comment in the CodeMirror instance.
+ *  * `isShown` - Whether this comment was hidden by the user.
+ *  * `top` - (in pixels) is the vertical space between the top of CodeMirror and the placeholder
+ *            over which the comment will be displayed.
  */
 
-const randomId = () => "comment-" + Math.random().toString().replace(".", "");
+const newRandomCommentId = () => "comment-" + Math.random().toString().replace(".", "");
 
+/**
+ * This is the interface for controlling a comment's line authorship. `lineAuthors` tells us which
+ * lines were made by which users.
+ *
+ * NOTE: Code mirror's uses 0-based indexing of line numbers whereas Y.Array uses 0-based indexing.
+ * Since this interface is used primarily from CodeMirror the functions expect the 1-based line index.
+ *
+ * NOTE: `lineAuthors` is an Y.Array of Y.Map. This is necessary since the values inserted
+ * into Y.Array are immutable (if they are not Y.js primitives).
+ */
 export class CommentLineAuthors {
   constructor(/** @type {Y.Doc} */ ydoc, provider, getAvatar, commentId) {
     this.user = provider.awareness.getLocalState().user;
@@ -18,6 +33,7 @@ export class CommentLineAuthors {
     this.getAvatar = getAvatar;
   }
 
+  /** Check who made the line at `lineNumber` */
   get(lineNumber) {
     const authorData = this.lineAuthors.get(lineNumber - 1)?.get("author");
     if (!authorData) return;
@@ -26,6 +42,7 @@ export class CommentLineAuthors {
     return authorData;
   }
 
+  /** Set the current user as the author of the line */
   mark(line) {
     while (line >= this.lineAuthors.length) {
       this.lineAuthors.push([new Y.Map()]);
@@ -34,10 +51,12 @@ export class CommentLineAuthors {
     this.lineAuthors.get(line - 1).set("author", this.user);
   }
 
+  /** Remove line authorships information for lines in range `[line, line + diff)`. */
   remove(line, diff) {
     this.lineAuthors.delete(line - 1, diff);
   }
 
+  /** Set this user as the author of `[line, line + diff)`. */
   insert(line, diff) {
     if (line - 1 > this.lineAuthors.length) {
       this.lineAuthors.push(
@@ -52,7 +71,8 @@ export class CommentLineAuthors {
     );
   }
 
-  /** Find the first line which has the same author as `originalLineNumber` with no other authors in-between */
+  /** Find the first line which has the same author as `originalLineNumber` with no other
+   * authors in-between */
   firstLineOfSection(originalLineNumber) {
     const author = this.get(originalLineNumber).name;
     return this.lineAuthors
@@ -66,6 +86,8 @@ export class CommentLineAuthors {
   }
 }
 
+/** This class controls the position of comments in the text. That is, which
+ * comments are assigned to which line numbers. */
 export class CommentPositionManager {
   /** @param {Y.Doc} ydoc */
   constructor(ydoc) {
@@ -116,6 +138,10 @@ export class CommentPositionManager {
   }
 }
 
+/** Controls the local state of comments: Their position and visibility
+ *
+ * NOTE: The information about visibility is used in Preact hooks, therefore a `onUpdate`
+ *  method is provided, which allows modifying a component when `DisplayManager`'s state changes. */
 export class DisplayManager {
   constructor() {
     this.comments = {};
@@ -243,10 +269,10 @@ export class YComments {
   }
 
   newComment(lineNumber) {
-    const newCommentId = randomId();
+    const newCommentId = newRandomCommentId();
     this.positions().set(newCommentId, lineNumber.toString());
     this.display().new(newCommentId);
-    this.lineAuthors(newCommentId).mark(1);
+    this.lineAuthors(newCommentId).mark(1); // Mark the first line with the current user
     this.newLocalComment = true;
     return newCommentId;
   }
