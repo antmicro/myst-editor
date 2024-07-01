@@ -28,6 +28,15 @@ const EditorParent = styled.div`
         return ".myst-preview { display: none }";
       case "Diff":
         return ".myst-main-editor { display: none }; .myst-preview { display: none }";
+        return ".main-editor { display: none }; .resolved { display: none }";
+      case "Source":
+        return ".preview { display: none }; .resolved { display: none }";
+      case "Both":
+        return ".resolved { display: none }";
+      case "Diff":
+        return ".main-editor { display: none }; .preview { display: none } .resolved { display: none }";
+      case "Resolved":
+        return ".preview { display: none };";
       default:
         return ``;
     }

@@ -8,6 +8,7 @@ import { ExtensionBuilder } from "../extensions";
 import { YCommentsParent } from "../components/Comment";
 import useComments from "../hooks/useComments";
 import commentIcon from "../icons/comment.svg?raw";
+import ResolvedComments from "./Resolved";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -227,6 +228,9 @@ const CodeMirror = ({ text, id, name, mode, collaboration, spellcheckOpts, highl
       ${collaboration.enabled && !ready && !error && html`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
       ${collaboration.commentsEnabled && !error ? html`<${YCommentsParent} ycomments=${ycomments} />` : ""}
     <//>
+
+    ${collaboration.commentsEnabled && !error ? html`<${ResolvedComments} ycomments=${ycomments} />` : ""}
+
     <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;
 };

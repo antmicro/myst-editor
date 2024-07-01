@@ -178,6 +178,7 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
     { id: "preview", tooltip: "Preview", action: () => setMode("Preview"), icon: PreviewIcon },
     { id: "both", tooltip: "Dual Pane", action: () => setMode("Both"), icon: BothIcon },
     { id: "diff", tooltip: "Diff View", action: () => setMode("Diff"), icon: DiffIcon },
+    { id: "resolved", tooltip: "Resolved Comments", action: () => setMode("Resolved"), icon: ResolvedIcon },
   ];
   const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), []);
   const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), []);
@@ -188,7 +189,7 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
           <${TopbarButton} className="icon" type="button" key=${button.id} title=${button.tooltip} name=${button.id} onClick=${button.action}>
             ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
           <//>
-        `,
+        `
       )}
       ${buttons.find((b) => b.id === "template-manager") && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
       ${alert && html`<${Alert}> ${alert} <//>`}

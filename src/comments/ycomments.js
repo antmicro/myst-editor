@@ -210,6 +210,25 @@ export class DisplayManager {
   }
 }
 
+export class ResolvedComments {
+  constructor(provider, /** @type {Y.Doc} */ ydoc) {
+    this.user = provider.awareness.getLocalState().user;
+    this.resolvedComments = ydoc.getMap("resolved-comments");
+  }
+
+  resolve(commentId, resolvedLine) {
+    this.resolvedComments.set(commentId, JSON.stringify({ resolvedLine, resolvedBy: this.user }));
+  }
+
+  resolved() {
+    return [...this.resolvedComments.entries()].map(([commentId, data]) => ({ commentId, ...JSON.parse(data) }));
+  }
+
+  onUpdate(f) {
+    this.resolvedComments.observe(() => f(this.resolved()));
+  }
+}
+
 export class YComments {
   static commentsPrefix = "comments/";
 
@@ -228,7 +247,8 @@ export class YComments {
     this.newLocalComment = false;
 
     this.positionManager = new CommentPositionManager(ydoc);
-    this.displayManager = new DisplayManager();
+    this.displayManager = new DisplayManager(provider);
+    this.commentResolver = new ResolvedComments(provider, ydoc);
     this.draggedComment = null;
     this.commentWithPopup = null;
 
@@ -245,6 +265,10 @@ export class YComments {
 
   display() {
     return this.displayManager;
+  }
+
+  resolver() {
+    return this.commentResolver;
   }
 
   registerCodeMirror(cm) {
@@ -281,6 +305,15 @@ export class YComments {
     this.positions().del(commentId);
     this.display().del(commentId);
     this.delText(commentId);
+  }
+
+  resolveComment(commentId) {
+    const lineNumber = this.positions().get(commentId);
+    this.positions().del(commentId);
+    this.display().del(commentId);
+
+    const lineContent = this.mainCodeMirror.state.doc.line(lineNumber);
+    this.resolver().resolve(commentId, lineContent.text.slice(0, 20));
   }
 
   isEmpty(commentId) {
