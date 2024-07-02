@@ -5,7 +5,7 @@ import { WebsocketProvider } from "y-websocket";
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
  * This is the "local" state of all comments:
- *  * `height` - Number of lines in the comment. We need to know this in order to create a
+ *  * `height` - Height (in pixels) of the comment. We need to know this in order to create a
  *               placeholder for the comment in the CodeMirror instance.
  *  * `isShown` - Whether this comment was hidden by the user.
  *  * `top` - (in pixels) is the vertical space between the top of CodeMirror and the placeholder
