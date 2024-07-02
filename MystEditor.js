@@ -26077,7 +26077,7 @@ const T7 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
   }
 
   .cm-gutters {
-    display: none;
+    border-width: 0;
   }
 
   .cm-content {
