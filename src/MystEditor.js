@@ -45,8 +45,8 @@ const EditorParent = styled.div`
 
 const MystWrapper = styled.div`
   padding: 20px;
-  display: flex;
-  flex-flow: row wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   width: 100%;
   position: relative;
   background-color: white;

@@ -3,8 +3,6 @@ import { useState, useEffect, useReducer, useRef, useMemo } from "preact/hooks";
 import styled from "styled-components";
 
 const ResolvedWrapper = styled.div`
-  flex: 1;
-  width: 50%;
 `;
 
 ResolvedWrapper.defaultProps = { className: "resolved" };
