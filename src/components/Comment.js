@@ -28,7 +28,7 @@ const YCommentWrapper = styled.div`
   }
 
   .cm-gutters {
-    display: none;
+    border-width: 0;
   }
 
   .cm-content {
