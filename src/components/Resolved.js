@@ -124,6 +124,13 @@ const CommentLine = styled.span`
     margin-bottom: 12px;
     padding-bottom: 8px;
   `};
+
+  ${(props) =>
+    props.lastForeignLine &&
+    `
+    margin-bottom: -10px;
+    padding-bottom: 8px;
+  `}
 `;
 
 ResolvedWrapper.defaultProps = { className: "resolved" };
@@ -169,6 +176,8 @@ const ResolvedComments = ({ ycomments }) => {
                         authors[idx].get(i).name !== authors[idx].get(i + 1).name}
                         spacingBottom=${authors[idx].get(i + 1).name !== authors[idx].get(1).name &&
                         authors[idx].get(Math.min(i + 2, commentContents[c.commentId].split("\n").length)).name !== authors[idx].get(i + 1).name}
+                        lastForeignLine=${authors[idx].get(i + 1).name !== authors[idx].get(1).name &&
+                        i + 1 == commentContents[c.commentId].split("\n").length}
                         >${line}<//
                       >
                     `,
