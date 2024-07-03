@@ -26417,7 +26417,7 @@ const q7 = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewB
       i.enabled && (u.disconnect(), p.destroy()), y.destroy();
     };
   }, [g]), H`
-    <${jC} className="main-editor" ref=${h} $mode=${r} id="${e}-editor">
+    <${jC} className="myst-main-editor" ref=${h} $mode=${r} id="${e}-editor">
       ${m && H`<div class="editor-msg collab-error">No connection to the collaboration server</div>`}
       ${i.enabled && !g && !m && H`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
       ${i.commentsEnabled && !m ? H`<${I7} ycomments=${O} />` : ""}
@@ -26755,7 +26755,7 @@ const q7 = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewB
   }
 `;
 zC.defaultProps = {
-  className: "preview"
+  className: "myst-preview"
 };
 class Ze {
   constructor(e, n, r, i) {
@@ -35247,11 +35247,11 @@ const e$e = fe.div`
   ${(t) => {
   switch (t.mode) {
     case "Preview":
-      return ".main-editor { display: none }";
+      return ".myst-main-editor { display: none }";
     case "Source":
-      return ".preview { display: none }";
+      return ".myst-preview { display: none }";
     case "Diff":
-      return ".main-editor { display: none }; .preview { display: none }";
+      return ".myst-main-editor { display: none }; .myst-preview { display: none }";
     default:
       return "";
   }
