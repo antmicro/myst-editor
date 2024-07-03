@@ -174,10 +174,10 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
   const titleHtml = useMemo(() => purify.sanitize(renderMdLinks(title || ""), []));
 
   const editorModeButtons = [
-    { id: "source", action: () => setMode("Source"), icon: SourceIcon },
-    { id: "preview", action: () => setMode("Preview"), icon: PreviewIcon },
-    { id: "both", action: () => setMode("Both"), icon: BothIcon },
-    { id: "diff", action: () => setMode("Diff"), icon: DiffIcon },
+    { id: "source", tooltip: "Source", action: () => setMode("Source"), icon: SourceIcon },
+    { id: "preview", tooltip: "Preview", action: () => setMode("Preview"), icon: PreviewIcon },
+    { id: "both", tooltip: "Dual Pane", action: () => setMode("Both"), icon: BothIcon },
+    { id: "diff", tooltip: "Diff View", action: () => setMode("Diff"), icon: DiffIcon },
   ];
   const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), []);
   const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), []);
