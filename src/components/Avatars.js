@@ -35,16 +35,25 @@ const AvatarsWrapper = styled.div`
   }
 `;
 
-const Avatar = ({ login, color, avatarUrl }) => html` <img src=${avatarUrl} key=${login} class="avatar" style="border-color: ${color}" />`;
+const Avatar = ({ login, color, avatarUrl }) =>
+  html` <img src=${avatarUrl} key=${login} title=${login} class="avatar" style="border-color: ${color}" />`;
 
-const AvatarPlaceholder = ({ n }) =>
-  html` <${AvatarsWrapper}>
+const AvatarPlaceholder = ({ n, usernames }) =>
+  html` <${AvatarsWrapper} title=${usernames}>
     <span class="avatar placeholder">+${n}</span>
   <//>`;
 
 const Avatars = ({ users }) =>
   html` <${AvatarsWrapper}>
-    ${users.length > MAX_AVATARS ? html`<${AvatarPlaceholder} n=${users.length - MAX_AVATARS} />` : ""}
+    ${users.length > MAX_AVATARS
+      ? html`<${AvatarPlaceholder}
+          n=${users.length - MAX_AVATARS}
+          usernames=${users
+            .filter((_, idx) => idx >= MAX_AVATARS)
+            .map((u) => u.login)
+            .join(", ")}
+        />`
+      : ""}
     ${users.filter((u, idx) => idx < MAX_AVATARS).map((user) => html`<${Avatar} ...${user} />`)}
   <//>`;
 
