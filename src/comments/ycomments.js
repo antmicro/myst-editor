@@ -313,7 +313,7 @@ export class YComments {
     this.display().del(commentId);
 
     const lineContent = this.mainCodeMirror.state.doc.line(lineNumber);
-    this.resolver().resolve(commentId, lineContent.text.slice(0, 20));
+    this.resolver().resolve(commentId, lineContent.text);
   }
 
   isEmpty(commentId) {

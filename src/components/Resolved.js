@@ -44,6 +44,11 @@ const ResolvedLine = styled.p`
   font-size: 16px;
   padding: 10px 6px;
   margin-bottom: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 90ch;
+  max-width: 90%;
 `;
 
 const ThreadContainer = styled.div`
@@ -131,7 +136,7 @@ const ResolvedComments = ({ ycomments }) => {
         contents[commentId] = ycomments.getTextForComment(commentId).toString();
         return contents;
       }, {}),
-    [resolvedComments]
+    [resolvedComments],
   );
   let authors = useMemo(() => resolvedComments.map((c) => ycomments.lineAuthors(c.commentId)), [resolvedComments]);
 
@@ -166,12 +171,12 @@ const ResolvedComments = ({ ycomments }) => {
                         authors[idx].get(Math.min(i + 2, commentContents[c.commentId].split("\n").length)).name !== authors[idx].get(i + 1).name}
                         >${line}<//
                       >
-                    `
+                    `,
                   )}
               <//>
             <//>
           </div>
-        `
+        `,
       )}
     <//>
   <//>`;

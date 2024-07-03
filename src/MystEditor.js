@@ -46,7 +46,7 @@ const EditorParent = styled.div`
 const MystWrapper = styled.div`
   padding: 20px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(calc(50%), 1fr) minmax(calc(50%), 1fr);
   width: 100%;
   position: relative;
   background-color: white;
