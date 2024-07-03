@@ -12,7 +12,7 @@ const ResolvedWrapper = styled.div`
   border-radius: var(--border-radius);
   font-family: "Lato", sans-serif;
   color: var(--gray-900);
-  
+
   & h1 {
     font-size: 20px;
     padding-left: 100px;
@@ -31,10 +31,40 @@ const VerticalSparator = styled.hr`
 const CommentsContainer = styled.div`
   margin-left: 100px;
   border-left: 1px solid var(--gray-600);
-  
-  & ul,p {
+
+  & ul,
+  p {
     margin-top: 0;
   }
+`;
+
+const ResolvedLine = styled.p`
+  font-family: monospace;
+  font-size: 16px;
+  padding: 10px 6px;
+  margin-bottom: 0;
+`;
+
+const ThreadContainer = styled.div`
+  background-color: #c2e0fb;
+  border: 2px solid #3397f1;
+  padding: 10px 6px;
+  margin-left: -1px;
+  width: calc(100% - 14px);
+`;
+
+const ThreadAuthor = styled.h2`
+  font-weight: bold;
+  font-size: 12px;
+  margin: 0;
+`;
+
+const CommentContent = styled.p`
+  margin: 0;
+  margin-top: 13px;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 400;
 `;
 
 ResolvedWrapper.defaultProps = { className: "resolved" };
@@ -47,7 +77,7 @@ const ResolvedComments = ({ ycomments }) => {
         contents[commentId] = ycomments.getTextForComment(commentId).toString();
         return contents;
       }, {}),
-    [resolvedComments],
+    [resolvedComments]
   );
 
   ycomments.resolver().onUpdate(setResolvedComments);
@@ -56,16 +86,17 @@ const ResolvedComments = ({ ycomments }) => {
     <h1>Resolved comments</h1>
     <${VerticalSparator} />
     <${CommentsContainer}>
-      <ul>
-        ${resolvedComments.map(
-          (c) =>
-            html`<li key=${c.commentId}>
-              <p>${c.resolvedLine}</p>
-              <p>${c.resolvedBy.name}</p>
-              <p>${commentContents[c.commentId]}</p>
-            </li>`,
-        )}
-      </ul>
+      ${resolvedComments.map(
+        (c) => html`
+          <div key=${c.commentId}>
+            <${ResolvedLine}>${c.resolvedLine}<//>
+            <${ThreadContainer}>
+              <${ThreadAuthor}>${c.resolvedBy.name}<//>
+              <${CommentContent}>${commentContents[c.commentId]}<//>
+            <//>
+          </div>
+        `
+      )}
     <//>
   <//>`;
 };
