@@ -23,11 +23,11 @@ const EditorParent = styled.div`
   ${(props) => {
     switch (props.mode) {
       case "Preview":
-        return ".main-editor { display: none }";
+        return ".myst-main-editor { display: none }";
       case "Source":
-        return ".preview { display: none }";
+        return ".myst-preview { display: none }";
       case "Diff":
-        return ".main-editor { display: none }; .preview { display: none }";
+        return ".myst-main-editor { display: none }; .myst-preview { display: none }";
       default:
         return ``;
     }

@@ -330,6 +330,6 @@ const Preview = styled.div`
     }
   }
 `;
-Preview.defaultProps = { className: "preview" };
+Preview.defaultProps = { className: "myst-preview" };
 
 export default Preview;
