@@ -133,6 +133,11 @@ const CommentLine = styled.span`
   `}
 `;
 
+const LineNumber = styled.span`
+  position: absolute;
+  transform: translateX(-38px);
+`;
+
 ResolvedWrapper.defaultProps = { className: "resolved" };
 
 const ResolvedComments = ({ ycomments }) => {
@@ -156,7 +161,10 @@ const ResolvedComments = ({ ycomments }) => {
       ${resolvedComments.map(
         (c, idx) => html`
           <div key=${c.commentId}>
-            <${ResolvedLine}>${c.resolvedLine}<//>
+            <${ResolvedLine}>
+              <${LineNumber}>${c.lineNumber}<//>
+              ${c.resolvedLine}
+            <//>
             <${ThreadContainer} color=${authors[idx].get(1).color}>
               <${ThreadTopbar}>
                 <${FlexRow}>
