@@ -56,7 +56,7 @@ const ThreadContainer = styled.div`
   border: 2px solid ${(props) => props.color};
   padding: 10px 0;
   margin-left: -1px;
-  width: calc(100% - 14px);
+  width: calc(100% - 2px);
 `;
 
 const ThreadTopbar = styled.div`
