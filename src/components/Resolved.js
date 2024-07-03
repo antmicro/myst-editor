@@ -53,9 +53,23 @@ const ThreadContainer = styled.div`
   width: calc(100% - 14px);
 `;
 
+const ThreadTopbar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 22px;
+`;
+
 const ThreadAuthor = styled.h2`
   font-weight: bold;
   font-size: 12px;
+  margin: 0;
+`;
+
+const ResolvedBy = styled.p`
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14px;
   margin: 0;
 `;
 
@@ -94,7 +108,10 @@ const ResolvedComments = ({ ycomments }) => {
           <div key=${c.commentId}>
             <${ResolvedLine}>${c.resolvedLine}<//>
             <${ThreadContainer}>
-              <${ThreadAuthor}>${c.resolvedBy.name}<//>
+              <${ThreadTopbar}>
+                <${ThreadAuthor}>${c.resolvedBy.name}<//>
+                <${ResolvedBy}>Thread resolved by ${c.resolvedBy.name}<//>
+              <//>
               <${CommentContent}>${commentContents[c.commentId]}<//>
             <//>
           </div>
