@@ -1,6 +1,7 @@
 import { html } from "htm/preact";
 import { useState, useEffect, useReducer, useRef, useMemo } from "preact/hooks";
 import styled from "styled-components";
+import { Avatar } from "./Avatars";
 
 const ResolvedWrapper = styled.div`
   background-color: white;
@@ -46,8 +47,8 @@ const ResolvedLine = styled.p`
 `;
 
 const ThreadContainer = styled.div`
-  background-color: #c2e0fb;
-  border: 2px solid #3397f1;
+  background-color: color-mix(in srgb, ${(props) => props.color}, white);
+  border: 2px solid ${(props) => props.color};
   padding: 10px 6px;
   margin-left: -1px;
   width: calc(100% - 14px);
@@ -71,6 +72,7 @@ const ResolvedBy = styled.p`
   font-weight: 400;
   line-height: 14px;
   margin: 0;
+  margin-right: 25px;
 `;
 
 const CommentContent = styled.p`
@@ -80,6 +82,22 @@ const CommentContent = styled.p`
   line-height: 22px;
   font-weight: 400;
   white-space: pre-wrap;
+`;
+
+const FlexRow = styled.div`
+  display: flex;
+  align-items: center;
+
+  & .avatar {
+    border-radius: 50%;
+    margin-top: 5px;
+    float: right;
+    border: 3px solid;
+    height: 28px;
+    width: 28px;
+    position: absolute;
+    transform: translateX(-46px);
+  }
 `;
 
 ResolvedWrapper.defaultProps = { className: "resolved" };
@@ -94,22 +112,26 @@ const ResolvedComments = ({ ycomments }) => {
       }, {}),
     [resolvedComments]
   );
+  let authors = useMemo(() => resolvedComments.map((c) => ycomments.lineAuthors(c.commentId)), [resolvedComments]);
 
   ycomments.resolver().onUpdate(setResolvedComments);
 
-  console.log(commentContents);
+  console.log(commentContents, resolvedComments, authors[0].get(1));
 
   return html` <${ResolvedWrapper}>
     <h1>Resolved comments</h1>
     <${VerticalSparator} />
     <${CommentsContainer}>
       ${resolvedComments.map(
-        (c) => html`
+        (c, idx) => html`
           <div key=${c.commentId}>
             <${ResolvedLine}>${c.resolvedLine}<//>
-            <${ThreadContainer}>
+            <${ThreadContainer} color=${authors[idx].get(1).color}>
               <${ThreadTopbar}>
-                <${ThreadAuthor}>${c.resolvedBy.name}<//>
+                <${FlexRow}>
+                  <${Avatar} login=${authors[idx].get(1).name} color=${authors[idx].get(1).color} avatarUrl=${authors[idx].get(1).avatar} />
+                  <${ThreadAuthor}>${authors[idx].get(1).name}<//>
+                <//>
                 <${ResolvedBy}>Thread resolved by ${c.resolvedBy.name}<//>
               <//>
               <${CommentContent}>${commentContents[c.commentId]}<//>
