@@ -49,7 +49,7 @@ const ResolvedLine = styled.p`
 const ThreadContainer = styled.div`
   background-color: color-mix(in srgb, ${(props) => props.color}, white);
   border: 2px solid ${(props) => props.color};
-  padding: 10px 6px;
+  padding: 10px 0;
   margin-left: -1px;
   width: calc(100% - 14px);
 `;
@@ -59,6 +59,7 @@ const ThreadTopbar = styled.div`
   justify-content: space-between;
   align-items: center;
   line-height: 22px;
+  padding: 0 6px;
 `;
 
 const ThreadAuthor = styled.h2`
@@ -81,7 +82,6 @@ const CommentContent = styled.p`
   font-size: 16px;
   line-height: 22px;
   font-weight: 400;
-  white-space: pre-wrap;
 `;
 
 const FlexRow = styled.div`
@@ -100,6 +100,27 @@ const FlexRow = styled.div`
   }
 `;
 
+const CommentLine = styled.span`
+  display: block;
+  background-color: color-mix(in srgb, ${(props) => props.color}, white);
+  margin: 0;
+  padding: 0 6px;
+
+  ${(props) =>
+    props.spacingTop &&
+    `
+    margin-top: 12px;
+    padding-top: 8px;
+  `};
+
+  ${(props) =>
+    props.spacingBottom &&
+    `
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  `};
+`;
+
 ResolvedWrapper.defaultProps = { className: "resolved" };
 
 const ResolvedComments = ({ ycomments }) => {
@@ -115,8 +136,6 @@ const ResolvedComments = ({ ycomments }) => {
   let authors = useMemo(() => resolvedComments.map((c) => ycomments.lineAuthors(c.commentId)), [resolvedComments]);
 
   ycomments.resolver().onUpdate(setResolvedComments);
-
-  console.log(commentContents, resolvedComments, authors[0].get(1));
 
   return html` <${ResolvedWrapper}>
     <h1>Resolved comments</h1>
@@ -134,7 +153,22 @@ const ResolvedComments = ({ ycomments }) => {
                 <//>
                 <${ResolvedBy}>Thread resolved by ${c.resolvedBy.name}<//>
               <//>
-              <${CommentContent}>${commentContents[c.commentId]}<//>
+              <${CommentContent}>
+                ${commentContents[c.commentId]
+                  .split("\n")
+                  .map(
+                    (line, i) => html`
+                      <${CommentLine}
+                        color=${authors[idx].get(i + 1).color}
+                        spacingTop=${authors[idx].get(i + 1).name !== authors[idx].get(1).name &&
+                        authors[idx].get(i).name !== authors[idx].get(i + 1).name}
+                        spacingBottom=${authors[idx].get(i + 1).name !== authors[idx].get(1).name &&
+                        authors[idx].get(Math.min(i + 2, commentContents[c.commentId].split("\n").length)).name !== authors[idx].get(i + 1).name}
+                        >${line}<//
+                      >
+                    `
+                  )}
+              <//>
             <//>
           </div>
         `
