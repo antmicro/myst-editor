@@ -136,6 +136,7 @@ const CommentLine = styled.span`
 const LineNumber = styled.span`
   position: absolute;
   transform: translateX(-38px);
+  color: var(--gray-700);
 `;
 
 ResolvedWrapper.defaultProps = { className: "resolved" };
