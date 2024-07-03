@@ -104,7 +104,7 @@ const TemplateManager = ({ text, templatelist }) => {
             error,
             message: "Template configuration is not valid",
           });
-        }),
+        })
       )
       .catch((error) => {
         console.warn(error);
@@ -170,7 +170,7 @@ const TemplateManager = ({ text, templatelist }) => {
       }}
       changeDocumentTemplate=${changeDocumentTemplate}
     />`}
-    <${Dropdown}>
+    <${Dropdown} title="Templates">
       <${TopbarButton} className="icon" type="button"><${TemplateIcon} /><//>
       <${TemplatesList}>
         <${TemplateDropdownContent}>
@@ -195,7 +195,7 @@ const TemplateManager = ({ text, templatelist }) => {
                       >${readyTemplates[key].id}
                     <//>
                   `}
-            `,
+            `
           )}
         <//>
       <//>

@@ -51,10 +51,11 @@ const ButtonGroup = ({ buttons, initialClickedId = 2 }) => {
             setClickedId(i);
             button.action();
           }}
+          title=${button.tooltip}
           active=${i === clickedId}
         >
           ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
-        <//>`,
+        <//>`
     )}
   <//>`;
 };

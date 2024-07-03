@@ -66,12 +66,13 @@ const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val
 const predefinedButtons = {
   printToPdf: {
     id: "print-to-pdf",
+    tooltip: "Print document as pdf",
     action: () => window.print(),
   },
   templateManager: { id: "template-manager" },
-  copyHtml: { id: "copy-html" },
-  fullscreen: { id: "fullscreen" },
-  refresh: { id: "refresh" },
+  copyHtml: { id: "copy-html", tooltip: "Copy document as HTML" },
+  fullscreen: { id: "fullscreen", tooltip: "Fullscreen" },
+  refresh: { id: "refresh", tooltip: "Refresh issue links" },
 };
 
 const defaultButtons = [
@@ -131,7 +132,7 @@ const MystEditor = ({
         ...b,
         action: b.action || buttonActions[b.id],
       })),
-    [],
+    []
   );
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
