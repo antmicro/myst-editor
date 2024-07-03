@@ -65,6 +65,7 @@ const CommentContent = styled.p`
   font-size: 16px;
   line-height: 22px;
   font-weight: 400;
+  white-space: pre-wrap;
 `;
 
 ResolvedWrapper.defaultProps = { className: "resolved" };
@@ -81,6 +82,8 @@ const ResolvedComments = ({ ycomments }) => {
   );
 
   ycomments.resolver().onUpdate(setResolvedComments);
+
+  console.log(commentContents);
 
   return html` <${ResolvedWrapper}>
     <h1>Resolved comments</h1>
