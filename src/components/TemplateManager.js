@@ -104,7 +104,7 @@ const TemplateManager = ({ text, templatelist }) => {
             error,
             message: "Template configuration is not valid",
           });
-        })
+        }),
       )
       .catch((error) => {
         console.warn(error);
@@ -195,7 +195,7 @@ const TemplateManager = ({ text, templatelist }) => {
                       >${readyTemplates[key].id}
                     <//>
                   `}
-            `
+            `,
           )}
         <//>
       <//>

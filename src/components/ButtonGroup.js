@@ -55,7 +55,7 @@ const ButtonGroup = ({ buttons, initialClickedId = 2 }) => {
           active=${i === clickedId}
         >
           ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
-        <//>`
+        <//>`,
     )}
   <//>`;
 };
