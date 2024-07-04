@@ -137,7 +137,7 @@ const MystEditor = ({
         ...b,
         action: b.action || buttonActions[b.id],
       })),
-    []
+    [],
   );
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
