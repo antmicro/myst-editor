@@ -23,20 +23,15 @@ const EditorParent = styled.div`
   ${(props) => {
     switch (props.mode) {
       case "Preview":
-        return ".myst-main-editor { display: none }";
+        return ".myst-main-editor { display: none } .myst-resolved { display: none }";
       case "Source":
-        return ".myst-preview { display: none }";
+        return ".myst-preview { display: none } .myst-resolved { display: none }";
       case "Diff":
-        return ".myst-main-editor { display: none }; .myst-preview { display: none }";
-        return ".main-editor { display: none }; .resolved { display: none }";
-      case "Source":
-        return ".preview { display: none }; .resolved { display: none }";
+        return ".myst-main-editor { display: none }; .myst-preview { display: none } .myst-resolved { display: none }";
       case "Both":
-        return ".resolved { display: none }";
-      case "Diff":
-        return ".main-editor { display: none }; .preview { display: none } .resolved { display: none }";
+        return ".myst-resolved { display: none }";
       case "Resolved":
-        return ".preview { display: none };";
+        return ".myst-preview { display: none };";
       default:
         return ``;
     }
@@ -141,7 +136,7 @@ const MystEditor = ({
         ...b,
         action: b.action || buttonActions[b.id],
       })),
-    [],
+    []
   );
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);

@@ -139,7 +139,7 @@ const LineNumber = styled.span`
   color: var(--gray-700);
 `;
 
-ResolvedWrapper.defaultProps = { className: "resolved" };
+ResolvedWrapper.defaultProps = { className: "myst-resolved" };
 
 const ResolvedComments = ({ ycomments }) => {
   let [resolvedComments, setResolvedComments] = useState(ycomments.resolver().resolved());
@@ -149,7 +149,7 @@ const ResolvedComments = ({ ycomments }) => {
         contents[commentId] = ycomments.getTextForComment(commentId).toString();
         return contents;
       }, {}),
-    [resolvedComments],
+    [resolvedComments]
   );
   let authors = useMemo(() => resolvedComments.map((c) => ycomments.lineAuthors(c.commentId)), [resolvedComments]);
 
@@ -189,12 +189,12 @@ const ResolvedComments = ({ ycomments }) => {
                         i + 1 == commentContents[c.commentId].split("\n").length}
                         >${line}<//
                       >
-                    `,
+                    `
                   )}
               <//>
             <//>
           </div>
-        `,
+        `
       )}
     <//>
   <//>`;
