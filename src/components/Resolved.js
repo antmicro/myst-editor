@@ -134,7 +134,7 @@ const CommentLine = styled.span`
 
 const LineNumber = styled.span`
   position: absolute;
-  transform: translateX(-38px);
+  transform: translateX(calc(-100% - 24px));
   color: var(--gray-700);
 `;
 
