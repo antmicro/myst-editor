@@ -1,5 +1,5 @@
 import { html } from "htm/preact";
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect, useRef } from "preact/hooks";
 import styled from "styled-components";
 import { Avatar } from "./Avatars";
 
@@ -181,12 +181,19 @@ const formatter = new Intl.RelativeTimeFormat("en", { style: "long" });
 
 const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
   const [difference, setDifference] = useState({ amount: 0, unit: "second" });
+  const timer = useRef(null);
 
-  function setTimeDifference(date) {
+  function setTimeDifference() {
     const secondDifference = Math.floor((Date.now() - c.resolvedDate) / 1000);
     const minuteDifference = Math.floor(secondDifference / 60);
     const hourDifference = Math.floor(minuteDifference / 60);
     const dayDifference = Math.floor(hourDifference / 24);
+    const monthDifference = Math.floor(dayDifference / 30);
+    const yearDifference = Math.floor(monthDifference / 12);
+
+    if (minuteDifference >= 60) {
+      clearInterval(timer.current);
+    }
 
     if (secondDifference < 60) {
       setDifference({ amount: secondDifference, unit: "second" });
@@ -194,15 +201,19 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
       setDifference({ amount: minuteDifference, unit: "minute" });
     } else if (hourDifference < 24) {
       setDifference({ amount: hourDifference, unit: "hour" });
-    } else {
+    } else if (dayDifference < 30) {
       setDifference({ amount: dayDifference, unit: "day" });
+    } else if (monthDifference < 12) {
+      setDifference({ amount: monthDifference, unit: "month" });
+    } else {
+      setDifference({ amount: yearDifference, unit: "year" });
     }
   }
 
   useEffect(() => {
-    const timer = setInterval(() => setTimeDifference(Date.now()), 1000);
+    timer.current = setInterval(setTimeDifference, 1000);
     return () => {
-      clearInterval(timer);
+      clearInterval(timer.current);
     };
   }, []);
 
