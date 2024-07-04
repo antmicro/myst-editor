@@ -28,7 +28,7 @@ const TooltipContent = styled.div`
     css`
       left: 50%;
     `}
-  transform: ${(props) => (props.$orientation == "left" ? "none" : "translateX(-25%)")};
+  transform: ${(props) => (props.$orientation == "left" ? "none" : "translateX(calc(50% - 14px))")};
 
   &::before {
     content: "";

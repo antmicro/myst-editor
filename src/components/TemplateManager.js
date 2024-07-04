@@ -152,6 +152,7 @@ const TemplateManager = ({ text, templatelist }) => {
   if (Object.keys(readyTemplates).length == 0) {
     return html` <${TopbarButton}
       type="button"
+      title="Templates"
       template=${template}
       onMouseEnter=${() => setShowTooltip(true)}
       onMouseLeave=${() => setShowTooltip(false)}
@@ -170,8 +171,8 @@ const TemplateManager = ({ text, templatelist }) => {
       }}
       changeDocumentTemplate=${changeDocumentTemplate}
     />`}
-    <${Dropdown} title="Templates">
-      <${TopbarButton} className="icon" type="button"><${TemplateIcon} /><//>
+    <${Dropdown}>
+      <${TopbarButton} className="icon" title="Templates" type="button"><${TemplateIcon} /><//>
       <${TemplatesList}>
         <${TemplateDropdownContent}>
           ${Object.keys(readyTemplates).map(
