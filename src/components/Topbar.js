@@ -216,7 +216,7 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
           <${TopbarButton} className="icon" type="button" key=${button.id} title=${button.tooltip} name=${button.id} onClick=${button.action}>
             ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
           <//>
-        `
+        `,
       )}
       ${buttons.find((b) => b.id === "template-manager") && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
       ${alert && html`<${Alert}> ${alert} <//>`}

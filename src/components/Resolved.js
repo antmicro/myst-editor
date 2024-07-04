@@ -223,7 +223,7 @@ const ResolvedComments = ({ ycomments }) => {
         contents[commentId] = ycomments.getTextForComment(commentId).toString();
         return contents;
       }, {}),
-    [resolvedComments]
+    [resolvedComments],
   );
   let authors = useMemo(() => resolvedComments.map((c) => ycomments.lineAuthors(c.commentId)), [resolvedComments]);
 
@@ -274,12 +274,12 @@ const ResolvedComments = ({ ycomments }) => {
                         i + 1 == commentContents[c.commentId].split("\n").length}
                         >${line}<//
                       >
-                    `
+                    `,
                   )}
               <//>
             <//>
           </div>
-        `
+        `,
       )}
     <//>
   <//>`;
