@@ -1,6 +1,7 @@
 import * as Y from "yjs";
 import { updateShownComments } from "./state";
 import { WebsocketProvider } from "y-websocket";
+import { ViewUpdate } from "@codemirror/view";
 
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
@@ -228,6 +229,11 @@ export class ResolvedComments {
     return [...this.resolvedComments.entries()].map(([commentId, data]) => ({ commentId, ...JSON.parse(data) }));
   }
 
+  updateLineNumber(commentId, lineNumber) {
+    console.log(lineNumber);
+    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), lineNumber }));
+  }
+
   onUpdate(f) {
     this.resolvedComments.observe(() => f(this.resolved()));
   }
@@ -392,6 +398,7 @@ export class YComments {
     this.syncCommentLocations(update);
     this.syncRemoteComments();
     this.removeLocalComments();
+    this.syncResolvedComments(update);
   }
 
   iterComments() {
@@ -408,6 +415,19 @@ export class YComments {
       this.mainCodeMirror.dispatch({ effects: updateShownComments.of(null) });
     } else {
       console.warn("[YComments] Failed to update the main CodeMirror instance since it doesn't exist.");
+    }
+  }
+
+  /** @param {ViewUpdate} update  */
+  syncResolvedComments(update) {
+    const resolvedComments = this.resolver().resolved();
+    for (const comment of resolvedComments) {
+      const oldPos = update.state.doc.line(comment.lineNumber).from;
+      const newPos = update.changes.mapPos(oldPos, 1);
+      const newLineNumber = update.state.doc.lineAt(newPos).number;
+      if (newLineNumber !== comment.lineNumber) {
+        this.resolver().updateLineNumber(comment.commentId, newLineNumber);
+      }
     }
   }
 }
