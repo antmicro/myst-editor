@@ -41,8 +41,12 @@ const CommentsContainer = styled.div`
 
 ResolvedWrapper.defaultProps = { className: "myst-resolved" };
 
+function dateComparator(c1, c2) {
+  return c1.resolvedDate - c2.resolvedDate;
+}
+
 const ResolvedComments = ({ ycomments }) => {
-  let [resolvedComments, setResolvedComments] = useState(ycomments.resolver().resolved());
+  let [resolvedComments, setResolvedComments] = useState(ycomments.resolver().resolved().sort(dateComparator));
   let commentContents = useMemo(
     () =>
       resolvedComments.reduce((contents, { commentId }) => {
@@ -53,7 +57,7 @@ const ResolvedComments = ({ ycomments }) => {
   );
   let authors = useMemo(() => resolvedComments.map((c) => ycomments.lineAuthors(c.commentId)), [resolvedComments]);
 
-  ycomments.resolver().onUpdate(setResolvedComments);
+  ycomments.resolver().onUpdate((comments) => setResolvedComments(comments.sort(dateComparator)));
 
   return html` <${ResolvedWrapper}>
     <h1>Resolved comments</h1>
