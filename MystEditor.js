@@ -34933,7 +34933,7 @@ const gAe = E$.exports, OAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   ${(t) => t.$orientation == "bottom" && Ro`
       left: 50%;
     `}
-  transform: ${(t) => t.$orientation == "left" ? "none" : "translateX(-25%)"};
+  transform: ${(t) => t.$orientation == "left" ? "none" : "translateX(calc(50% - 14px))"};
 
   &::before {
     content: "";
@@ -35049,6 +35049,7 @@ const gAe = E$.exports, OAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
       <//>
       <${h && Cw} tooltipOrientation="bottom" errorMessage=${f.message} />` : Object.keys(i).length == 0 ? G` <${Sc}
       type="button"
+      title="Templates"
       template=${n}
       onMouseEnter=${() => u(!0)}
       onMouseLeave=${() => u(!1)}
@@ -35062,8 +35063,8 @@ const gAe = E$.exports, OAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   }}
       changeDocumentTemplate=${m}
     />`}
-    <${RAe} title="Templates">
-      <${Sc} className="icon" type="button"><${td} /><//>
+    <${RAe}>
+      <${Sc} className="icon" title="Templates" type="button"><${td} /><//>
       <${ZAe}>
         <${DAe}>
           ${Object.keys(i).map((y) => G`
