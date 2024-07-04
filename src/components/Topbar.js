@@ -28,7 +28,7 @@ const Topbar = styled.div`
     }
   }
 
-  button:not(:disabled):not(view-menu):hover {
+  button:not(:disabled):not(view-menu):not(.radio-icon):hover {
     background-color: var(--icon-selected);
     border: 1px solid var(--icon-selected);
     .inner-copy {
@@ -81,18 +81,14 @@ const TopbarRight = styled.div`
   button[active] {
     pointer-events: none;
   }
-
-  button.icon:not(disabled):hover {
-    background-color: var(--icon-main-selected);
-    border: 1px solid var(--icon-main-selected);
-  }
 `;
 
-const Separator = styled.div`
-  border-left: 1px solid var(--separator);
-  height: 40px;
-  margin-right: 10px;
-  margin-left: 10px;
+export const TopbarButton = styled(DefaultButton)`
+  color: ${(props) => (props.active ? "white" : "var(--icon-color)")};
+  border: ${(props) => (props.active ? "1px solid var(--icon-main-active)" : "1px solid var(--icon-border)")};
+  background-color: ${(props) => (props.active ? "var(--icon-main-active)" : "var(--icon-bg)")};
+  margin: 5px;
+  width: 40px;
 `;
 
 const FullscreenIcon = () =>
@@ -187,7 +183,13 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
   const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), []);
   return html` <${Topbar}>
     <${TopbarLeft}>
-      <${ButtonGroup} buttons=${buttonsLeft} highlightActive=${false} initialClickedId=${null} />
+      ${buttonsLeft.map(
+        (button) => html`
+          <${TopbarButton} className="icon" type="button" key=${button.id} name=${button.id} onClick=${button.action}>
+            ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
+          <//>
+        `,
+      )}
       ${buttons.find((b) => b.id === "template-manager") && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
       ${alert && html`<${Alert}> ${alert} <//>`}
       <${Title} dangerouslySetInnerHTML=${{ __html: titleHtml }} />
@@ -196,8 +198,7 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
       <${Avatars} users=${users} />
       ${textButtons.map((b) => html`<${DefaultButton} type="button" onClick=${b.action}>${b.text}<//>`)}
 
-      <${Separator} />
-      <${ButtonGroup} buttons=${editorModeButtons} clickedId=${2} />
+      <${ButtonGroup} buttons=${editorModeButtons} initialClickedId=${2} />
     <//>
   <//>`;
 };
