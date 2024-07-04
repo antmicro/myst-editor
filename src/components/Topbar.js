@@ -185,7 +185,7 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
     <${TopbarLeft}>
       ${buttonsLeft.map(
         (button) => html`
-          <${TopbarButton} className="icon" type="button" key=${button.id} name=${button.id} onClick=${button.action}>
+          <${TopbarButton} className="icon" type="button" key=${button.id} title=${button.tooltip} name=${button.id} onClick=${button.action}>
             ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
           <//>
         `,
