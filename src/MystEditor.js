@@ -23,11 +23,11 @@ const EditorParent = styled.div`
   ${(props) => {
     switch (props.mode) {
       case "Preview":
-        return ".myst-main-editor { display: none } .myst-resolved { display: none }";
+        return ".myst-main-editor { display: none } .myst-resolved { display: none } .myst-editor-wrapper { grid-template-columns: minmax(50%, 1fr) }";
       case "Source":
-        return ".myst-preview { display: none } .myst-resolved { display: none }";
+        return ".myst-preview { display: none } .myst-resolved { display: none } .myst-editor-wrapper { grid-template-columns: minmax(50%, 1fr) }";
       case "Diff":
-        return ".myst-main-editor { display: none }; .myst-preview { display: none } .myst-resolved { display: none }";
+        return ".myst-main-editor { display: none }; .myst-preview { display: none } .myst-resolved { display: none } .myst-editor-wrapper { grid-template-columns: minmax(50%, 1fr) }";
       case "Both":
         return ".myst-resolved { display: none }";
       case "Resolved":
@@ -41,8 +41,9 @@ const EditorParent = styled.div`
 const MystWrapper = styled.div`
   padding: 20px;
   display: grid;
-  grid-template-columns: minmax(calc(50%), 1fr) minmax(calc(50%), 1fr);
-  width: 100%;
+  grid-template-columns: repeat(2, minmax(50%, 1fr));
+  box-sizing: border-box;
+  width: calc(100vw - (100vw - 100%)); /* screen width without scrollbar */
   position: relative;
   background-color: white;
   ${(props) => props.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;"}

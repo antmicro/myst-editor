@@ -47,8 +47,7 @@ const ResolvedLine = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 90ch;
-  max-width: 90%;
+  max-width: 95%;
 `;
 
 const ThreadContainer = styled.div`
