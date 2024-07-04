@@ -94,13 +94,11 @@ const FlexRow = styled.div`
 
   & .avatar {
     border-radius: 50%;
-    margin-top: 5px;
-    float: right;
     border: 3px solid;
     height: 28px;
     width: 28px;
     position: absolute;
-    transform: translateX(-46px);
+    transform: translateX(calc(-100% - 12px));
   }
 `;
 
