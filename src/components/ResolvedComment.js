@@ -14,7 +14,7 @@ const ResolvedLine = styled.p`
   max-width: 95%;
 `;
 
-const ThreadContainer = styled.div`
+const CommentContainer = styled.div`
   background-color: color-mix(in srgb, ${(props) => props.color}, white);
   border: 2px solid ${(props) => props.color};
   padding: 10px 0;
@@ -22,7 +22,7 @@ const ThreadContainer = styled.div`
   width: calc(100% - 2px);
 `;
 
-const ThreadTopbar = styled.div`
+const CommentTopbar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -30,7 +30,7 @@ const ThreadTopbar = styled.div`
   padding: 0 6px;
 `;
 
-const ThreadAuthor = styled.h2`
+const CommentAuthor = styled.h2`
   font-weight: bold;
   font-size: 12px;
   margin: 0;
@@ -223,20 +223,20 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
         <${LineNumber}>${c.lineNumber}<//>
         ${c.resolvedLine}
       <//>
-      <${ThreadContainer} color=${authors[idx].get(1).color}>
-        <${ThreadTopbar}>
+      <${CommentContainer} color=${authors[idx].get(1).color}>
+        <${CommentTopbar}>
           <${FlexRow}>
             <${Avatar} login=${authors[idx].get(1).name} color=${authors[idx].get(1).color} avatarUrl=${authors[idx].get(1).avatar} />
-            <${ThreadAuthor}>${authors[idx].get(1).name}<//>
+            <${CommentAuthor}>${authors[idx].get(1).name}<//>
           <//>
           <${FlexRow}>
-            <${ResolvedBy}>Thread resolved by @${c.resolvedBy.name} ${formatter.format(-difference.amount, difference.unit)}<//>
+            <${ResolvedBy}>Comment resolved by @${c.resolvedBy.name} ${formatter.format(-difference.amount, difference.unit)}<//>
             <${OptionsContainer}>
               <${OptionsIcon} />
               <${DropdownContainer}>
                 <${DropdownButton} onClick=${() => ycomments.resolver().delete(c.commentId)}>
                   <${DeleteIcon} />
-                  <p>DELETE THREAD</p>
+                  <p>DELETE COMMENT</p>
                 <//>
               <//>
             <//>
