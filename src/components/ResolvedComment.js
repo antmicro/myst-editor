@@ -1,4 +1,5 @@
 import { html } from "htm/preact";
+import { useState, useEffect } from "preact/hooks";
 import styled from "styled-components";
 import { Avatar } from "./Avatars";
 
@@ -176,7 +177,35 @@ const DeleteIcon = () => html`
   </svg>
 `;
 
+const formatter = new Intl.RelativeTimeFormat("en", { style: "long" });
+
 const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
+  const [difference, setDifference] = useState({ amount: 0, unit: "second" });
+
+  function setTimeDifference(date) {
+    const secondDifference = Math.floor((Date.now() - c.resolvedDate) / 1000);
+    const minuteDifference = Math.floor(secondDifference / 60);
+    const hourDifference = Math.floor(minuteDifference / 60);
+    const dayDifference = Math.floor(hourDifference / 24);
+
+    if (secondDifference < 60) {
+      setDifference({ amount: secondDifference, unit: "second" });
+    } else if (minuteDifference < 60) {
+      setDifference({ amount: minuteDifference, unit: "minute" });
+    } else if (hourDifference < 24) {
+      setDifference({ amount: hourDifference, unit: "hour" });
+    } else {
+      setDifference({ amount: dayDifference, unit: "day" });
+    }
+  }
+
+  useEffect(() => {
+    const timer = setInterval(() => setTimeDifference(Date.now()), 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
   return html`
     <div key=${c.commentId}>
       <${ResolvedLine}>
@@ -190,7 +219,7 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
             <${ThreadAuthor}>${authors[idx].get(1).name}<//>
           <//>
           <${FlexRow}>
-            <${ResolvedBy}>Thread resolved by ${c.resolvedBy.name}<//>
+            <${ResolvedBy}>Thread resolved by @${c.resolvedBy.name} ${formatter.format(-difference.amount, difference.unit)}<//>
             <${OptionsContainer}>
               <${OptionsIcon} />
               <${DropdownContainer}>
