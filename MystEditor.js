@@ -34767,6 +34767,7 @@ const gAe = E$.exports, OAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   height: 40px;
   display: flex;
   justify-content: center;
+  margin-top: 0px;
   align-items: center;
   padding: 0;
   transition: 0.4s ease;
