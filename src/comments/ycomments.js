@@ -61,13 +61,13 @@ export class CommentLineAuthors {
     if (line - 1 > this.lineAuthors.length) {
       this.lineAuthors.push(
         // Adjust array length so that we can safely insert new elements at index `line-1`
-        [...Array(line - 1 - this.lineAuthors.length).keys()].map((_) => new Y.Map()),
+        [...Array(line - 1 - this.lineAuthors.length).keys()].map((_) => new Y.Map())
       );
     }
 
     this.lineAuthors.insert(
       line - 1,
-      [...Array(diff).keys()].map((_) => new Y.Map([["author", this.user]])),
+      [...Array(diff).keys()].map((_) => new Y.Map([["author", this.user]]))
     );
   }
 
@@ -81,7 +81,7 @@ export class CommentLineAuthors {
       .reduceRight(
         // Go up until you find a line made by a different author
         (prev, { name, lineNumber }) => (name == author && lineNumber == prev - 1 ? lineNumber : prev),
-        originalLineNumber,
+        originalLineNumber
       );
   }
 }
@@ -220,6 +220,10 @@ export class ResolvedComments {
     this.resolvedComments.set(commentId, JSON.stringify({ resolvedLine, lineNumber, resolvedBy: this.user }));
   }
 
+  delete(commentId) {
+    this.resolvedComments.delete(commentId);
+  }
+
   resolved() {
     return [...this.resolvedComments.entries()].map(([commentId, data]) => ({ commentId, ...JSON.parse(data) }));
   }
@@ -349,7 +353,7 @@ export class YComments {
           comments[box.id].top = box.offsetTop;
         });
         return comments;
-      },
+      }
     );
   }
 
