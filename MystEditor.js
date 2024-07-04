@@ -34817,6 +34817,7 @@ const gAe = E$.exports, OAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
           onClick=${() => {
     r(s), i.action();
   }}
+          title=${i.tooltip}
           active=${s === n}
         >
           ${typeof i.icon == "function" ? G`<${i.icon} />` : G`<img src=${i.icon} />`}
@@ -35061,7 +35062,7 @@ const gAe = E$.exports, OAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   }}
       changeDocumentTemplate=${m}
     />`}
-    <${RAe}>
+    <${RAe} title="Templates">
       <${Sc} className="icon" type="button"><${td} /><//>
       <${ZAe}>
         <${DAe}>
@@ -35219,18 +35220,22 @@ const gAe = E$.exports, OAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
 }) => {
   const l = rt(() => Q$.sanitize(NAe(o || ""), [])), a = [{
     id: "source",
+    tooltip: "Source",
     action: () => r("Source"),
     icon: FAe
   }, {
     id: "preview",
+    tooltip: "Preview",
     action: () => r("Preview"),
     icon: zAe
   }, {
     id: "both",
+    tooltip: "Dual Pane",
     action: () => r("Both"),
     icon: GAe
   }, {
     id: "diff",
+    tooltip: "Diff View",
     action: () => r("Diff"),
     icon: HAe
   }], c = rt(() => s.map((u) => ({
@@ -35240,7 +35245,7 @@ const gAe = E$.exports, OAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
   return G` <${qAe}>
     <${YAe}>
       ${c.map((u) => G`
-          <${Sc} className="icon" type="button" key=${u.id} name=${u.id} onClick=${u.action}>
+          <${Sc} className="icon" type="button" key=${u.id} title=${u.tooltip} name=${u.id} onClick=${u.action}>
             ${typeof u.icon == "function" ? G`<${u.icon} />` : G`<img src=${u.icon} />`}
           <//>
         `)}
@@ -35301,19 +35306,23 @@ const n$e = (t) => {
 }, r$e = (t) => document.documentElement.style.overflow = t ? "hidden" : "visible", wo = {
   printToPdf: {
     id: "print-to-pdf",
+    tooltip: "Print document as pdf",
     action: () => window.print()
   },
   templateManager: {
     id: "template-manager"
   },
   copyHtml: {
-    id: "copy-html"
+    id: "copy-html",
+    tooltip: "Copy document as HTML"
   },
   fullscreen: {
-    id: "fullscreen"
+    id: "fullscreen",
+    tooltip: "Fullscreen"
   },
   refresh: {
-    id: "refresh"
+    id: "refresh",
+    tooltip: "Refresh issue links"
   }
 }, i$e = [wo.fullscreen, wo.copyHtml, wo.refresh, wo.printToPdf, wo.templateManager], c$e = ({
   name: t = "myst_editor_textarea",
