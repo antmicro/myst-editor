@@ -84,7 +84,17 @@ const ResolvedComments = ({ ycomments }) => {
         ? html`<${NoCommentsText}
             >No resolved comments yet, to resolve a comment hover over it's icon <img src=${CommentIcon} /> and click <span>RESOLVE</span><//
           >`
-        : resolvedComments.map((c, idx) => ResolvedComment({ c, idx, authors, ycomments, commentContents }))}
+        : resolvedComments.map(
+            (c, idx) =>
+              html`<${ResolvedComment}
+                key=${c.commentId}
+                c=${c}
+                idx=${idx}
+                authors=${authors}
+                ycomments=${ycomments}
+                commentContents=${commentContents}
+              />`,
+          )}
     <//>
   <//>`;
 };
