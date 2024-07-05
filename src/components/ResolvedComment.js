@@ -12,6 +12,7 @@ const ResolvedLine = styled.p`
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 95%;
+  min-height: 22px;
 `;
 
 const CommentContainer = styled.div`
