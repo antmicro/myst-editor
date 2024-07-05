@@ -443,18 +443,18 @@ export class YComments {
     const resolvedComments = this.resolver().resolved();
     for (const comment of resolvedComments) {
       const newPos = update.changes.mapPos(comment.pos, 1);
-      const newLineNumber = update.state.doc.lineAt(newPos + 1).number;
+      const newLineNumber = update.state.doc.lineAt(newPos).number;
 
       // check if the resolved line was deleted
-      if (
-        update.changes.mapPos(comment.pos, 1, MapMode.TrackDel) == null ||
-        (update.changes.mapPos(comment.pos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "")
-      ) {
+      const lineDeletedViaSelection = update.changes.mapPos(comment.pos, 1, MapMode.TrackDel) == null;
+      const backspacePressedOnEmptyLine =
+        update.changes.mapPos(comment.pos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "";
+      if (lineDeletedViaSelection || backspacePressedOnEmptyLine) {
         this.resolver().markOrphaned(comment.commentId);
         continue;
       }
 
-      if (!comment.orphaned && update.state.doc.lineAt(newPos).text != "") {
+      if (!comment.orphaned) {
         this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber, newPos);
       }
     }
