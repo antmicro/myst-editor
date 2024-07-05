@@ -78,13 +78,13 @@ export class CommentLineAuthors {
     if (line - 1 > this.lineAuthors.length) {
       this.lineAuthors.push(
         // Adjust array length so that we can safely insert new elements at index `line-1`
-        [...Array(line - 1 - this.lineAuthors.length).keys()].map((_) => new Y.Map())
+        [...Array(line - 1 - this.lineAuthors.length).keys()].map((_) => new Y.Map()),
       );
     }
 
     this.lineAuthors.insert(
       line - 1,
-      [...Array(diff).keys()].map((_) => new Y.Map([["author", this.user]]))
+      [...Array(diff).keys()].map((_) => new Y.Map([["author", this.user]])),
     );
   }
 
@@ -98,7 +98,7 @@ export class CommentLineAuthors {
       .reduceRight(
         // Go up until you find a line made by a different author
         (prev, { name, lineNumber }) => (name == author && lineNumber == prev - 1 ? lineNumber : prev),
-        originalLineNumber
+        originalLineNumber,
       );
   }
 }
@@ -379,7 +379,7 @@ export class YComments {
           comments[box.id].top = box.offsetTop;
         });
         return comments;
-      }
+      },
     );
   }
 
@@ -447,14 +447,14 @@ export class YComments {
 
       // check if the resolved line was deleted
       if (
-        update.changes.mapPos(comment.pos, 0, MapMode.TrackDel) == null ||
-        (update.changes.mapPos(comment.pos, 0, MapMode.TrackBefore) == null && update.state.doc.line(newLineNumber).text == "")
+        update.changes.mapPos(comment.pos, 1, MapMode.TrackDel) == null ||
+        (update.changes.mapPos(comment.pos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "")
       ) {
         this.resolver().markOrphaned(comment.commentId);
         continue;
       }
 
-      if (!comment.orphaned && update.state.doc.line(newLineNumber).text != "") {
+      if (!comment.orphaned && update.state.doc.lineAt(newPos).text != "") {
         this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber, newPos);
       }
     }
