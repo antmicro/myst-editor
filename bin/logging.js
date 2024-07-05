@@ -1,6 +1,19 @@
 import * as Y from 'yjs'
 
-const logAsync = (obj) => new Promise(r => console.log(JSON.stringify({ time: Date.now(), ...obj })) && r())
+import fs from 'fs'
+import path from 'path';
+
+if (process.env.LOGDIR) {
+    console.log(`Logging to ${process.env.LOGDIR}/{room name}/ydoc.log`)
+} else {
+    console.log("Logging is disabled");
+}
+
+const logFile = (room) => path.join(process.env.LOGDIR, room + ".log")
+
+const logAsync = (room, obj) =>
+    new Promise((r) => r(JSON.stringify({ time: Date.now(), ...obj }) + "\n"))
+        .then(data => fs.appendFileSync(logFile(room), data));
 
 const humanReadableDelta = (delta) => {
     delta.filter(d => typeof d.insert?.join == "function")
@@ -17,20 +30,24 @@ const peer = (/** @type {Y.Transaction}*/ transaction) => {
         const peerdata = transaction.origin?._sender?._socket?._peername;
         return { address: peerdata.address, port: peerdata.port }
     };
-    return null; 
+    return null;
 }
 
 export default (/** @type {Y.Doc} */ doc, docName) => {
+    if (!process.env.LOGDIR) return;
+
+    if (!fs.existsSync(process.env.LOGDIR)) {
+        fs.mkdirSync(process.env.LOGDIR, { recursive: true });
+    }
+
     doc.getXmlFragment("codemirror")
-        .observe((event, transaction) => logAsync({
+        .observe((event, transaction) => logAsync(docName, {
             peer: peer(transaction),
-            room: docName,
             ...humanReadableDelta(event.changes.delta)
         }));
 
-    const observeComment = (event, transaction) => logAsync({
+    const observeComment = (event, transaction) => logAsync(docName, {
         peer: peer(transaction),
-        room: docName,
         commentId: event.target.getAttribute("comment-id"),
         ...humanReadableDelta(event.changes.delta)
     });
@@ -40,7 +57,7 @@ export default (/** @type {Y.Doc} */ doc, docName) => {
         .observe((event, transaction) => {
             const newComments = event.currentTarget.toJSON();
 
-            logAsync({ peer: peer(transaction), room: docName, comments: newComments });
+            logAsync(docName, { peer: peer(transaction), room: docName, comments: newComments });
 
             Object.keys(newComments)
                 .filter(commentId => !comments[commentId])
