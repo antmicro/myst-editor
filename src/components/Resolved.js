@@ -2,6 +2,7 @@ import { html } from "htm/preact";
 import { useState, useMemo } from "preact/hooks";
 import styled from "styled-components";
 import ResolvedComment from "./ResolvedComment";
+import CommentIcon from "../icons/comment.svg";
 
 const ResolvedWrapper = styled.div`
   background-color: white;
@@ -39,6 +40,22 @@ const CommentsContainer = styled.div`
   }
 `;
 
+const NoCommentsText = styled.p`
+  padding: 10px 6px;
+
+  img {
+    margin: 0 5px;
+    transform: translateY(20%);
+  }
+
+  span {
+    color: #e7473c;
+    line-height: 25px;
+    font-size: 10px;
+    margin: 0 5px;
+  }
+`;
+
 ResolvedWrapper.defaultProps = { className: "myst-resolved" };
 
 function dateComparator(c1, c2) {
@@ -62,7 +79,13 @@ const ResolvedComments = ({ ycomments }) => {
   return html` <${ResolvedWrapper}>
     <h1>Resolved comments</h1>
     <${VerticalSparator} />
-    <${CommentsContainer}> ${resolvedComments.map((c, idx) => ResolvedComment({ c, idx, authors, ycomments, commentContents }))} <//>
+    <${CommentsContainer}>
+      ${resolvedComments.length === 0
+        ? html`<${NoCommentsText}
+            >No resolved comments yet, to resolve a comment hover over it's icon <img src=${CommentIcon} /> and click <span>RESOLVE</span><//
+          >`
+        : resolvedComments.map((c, idx) => ResolvedComment({ c, idx, authors, ycomments, commentContents }))}
+    <//>
   <//>`;
 };
 
