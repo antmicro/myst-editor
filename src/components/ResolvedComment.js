@@ -1,5 +1,5 @@
 import { html } from "htm/preact";
-import { useState, useEffect, useRef } from "preact/hooks";
+import { useState, useEffect, useRef, useMemo } from "preact/hooks";
 import styled from "styled-components";
 import { Avatar } from "./Avatars";
 
@@ -17,7 +17,7 @@ const ResolvedLine = styled.p`
 const CommentContainer = styled.div`
   background-color: color-mix(in srgb, ${(props) => props.color}, white);
   border: 2px solid ${(props) => props.color};
-  padding: 10px 0;
+  padding-top: 10px;
   margin-left: -1px;
   width: calc(100% - 2px);
 `;
@@ -46,7 +46,7 @@ const ResolvedBy = styled.p`
 
 const CommentContent = styled.p`
   margin: 0;
-  margin-top: 13px;
+  margin-top: 3px;
   font-size: 16px;
   line-height: 22px;
   font-weight: 400;
@@ -70,28 +70,8 @@ const CommentLine = styled.span`
   display: block;
   background-color: color-mix(in srgb, ${(props) => props.color}, white);
   margin: 0;
-  padding: 0 6px;
-
-  ${(props) =>
-    props.spacingTop &&
-    `
-    margin-top: 12px;
-    padding-top: 8px;
-  `};
-
-  ${(props) =>
-    props.spacingBottom &&
-    `
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-  `};
-
-  ${(props) =>
-    props.lastForeignLine &&
-    `
-    margin-bottom: -10px;
-    padding-bottom: 8px;
-  `}
+  padding: 10px 6px;
+  white-space: pre-wrap;
 `;
 
 const LineNumber = styled.span`
@@ -204,6 +184,19 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
   const [difference, setDifference] = useState({ amount: 0, unit: "second" });
   const timer = useRef(null);
 
+  const groupedLines = useMemo(() => {
+    const lines = commentContents[c.commentId].split("\n");
+    const grouped = [];
+    for (let i = 0; i < lines.length; i++) {
+      if (grouped.length == 0 || grouped[grouped.length - 1].author.name != authors[idx].get(i + 1).name) {
+        grouped.push({ text: lines[i], author: authors[idx].get(i + 1) });
+      } else {
+        grouped[grouped.length - 1].text += "\n" + lines[i];
+      }
+    }
+    return grouped;
+  }, [commentContents]);
+
   function setTimeDifference() {
     const secondDifference = Math.floor((Date.now() - c.resolvedDate) / 1000);
     const minuteDifference = Math.floor(secondDifference / 60);
@@ -267,23 +260,7 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
             <//>
           <//>
         <//>
-        <${CommentContent}>
-          ${commentContents[c.commentId]
-            .split("\n")
-            .map(
-              (line, i) => html`
-                <${CommentLine}
-                  color=${authors[idx].get(i + 1).color}
-                  spacingTop=${authors[idx].get(i + 1).name !== authors[idx].get(1).name && authors[idx].get(i).name !== authors[idx].get(i + 1).name}
-                  spacingBottom=${authors[idx].get(i + 1).name !== authors[idx].get(1).name &&
-                  authors[idx].get(Math.min(i + 2, commentContents[c.commentId].split("\n").length)).name !== authors[idx].get(i + 1).name}
-                  lastForeignLine=${authors[idx].get(i + 1).name !== authors[idx].get(1).name &&
-                  i + 1 == commentContents[c.commentId].split("\n").length}
-                  >${line}<//
-                >
-              `
-            )}
-        <//>
+        <${CommentContent}> ${groupedLines.map((lineData) => html` <${CommentLine} color=${lineData.author.color}>${lineData.text}<//> `)} <//>
       <//>
     </div>
   `;
