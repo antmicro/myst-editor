@@ -41,7 +41,7 @@ export default (/** @type {Y.Doc} */ doc, docName) => {
       fs.mkdirSync(process.env.LOGDIR, { recursive: true });
     }
 
-    doc.getXmlFragment("codemirror")
+    doc.getText("codemirror")
       .observe((event, transaction) => logAsync(docName, {
         peer: peer(transaction),
         ...humanReadableDelta(event.changes.delta)
