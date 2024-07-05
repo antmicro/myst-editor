@@ -448,7 +448,7 @@ export class YComments {
       // check if the resolved line was deleted
       const lineDeletedViaSelection = update.changes.mapPos(comment.pos, 1, MapMode.TrackDel) == null;
       const backspacePressedOnEmptyLine =
-        update.changes.mapPos(comment.pos, 0, MapMode.TrackAfter) == null && update.startState.doc.line(comment.lineNumber).text == "";
+        update.changes.mapPos(comment.pos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "";
       if (lineDeletedViaSelection || backspacePressedOnEmptyLine) {
         this.resolver().markOrphaned(comment.commentId);
         continue;
