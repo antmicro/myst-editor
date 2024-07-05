@@ -12,6 +12,8 @@ import debounce from 'lodash.debounce';
 import { callbackHandler } from './callback.js';
 import { isCallbackSet } from './callback.js';
 
+import logChanges from './logging.js';
+
 const CALLBACK_DEBOUNCE_WAIT = parseInt(process.env.CALLBACK_DEBOUNCE_WAIT) || 2000
 const CALLBACK_DEBOUNCE_MAXWAIT = parseInt(process.env.CALLBACK_DEBOUNCE_MAXWAIT) || 10000
 
@@ -149,6 +151,7 @@ export const getYDoc = (docname, gc = true) => map.setIfUndefined(docs, docname,
     persistence.bindState(docname, doc)
   }
   docs.set(docname, doc)
+  logChanges(doc, docname);
   return doc
 })
 
