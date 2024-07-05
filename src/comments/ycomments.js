@@ -253,6 +253,10 @@ export class ResolvedComments {
     this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), orphaned: true }));
   }
 
+  setResolvedLine(commentId, line) {
+    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), resolvedLine: line }));
+  }
+
   onUpdate(f) {
     this.resolvedComments.observe(() => f(this.resolved()));
   }
@@ -456,6 +460,8 @@ export class YComments {
 
       if (!comment.orphaned) {
         this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber, newPos);
+        const text = update.state.doc.line(newLineNumber).text;
+        this.resolver().setResolvedLine(comment.commentId, text);
       }
     }
   }
