@@ -23,11 +23,11 @@ const EditorParent = styled.div`
   ${(props) => {
     switch (props.mode) {
       case "Preview":
-        return ".myst-main-editor { display: none } .myst-resolved { display: none } .myst-editor-wrapper { grid-template-columns: minmax(50%, 1fr) }";
+        return ".myst-main-editor { display: none } .myst-resolved { display: none }";
       case "Source":
-        return ".myst-preview { display: none } .myst-resolved { display: none } .myst-editor-wrapper { grid-template-columns: minmax(50%, 1fr) }";
+        return ".myst-preview { display: none } .myst-resolved { display: none }";
       case "Diff":
-        return ".myst-main-editor { display: none }; .myst-preview { display: none } .myst-resolved { display: none } .myst-editor-wrapper { grid-template-columns: minmax(50%, 1fr) }";
+        return ".myst-main-editor { display: none }; .myst-preview { display: none } .myst-resolved { display: none }";
       case "Both":
         return ".myst-resolved { display: none }";
       case "Resolved":
@@ -41,7 +41,8 @@ const EditorParent = styled.div`
 const MystWrapper = styled.div`
   padding: 20px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(50%, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(50%, 1fr);
   box-sizing: border-box;
   width: calc(100vw - (100vw - 100%)); /* screen width without scrollbar */
   position: relative;
