@@ -2,6 +2,7 @@ import * as Y from "yjs";
 import { updateShownComments } from "./state";
 import { WebsocketProvider } from "y-websocket";
 import { EditorView, ViewUpdate } from "@codemirror/view";
+import { MapMode } from "@codemirror/state";
 
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
@@ -248,6 +249,10 @@ export class ResolvedComments {
     this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), lineNumber, pos }));
   }
 
+  markOrphaned(commentId) {
+    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), orphaned: true }));
+  }
+
   onUpdate(f) {
     this.resolvedComments.observe(() => f(this.resolved()));
   }
@@ -439,7 +444,19 @@ export class YComments {
     for (const comment of resolvedComments) {
       const newPos = update.changes.mapPos(comment.pos, 1);
       const newLineNumber = update.state.doc.lineAt(newPos + 1).number;
-      this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber, newPos);
+
+      // check if the resolved line was deleted
+      if (
+        update.changes.mapPos(comment.pos, 0, MapMode.TrackDel) == null ||
+        (update.changes.mapPos(comment.pos, 0, MapMode.TrackBefore) == null && update.state.doc.line(newLineNumber).text == "")
+      ) {
+        this.resolver().markOrphaned(comment.commentId);
+        continue;
+      }
+
+      if (!comment.orphaned && update.state.doc.line(newLineNumber).text != "") {
+        this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber, newPos);
+      }
     }
   }
 

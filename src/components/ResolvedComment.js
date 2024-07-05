@@ -13,6 +13,12 @@ const ResolvedLine = styled.p`
   white-space: nowrap;
   max-width: 95%;
   min-height: 22px;
+  text-decoration: ${(props) => (props.orphaned ? "line-through" : "none")};
+  color: ${(props) => (props.orphaned ? "var(--gray-700)" : "var(--gray-900)")};
+
+  & > span {
+    display: ${(props) => (props.orphaned ? "none" : "block")};
+  }
 `;
 
 const CommentContainer = styled.div`
@@ -234,7 +240,7 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
 
   return html`
     <div key=${c.commentId}>
-      <${ResolvedLine}>
+      <${ResolvedLine} orphaned=${c.orphaned}>
         <${LineNumber}>${c.lineNumber}<//>
         ${c.resolvedLine}
       <//>
