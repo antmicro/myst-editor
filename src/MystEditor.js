@@ -44,7 +44,7 @@ const MystWrapper = styled.div`
   grid-auto-flow: column;
   grid-auto-columns: minmax(50%, 1fr);
   box-sizing: border-box;
-  width: calc(100vw - (100vw - 100%)); /* screen width without scrollbar */
+  width: 100%;
   position: relative;
   background-color: white;
   ${(props) => props.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;"}
