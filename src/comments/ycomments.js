@@ -448,7 +448,7 @@ export class YComments {
       // check if the resolved line was deleted
       const lineDeletedViaSelection = update.changes.mapPos(comment.pos, 1, MapMode.TrackDel) == null;
       const backspacePressedOnEmptyLine =
-        update.changes.mapPos(comment.pos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "";
+        update.changes.mapPos(comment.pos, 0, MapMode.TrackAfter) == null && update.startState.doc.line(comment.lineNumber).text == "";
       if (lineDeletedViaSelection || backspacePressedOnEmptyLine) {
         this.resolver().markOrphaned(comment.commentId);
         continue;
@@ -463,16 +463,17 @@ export class YComments {
   restoreComment(comment) {
     const authors = this.lineAuthors(comment.commentId);
     const oldText = this.getTextForComment(comment.commentId);
+    const lineNumber = !comment.orphaned ? comment.lineNumber : this.mainCodeMirror.state.doc.lines;
 
-    if (!this.positions().isOccupied(comment.lineNumber)) {
-      const newId = this.newComment(comment.lineNumber);
+    if (!this.positions().isOccupied(lineNumber)) {
+      const newId = this.newComment(lineNumber);
       this.lineAuthors(newId).delete();
       this.lineAuthors(newId).copyFrom(authors.lineAuthors);
       const newText = this.getTextForComment(newId);
       newText.insert(0, oldText.toString());
       this.display().setVisibility(newId, true);
     } else {
-      const id = this.findCommentOn(comment.lineNumber).commentId;
+      const id = this.findCommentOn(lineNumber).commentId;
       this.lineAuthors(id).copyFrom(authors.lineAuthors);
       const text = this.getTextForComment(id);
       text.insert(text.length - 1, "\n" + oldText.toString());
