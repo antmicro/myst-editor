@@ -109,12 +109,11 @@ const OptionsContainer = styled.span`
   padding: 10px 0;
 
   &:hover div {
-    display: block !important;
+    display: flex !important;
   }
 `;
 
 const DropdownContainer = styled.div`
-  display: flex;
   align-items: center;
   position: absolute;
   background-color: var(--gray-200);
@@ -138,9 +137,20 @@ const DropdownButton = styled.button`
   align-items: center;
   cursor: pointer;
   padding: 7px 18px;
+  align-self: stretch;
 
   &:hover {
     background-color: var(--gray-300);
+  }
+
+  &.myst-restore-btn {
+    svg {
+      padding-right: 10px;
+    }
+
+    p {
+      color: var(--gray-900);
+    }
   }
 `;
 
@@ -174,6 +184,17 @@ const DeleteIcon = () => html`
     <path d="M6.42871 1H11.5716" stroke="#E7473C" stroke-width="1.75" />
     <path d="M0 2.28564H18" stroke="#E7473C" stroke-width="1.75" />
     <path d="M1.92871 2.28564L3.85728 18.3571H14.143L16.0716 2.28564" stroke="#E7473C" stroke-width="1.75" />
+  </svg>
+`;
+
+const RestoreIcon = () => html`
+  <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1.00169 1V6.66103H6.82422" stroke="black" stroke-width="1.75" />
+    <path
+      d="M1.08493 10.8517C1.67993 14.9572 5.22444 18.1192 9.49996 18.1192C14.192 18.1192 18 14.3112 18 9.61918C18 4.92716 14.192 1.11914 9.49996 1.11914C5.68344 1.11914 2.46193 3.63515 1.38242 7.09467"
+      stroke="black"
+      stroke-width="1.75"
+    />
   </svg>
 `;
 
@@ -234,6 +255,10 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
             <${OptionsContainer}>
               <${OptionsIcon} />
               <${DropdownContainer}>
+                <${DropdownButton} className="myst-restore-btn" onClick=${() => ycomments.restoreComment(c)}>
+                  <${RestoreIcon} />
+                  <p>RESTORE</p>
+                <//>
                 <${DropdownButton} onClick=${() => ycomments.resolver().delete(c.commentId)}>
                   <${DeleteIcon} />
                   <p>DELETE COMMENT</p>
@@ -256,7 +281,7 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
                   i + 1 == commentContents[c.commentId].split("\n").length}
                   >${line}<//
                 >
-              `,
+              `
             )}
         <//>
       <//>

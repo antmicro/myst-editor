@@ -32,6 +32,7 @@ export class CommentLineAuthors {
     this.lineAuthors = ydoc.getArray(commentId + "/commentLineAuthors");
     this.ydoc = ydoc;
     this.getAvatar = getAvatar;
+    this.commentId = commentId;
   }
 
   /** Check who made the line at `lineNumber` */
@@ -41,6 +42,20 @@ export class CommentLineAuthors {
 
     authorData.avatar = this.getAvatar(authorData.name);
     return authorData;
+  }
+
+  /** @param {Y.Array} lineAuthors  */
+  copyFrom(lineAuthors) {
+    for (let i = 0; i < lineAuthors.length; i++) {
+      if (i != 0 || this.lineAuthors.length == 0) {
+        this.lineAuthors.push([new Y.Map()]);
+      }
+      this.lineAuthors.get(this.lineAuthors.length - 1).set("author", lineAuthors.get(i).get("author"));
+    }
+  }
+
+  delete() {
+    this.lineAuthors.delete(0, this.lineAuthors.length);
   }
 
   /** Set the current user as the author of the line */
@@ -429,5 +444,28 @@ export class YComments {
         this.resolver().updateLineNumber(comment.commentId, newLineNumber);
       }
     }
+  }
+
+  restoreComment(comment) {
+    const authors = this.lineAuthors(comment.commentId);
+    const oldText = this.getTextForComment(comment.commentId);
+
+    if (!this.positions().isOccupied(comment.lineNumber)) {
+      const newId = this.newComment(comment.lineNumber);
+      this.lineAuthors(newId).delete();
+      this.lineAuthors(newId).copyFrom(authors.lineAuthors);
+      const newText = this.getTextForComment(newId);
+      newText.insert(0, oldText.toString());
+      this.display().setVisibility(newId, true);
+    } else {
+      const id = this.findCommentOn(comment.lineNumber).commentId;
+      this.lineAuthors(id).copyFrom(authors.lineAuthors);
+      const text = this.getTextForComment(id);
+      text.insert(text.length - 1, "\n" + oldText.toString());
+      this.display().setVisibility(id, true);
+    }
+    this.updateMainCodeMirror();
+
+    this.resolver().delete(comment.commentId);
   }
 }
