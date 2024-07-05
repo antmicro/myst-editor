@@ -1,7 +1,7 @@
 import * as Y from "yjs";
 import { updateShownComments } from "./state";
 import { WebsocketProvider } from "y-websocket";
-import { ViewUpdate } from "@codemirror/view";
+import { EditorView, ViewUpdate } from "@codemirror/view";
 
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
@@ -77,13 +77,13 @@ export class CommentLineAuthors {
     if (line - 1 > this.lineAuthors.length) {
       this.lineAuthors.push(
         // Adjust array length so that we can safely insert new elements at index `line-1`
-        [...Array(line - 1 - this.lineAuthors.length).keys()].map((_) => new Y.Map()),
+        [...Array(line - 1 - this.lineAuthors.length).keys()].map((_) => new Y.Map())
       );
     }
 
     this.lineAuthors.insert(
       line - 1,
-      [...Array(diff).keys()].map((_) => new Y.Map([["author", this.user]])),
+      [...Array(diff).keys()].map((_) => new Y.Map([["author", this.user]]))
     );
   }
 
@@ -97,7 +97,7 @@ export class CommentLineAuthors {
       .reduceRight(
         // Go up until you find a line made by a different author
         (prev, { name, lineNumber }) => (name == author && lineNumber == prev - 1 ? lineNumber : prev),
-        originalLineNumber,
+        originalLineNumber
       );
   }
 }
@@ -232,8 +232,8 @@ export class ResolvedComments {
     this.resolvedComments = ydoc.getMap("resolved-comments");
   }
 
-  resolve(commentId, resolvedLine, lineNumber, date) {
-    this.resolvedComments.set(commentId, JSON.stringify({ resolvedLine, lineNumber, resolvedBy: this.user, resolvedDate: date }));
+  resolve(commentId, resolvedLine, lineNumber, date, pos) {
+    this.resolvedComments.set(commentId, JSON.stringify({ resolvedLine, lineNumber, resolvedBy: this.user, resolvedDate: date, pos }));
   }
 
   delete(commentId) {
@@ -244,9 +244,8 @@ export class ResolvedComments {
     return [...this.resolvedComments.entries()].map(([commentId, data]) => ({ commentId, ...JSON.parse(data) }));
   }
 
-  updateLineNumber(commentId, lineNumber) {
-    console.log(lineNumber);
-    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), lineNumber }));
+  updateLineNumberAndPos(commentId, lineNumber, pos) {
+    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), lineNumber, pos }));
   }
 
   onUpdate(f) {
@@ -334,11 +333,12 @@ export class YComments {
 
   resolveComment(commentId) {
     const lineNumber = this.positions().get(commentId);
+    const pos = this.mainCodeMirror.state.doc.line(lineNumber).from;
     this.positions().del(commentId);
     this.display().del(commentId);
 
     const lineContent = this.mainCodeMirror.state.doc.line(lineNumber);
-    this.resolver().resolve(commentId, lineContent.text, lineNumber, Date.now());
+    this.resolver().resolve(commentId, lineContent.text, lineNumber, Date.now(), pos);
   }
 
   isEmpty(commentId) {
@@ -374,7 +374,7 @@ export class YComments {
           comments[box.id].top = box.offsetTop;
         });
         return comments;
-      },
+      }
     );
   }
 
@@ -437,12 +437,9 @@ export class YComments {
   syncResolvedComments(update) {
     const resolvedComments = this.resolver().resolved();
     for (const comment of resolvedComments) {
-      const oldPos = update.state.doc.line(comment.lineNumber).from;
-      const newPos = update.changes.mapPos(oldPos, 1);
-      const newLineNumber = update.state.doc.lineAt(newPos).number;
-      if (newLineNumber !== comment.lineNumber) {
-        this.resolver().updateLineNumber(comment.commentId, newLineNumber);
-      }
+      const newPos = update.changes.mapPos(comment.pos, 1);
+      const newLineNumber = update.state.doc.lineAt(newPos + 1).number;
+      this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber, newPos);
     }
   }
 
