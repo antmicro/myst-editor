@@ -197,7 +197,7 @@ const icons = {
   "print-to-pdf": PrintPDFIcon,
 };
 
-export const EditorTopbar = ({ alert, users, text, setMode, templatelist, buttons, title }) => {
+export const EditorTopbar = ({ alert, users, text, setMode, templatelist, buttons, title, collaboration }) => {
   const titleHtml = useMemo(() => purify.sanitize(renderMdLinks(title || ""), []));
 
   const editorModeButtons = [
@@ -205,8 +205,10 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
     { id: "preview", tooltip: "Preview", action: () => setMode("Preview"), icon: PreviewIcon },
     { id: "both", tooltip: "Dual Pane", action: () => setMode("Both"), icon: BothIcon },
     { id: "diff", tooltip: "Diff View", action: () => setMode("Diff"), icon: DiffIcon },
-    { id: "resolved", tooltip: "Resolved Comments", action: () => setMode("Resolved"), icon: ResolvedIcon },
   ];
+  if (collaboration.resolvingCommentsEnabled) {
+    editorModeButtons.push({ id: "resolved", tooltip: "Resolved Comments", action: () => setMode("Resolved"), icon: ResolvedIcon });
+  }
   const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), []);
   const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), []);
   return html` <${Topbar}>

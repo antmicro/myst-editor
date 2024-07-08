@@ -145,6 +145,8 @@ Here are the props you can pass to the MystEditor component:
 - `collaboration` - options related to live collaboration:
   - `enabled` *(default: false)*
   - `wsUrl` *(example: ws://example:4444)* - url of the websocket server
+  - `commentsEnabled` - enable basic comment functionality,
+  - `resolvingCommentsEnabled` - enable resolving comments,
   - `username`
   - `room` - name of the room to join, users will see others in the same room
   - `color` - color of the cursor seen by other users

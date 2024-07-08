@@ -225,7 +225,7 @@ const CodeMirror = ({ text, id, name, mode, collaboration, spellcheckOpts, highl
     <${CodeEditor} className="myst-main-editor" ref=${editorMountpoint} $mode=${mode} id="${id}-editor">
       ${error && html`<div class="editor-msg collab-error">${typeof error == "string" ? error : "No connection to the collaboration server"}</div>`}
       ${collaboration.enabled && !ready && !error && html`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
-      ${collaboration.commentsEnabled && !error ? html`<${YCommentsParent} ycomments=${ycomments} />` : ""}
+      ${collaboration.commentsEnabled && !error ? html`<${YCommentsParent} ycomments=${ycomments} collaboration=${collaboration} />` : ""}
     <//>
 
     ${collaboration.commentsEnabled && !error ? html`<${ResolvedComments} ycomments=${ycomments} />` : ""}

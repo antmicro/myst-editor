@@ -53,7 +53,7 @@ const YCommentWrapper = styled.div`
   }
 `;
 /** @param {{ ycomments: YComments }} */
-const YComment = ({ ycomments, commentId }) => {
+const YComment = ({ ycomments, commentId, collaboration }) => {
   let cmref = useRef(null);
 
   const lineAuthors = useMemo(() => ycomments.lineAuthors(commentId), [commentId]);
@@ -134,7 +134,8 @@ const YComment = ({ ycomments, commentId }) => {
           </svg>
 
           <${PopupButton} icon=${trashcanIcon} bgOnHover=${"#e7473c15"} text="DELETE" onClick=${() => ycomments.deleteComment(commentId)} />
-          <${PopupButton} icon=${resolveIcon} bgOnHover=${"#AAE17320"} text="RESOLVE" onClick=${() => ycomments.resolveComment(commentId)} />
+          ${collaboration.resolvingCommentsEnabled &&
+          html`<${PopupButton} icon=${resolveIcon} bgOnHover=${"#AAE17320"} text="RESOLVE" onClick=${() => ycomments.resolveComment(commentId)} />`}
         <//>
       `}
 
@@ -216,8 +217,8 @@ const PopupButton = ({ icon, onClick, text, bgOnHover }) => {
 };
 
 /** @param {{ ycomments: YComments }} */
-export const YCommentsParent = ({ ycomments }) => {
-  let createWidget = ({ commentId }) => html`<${YComment} ...${{ key: commentId, commentId, ycomments }} />`;
+export const YCommentsParent = ({ ycomments, collaboration }) => {
+  let createWidget = ({ commentId }) => html`<${YComment} ...${{ key: commentId, commentId, ycomments, collaboration }} />`;
   let createWidgets = () => ycomments.iterComments().map(createWidget);
   let [widgets, setWidgets] = useState(createWidgets());
 

@@ -154,6 +154,7 @@ const MystEditor = ({
             text,
             templatelist,
             buttons,
+            collaboration,
             setMode,
             title,
           }}
