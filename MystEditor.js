@@ -25799,29 +25799,30 @@ const lu = I.define({
   static: !0
 }), ph = F.define();
 class d7 extends qt {
-  constructor(e, n) {
-    super(), this.height = e, this.commentId = n;
+  constructor(e, n, r) {
+    super(), this.height = e, this.commentId = n, this.isShown = r;
   }
   toDOM() {
     const e = document.createElement("div");
-    return e.id = this.commentId, e.classList = "comment-box", e.style.height = this.height + "px", e;
+    return e.id = this.commentId, e.classList = "comment-box", this.isShown || (e.classList += " comment-box-hidden"), e.style.height = this.height + "px", e;
   }
 }
-const p7 = (t, e) => L.widget({
-  widget: new d7(t, e),
+const p7 = (t, e, n) => L.widget({
+  widget: new d7(t, e, n),
   side: 1e4,
   inlineOrder: !1,
-  block: !0
+  block: n
 }), m7 = (t, e) => t.lineNumber - e.lineNumber, g7 = (t) => t.docChanged || t.effects.some((e) => e.is(ph)), O7 = (t) => [(e, {
   commentId: n,
   lineNumber: r,
-  height: i
+  height: i,
+  isShown: s
 }) => {
   try {
-    const s = t.newDoc.line(r).to;
-    e.add(s, s, p7(i, n));
-  } catch (s) {
-    console.warn(s), console.warn(`An error occured when rendering comment ${n}. Comment will not be shown.`);
+    const o = t.newDoc.line(r).to;
+    e.add(o, o, p7(i, n, s));
+  } catch (o) {
+    console.warn(o), console.warn(`An error occured when rendering comment ${n}. Comment will not be shown.`);
   }
   return e;
 }, new He()], b7 = (t, e) => {
@@ -25838,10 +25839,8 @@ const p7 = (t, e) => L.widget({
   },
   update(t, e) {
     if (g7(e)) {
-      const n = e.state.facet(lu), r = ({
-        isShown: i
-      }) => i;
-      return b7(e, n), n.iterComments().filter(r).sort(m7).reduce(...O7(e)).finish();
+      const n = e.state.facet(lu);
+      return b7(e, n), n.iterComments().sort(m7).reduce(...O7(e)).finish();
     }
     return t;
   },
@@ -26140,7 +26139,7 @@ const Q7 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
     }, o.current.ondragend = () => {
       t.draggedComment = null, t.display().update();
     });
-  }, [o.current]), G` <${D7}
+  }, [o.current, t.commentWithPopup]), G` <${D7}
     left=${t.marginLeft()}
     top=${t.display().offset(e)}
     fade=${t.draggedComment == e}
@@ -26284,6 +26283,12 @@ const q7 = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewB
     display: flex;
     margin: 0px;
     padding: 0px;
+  }
+
+  .comment-box-hidden {
+    position: absolute;
+    pointer-events: none;
+    margin-top: -5px;
   }
 
   @media print {
