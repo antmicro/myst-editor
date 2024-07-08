@@ -8,27 +8,31 @@ import { YComments } from "./ycomments";
  * The real comment HTML element is rendered on the top of the textarea, outside the DOM tree of Code Mirror.
  */
 class Comment extends WidgetType {
-  constructor(height, commentId) {
+  constructor(height, commentId, isShown) {
     super();
     this.height = height;
     this.commentId = commentId;
+    this.isShown = isShown;
   }
 
   toDOM() {
     const btn = document.createElement("div");
     btn.id = this.commentId;
     btn.classList = "comment-box";
+    if (!this.isShown) {
+      btn.classList += " comment-box-hidden";
+    }
     btn.style.height = this.height + "px";
     return btn;
   }
 }
 
-const commentWidget = (height, commentId) =>
+const commentWidget = (height, commentId, isShown) =>
   Decoration.widget({
-    widget: new Comment(height, commentId),
+    widget: new Comment(height, commentId, isShown),
     side: 10000,
     inlineOrder: false,
-    block: true,
+    block: isShown,
   });
 
 const sortByLine = (commentA, commentB) => commentA.lineNumber - commentB.lineNumber;
@@ -41,10 +45,10 @@ const shouldUpdateTextWidget = (transaction) => transaction.docChanged || transa
 
 /** @param {Transaction} transaction */
 const buildTextareaWidgets = (transaction) => [
-  (builder, { commentId, lineNumber, height }) => {
+  (builder, { commentId, lineNumber, height, isShown }) => {
     try {
       const mountPoint = transaction.newDoc.line(lineNumber).to;
-      builder.add(mountPoint, mountPoint, commentWidget(height, commentId));
+      builder.add(mountPoint, mountPoint, commentWidget(height, commentId, isShown));
     } catch (e) {
       console.warn(e);
       console.warn(`An error occured when rendering comment ${commentId}. Comment will not be shown.`);
@@ -92,7 +96,6 @@ const commentStateEffect = StateField.define({
 
       return ycomments
         .iterComments()
-        .filter(isShown)
         .sort(sortByLine)
         .reduce(...buildTextareaWidgets(transaction))
         .finish();

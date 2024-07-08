@@ -108,7 +108,7 @@ const YComment = ({ ycomments, commentId }) => {
       ycomments.draggedComment = null;
       ycomments.display().update();
     };
-  }, [popupIcon.current]);
+  }, [popupIcon.current, ycomments.commentWithPopup]);
 
   return html` <${YCommentWrapper}
     left=${ycomments.marginLeft()}

@@ -48,6 +48,12 @@ const CodeEditor = styled.div`
     padding: 0px;
   }
 
+  .comment-box-hidden {
+    position: absolute;
+    pointer-events: none;
+    margin-top: -5px;
+  }
+
   @media print {
     & {
       display: none;
