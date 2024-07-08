@@ -6,13 +6,19 @@
 import WebSocket from 'ws';
 import http from 'http';
 const wss = new WebSocket.Server({ noServer: true })
-import { setupWSConnection } from './utils.js'
+import { setupWSConnection, docs } from './utils.js'
 
 const port = process.env.PORT || 4444
 
 const server = http.createServer((request, response) => {
-  response.writeHead(200, { 'Content-Type': 'text/plain' })
-  response.end('okay')
+  if (request.url.startsWith("/check/")) {
+    const [_, room] = request.url.split("/check/");
+    response.writeHead(docs.has(room) ? 200 : 204);
+    response.end();
+  } else {
+    response.writeHead(200, { 'Content-Type': 'text/plain' });
+    response.end('okay');
+  }
 })
 
 wss.on('connection', setupWSConnection)
