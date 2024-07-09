@@ -13,7 +13,7 @@ const port = process.env.PORT || 4444
 const server = http.createServer((request, response) => {
   if (request.url.startsWith("/check/")) {
     const [_, room] = request.url.split("/check/");
-    response.writeHead(docs.has(room) ? 200 : 204);
+    response.writeHead(docs.has(room) ? 200 : 204, { 'Access-Control-Allow-Origin': '*' });
     response.end();
   } else {
     response.writeHead(200, { 'Content-Type': 'text/plain' });

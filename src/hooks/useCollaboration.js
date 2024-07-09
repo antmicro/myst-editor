@@ -18,9 +18,7 @@ WebsocketProvider.prototype.watchCollabolators = function (hook) {
 };
 
 const checkDocExists = (settings) =>
-  fetch(settings.wsUrl.replace("ws://", "http://").replace("wss://", "https://") + "/check/" + settings.room, { mode: "no-cors" }).then(
-    (r) => r.status !== 204,
-  );
+  fetch(settings.wsUrl.replace("ws://", "http://").replace("wss://", "https://") + "/check/" + settings.room).then((r) => r.status !== 204);
 
 export default function useCollaboration(settings, text) {
   if (!settings.enabled) {
@@ -68,7 +66,7 @@ export default function useCollaboration(settings, text) {
 
   useEffect(() => {
     checkDocExists(settings).then((exists) => {
-      if (exists) {
+      if (!exists) {
         console.warn("[Collaboration] Document does not exist! Overriding with initial content");
         ytext.applyDelta([{ insert: text.get() }]);
       }
