@@ -147,7 +147,7 @@ const setEditorText = (editor, text) => {
 const CodeMirror = ({ text, id, name, mode, collaboration, spellcheckOpts, highlights, setUsers, getAvatar }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
-  const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration, text);
+  const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration);
   const ycomments = useComments(ydoc, provider, getAvatar);
 
   useEffect(() => {

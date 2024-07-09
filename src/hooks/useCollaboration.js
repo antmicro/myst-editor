@@ -17,19 +17,12 @@ WebsocketProvider.prototype.watchCollabolators = function (hook) {
   });
 };
 
-const checkDocExists = (settings) =>
-  fetch(settings.wsUrl.replace("ws://", "http://").replace("wss://", "https://") + "/check/" + settings.room, { mode: "no-cors" }).then(
-    (r) => r.status !== 204,
-  );
-
-export default function useCollaboration(settings, text) {
+export default function useCollaboration(settings) {
   if (!settings.enabled) {
     return {};
   }
 
   const ydoc = useMemo(() => new Y.Doc(), []);
-
-  const [docContentSynced, setDocContentSynced] = useState(false);
   const [synced, setSynced] = useState(false);
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState(false);
@@ -66,16 +59,6 @@ export default function useCollaboration(settings, text) {
     [],
   );
 
-  useEffect(() => {
-    checkDocExists(settings).then((exists) => {
-      if (exists) {
-        console.warn("[Collaboration] Document does not exist! Overriding with initial content");
-        ytext.applyDelta([{ insert: text.get() }]);
-      }
-      setDocContentSynced(true);
-    });
-  }, []);
-
   useEffect(() => !provider.ws && setError(true), [connected]);
 
   return {
@@ -84,6 +67,6 @@ export default function useCollaboration(settings, text) {
     ytext,
     ydoc,
     error,
-    ready: synced && connected && docContentSynced,
+    ready: synced && connected,
   };
 }
