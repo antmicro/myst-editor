@@ -148,6 +148,7 @@ export const getYDoc = (docname, gc = true) => map.setIfUndefined(docs, docname,
   const doc = new WSSharedDoc(docname)
   doc.gc = gc
   if (persistence !== null) {
+    console.warn("[WARNING] Loading " + docname + " from the persistence layer")
     persistence.bindState(docname, doc)
   }
   docs.set(docname, doc)
@@ -202,11 +203,12 @@ const closeConn = (doc, conn) => {
     doc.conns.delete(conn)
     awarenessProtocol.removeAwarenessStates(doc.awareness, Array.from(controlledIds), null)
     if (doc.conns.size === 0 && persistence !== null) {
-      // if persisted, we store state and destroy ydocument
+      // If persisted, we store state and destroy ydocument but we do not ever delete a document from the memory. 
+      // This is so that we can avoid race condition on the persistence layer which happen when the document 
+      // is persisted (when a WS connection is being closed) and then immediately loaded from DB (when a new WS connection is being opened).
       persistence.writeState(doc.name, doc).then(() => {
         doc.destroy()
       })
-      docs.delete(doc.name)
     }
   }
   conn.close()
