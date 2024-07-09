@@ -19949,9 +19949,7 @@ R_.prototype.watchCollabolators = function(t) {
     }
   });
 };
-const NI = (t) => fetch(t.wsUrl.replace("ws://", "http://").replace("wss://", "https://") + "/check/" + t.room, {
-  mode: "no-cors"
-}).then((e) => e.status !== 204);
+const NI = (t) => fetch(t.wsUrl.replace("ws://", "http://").replace("wss://", "https://") + "/check/" + t.room).then((e) => e.status !== 204);
 function qI(t, e) {
   if (!t.enabled)
     return {};
@@ -19976,7 +19974,7 @@ function qI(t, e) {
   }), []);
   return dt(() => {
     NI(t).then((p) => {
-      p && (console.warn("[Collaboration] Document does not exist! Overriding with initial content"), f.applyDelta([{
+      p || (console.warn("[Collaboration] Document does not exist! Overriding with initial content"), f.applyDelta([{
         insert: e.get()
       }])), i(!0);
     });
