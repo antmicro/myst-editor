@@ -325,7 +325,7 @@ export class YComments {
     this.display().update((comments) => {
       this.positions()
         .iter()
-        .filter((c) => !comments[c.commentId])
+        .filter((c) => !comments[c.commentId] || comments[c.commentId].isShown == undefined)
         .forEach((c) => {
           comments[c.commentId] = { isShown: true, height: 17 };
           this.updateMainCodeMirror();

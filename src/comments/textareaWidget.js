@@ -90,7 +90,6 @@ const commentStateEffect = StateField.define({
   update(oldState, transaction) {
     if (shouldUpdateTextWidget(transaction)) {
       const ycomments = transaction.state.facet(ycommentsFacet);
-      const isShown = ({ isShown }) => isShown;
 
       moveComments(transaction, ycomments);
 
