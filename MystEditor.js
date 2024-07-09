@@ -26401,7 +26401,7 @@ const N7 = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewB
   }, [g]), bt(() => {
     if (i.enabled && !m || c.current || g)
       return;
-    i.enabled && t.set(d.toString()), t.readyToRender();
+    (d == null ? void 0 : d.toString().length) === 0 && t.get().length > 0 && (console.warn("[Collaboration] Remote state is empty, overriding with local state"), d.insert(0, t.get())), i.enabled && t.set(d.toString()), t.readyToRender();
     const b = ne.create({
       doc: i.enabled ? d.toString() : t.get(),
       extensions: Lr.basicSetup().useHighlighter(o).useSpellcheck(s).useCollaboration({
