@@ -206,9 +206,7 @@ const closeConn = (doc, conn) => {
       // If persisted, we store state and destroy ydocument but we do not ever delete a document from the memory. 
       // This is so that we can avoid race condition on the persistence layer which happen when the document 
       // is persisted (when a WS connection is being closed) and then immediately loaded from DB (when a new WS connection is being opened).
-      persistence.writeState(doc.name, doc).then(() => {
-        doc.destroy()
-      })
+      persistence.writeState(doc.name, doc);
     }
   }
   conn.close()
