@@ -65,7 +65,7 @@ const buildTextareaWidgets = (transaction) => [
 const moveComments = (transaction, ycomments) => {
   if (transaction.isUserEvent("input") || transaction.isUserEvent("delete")) {
     const lineDiff = transaction.state.doc.lines - transaction.startState.doc.lines;
-    if (lineDiff != 0) {
+    if (lineDiff != 0 && transaction.selection != undefined) {
       const docLines = transaction.state.doc.lines;
       const cursorLine = transaction.state.doc.lineAt(transaction.selection.main.from).number - lineDiff;
       ycomments.positions().shift(cursorLine, lineDiff, docLines);
