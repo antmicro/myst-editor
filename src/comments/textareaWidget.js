@@ -65,6 +65,8 @@ const buildTextareaWidgets = (transaction) => [
 const moveComments = (transaction, ycomments) => {
   if (transaction.isUserEvent("input") || transaction.isUserEvent("delete")) {
     const lineDiff = transaction.state.doc.lines - transaction.startState.doc.lines;
+    // adding the undefined check seems to solve the "incomplete cutting" problem but we didn't drill down too deep into this
+    // if the problem resurfaces, look here
     if (lineDiff != 0 && transaction.selection != undefined) {
       const docLines = transaction.state.doc.lines;
       const cursorLine = transaction.state.doc.lineAt(transaction.selection.main.from).number - lineDiff;
