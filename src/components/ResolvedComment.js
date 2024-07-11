@@ -237,6 +237,16 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
     };
   }, []);
 
+  const restoreText = useMemo(() => {
+    if (c.orphaned) {
+      return "RESTORE ORPHANED";
+    } else if (c.occupied) {
+      return "RESTORE AND MERGE";
+    } else {
+      return "RESTORE";
+    }
+  }, [c]);
+
   return html`
     <div key=${c.commentId}>
       <${ResolvedLine} orphaned=${c.orphaned}>
@@ -256,7 +266,7 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
               <${DropdownContainer}>
                 <${DropdownButton} className="myst-restore-btn" onClick=${() => ycomments.restoreComment(c)}>
                   <${RestoreIcon} />
-                  <p>${c.orphaned ? "RESTORE ORPHANED" : "RESTORE"}</p>
+                  <p>${restoreText}</p>
                 <//>
                 <${DropdownButton} onClick=${() => ycomments.resolver().delete(c.commentId)}>
                   <${DeleteIcon} />

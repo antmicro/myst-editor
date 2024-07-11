@@ -253,6 +253,10 @@ export class ResolvedComments {
     this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), orphaned: true }));
   }
 
+  setOccupied(commentId, occupied) {
+    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), occupied }));
+  }
+
   setResolvedLine(commentId, line) {
     this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), resolvedLine: line }));
   }
@@ -457,6 +461,8 @@ export class YComments {
         this.resolver().markOrphaned(comment.commentId);
         continue;
       }
+
+      this.resolver().setOccupied(comment.commentId, this.positions().isOccupied(newLineNumber));
 
       if (!comment.orphaned) {
         this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber, newPos);
