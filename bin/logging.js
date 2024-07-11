@@ -4,15 +4,18 @@ import fs from 'fs'
 import path from 'path';
 
 if (process.env.LOGDIR) {
-  console.log(`Logging to ${process.env.LOGDIR}/{room name}.log`)
+  console.log(`Logging to ${process.env.LOGDIR}/{room name}.log`)  
+  if (!fs.existsSync(process.env.LOGDIR)) {
+    fs.mkdirSync(process.env.LOGDIR, { recursive: true });
+  }
 } else {
   console.log("Logging is disabled");
 }
 
 const logFile = (room) => path.join(process.env.LOGDIR, room + ".log")
 
-const logAsync = (room, obj) =>
-  new Promise((r) => r(JSON.stringify({ time: Date.now(), ...obj }) + "\n"))
+export const logAsync = (room, obj) => process.env.LOGDIR && 
+  new Promise((r) => r(JSON.stringify({ time: new Date().toISOString().slice(0,-2), ...obj }) + "\n"))
     .then(data => fs.appendFileSync(logFile(room), data));
 
 const humanReadableDelta = (delta) => {
@@ -25,35 +28,31 @@ const humanReadableDelta = (delta) => {
   return { [`doc[${from}:${from + size}]`]: content }
 }
 
-const peer = (/** @type {Y.Transaction}*/ transaction) => {
+const origin = (/** @type {Y.Transaction}*/ transaction) => {
   if (transaction.origin?._sender?._socket?.remoteAddress) {
-    const peerdata = transaction.origin?._sender?._socket?._peername;
-    return { address: peerdata.address, port: peerdata.port }
+    return "client"
   };
-  return null;
+  return "unknown";
 }
 
 export default (/** @type {Y.Doc} */ doc, docName) => {
   if (!process.env.LOGDIR) return;
 
   try {
-    if (!fs.existsSync(process.env.LOGDIR)) {
-      fs.mkdirSync(process.env.LOGDIR, { recursive: true });
-    }
-
     doc.getText("codemirror")
       .observe((event, transaction) => logAsync(docName, {
-        peer: peer(transaction),
+        origin: origin(transaction),
+        event: "doc-update",
         ...humanReadableDelta(event.changes.delta)
       }));
 
     const observeComment = (event, transaction) => logAsync(docName, {
-      peer: peer(transaction),
+      peer: origin(transaction),
+      event: "comment-update",
       commentId: event.target.getAttribute("comment-id"),
       ...humanReadableDelta(event.changes.delta)
     });
     
-
     // Keep track of observed comments
     var comments = {}
 
@@ -61,7 +60,7 @@ export default (/** @type {Y.Doc} */ doc, docName) => {
       .observe((event, transaction) => {
         const newComments = event.currentTarget.toJSON();
 
-        logAsync(docName, { peer: peer(transaction), comments: newComments });
+        logAsync(docName, { event: "comment-update", origin: origin(transaction), comments: newComments });
 
         Object.keys(newComments)
           .filter(commentId => !comments[commentId])

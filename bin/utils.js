@@ -12,7 +12,7 @@ import debounce from 'lodash.debounce';
 import { callbackHandler } from './callback.js';
 import { isCallbackSet } from './callback.js';
 
-import logChanges from './logging.js';
+import logChanges, { logAsync } from './logging.js';
 
 const CALLBACK_DEBOUNCE_WAIT = parseInt(process.env.CALLBACK_DEBOUNCE_WAIT) || 2000
 const CALLBACK_DEBOUNCE_MAXWAIT = parseInt(process.env.CALLBACK_DEBOUNCE_MAXWAIT) || 10000
@@ -36,11 +36,13 @@ if (typeof persistenceDir === 'string') {
   persistence = {
     provider: ldb,
     bindState: async (docName, ydoc) => {
+      logAsync(docName, { event: "persistence", msg: "Adding a persistence hook for doc: '" + docName + "'"})
       const persistedYdoc = await ldb.getYDoc(docName)
       const newUpdates = Y.encodeStateAsUpdate(ydoc)
       ldb.storeUpdate(docName, newUpdates)
       Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc))
-      ydoc.on('update', update => {
+      ydoc.on('update', /** @type {Y.Update} */ update => {
+        logAsync(docName, { event: "persistence", msg: "Persisting document update"})
         ldb.storeUpdate(docName, update)
       })
     },
@@ -148,13 +150,25 @@ export const getYDoc = (docname, gc = true) => map.setIfUndefined(docs, docname,
   const doc = new WSSharedDoc(docname)
   doc.gc = gc
   if (persistence !== null) {
-    console.warn("[WARNING] Loading " + docname + " from the persistence layer")
+    logAsync(docname, { event: "connection-setup", msg: "Loading persistent document '" + docname + "'"})
     persistence.bindState(docname, doc)
+  } else {
+    logAsync(docname, { event: "connection-setup", msg: "Persistence is disabled: creating a new document '" + docname + "'" })
   }
-  docs.set(docname, doc)
   logChanges(doc, docname);
   return doc
 })
+
+/**  @param {Uint8Array} msg */
+const tryDecode = (msg) => {
+  try {
+    const maxLogSize = 1000;
+    const msgHead = msg.slice(0, maxLogSize);
+    return new TextDecoder().decode(msgHead) + (msgHead.length == maxLogSize ? ` .....<${msg.length - maxLogSize} bytes more>` : "")
+  } catch(e) {
+    return { failedToDecode: e.toString() }
+  }
+}
 
 /**
  * @param {any} conn
@@ -166,8 +180,11 @@ const messageListener = (conn, doc, message) => {
     const encoder = encoding.createEncoder()
     const decoder = decoding.createDecoder(message)
     const messageType = decoding.readVarUint(decoder)
+
     switch (messageType) {
       case messageSync:
+        logAsync(doc.name, { event: "ws-message-recv", type: "sync", connectionId: conn.__connectionId, msg: tryDecode(message) })
+
         encoding.writeVarUint(encoder, messageSync)
         syncProtocol.readSyncMessage(decoder, encoder, doc, conn)
 
@@ -201,12 +218,16 @@ const closeConn = (doc, conn) => {
     // @ts-ignore
     const controlledIds = doc.conns.get(conn)
     doc.conns.delete(conn)
+
+    logAsync(doc.name, { event: "connection-teardown", connectionId: conn.__connectionId })
+
     awarenessProtocol.removeAwarenessStates(doc.awareness, Array.from(controlledIds), null)
     if (doc.conns.size === 0 && persistence !== null) {
       // If persisted, we store state and destroy ydocument but we do not ever delete a document from the memory. 
       // This is so that we can avoid race condition on the persistence layer which happen when the document 
       // is persisted (when a WS connection is being closed) and then immediately loaded from DB (when a new WS connection is being opened).
-      persistence.writeState(doc.name, doc);
+      persistence.writeState(doc.name, doc)
+        .then(() => logAsync(doc.name, { event: "connection-teardown", connectionId: conn.__connectionId, msg: "Document state persisted" }))
     }
   }
   conn.close()
@@ -222,6 +243,7 @@ const send = (doc, conn, m) => {
     closeConn(doc, conn)
   }
   try {
+    logAsync(doc.name, { event: "ws-message-send", connectionId: conn.__connectionId, msg: tryDecode(m) })
     conn.send(m, /** @param {any} err */ err => { err != null && closeConn(doc, conn) })
   } catch (e) {
     closeConn(doc, conn)
@@ -236,7 +258,10 @@ const pingTimeout = 30000
  * @param {any} opts
  */
 export const setupWSConnection = (conn, req, { docName = req.url.slice(1).split('?')[0], gc = true } = {}) => {
+  conn.__connectionId = Math.floor(Math.random() * 100000);
   conn.binaryType = 'arraybuffer'
+  logAsync(docName, { event: "connection-setup", msg: "New connection", connectionId: conn.__connectionId })
+
   // get doc, initialize if it does not exist yet
   const doc = getYDoc(docName, gc)
   doc.conns.set(conn, new Set())
