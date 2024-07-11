@@ -25748,7 +25748,7 @@ const Gg = class {
     );
   }
   syncRemoteComments() {
-    this.display().update((e) => (this.positions().iter().filter((n) => !e[n.commentId]).forEach((n) => {
+    this.display().update((e) => (this.positions().iter().filter((n) => !e[n.commentId] || e[n.commentId].isShown == null).forEach((n) => {
       e[n.commentId] = {
         isShown: !0,
         height: 17
