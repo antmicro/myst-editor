@@ -477,6 +477,8 @@ export class YComments {
     const oldText = this.getTextForComment(comment.commentId);
     const lineNumber = !comment.orphaned ? comment.lineNumber : this.mainCodeMirror.state.doc.lines;
 
+    this.resolver().delete(comment.commentId);
+
     if (!this.positions().isOccupied(lineNumber)) {
       const newId = this.newComment(lineNumber);
       this.lineAuthors(newId).delete();
@@ -491,8 +493,5 @@ export class YComments {
       text.insert(text.length, "\n" + oldText.toString());
       this.display().setVisibility(id, true);
     }
-    this.updateMainCodeMirror();
-
-    this.resolver().delete(comment.commentId);
   }
 }
