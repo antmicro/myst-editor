@@ -488,7 +488,7 @@ export class YComments {
       const id = this.findCommentOn(lineNumber).commentId;
       this.lineAuthors(id).copyFrom(authors.lineAuthors);
       const text = this.getTextForComment(id);
-      text.insert(text.length - 1, "\n" + oldText.toString());
+      text.insert(text.length, "\n" + oldText.toString());
       this.display().setVisibility(id, true);
     }
     this.updateMainCodeMirror();
