@@ -5,6 +5,7 @@ before_script:
 
 stages:
   - build
+  - doc-deploy
   - ui-tests
 
 build:
@@ -43,3 +44,17 @@ ui-tests:
     when: always
     paths:
       - ui-tests/*.png
+
+doc-deploy:
+  stage: doc-deploy
+  tags: ["docs"]
+  dependencies: [build]
+  script:
+    - sed -i -e 's/{}.VITE_COLLAB/"ON"/g' dist/index.js
+    - sed -i -e 's/{}.VITE_WS_URL/"\/devsignal"/g' dist/index.js
+    - tar cf $CI_DOCS_ARCHIVE -C dist/ .
+  artifacts:
+    paths:
+      - docs.tar
+  only:
+    - merge_requests
