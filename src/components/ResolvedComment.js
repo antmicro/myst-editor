@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { Avatar } from "./Avatars";
 
 const ResolvedLine = styled.p`
-  font-family: monospace;
   font-size: 16px;
   padding: 10px 6px;
   margin-bottom: 0;
