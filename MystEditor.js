@@ -25819,7 +25819,7 @@ const d7 = (t, e, n) => L.widget({
 }, new He()], O7 = (t, e) => {
   if (t.isUserEvent("input") || t.isUserEvent("delete")) {
     const n = t.state.doc.lines - t.startState.doc.lines;
-    if (n != 0) {
+    if (n != 0 && t.selection != null) {
       const r = t.state.doc.lines, i = t.state.doc.lineAt(t.selection.main.from).number - n;
       e.positions().shift(i, n, r);
     }
