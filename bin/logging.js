@@ -43,12 +43,14 @@ export default (/** @type {Y.Doc} */ doc, docName) => {
       .observe((event, transaction) => logAsync(docName, {
         origin: origin(transaction),
         event: "doc-update",
+        username: transaction.origin?.__username ?? "",
         ...humanReadableDelta(event.changes.delta)
       }));
 
     const observeComment = (event, transaction) => logAsync(docName, {
       origin: origin(transaction),
       event: "comment-update",
+      username: transaction.origin?.__username ?? "",
       commentId: event.target.getAttribute("comment-id"),
       ...humanReadableDelta(event.changes.delta)
     });

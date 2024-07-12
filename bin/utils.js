@@ -123,6 +123,14 @@ class WSSharedDoc extends Y.Doc {
       encoding.writeVarUint(encoder, messageAwareness)
       encoding.writeVarUint8Array(encoder, awarenessProtocol.encodeAwarenessUpdate(this.awareness, changedClients))
       const buff = encoding.toUint8Array(encoder)
+
+      if (conn && conn.__username == undefined && changedClients.length > 0) {
+        const state = this.awareness.states.get(changedClients[0]);
+        if (state) {
+          conn.__username = state?.user?.name;
+        }
+      }
+
       this.conns.forEach((_, c) => {
         send(this, c, buff)
       })
@@ -243,7 +251,7 @@ const send = (doc, conn, m) => {
     closeConn(doc, conn)
   }
   try {
-    logAsync(doc.name, { event: "ws-message-send", connectionId: conn.__connectionId, msg: tryDecode(m) })
+    logAsync(doc.name, { event: "ws-message-send", connectionId: conn.__connectionId, msg: tryDecode(m)})
     conn.send(m, /** @param {any} err */ err => { err != null && closeConn(doc, conn) })
   } catch (e) {
     closeConn(doc, conn)
