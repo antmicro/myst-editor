@@ -27,6 +27,18 @@ export default function useCollaboration(settings) {
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState(false);
 
+  // Y.js does not throw errors, it only logs them. We want to raise a
+  // fatal error when there are any errors in the collaborative state
+  // so we add a hook to `console.error` which checks if it came from Yjs.
+  useEffect(() => {
+    const defaultError = console.error;
+    const isFromYjs = (err) => err.includes("Caught error while handling a Yjs update");
+    console.error = (err) => {
+      if (isFromYjs(err)) setError("Collaboration error occured. Please check browser logs and restart the MyST Editor");
+      defaultError(err);
+    };
+  }, []);
+
   const provider = useMemo(() => {
     const prov = new WebsocketProvider(settings.wsUrl ?? "ws://localhost:4444", settings.room, ydoc, {
       connect: true,
