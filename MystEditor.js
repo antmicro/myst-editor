@@ -25988,7 +25988,8 @@ const S7 = Nh({
 };
 class Lr {
   constructor(e = []) {
-    this.important = [], this.base = e, this.extensions = Lr.defaultPlugins();
+    this.important = [ne.lineSeparator.of(`
+`)], this.base = e, this.extensions = Lr.defaultPlugins();
   }
   static minimalSetup() {
     return new Lr(A7);
