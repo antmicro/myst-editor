@@ -29,7 +29,7 @@ const restoreCursorLocation = (view, location) => {
 
 export class ExtensionBuilder {
   constructor(base = []) {
-    this.important = [];
+    this.important = [EditorState.lineSeparator.of("\n")];
     this.base = base;
     this.extensions = ExtensionBuilder.defaultPlugins();
   }
