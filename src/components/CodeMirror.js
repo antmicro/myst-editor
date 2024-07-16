@@ -128,6 +128,10 @@ const CodeEditor = styled.div`
       background-color: var(--blue-100);
     }
   }
+
+  .cm-panels-bottom {
+    z-index: 3;
+  }
 `;
 
 const HiddenTextArea = styled.textarea`
