@@ -26364,6 +26364,10 @@ const N7 = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewB
       background-color: var(--blue-100);
     }
   }
+
+  .cm-panels-bottom {
+    z-index: 3;
+  }
 `, q7 = ae.textarea`
   display: none;
 `, B7 = (t, e) => {
