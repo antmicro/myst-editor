@@ -91,10 +91,9 @@ const ResolvedComments = ({ ycomments }) => {
               html`<${ResolvedComment}
                 key=${c.commentId}
                 c=${c}
-                idx=${idx}
-                authors=${authors}
+                authors=${authors[idx]}
                 ycomments=${ycomments}
-                commentContents=${commentContents}
+                content=${commentContents[c.commentId]}
               />`,
           )}
     <//>

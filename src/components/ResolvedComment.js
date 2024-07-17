@@ -186,22 +186,22 @@ const RestoreIcon = () => html`
 
 const formatter = new Intl.RelativeTimeFormat("en", { style: "long" });
 
-const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
+const ResolvedComment = ({ c, authors, ycomments, content }) => {
   const [difference, setDifference] = useState({ amount: 0, unit: "second" });
   const timer = useRef(null);
 
   const groupedLines = useMemo(() => {
-    const lines = commentContents[c.commentId].split("\n");
+    const lines = content.split("\n");
     const grouped = [];
     for (let i = 0; i < lines.length; i++) {
-      if (grouped.length == 0 || grouped[grouped.length - 1].author.name != authors[idx].get(i + 1).name) {
-        grouped.push({ text: lines[i], author: authors[idx].get(i + 1) });
+      if (grouped.length == 0 || grouped[grouped.length - 1].author.name != authors.get(i + 1).name) {
+        grouped.push({ text: lines[i], author: authors.get(i + 1) });
       } else {
         grouped[grouped.length - 1].text += "\n" + lines[i];
       }
     }
     return grouped;
-  }, [commentContents]);
+  }, [content]);
 
   function setTimeDifference() {
     const secondDifference = Math.floor((Date.now() - c.resolvedDate) / 1000);
@@ -248,16 +248,16 @@ const ResolvedComment = ({ c, idx, authors, ycomments, commentContents }) => {
   }, [c]);
 
   return html`
-    <div key=${c.commentId}>
+    <div>
       <${ResolvedLine} orphaned=${c.orphaned}>
         <${LineNumber}>${c.lineNumber}<//>
         ${c.resolvedLine}
       <//>
-      <${CommentContainer} color=${authors[idx].get(1).color}>
+      <${CommentContainer} color=${authors.get(1).color}>
         <${CommentTopbar}>
           <${FlexRow}>
-            <${Avatar} login=${authors[idx].get(1).name} color=${authors[idx].get(1).color} avatarUrl=${authors[idx].get(1).avatar} />
-            <${CommentAuthor}>${authors[idx].get(1).name}<//>
+            <${Avatar} login=${authors.get(1).name} color=${authors.get(1).color} avatarUrl=${authors.get(1).avatar} />
+            <${CommentAuthor}>${authors.get(1).name}<//>
           <//>
           <${FlexRow}>
             <${ResolvedBy}>Comment resolved by @${c.resolvedBy.name} ${formatter.format(-difference.amount, difference.unit)}<//>
