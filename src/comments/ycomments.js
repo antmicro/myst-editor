@@ -244,8 +244,8 @@ export class ResolvedComments {
     return [...this.resolvedComments.entries()].map(([commentId, data]) => ({ commentId, ...JSON.parse(data) }));
   }
 
-  updateLineNumberAndPos(commentId, lineNumber, pos) {
-    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), lineNumber, pos }));
+  updateLineNumberAndPos(commentId, lineNumber) {
+    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), lineNumber }));
   }
 
   markOrphaned(commentId) {
@@ -447,15 +447,34 @@ export class YComments {
 
   /** @param {ViewUpdate} update  */
   syncResolvedComments(update) {
+    if (!update.docChanged && !update.transactions.some((t) => t.effects.some((e) => e.is(updateShownComments)))) return;
+    const linesNotMoved = update.startState.doc.lines === update.state.doc.lines;
+
     const resolvedComments = this.resolver().resolved();
     for (const comment of resolvedComments) {
-      const newPos = update.changes.mapPos(comment.pos, 1);
+      if (linesNotMoved) {
+        let noChangesToCommentLine = true;
+        update.changes.iterChanges((from) => {
+          if (update.startState.doc.lineAt(from).number === comment.lineNumber) {
+            noChangesToCommentLine = false;
+          }
+        });
+
+        if (comment.occupied !== this.positions().isOccupied(comment.lineNumber)) {
+          noChangesToCommentLine = false;
+        }
+
+        if (noChangesToCommentLine) continue;
+      }
+
+      const oldPos = update.startState.doc.line(comment.lineNumber).from;
+      const newPos = update.changes.mapPos(oldPos, 1);
       const newLineNumber = update.state.doc.lineAt(newPos).number;
 
       // check if the resolved line was deleted
-      const lineDeletedViaSelection = update.changes.mapPos(comment.pos, 1, MapMode.TrackDel) == null;
+      const lineDeletedViaSelection = update.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
       const backspacePressedOnEmptyLine =
-        update.changes.mapPos(comment.pos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "";
+        update.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "";
       if (lineDeletedViaSelection || backspacePressedOnEmptyLine) {
         this.resolver().markOrphaned(comment.commentId);
         continue;
@@ -464,7 +483,7 @@ export class YComments {
       this.resolver().setOccupied(comment.commentId, this.positions().isOccupied(newLineNumber));
 
       if (!comment.orphaned) {
-        this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber, newPos);
+        this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber);
         const text = update.state.doc.line(newLineNumber).text;
         this.resolver().setResolvedLine(comment.commentId, text);
       }
