@@ -46,13 +46,12 @@ export class CommentLineAuthors {
   }
 
   /** @param {Y.Array} lineAuthors  */
-  copyFrom(lineAuthors) {
-    for (let i = 0; i < lineAuthors.length; i++) {
-      if (i != 0 || this.lineAuthors.length == 0) {
-        this.lineAuthors.push([new Y.Map()]);
-      }
-      this.lineAuthors.get(this.lineAuthors.length - 1).set("author", lineAuthors.get(i).get("author"));
+  appendFrom(lineAuthors) {
+    if (this.lineAuthors.length !== 0) {
+      this.lineAuthors.delete(this.lineAuthors.length - 1);
     }
+
+    this.lineAuthors.push(lineAuthors.toArray().map((m) => m.clone()));
   }
 
   delete() {
@@ -482,13 +481,13 @@ export class YComments {
     if (!this.positions().isOccupied(lineNumber)) {
       const newId = this.newComment(lineNumber);
       this.lineAuthors(newId).delete();
-      this.lineAuthors(newId).copyFrom(authors.lineAuthors);
+      this.lineAuthors(newId).appendFrom(authors.lineAuthors);
       const newText = this.getTextForComment(newId);
       newText.insert(0, oldText.toString());
       this.display().setVisibility(newId, true);
     } else {
       const id = this.findCommentOn(lineNumber).commentId;
-      this.lineAuthors(id).copyFrom(authors.lineAuthors);
+      this.lineAuthors(id).appendFrom(authors.lineAuthors);
       const text = this.getTextForComment(id);
       text.insert(text.length, "\n" + oldText.toString());
       this.display().setVisibility(id, true);
