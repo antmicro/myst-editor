@@ -232,8 +232,8 @@ export class ResolvedComments {
     this.resolvedComments = ydoc.getMap("resolved-comments");
   }
 
-  resolve(commentId, resolvedLine, lineNumber, date, pos) {
-    this.resolvedComments.set(commentId, JSON.stringify({ resolvedLine, lineNumber, resolvedBy: this.user, resolvedDate: date, pos }));
+  resolve(commentId, resolvedLine, lineNumber, pos) {
+    this.resolvedComments.set(commentId, JSON.stringify({ resolvedLine, lineNumber, resolvedBy: this.user, resolvedDate: Date.now(), pos }));
   }
 
   delete(commentId) {
@@ -350,7 +350,7 @@ export class YComments {
     this.display().del(commentId);
 
     const lineContent = this.mainCodeMirror.state.doc.line(lineNumber);
-    this.resolver().resolve(commentId, lineContent.text, lineNumber, Date.now(), pos);
+    this.resolver().resolve(commentId, lineContent.text, lineNumber, pos);
   }
 
   isEmpty(commentId) {
