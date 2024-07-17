@@ -1,5 +1,5 @@
 import { html } from "htm/preact";
-import { useState, useMemo } from "preact/hooks";
+import { useState, useMemo, useEffect } from "preact/hooks";
 import styled from "styled-components";
 import ResolvedComment from "./ResolvedComment";
 import CommentIcon from "../icons/comment.svg";
@@ -74,7 +74,9 @@ const ResolvedComments = ({ ycomments }) => {
   );
   let authors = useMemo(() => resolvedComments.map((c) => ycomments.lineAuthors(c.commentId)), [resolvedComments]);
 
-  ycomments.resolver().onUpdate((comments) => setResolvedComments(comments.sort(dateComparator)));
+  useEffect(() => {
+    ycomments.resolver().onUpdate((comments) => setResolvedComments(comments.sort(dateComparator)));
+  }, []);
 
   return html` <${ResolvedWrapper}>
     <h1>Resolved comments</h1>
