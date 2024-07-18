@@ -448,24 +448,21 @@ export class YComments {
   /** @param {ViewUpdate} update  */
   syncResolvedComments(update) {
     if (!update.docChanged && !update.transactions.some((t) => t.effects.some((e) => e.is(updateShownComments)))) return;
-    const linesNotMoved = update.startState.doc.lines === update.state.doc.lines;
 
     const resolvedComments = this.resolver().resolved();
     for (const comment of resolvedComments) {
-      if (linesNotMoved) {
-        let noChangesToCommentLine = true;
-        update.changes.iterChanges((from) => {
-          if (update.startState.doc.lineAt(from).number === comment.lineNumber) {
-            noChangesToCommentLine = false;
-          }
-        });
-
-        if (comment.occupied !== this.positions().isOccupied(comment.lineNumber)) {
-          noChangesToCommentLine = false;
+      let doNotUpdate = true;
+      update.changes.iterChanges((from) => {
+        if (update.startState.doc.lineAt(from).number <= comment.lineNumber) {
+          doNotUpdate = false;
         }
+      });
 
-        if (noChangesToCommentLine) continue;
+      if (comment.occupied !== this.positions().isOccupied(comment.lineNumber)) {
+        doNotUpdate = false;
       }
+
+      if (doNotUpdate) continue;
 
       const oldPos = update.startState.doc.line(comment.lineNumber).from;
       const newPos = update.changes.mapPos(oldPos, 1);
