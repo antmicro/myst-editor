@@ -1,27 +1,27 @@
 import "./MystEditor2.js";
 import u, { render as l, html as d, defaultButtons as c } from "./MystEditor.js";
 (function() {
-  const i = document.createElement("link").relList;
-  if (i && i.supports && i.supports("modulepreload"))
+  const o = document.createElement("link").relList;
+  if (o && o.supports && o.supports("modulepreload"))
     return;
   for (const e of document.querySelectorAll('link[rel="modulepreload"]'))
     n(e);
   new MutationObserver((e) => {
-    for (const o of e)
-      if (o.type === "childList")
-        for (const a of o.addedNodes)
+    for (const i of e)
+      if (i.type === "childList")
+        for (const a of i.addedNodes)
           a.tagName === "LINK" && a.rel === "modulepreload" && n(a);
   }).observe(document, { childList: !0, subtree: !0 });
   function r(e) {
-    const o = {};
-    return e.integrity && (o.integrity = e.integrity), e.referrerpolicy && (o.referrerPolicy = e.referrerpolicy), e.crossorigin === "use-credentials" ? o.credentials = "include" : e.crossorigin === "anonymous" ? o.credentials = "omit" : o.credentials = "same-origin", o;
+    const i = {};
+    return e.integrity && (i.integrity = e.integrity), e.referrerpolicy && (i.referrerPolicy = e.referrerpolicy), e.crossorigin === "use-credentials" ? i.credentials = "include" : e.crossorigin === "anonymous" ? i.credentials = "omit" : i.credentials = "same-origin", i;
   }
   function n(e) {
     if (e.ep)
       return;
     e.ep = !0;
-    const o = r(e);
-    fetch(e.href, o);
+    const i = r(e);
+    fetch(e.href, i);
   }
 })();
 let m = `# h1 is quite big
@@ -123,14 +123,14 @@ const s = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8
 let f = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (t) => {
-    const [i, r] = t.split("#");
-    return `<a href="https://github.com/${i}/issues/${r}">${t}</a>`;
+    const [o, r] = t.split("#");
+    return `<a href="https://github.com/${o}/issues/${r}">${t}</a>`;
   }
 }, {
   target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
   transform: (t) => {
-    const [i, r] = t.split("!");
-    return `<a href="https://github.com/${i}/pull/${r}">${t}</a>`;
+    const [o, r] = t.split("!");
+    return `<a href="https://github.com/${o}/pull/${r}">${t}</a>`;
   }
 }, {
   target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
@@ -141,10 +141,10 @@ let f = [{
 }, {
   target: /@[0-9a-z\-]+/g,
   transform: (t) => {
-    const i = t.slice(1);
+    const o = t.slice(1);
     return `
-          <a href='https://github.com/${i}'>
-            ${i}
+          <a href='https://github.com/${o}'>
+            ${o}
           </a>`;
   }
 }];
@@ -158,6 +158,7 @@ l(d`
             collaboration=${{
   enabled: {}.VITE_COLLAB == "ON",
   commentsEnabled: {}.VITE_COLLAB == "ON",
+  resolvingCommentsEnabled: {}.VITE_COLLAB == "ON",
   wsUrl: {}.VITE_WS_URL,
   username: h,
   room: p,
