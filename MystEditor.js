@@ -19955,8 +19955,8 @@ function NI(t) {
   const e = rt(() => new Ks(), []), [n, r] = Me(!1), [i, s] = Me(!1), [o, l] = Me(!1);
   dt(() => {
     const u = console.error, f = (d) => d.includes("Caught error while handling a Yjs update");
-    console.error = (d) => {
-      f(d) && l("Collaboration error occured. Please check browser logs and restart the MyST Editor"), u(d);
+    console.error = (...d) => {
+      f(d[0]) && l("Collaboration error occured. Please check browser logs and restart the MyST Editor"), u(...d);
     };
   }, []);
   const a = rt(() => {
