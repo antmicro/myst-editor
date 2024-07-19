@@ -124,6 +124,7 @@ const DropdownButton = styled.button`
   cursor: pointer;
   padding: 7px 18px;
   align-self: stretch;
+  width: fit-content;
 
   &:hover {
     background-color: var(--gray-300);
