@@ -3,12 +3,9 @@ import { html } from "htm/preact";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import styled from "styled-components";
-import useCollaboration from "../hooks/useCollaboration";
 import { ExtensionBuilder } from "../extensions";
 import { YCommentsParent } from "../components/Comment";
-import useComments from "../hooks/useComments";
 import commentIcon from "../icons/comment.svg?raw";
-import ResolvedComments from "./Resolved";
 import { customHighlighter } from "../extensions/customHighlights";
 import { suggestionCompartment } from "../extensions/suggestions";
 
@@ -171,11 +168,25 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, id, name, mode, collaboration, spellcheckOpts, highlights, setUsers, getAvatar }) => {
+const CodeMirror = ({
+  text,
+  id,
+  name,
+  mode,
+  collaboration,
+  spellcheckOpts,
+  highlights,
+  setUsers,
+  provider,
+  undoManager,
+  ytext,
+  ydoc,
+  ready,
+  error,
+  ycomments,
+}) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
-  const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration);
-  const ycomments = useComments(ydoc, provider, getAvatar);
 
   useEffect(() => {
     if (collaboration.enabled && error) {
@@ -253,9 +264,6 @@ const CodeMirror = ({ text, id, name, mode, collaboration, spellcheckOpts, highl
       ${collaboration.enabled && !ready && !error && html`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
       ${collaboration.commentsEnabled && !error ? html`<${YCommentsParent} ycomments=${ycomments} collaboration=${collaboration} />` : ""}
     <//>
-
-    ${collaboration.commentsEnabled && !error ? html`<${ResolvedComments} ycomments=${ycomments} />` : ""}
-
     <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;
 };

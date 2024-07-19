@@ -2,13 +2,15 @@ import { render } from "preact";
 import { useState, useEffect, useReducer, useRef, useMemo } from "preact/hooks";
 import { html } from "htm/preact";
 import { StyleSheetManager, styled } from "styled-components";
-
 import CodeMirror from "./components/CodeMirror";
 import Preview from "./components/Preview";
 import Diff from "./components/Diff";
 import { resetCache } from "./hooks/markdownReplacer";
 import { useText } from "./hooks/useText";
 import { EditorTopbar } from "./components/Topbar";
+import useCollaboration from "./hooks/useCollaboration";
+import useComments from "./hooks/useComments";
+import ResolvedComments from "./components/Resolved";
 
 if (!window.myst_editor?.isFresh) {
   resetCache();
@@ -115,6 +117,9 @@ const MystEditor = ({
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer((_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: getAvatar(u.login) })), []);
 
+  const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration);
+  const ycomments = useComments(ydoc, provider, getAvatar);
+
   const alertFor = (alertText, secs) => {
     setAlert(alertText);
     setTimeout(() => setAlert(null), secs * 1000);
@@ -164,7 +169,6 @@ const MystEditor = ({
           <${CodeMirror}
             ...${{
               setUsers,
-              getAvatar,
               mode,
               text,
               name,
@@ -172,10 +176,18 @@ const MystEditor = ({
               collaboration,
               spellcheckOpts,
               highlights: transforms,
+              provider,
+              undoManager,
+              ytext,
+              ydoc,
+              ready,
+              error,
+              ycomments,
             }}
           />
           <${Preview} ref=${preview} />
           ${mode === "Diff" && html`<${Diff} oldText=${initialText} text=${text} />`}
+          ${collaboration.commentsEnabled && collaboration.resolvingCommentsEnabled && !error && html`<${ResolvedComments} ycomments=${ycomments} />`}
         <//>
       <//>
     <//>
