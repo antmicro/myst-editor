@@ -168,28 +168,12 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({
-  text,
-  id,
-  name,
-  mode,
-  collaboration,
-  spellcheckOpts,
-  highlights,
-  setUsers,
-  provider,
-  undoManager,
-  ytext,
-  ydoc,
-  ready,
-  error,
-  ycomments,
-}) => {
+const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collaboration }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
 
   useEffect(() => {
-    if (collaboration.enabled && error) {
+    if (collaboration.opts.enabled && collaboration.error) {
       text.readyToRender();
       editorRef.current?.destroy();
 
@@ -203,36 +187,36 @@ const CodeMirror = ({
 
       view.dom.style.opacity = "0.5";
     }
-  }, [error]);
+  }, [collaboration.error]);
 
   useEffect(() => {
-    if (collaboration.enabled && !ready) return;
+    if (collaboration.opts.enabled && !collaboration.ready) return;
     if (editorRef.current) return;
-    if (error) return;
+    if (collaboration.error) return;
 
-    if (ytext?.toString().length === 0 && text.get().length > 0) {
+    if (collaboration.ytext?.toString().length === 0 && text.get().length > 0) {
       console.warn("[Collaboration] Remote state is empty, overriding with local state");
-      ytext.insert(0, text.get());
+      collaboration.ytext.insert(0, text.get());
     }
 
-    if (collaboration.enabled) text.set(ytext.toString());
+    if (collaboration.opts.enabled) text.set(collaboration.ytext.toString());
 
     text.readyToRender();
 
     const startState = EditorState.create({
-      doc: collaboration.enabled ? ytext.toString() : text.get(),
+      doc: collaboration.opts.enabled ? collaboration.ytext.toString() : text.get(),
       extensions: ExtensionBuilder.basicSetup()
         .useHighlighter(highlights)
         .useCompartment(suggestionCompartment, customHighlighter([]))
         .useSpellcheck(spellcheckOpts)
         .useCollaboration({
-          enabled: collaboration.enabled || false,
-          ytext,
-          undoManager,
-          provider,
+          enabled: collaboration.opts.enabled || false,
+          ytext: collaboration.ytext,
+          undoManager: collaboration.undoManager,
+          provider: collaboration.provider,
           editorRef,
         })
-        .useComments({ enabled: collaboration.commentsEnabled, ycomments })
+        .useComments({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments })
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString()))
         .useRemoveSelectionOnBlur(ytext, provider)
         .create(),
@@ -245,24 +229,32 @@ const CodeMirror = ({
     editorRef.current = view;
     window.myst_editor.main_editor = view;
 
-    ycomments?.registerCodeMirror(view);
-    provider?.watchCollabolators(setUsers);
+    collaboration.ycomments?.registerCodeMirror(view);
+    collaboration.provider?.watchCollabolators(collaboration.setUsers);
     text.onSync((currentText) => setEditorText(view, currentText));
 
     return () => {
-      if (collaboration.enabled) {
-        provider.disconnect();
-        ydoc.destroy();
+      if (collaboration.opts.enabled) {
+        collaboration.provider.disconnect();
+        collaboration.ydoc.destroy();
       }
       view.destroy();
     };
-  }, [ready]);
+  }, [collaboration.ready]);
 
   return html`
     <${CodeEditor} className="myst-main-editor" ref=${editorMountpoint} $mode=${mode} id="${id}-editor">
-      ${error && html`<div class="editor-msg collab-error">${typeof error == "string" ? error : "No connection to the collaboration server"}</div>`}
-      ${collaboration.enabled && !ready && !error && html`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
-      ${collaboration.commentsEnabled && !error ? html`<${YCommentsParent} ycomments=${ycomments} collaboration=${collaboration} />` : ""}
+      ${collaboration.error &&
+      html`<div class="editor-msg collab-error">
+        ${typeof collaboration.error == "string" ? collaboration.error : "No connection to the collaboration server"}
+      </div>`}
+      ${collaboration.opts.enabled &&
+      !collaboration.ready &&
+      !collaboration.error &&
+      html`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
+      ${collaboration.opts.commentsEnabled &&
+      !collaboration.error &&
+      html`<${YCommentsParent} ycomments=${collaboration.ycomments} collaboration=${collaboration.opts} />`}
     <//>
     <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;

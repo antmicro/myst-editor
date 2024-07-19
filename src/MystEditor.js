@@ -168,21 +168,23 @@ const MystEditor = ({
         <${MystWrapper} fullscreen=${fullscreen}>
           <${CodeMirror}
             ...${{
-              setUsers,
               mode,
               text,
               name,
               id,
-              collaboration,
               spellcheckOpts,
               highlights: transforms,
-              provider,
-              undoManager,
-              ytext,
-              ydoc,
-              ready,
-              error,
-              ycomments,
+              collaboration: {
+                opts: collaboration,
+                setUsers,
+                provider,
+                undoManager,
+                ytext,
+                ydoc,
+                ready,
+                error,
+                ycomments,
+              },
             }}
           />
           <${Preview} ref=${preview} />
