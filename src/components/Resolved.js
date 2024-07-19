@@ -75,6 +75,7 @@ const ResolvedComments = ({ ycomments }) => {
   let authors = useMemo(() => resolvedComments.map((c) => ycomments.lineAuthors(c.commentId)), [resolvedComments]);
 
   useEffect(() => {
+    setResolvedComments(ycomments.resolver().resolved().sort(dateComparator));
     ycomments.resolver().onUpdate((comments) => setResolvedComments(comments.sort(dateComparator)));
   }, []);
 
