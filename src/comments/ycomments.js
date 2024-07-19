@@ -251,20 +251,8 @@ export class ResolvedComments {
     return [...this.resolvedComments.entries()].map(([commentId, data]) => ({ commentId, ...JSON.parse(data) }));
   }
 
-  updateLineNumberAndPos(commentId, lineNumber) {
-    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), lineNumber }));
-  }
-
-  markOrphaned(commentId) {
-    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), orphaned: true }));
-  }
-
-  setOccupied(commentId, occupied) {
-    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), occupied }));
-  }
-
-  setResolvedLine(commentId, line) {
-    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), resolvedLine: line }));
+  updateComment(commentId, attributes) {
+    this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), ...attributes }));
   }
 
   onUpdate(f) {
@@ -518,16 +506,16 @@ export class YComments {
       const backspacePressedOnEmptyLine =
         update.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "";
       if (lineDeletedViaSelection || backspacePressedOnEmptyLine) {
-        this.resolver().markOrphaned(comment.commentId);
+        this.resolver().updateComment(comment.commentId, { orphaned: true });
         continue;
       }
 
-      this.resolver().setOccupied(comment.commentId, this.positions().isOccupied(newLineNumber));
+      this.resolver().updateComment(comment.commentId, { occupied: this.positions().isOccupied(newLineNumber) });
 
       if (!comment.orphaned) {
-        this.resolver().updateLineNumberAndPos(comment.commentId, newLineNumber);
+        this.resolver().updateComment(comment.commentId, { lineNumber: newLineNumber });
         const text = update.state.doc.line(newLineNumber).text;
-        this.resolver().setResolvedLine(comment.commentId, text);
+        this.resolver().updateComment(comment.commentId, { resolvedLine: text });
       }
     }
   }
