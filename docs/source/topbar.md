@@ -2,7 +2,7 @@
 
 The editor topbar contains some useful information and buttons. Starting from the left:
 
-## Left side buttons:
+## Left Side Buttons:
 
 ![Left Side Buttons](./assets/left-side.png)
 
@@ -15,11 +15,11 @@ The editor topbar contains some useful information and buttons. Starting from th
   Applying a template while there is already text in the document will replace all the text with the template. You can undo this action, however if there where any comments in the document, they will be removed.
   ```
 
-## Document name
+## Document Name
 
 Shows the name of the document, for example the name of an issue or documentation page.
 
-## User avatars
+## User Avatars
 
 Users who are currently editing the document will be shown (including you). When there are too many users, only a couple are shown and there is an indicator saying how many more are editing.
 
@@ -27,11 +27,11 @@ Users who are currently editing the document will be shown (including you). When
 Hovering over an avatar or the more users indicator reveals usernames.
 ```
 
-## Custom buttons
+## Custom Buttons
 
 Depending on the configuration of the editor, additional buttons may be shown.
 
-## View mode buttons
+## View Mode Buttons
 
 ![View Mode Buttons](./assets/view-btns.png)
 

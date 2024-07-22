@@ -12,6 +12,6 @@ If you run into connection problems an error will be displayed and the editor wi
 Changes made in the editor while offline would are lost, but a connectivity error should lock the editor and prompt you for a restart. Please keep this in mind.
 ```
 
-## Other collaborative features
+## Other Collaborative Features
 
 There are many more MyST features aimed at collaboration. For more information refer to: {doc}`comments` and {doc}`rich-links`
