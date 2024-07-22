@@ -7,6 +7,7 @@ stages:
   - build
   - doc-deploy
   - ui-tests
+  - deploy
 
 build:
   stage: build
@@ -42,8 +43,7 @@ build-docs:
     - pip3 install -r requirements.txt
   script:
     - cd docs
-    - make html latexpdf
-    - cp build/latex/*.pdf build/html/
+    - make html
     - tar cf $CI_DOCS_ARCHIVE -C build/html/ .
   artifacts:
     paths:
@@ -76,3 +76,16 @@ doc-deploy:
       - docs.tar
   only:
     - merge_requests
+deploy-docs:
+  stage: deploy
+  when: manual
+  tags: ['docs']
+  image: $CI_DOCS_DOCKER_IMAGE
+  variables:
+    GIT_STRATEGY: none
+  dependencies:
+    - build-docs
+  script: echo 'Deploying docs'
+  artifacts:
+    paths:
+      - $CI_DOCS_ARCHIVE
