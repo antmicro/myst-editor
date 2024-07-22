@@ -1,8 +1,3 @@
-image: node:20
-
-before_script:
-  - yarn
-
 stages:
   - build
   - doc-deploy
@@ -11,7 +6,10 @@ stages:
 
 build:
   stage: build
-  script:   
+  image: node:20
+  before_script:
+  - yarn
+  script:
     - yarn run lint
     - yarn build
   artifacts:
@@ -52,6 +50,8 @@ build-docs:
 
 ui-tests:
   stage: ui-tests
+  image: node:20
+  before_script:
   script:
     - apt-get -qqy update > /dev/null 2> /dev/null
     - apt-get -qqy install --no-install-recommends chromium > /dev/null 2> /dev/null
