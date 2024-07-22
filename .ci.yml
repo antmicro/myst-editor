@@ -32,6 +32,24 @@ functional-tests:
       - test-results/.last-run.json
       - playwright-report/index.html
 
+build-docs:
+  stage: build
+  when: manual
+  image: $CI_DOCS_DOCKER_IMAGE
+  tags: ['ace-x86_64']
+  before_script:
+    - cd docs
+    - pip3 install -r requirements.txt
+  script:
+    - cd docs
+    - make html latexpdf
+    - cp build/latex/*.pdf build/html/
+    - tar cf $CI_DOCS_ARCHIVE -C build/html/ .
+  artifacts:
+    paths:
+      - docs/build
+      - $CI_DOCS_ARCHIVE
+
 ui-tests:
   stage: ui-tests
   script:
