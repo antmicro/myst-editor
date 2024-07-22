@@ -37,4 +37,4 @@ MyST editor has several view modes:
 - `Preview` - only show the rendered document
 - `Dual Pane` **(default)** - show Markdown on the left and a preview on the right
 - `Diff View` - show changes made to the document
-- `Resolved Comments` - show resolved comments, for more information check {doc}`comments`
+- `Resolved Comments` - show resolved comments, for more information check [Resolving Comments](./comments.md#resolving-comments)
