@@ -41,7 +41,8 @@ build-docs:
     - pip3 install -r requirements.txt
   script:
     - cd docs
-    - make html
+    - make html latexpdf
+    - cp build/latex/*.pdf build/html/
     - cd ..
     - tar cf $CI_DOCS_ARCHIVE -C docs/build/html/ .
   artifacts:
