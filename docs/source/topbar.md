@@ -4,6 +4,8 @@ The editor topbar contains some useful information and buttons. Starting from th
 
 ## Left side buttons:
 
+![Left Side Buttons](./assets/left-side.png)
+
 - `Fullscreen` - toggle fullscreen mode (the editor will take up the entire page)
 - `Copy as HTML` - copies the rendered document as HTML, you might find this useful if you want to paste the document somewhere, for example in an email
 - `Refresh Rich Links` - rerenders all the rich links in the document, for more information refer to {doc}`rich-links`
@@ -30,6 +32,8 @@ Hovering over an avatar or the more users indicator reveals usernames.
 Depending on the configuration of the editor, additional buttons may be shown.
 
 ## View mode buttons
+
+![View Mode Buttons](./assets/view-btns.png)
 
 MyST editor has several view modes:
 

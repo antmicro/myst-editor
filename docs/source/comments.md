@@ -4,6 +4,8 @@ Sometimes you want leave some feedback meant for other people editing the docume
 
 ## Adding a Comment
 
+![Add Comment](./assets/comment-add.png)
+
 To add a comment hover your cursor over the editor gutter (to the left of line numbers) on the line you want to comment on.
 This should make the comment icon appear and clicking it will create a comment.
 
@@ -12,6 +14,8 @@ This should make the comment icon appear and clicking it will create a comment.
 Clicking on the comment icon can be used to hide/show a comment. By default when you load up a document, all preexisting comments will be expanded as well as any new comment which someone adds.
 
 ## Collaborating on a Comment
+
+![Multiple comment authors](./assets/comment.png)
 
 Comments can be multiple lines long and multiple people can participate in writing one comment. Instead of something like comment threads, MyST Editor has a concept of line authorship.
 Every line of a comment is colored by the author of that line. If you hover over a line, you can also see its authors avatar to the left of the comment.
@@ -58,6 +62,8 @@ Click the Resolved Comments button to see it. Such comments keep some informatio
 
 You can access some more options by hovering over the `...` button in the top right of a comment.
 
+![Resolved Comment](./assets/resolved-comment.png)
+
 ### Restoring Comments
 
 After a comment is resolved, it tries to keep track of the line it was attached to. If the text of the line or its line number change, this will be reflected in this view.
@@ -66,9 +72,13 @@ You can bring back a comment to the editor by clicking the restore button in the
 ```{important}
 If there is currently a comment on the line a resolved comment was attached to, when opening the menu the restore button will say `RESTORE AND MERGE`.
 This means the original line is occupied. If you press this button, the resolved comment will be added to the bottom of the comment already on that line.
+
+![Merge Comments](./assets/comment-occupied.png)
 ```
 
 #### Orphaned Comments
+
+![Orphaned Comment](./assets/comment-orphaned.png)
 
 If a resolved comment does not have a line number next to it, or the text of the commented line is crossed out the line the comment was assigned to has been deleted.
 Such a comment is considered `orphaned`. If you try to restore such a comment, it will be added to the last line of the document. From there you can of course move it wherever you want.
@@ -78,6 +88,8 @@ Applying a document template to a document with resolved comments, will make all
 ```
 
 ## Suggestions
+
+![Suggest Change](./assets/suggestion.png)
 
 You can suggest changes to a line in a comment. To do so you can use the following syntax somewhere in the comment:
 
