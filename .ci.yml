@@ -52,6 +52,7 @@ ui-tests:
   stage: ui-tests
   image: node:20
   before_script:
+  - yarn
   script:
     - apt-get -qqy update > /dev/null 2> /dev/null
     - apt-get -qqy install --no-install-recommends chromium > /dev/null 2> /dev/null
