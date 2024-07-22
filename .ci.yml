@@ -42,7 +42,8 @@ build-docs:
   script:
     - cd docs
     - make html
-    - tar cf $CI_DOCS_ARCHIVE -C build/html/ .
+    - cd ..
+    - tar cf $CI_DOCS_ARCHIVE -C docs/build/html/ .
   artifacts:
     paths:
       - docs/build
