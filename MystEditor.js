@@ -26504,6 +26504,7 @@ const z4 = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewB
   cursor: pointer;
   padding: 7px 18px;
   align-self: stretch;
+  width: fit-content;
 
   &:hover {
     background-color: var(--gray-300);
