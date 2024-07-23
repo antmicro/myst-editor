@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useReducer, useState } from "preact/ho
 import IMurMurHash from "imurmurhash";
 import markdownItMermaid from "@agoose77/markdown-it-mermaid";
 import { backslashLineBreakPlugin } from "./markdownLineBreak";
+import markdownSourceMap from "./markdownSourceMap";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -68,7 +69,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       .use(markdownitDocutils)
       .use(markdownReplacer(transforms, parent))
       .use(useCustomRoles(customRoles, parent))
-      .use(markdownItMermaid);
+      .use(markdownItMermaid)
+      .use(markdownSourceMap);
     if (backslashLineBreak) md.use(backslashLineBreakPlugin);
     return md;
   }, []);
@@ -83,18 +85,19 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
           (chunks, newChunk) => {
             const lastChunkIdx = chunks.length - 1;
             const lastChunk = chunks[lastChunkIdx];
-            if (countOccurences(lastChunk, /\n```/g) % 2 != 0) {
-              chunks[lastChunkIdx] = lastChunk + newChunk;
+            const startLine = !lastChunk ? 1 : lastChunk.startLine + lastChunk.md.trimLeft().split("\n").length;
+            if (countOccurences(lastChunk?.md, /\n```/g) % 2 != 0) {
+              chunks[lastChunkIdx] = { md: lastChunk.md + newChunk.md, startLine: lastChunk.startLine };
             } else {
-              chunks.push(newChunk);
+              chunks.push({ md: newChunk, startLine });
             }
             return chunks;
           },
           [],
         )
-        .map((md, id) => {
+        .map(({ md, startLine }, id) => {
           const hash = new IMurMurHash(md, 42).result();
-          const html = lookup[hash] || purify.sanitize(markdown.render(md));
+          const html = lookup[hash] || purify.sanitize(markdown.render(md, { chunkId: id, startLine }));
           return { md, hash, id, html };
         }),
     [markdown],
