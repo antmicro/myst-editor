@@ -2,7 +2,8 @@ import markdownIt from "markdown-it";
 
 /** @param {markdownIt} md  */
 export default function markdownSourceMap(md) {
-  const overrideRules = [...Object.keys(md.renderer.rules), "paragraph_open", "heading_open", "list_item_open", "table_open"];
+  md.use(overrideDefaultDirectives);
+  const overrideRules = [...Object.keys(md.renderer.rules), "paragraph_open", "heading_open", "list_item_open", "table_open", "admonition_open"];
 
   for (const rule of overrideRules) {
     const temp = md.renderer.rules[rule];
@@ -30,4 +31,22 @@ function addLineNumberToTokens(defaultRule) {
       return self.renderToken(tokens, idx, options);
     }
   };
+}
+
+// the fallback renderer rule for unhandled and error directives does not output the token attributes into the html
+function overrideDefaultDirectives(/** @type {markdownIt} */ md) {
+  function newRule(defaultRule) {
+    return (tokens, idx) => {
+      const token = tokens[idx];
+      let html = defaultRule(tokens, idx);
+      const asideCloseIdx = html.indexOf(">");
+      for (const [key, value] of token.attrs) {
+        html = html.slice(0, asideCloseIdx) + ` ${key}="${value}"` + html.slice(asideCloseIdx);
+      }
+      return html;
+    };
+  }
+
+  md.renderer.rules.directive = newRule(md.renderer.rules.directive);
+  md.renderer.rules["directive_error"] = newRule(md.renderer.rules["directive_error"]);
 }
