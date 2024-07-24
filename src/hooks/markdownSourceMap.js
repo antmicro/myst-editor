@@ -61,7 +61,7 @@ function addLineNumberToTokens(defaultRule) {
   };
 }
 
-// the fallback renderer rule for unhandled and error directives does not output the token attributes into the html
+/** The fallback renderer rule for unhandled and error directives does not output the token attributes into the html **/
 function overrideDefaultDirectives(/** @type {markdownIt} */ md) {
   function newRule(defaultRule) {
     return (tokens, idx, options, env, self) => {
@@ -77,7 +77,7 @@ function overrideDefaultDirectives(/** @type {markdownIt} */ md) {
   md.renderer.rules["directive_error"] = newRule(md.renderer.rules["directive_error"]);
 }
 
-// we need some way to add line info to html text, so the idea is to wrap every text token in a span
+/** We need some way to add line info to html text, so the idea is to wrap every text token in a span **/
 function wrapTextInSpan(/** @type {markdownIt} */ md) {
   const defaultTextRule = md.renderer.rules.text;
   md.renderer.rules.text = (tokens, idx, options, env, self) => {
@@ -88,8 +88,8 @@ function wrapTextInSpan(/** @type {markdownIt} */ md) {
   };
 }
 
-// currently the contents of a fenced code block are treated as a singular string so we need to wrap each line with a `span` to attach line metadata
-// if we ever decide to add syntax highlighting in fenced code blocks, this will need to be changed
+/** Currently the contents of a fenced code block are treated as a singular string so we need to wrap each line with a `span` to attach line metadata.
+    If we ever decide to add syntax highlighting in fenced code blocks, this will need to be changed. **/
 function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
   md.renderer.rules.fence = (tokens, idx, options, env, self) => {
     const token = tokens[idx];
