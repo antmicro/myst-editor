@@ -1,6 +1,8 @@
 import markdownIt from "markdown-it";
 import { escapeHtml } from "markdown-it/lib/common/utils";
 
+const SRC_LINE_ATTRIBUTE = "data-source-line";
+
 /** @param {markdownIt} md  */
 export default function markdownSourceMap(md) {
   md.use(overrideDefaultDirectives);
@@ -34,7 +36,7 @@ function addLineNumberToTokens(defaultRule) {
     let line = 0;
     if (tokens[idx].map) {
       line = tokens[idx].map[0] + env.startLine - (env.chunkId === 0 ? 0 : 1);
-      tokens[idx].attrSet("data-source-line", line.toString());
+      tokens[idx].attrSet(SRC_LINE_ATTRIBUTE, line.toString());
     }
 
     const inlineContainers = ["paragraph_open", "heading_open"];
@@ -98,7 +100,7 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
     let htmlContent = sanitizedContent
       .split("\n")
       .filter((_, i, lines) => i !== lines.length - 1)
-      .map((l, i) => `<span data-source-line="${startLine + i + 1}">${l}</span>`)
+      .map((l, i) => `<span ${SRC_LINE_ATTRIBUTE}="${startLine + i + 1}">${l}</span>`)
       .join("\n");
 
     return `<pre><code${self.renderAttrs(token)}>${htmlContent}</code></pre>\n`;
