@@ -36,7 +36,8 @@ function addLineNumberToTokens(defaultRule) {
       tokens[idx].attrSet("data-source-line", line.toString());
     }
 
-    if (tokens[idx].type === "paragraph_open") {
+    const inlineContainers = ["paragraph_open", "heading_open"];
+    if (inlineContainers.includes(tokens[idx].type)) {
       const inlineToken = tokens[idx + 1];
       let lineInParagraph = 0;
       for (const childToken of inlineToken.children) {
