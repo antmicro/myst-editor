@@ -67,9 +67,7 @@ function overrideDefaultDirectives(/** @type {markdownIt} */ md) {
       const token = tokens[idx];
       let html = defaultRule(tokens, idx, options, env, self);
       const asideCloseIdx = html.indexOf(">");
-      for (const [key, value] of token.attrs) {
-        html = html.slice(0, asideCloseIdx) + ` ${key}="${value}"` + html.slice(asideCloseIdx);
-      }
+      html = html.slice(0, asideCloseIdx) + self.renderAttrs(token) + html.slice(asideCloseIdx);
       return html;
     };
   }
@@ -84,13 +82,7 @@ function wrapTextInSpan(/** @type {markdownIt} */ md) {
   md.renderer.rules.text = (tokens, idx, options, env, self) => {
     const token = tokens[idx];
     const defaultOutput = defaultTextRule(tokens, idx, options, env, self);
-    let html = `<span>${defaultOutput}</span>`;
-    const spanCloseIdx = html.indexOf(">");
-    if (token.attrs) {
-      for (const [key, value] of token.attrs) {
-        html = html.slice(0, spanCloseIdx) + ` ${key}="${value}"` + html.slice(spanCloseIdx);
-      }
-    }
+    let html = `<span${self.renderAttrs(token)}>${defaultOutput}</span>`;
     return html;
   };
 }
