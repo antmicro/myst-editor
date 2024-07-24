@@ -17,10 +17,13 @@ const exposeText = (text) => () => {
   window.myst_editor.text = text;
 };
 
-const copyHtmlAsRichText = (txt) => {
+const copyHtmlAsRichText = (/** @type {string} */ txt) => {
+  // remove data-source-line from the copied html
+  const sanitizedText = txt.replace(/(?<=\<\S+) data-source-line="\d+"/g, "");
+
   const listener = (e) => {
-    e.clipboardData.setData("text/html", txt);
-    e.clipboardData.setData("text/plain", txt);
+    e.clipboardData.setData("text/html", sanitizedText);
+    e.clipboardData.setData("text/plain", sanitizedText);
     e.preventDefault();
   };
   document.addEventListener("copy", listener);
