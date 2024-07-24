@@ -113,11 +113,11 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   }, [syncText]);
 
   return {
-    set(newMarkdown) {
+    set(newMarkdown, force = false) {
       setText(newMarkdown);
       setTimeout(() => {
         try {
-          updateHtmlChunks({ newMarkdown });
+          updateHtmlChunks({ newMarkdown, force });
         } catch (e) {
           console.warn(e);
           updateHtmlChunks({ newMarkdown, force: true });
