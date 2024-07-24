@@ -2,7 +2,7 @@ import markdownIt from "markdown-it";
 
 /** @param {markdownIt} md  */
 export default function markdownSourceMap(md) {
-  const overrideRules = ["paragraph_open", "heading_open", "list_item_open", "table_open", "fence"];
+  const overrideRules = [...Object.keys(md.renderer.rules), "paragraph_open", "heading_open", "list_item_open", "table_open"];
 
   for (const rule of overrideRules) {
     const temp = md.renderer.rules[rule];
