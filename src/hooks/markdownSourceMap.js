@@ -1,9 +1,11 @@
 import markdownIt from "markdown-it";
+import { escapeHtml } from "markdown-it/lib/common/utils";
 
 /** @param {markdownIt} md  */
 export default function markdownSourceMap(md) {
   md.use(overrideDefaultDirectives);
   md.use(wrapTextInSpan);
+  md.use(wrapFencedLinesInSpan);
 
   const excludeRules = ["softbreak"];
   const overrideRules = [
@@ -29,7 +31,6 @@ function addLineNumberToTokens(defaultRule) {
    * @param {import("markdown-it/index.js").Renderer} self
    */
   return (tokens, idx, options, env, self) => {
-    console.log(tokens);
     let line = 0;
     if (tokens[idx].map) {
       line = tokens[idx].map[0] + env.startLine - (env.chunkId === 0 ? 0 : 1);
@@ -84,5 +85,22 @@ function wrapTextInSpan(/** @type {markdownIt} */ md) {
     const defaultOutput = defaultTextRule(tokens, idx, options, env, self);
     let html = `<span${self.renderAttrs(token)}>${defaultOutput}</span>`;
     return html;
+  };
+}
+
+// currently the contents of a fenced code block are treated as a singular string so we need to wrap each line with a `span` to attach line metadata
+// if we ever decide to add syntax highlighting in fenced code blocks, this will need to be changed
+function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
+  md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    const sanitizedContent = escapeHtml(token.content);
+    const startLine = parseInt(token.attrGet("data-source-line"));
+    let htmlContent = sanitizedContent
+      .split("\n")
+      .filter((_, i, lines) => i !== lines.length - 1)
+      .map((l, i) => `<span data-source-line="${startLine + i + 1}">${l}</span>`)
+      .join("\n");
+
+    return `<pre><code${self.renderAttrs(token)}>${htmlContent}</code></pre>\n`;
   };
 }
