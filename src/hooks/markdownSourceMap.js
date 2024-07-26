@@ -14,11 +14,8 @@ export default function markdownSourceMap(md) {
     ...Object.keys(md.renderer.rules).filter((r) => !excludeRules.includes(r)),
     "paragraph_open",
     "heading_open",
-    "list_item_open",
-    "table_open",
     "admonition_open",
   ];
-  console.log(overrideRules);
 
   for (const rule of overrideRules) {
     const temp = md.renderer.rules[rule];
