@@ -33,12 +33,6 @@ function addLineNumberToTokens(defaultRule) {
    * @param {import("markdown-it/index.js").Renderer} self
    */
   return (tokens, idx, options, env, self) => {
-    let line = 0;
-    if (tokens[idx].map) {
-      line = tokens[idx].map[0] + env.startLine - (env.chunkId === 0 ? 0 : 1);
-      tokens[idx].attrSet(SRC_LINE_ATTRIBUTE, line.toString());
-    }
-
     const inlineContainers = ["paragraph_open", "heading_open"];
     if (inlineContainers.includes(tokens[idx].type)) {
       const inlineToken = tokens[idx + 1];
@@ -51,6 +45,9 @@ function addLineNumberToTokens(defaultRule) {
 
         childToken.map = [tokens[idx].map[0] + lineInParagraph, tokens[idx].map[0] + lineInParagraph + 1];
       }
+    } else if (tokens[idx].map) {
+      const line = tokens[idx].map[0] + env.startLine - (env.chunkId === 0 ? 0 : 1);
+      tokens[idx].attrSet(SRC_LINE_ATTRIBUTE, line.toString());
     }
 
     if (defaultRule) {
