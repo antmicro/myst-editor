@@ -43,6 +43,7 @@ const MystWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(50%, 1fr);
+  grid-template-rows: max-content;
   box-sizing: border-box;
   width: 100%;
   position: relative;
