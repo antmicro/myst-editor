@@ -220,7 +220,7 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
           <//>
         `,
       )}
-      ${buttons.find((b) => b.id === "template-manager") && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
+      ${buttons.find((b) => b.id === "template-manager") && templatelist && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
       ${alert && html`<${Alert}> ${alert} <//>`}
       <${Title} dangerouslySetInnerHTML=${{ __html: titleHtml }} />
     <//>
