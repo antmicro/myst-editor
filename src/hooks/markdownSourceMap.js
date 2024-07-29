@@ -43,7 +43,7 @@ function addLineNumberToTokens(defaultRule) {
         childToken.map = [tokens[idx].map[0] + lineInParagraph, tokens[idx].map[0] + lineInParagraph + 1];
       }
     } else if (tokens[idx].map) {
-      const line = tokens[idx].map[0] + env.startLine - (env.chunkId === 0 ? 0 : 1);
+      const line = tokens[idx].map[0] + env.startLine - (env.chunkId === 1);
       tokens[idx].attrSet(SRC_LINE_ATTRIBUTE, line.toString());
     }
 
