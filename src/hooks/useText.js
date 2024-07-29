@@ -122,7 +122,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
              * In order to get the line number relative to the whole document, we need to keep track of which line a chunk begins at.*/
             const startLine = !lastChunk ? 1 : lastChunk.startLine + lastChunk.md.trimLeft().split("\n").length;
             if (countOccurences(lastChunk?.md, /\n```/g) % 2 != 0) {
-              chunks[lastChunkIdx] = { md: lastChunk.md + newChunk.md, startLine: lastChunk.startLine };
+              chunks[lastChunkIdx] = { md: lastChunk.md + newChunk, startLine: lastChunk.startLine };
             } else {
               chunks.push({ md: newChunk, startLine });
             }
