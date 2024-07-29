@@ -88,6 +88,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
           (chunks, newChunk) => {
             const lastChunkIdx = chunks.length - 1;
             const lastChunk = chunks[lastChunkIdx];
+            /** Markdown-it gets passed small chunks of `newMarkdown` so when we get the line number of a token, it is relative to that chunk.
+             * In order to get the line number relative to the whole document, we need to keep track of which line a chunk begins at.*/
             const startLine = !lastChunk ? 1 : lastChunk.startLine + lastChunk.md.trimLeft().split("\n").length;
             if (countOccurences(lastChunk?.md, /\n```/g) % 2 != 0) {
               chunks[lastChunkIdx] = { md: lastChunk.md + newChunk.md, startLine: lastChunk.startLine };
