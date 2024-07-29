@@ -2,11 +2,12 @@ import markdownitDocutils from "markdown-it-docutils";
 import purify from "dompurify";
 import markdownIt from "markdown-it";
 import { markdownReplacer, useCustomRoles } from "./markdownReplacer";
-import { useCallback, useEffect, useMemo, useReducer, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
 import IMurMurHash from "imurmurhash";
 import markdownItMermaid from "@agoose77/markdown-it-mermaid";
 import { backslashLineBreakPlugin } from "./markdownLineBreak";
 import markdownSourceMap from "./markdownSourceMap";
+import { ViewUpdate } from "@codemirror/view";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -37,7 +38,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
   const [onSync, setOnSync] = useState({ action: (text) => {} });
-
+  const lineMap = useRef(new Map());
   /**
    * Split the document into chunks and re-render only the chunks which were changed
    *
@@ -78,6 +79,35 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
     return md;
   }, []);
 
+  const shiftLineMap = useCallback((/** @type {ViewUpdate} */ update) => {
+    if (update.startState.doc.lines === update.state.doc.lines) return;
+    let shiftStart = 0;
+    let shiftAmount = 0;
+    update.changes.iterChangedRanges((fromA, toA, fromB, toB) => {
+      const startLine = update.startState.doc.lineAt(fromA).number;
+      const endLine = update.startState.doc.lineAt(toA).number;
+      const startLineB = update.state.doc.lineAt(fromB).number;
+      const endLineB = update.state.doc.lineAt(toB).number;
+
+      shiftStart = endLine;
+      if (startLine === endLine) {
+        shiftAmount = endLineB - startLineB;
+      } else {
+        shiftAmount = -(endLine - startLine);
+      }
+    });
+
+    const newMap = new Map(lineMap.current);
+    for (const [line, id] of lineMap.current.entries()) {
+      if (line < shiftStart) continue;
+      if (id === newMap.get(line)) {
+        newMap.delete(line);
+      }
+      newMap.set(line + shiftAmount, id);
+    }
+    lineMap.current = newMap;
+  });
+
   /** Split and parse markdown into chunks of HTML. If `lookup` is not provided then every chunk will be parsed */
   const splitIntoChunks = useCallback(
     (newMarkdown, lookup = {}) =>
@@ -102,7 +132,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
         )
         .map(({ md, startLine }, id) => {
           const hash = new IMurMurHash(md, 42).result();
-          const html = lookup[hash] || purify.sanitize(markdown.render(md, { chunkId: id, startLine }));
+          const html = lookup[hash] || purify.sanitize(markdown.render(md, { chunkId: id, startLine, lineMap }));
           return { md, hash, id, html };
         }),
     [markdown],
@@ -118,11 +148,14 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   }, [syncText]);
 
   return {
-    set(newMarkdown, force = false) {
+    set(newMarkdown, update) {
+      if (update) {
+        shiftLineMap(update);
+      }
       setText(newMarkdown);
       setTimeout(() => {
         try {
-          updateHtmlChunks({ newMarkdown, force });
+          updateHtmlChunks({ newMarkdown });
         } catch (e) {
           console.warn(e);
           updateHtmlChunks({ newMarkdown, force: true });

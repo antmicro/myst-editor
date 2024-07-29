@@ -1,7 +1,8 @@
 import markdownIt from "markdown-it";
 import { escapeHtml } from "markdown-it/lib/common/utils";
 
-const SRC_LINE_ATTRIBUTE = "data-source-line";
+const SRC_LINE_ID = "data-line-id";
+const randomLineId = () => Math.random().toString().replace(".", "");
 
 /** @param {markdownIt} md  */
 export default function markdownSourceMap(md) {
@@ -43,8 +44,10 @@ function addLineNumberToTokens(defaultRule) {
         childToken.map = [tokens[idx].map[0] + lineInParagraph, tokens[idx].map[0] + lineInParagraph + 1];
       }
     } else if (tokens[idx].map) {
-      const line = tokens[idx].map[0] + env.startLine - (env.chunkId === 1);
-      tokens[idx].attrSet(SRC_LINE_ATTRIBUTE, line.toString());
+      const line = tokens[idx].map[0] + env.startLine - (env.chunkId !== 0);
+      const id = randomLineId();
+      env.lineMap.current.set(line, id);
+      tokens[idx].attrSet(SRC_LINE_ID, id);
     }
 
     if (defaultRule) {
@@ -94,7 +97,11 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
     let htmlContent = sanitizedContent
       .split("\n")
       .filter((_, i, lines) => i !== lines.length - 1)
-      .map((l, i) => `<span ${SRC_LINE_ATTRIBUTE}="${startLine + i + 1}">${l}</span>`)
+      .map((l, i) => {
+        const id = randomLineId();
+        env.lineMap.current.set(startLine + i + 1, id);
+        return `<span ${SRC_LINE_ID}="${id}">${l}</span>`;
+      })
       .join("\n");
 
     return `<pre><code${self.renderAttrs(token)}>${htmlContent}</code></pre>\n`;
