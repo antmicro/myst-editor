@@ -45,9 +45,11 @@ function addLineNumberToTokens(defaultRule) {
       }
     } else if (tokens[idx].map) {
       const line = tokens[idx].map[0] + env.startLine - (env.chunkId !== 0);
-      const id = randomLineId();
-      env.lineMap.current.set(line, id);
-      tokens[idx].attrSet(SRC_LINE_ID, id);
+      if (!env.lineMap.current.has(line)) {
+        const id = randomLineId();
+        env.lineMap.current.set(line, id);
+        tokens[idx].attrSet(SRC_LINE_ID, id);
+      }
     }
 
     if (defaultRule) {
