@@ -16,6 +16,7 @@ export default function markdownSourceMap(md) {
     "paragraph_open",
     "heading_open",
     "admonition_open",
+    "link_open",
   ];
 
   for (const rule of overrideRules) {
