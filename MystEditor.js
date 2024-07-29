@@ -35721,7 +35721,7 @@ const WAe = N$.exports, zAe = (t, e) => ((t == null ? void 0 : t.match(e)) || []
             ${typeof f.icon == "function" ? j`<${f.icon} />` : j`<img src=${f.icon} />`}
           <//>
         `)}
-      ${s.find((f) => f.id === "template-manager") && j`<${h$e} text=${n} templatelist=${i} />`}
+      ${s.find((f) => f.id === "template-manager") && i && j`<${h$e} text=${n} templatelist=${i} />`}
       ${t && j`<${g$e}> ${t} <//>`}
       <${d$e} dangerouslySetInnerHTML=${{
     __html: a
