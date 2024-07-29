@@ -35,21 +35,24 @@ function addLineNumberToTokens(defaultRule) {
     if (inlineContainers.includes(tokens[idx].type)) {
       const inlineToken = tokens[idx + 1];
       let lineInParagraph = 0;
+      let lineUsed = false;
       for (const childToken of inlineToken.children) {
         if (childToken.type === "softbreak") {
           lineInParagraph++;
+          lineUsed = false;
           continue;
         }
 
-        childToken.map = [tokens[idx].map[0] + lineInParagraph, tokens[idx].map[0] + lineInParagraph + 1];
+        if (!lineUsed) {
+          childToken.map = [tokens[idx].map[0] + lineInParagraph, tokens[idx].map[0] + lineInParagraph + 1];
+          lineUsed = true;
+        }
       }
     } else if (tokens[idx].map) {
       const line = tokens[idx].map[0] + env.startLine - (env.chunkId !== 0);
-      if (!env.lineMap.current.has(line)) {
-        const id = randomLineId();
-        env.lineMap.current.set(line, id);
-        tokens[idx].attrSet(SRC_LINE_ID, id);
-      }
+      const id = randomLineId();
+      env.lineMap.current.set(line, id);
+      tokens[idx].attrSet(SRC_LINE_ID, id);
     }
 
     if (defaultRule) {
