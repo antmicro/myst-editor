@@ -99,7 +99,7 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
   md.renderer.rules.fence = (tokens, idx, options, env, self) => {
     const token = tokens[idx];
     const sanitizedContent = escapeHtml(token.content);
-    const startLine = parseInt(token.attrGet("data-source-line"));
+    const startLine = token.map[0] + env.startLine - (env.chunkId !== 0);
     let htmlContent = sanitizedContent
       .split("\n")
       .filter((_, i, lines) => i !== lines.length - 1)
