@@ -9,6 +9,8 @@ import { YCommentsParent } from "../components/Comment";
 import useComments from "../hooks/useComments";
 import commentIcon from "../icons/comment.svg?raw";
 import ResolvedComments from "./Resolved";
+import { customHighlighter } from "../extensions/customHighlights";
+import { suggestionCompartment } from "../extensions/suggestions";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -132,6 +134,27 @@ const CodeEditor = styled.div`
   .cm-panels-bottom {
     z-index: 3;
   }
+
+  .cm-suggestion {
+    font-weight: 700;
+
+    &.replaced {
+      font-weight: initial;
+      color: initial !important;
+      text-decoration: line-through;
+    }
+
+    & * {
+      color: inherit;
+    }
+  }
+
+  .cm-replacement {
+    font-weight: 700;
+    display: inline-block;
+    margin-right: 4px;
+    cursor: pointer;
+  }
 `;
 
 const HiddenTextArea = styled.textarea`
@@ -189,6 +212,7 @@ const CodeMirror = ({ text, id, name, mode, collaboration, spellcheckOpts, highl
       doc: collaboration.enabled ? ytext.toString() : text.get(),
       extensions: ExtensionBuilder.basicSetup()
         .useHighlighter(highlights)
+        .useCompartment(suggestionCompartment, customHighlighter([]))
         .useSpellcheck(spellcheckOpts)
         .useCollaboration({
           enabled: collaboration.enabled || false,

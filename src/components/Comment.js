@@ -103,6 +103,12 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
       parent: cmref.current,
     });
 
+    ycomments.syncSuggestions(commentId);
+    ytext.observe((_, tr) => {
+      if (!tr.local) return;
+      ycomments.syncSuggestions(commentId);
+    });
+
     if (ycomments.newLocalComment) {
       view.focus();
       ycomments.newLocalComment = false;

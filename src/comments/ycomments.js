@@ -2,7 +2,9 @@ import * as Y from "yjs";
 import { updateShownComments } from "./state";
 import { WebsocketProvider } from "y-websocket";
 import { EditorView, ViewUpdate } from "@codemirror/view";
-import { MapMode } from "@codemirror/state";
+import { customHighlighter } from "../extensions/customHighlights";
+import { MapMode, Transaction } from "@codemirror/state";
+import { modifyHighlight, parseCommentLine, suggestionCompartment } from "../extensions/suggestions";
 
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
@@ -106,9 +108,10 @@ export class CommentLineAuthors {
  * comments are assigned to which line numbers. */
 export class CommentPositionManager {
   /** @param {Y.Doc} ydoc */
-  constructor(ydoc) {
+  constructor(ydoc, ycomments) {
     /** @type {Y.Map<string>} A map from line numbers to comment ids */
     this.commentPositions = ydoc.getMap(YComments.dataPath);
+    this.ycomments = ycomments;
   }
 
   iter() {
@@ -118,9 +121,12 @@ export class CommentPositionManager {
     }));
   }
 
-  move(commentId, targetLine) {
+  move(commentId, targetLine, syncSuggestions = true) {
     if (targetLine > 0 && !this.isOccupied(targetLine)) {
       this.commentPositions.set(commentId, targetLine);
+    }
+    if (syncSuggestions) {
+      this.ycomments.syncSuggestions(commentId);
     }
   }
 
@@ -131,10 +137,11 @@ export class CommentPositionManager {
         .forEach((c) => this.del(c.commentId));
     }
 
-    this.iter()
+    const filteredComments = this.iter()
       .filter((c) => c.lineNumber >= startLine)
-      .filter((c) => c.lineNumber + diff <= maxLine)
-      .forEach((c) => this.move(c.commentId, c.lineNumber + diff));
+      .filter((c) => c.lineNumber + diff <= maxLine);
+    filteredComments.forEach((c) => this.move(c.commentId, c.lineNumber + diff, false));
+    this.ycomments.syncSuggestions(...filteredComments.map((c) => c.commentId));
   }
 
   isOccupied(lineNumber) {
@@ -282,11 +289,21 @@ export class YComments {
     /** If `true`, it means that this user has just created a new comment */
     this.newLocalComment = false;
 
-    this.positionManager = new CommentPositionManager(ydoc);
+    this.positionManager = new CommentPositionManager(ydoc, this);
     this.displayManager = new DisplayManager(provider);
     this.commentResolver = new ResolvedComments(provider, ydoc);
     this.draggedComment = null;
     this.commentWithPopup = null;
+
+    this.suggestions = ydoc.getMap("suggestions");
+    this.suggestions.observe(() => {
+      if (!this.mainCodeMirror) return;
+      const highlights = [...this.suggestions.values()].flat().map((h) => ({ ...h, target: new RegExp(h.targetRegexSrc, h.targetRegexFlags) }));
+      this.mainCodeMirror.dispatch({
+        effects: suggestionCompartment.reconfigure(customHighlighter(highlights, modifyHighlight, this.positions())),
+        annotations: Transaction.userEvent.of("suggestion"),
+      });
+    });
 
     this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
   }
@@ -341,6 +358,7 @@ export class YComments {
     this.positions().del(commentId);
     this.display().del(commentId);
     this.delText(commentId);
+    this.suggestions.set(commentId, []);
   }
 
   resolveComment(commentId) {
@@ -414,6 +432,7 @@ export class YComments {
       for (let commentId in comments) {
         if (!remoteComments.includes(commentId)) {
           delete comments[commentId];
+          this.suggestions.set(commentId, []);
         }
       }
       return comments;
@@ -421,7 +440,11 @@ export class YComments {
   }
 
   /** Full synchronization between Y.js and Preact state */
+  /** @param {ViewUpdate} update  */
   syncComments(update) {
+    // prevent syncing from suggestion updates
+    if (update.transactions.some((t) => t.isUserEvent("suggestion"))) return;
+
     this.syncCommentLocations(update);
     this.syncRemoteComments();
     this.removeLocalComments();
@@ -435,6 +458,28 @@ export class YComments {
       commentId,
     });
     return this.positions().iter().map(addPreactState);
+  }
+
+  /** If multiple ids are passed, they are updated in one yjs transaction */
+  syncSuggestions(...commentIds) {
+    let suggestions = {};
+    for (const commentId of commentIds) {
+      const text = this.getTextForComment(commentId).toString();
+      const docLineNumber = parseInt(this.positions().get(commentId));
+      const authors = this.lineAuthors(commentId);
+      const lines = text.split("\n").map((text, i) => ({
+        text,
+        commentId,
+        color: authors.get(i + 1)?.color ?? "#111",
+      }));
+      suggestions[commentId] = lines.flatMap(parseCommentLine);
+    }
+
+    this.suggestions.doc.transact(() => {
+      for (const [id, commentSuggestions] of Object.entries(suggestions)) {
+        this.suggestions.set(id, commentSuggestions);
+      }
+    });
   }
 
   updateMainCodeMirror() {

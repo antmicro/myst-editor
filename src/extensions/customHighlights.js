@@ -12,7 +12,7 @@ const defaultHighlights = [
 ];
 
 /** @param {EditorView} view */
-function buildDecorations(view, highlights) {
+function buildDecorations(view, highlights, modifyHighlight, positions) {
   let from = view.visibleRanges[0]?.from || 0;
   let to = view.visibleRanges[0]?.to || undefined;
 
@@ -20,15 +20,23 @@ function buildDecorations(view, highlights) {
   const cmText = view.state.doc.sliceString(from, to);
 
   highlights
-    .flatMap((hl) => [...cmText.matchAll(hl.target)].map((match) => ({ match, hl })))
-    .sort((a, b) => a.match.index - b.match.index)
-    .forEach(({ hl, match }) =>
-      builder.add(
-        from + match.index,
-        from + match.index + match[0].length,
-        hl.cssClass ? Decoration.mark({ class: hl.cssClass }) : Decoration.mark({ class: defaultDecorationClass }),
-      ),
-    );
+    .flatMap((hl) => {
+      const text = !hl.id ? cmText : view.state.doc.line(parseInt(positions.get(hl.id))).text;
+      const localFrom = !hl.id ? from : view.state.doc.line(parseInt(positions.get(hl.id))).from;
+      return [...text.matchAll(hl.target)].map((match) => ({ match, hl: { ...hl, from: localFrom } }));
+    })
+    .sort((a, b) => a.hl.from + a.match.index - (b.hl.from + b.match.index))
+    .forEach(({ hl, match }) => {
+      let markParams = { class: defaultDecorationClass };
+      if (hl.cssClass) {
+        markParams.class = hl.cssClass;
+      }
+      if (modifyHighlight) {
+        modifyHighlight({ builder, from: hl.from, match, hl, markParams, view });
+      }
+
+      builder.add(hl.from + match.index, hl.from + match.index + match[0].length, Decoration.mark(markParams));
+    });
 
   return builder.finish();
 }
@@ -36,21 +44,22 @@ function buildDecorations(view, highlights) {
 /**
  * Returns an extension which will apply `cssClass` to all matches of `target` regex.
  *
- * @param {{target: RegExp, cssClass: string}[]} highlights A list of highlights to apply.
+ * @param {{target: RegExp, cssClass: string, lines: number[], replacement: string}[]} highlights A list of highlights to apply.
  * */
-const customHighlighter = (highlights) => {
+const customHighlighter = (highlights, modifyHighlight, positions) => {
   if (!highlights) highlights = [];
 
   const allHighlights = highlights.concat(defaultHighlights);
-
   return ViewPlugin.fromClass(
     class {
       constructor(/** @type {EditorView} */ view) {
-        this.decorations = buildDecorations(view, allHighlights);
+        this.decorations = buildDecorations(view, allHighlights, modifyHighlight, positions);
       }
 
       update(/** @type {ViewUpdate} */ update) {
-        if (update.docChanged || update.viewportChanged) this.decorations = buildDecorations(update.view, allHighlights);
+        if (update.docChanged || update.viewportChanged) {
+          this.decorations = buildDecorations(update.view, allHighlights, modifyHighlight, positions);
+        }
       }
     },
     {

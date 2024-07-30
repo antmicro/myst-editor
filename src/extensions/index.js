@@ -67,6 +67,11 @@ export class ExtensionBuilder {
     return this;
   }
 
+  useCompartment(compartment, opts) {
+    this.extensions.push(compartment.of(opts));
+    return this;
+  }
+
   useComments({ enabled, ycomments }) {
     if (!enabled) return this;
     this.important.push(commentExtension(ycomments));
