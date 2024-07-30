@@ -28,6 +28,11 @@ const YCommentWrapper = styled.div`
     z-index: 1004;
   }
 
+  .cm-yLineSelection {
+    margin: 0 !important;
+    padding: 0 2px 0 6px;
+  }
+
   .cm-gutters {
     border-width: 0;
   }
@@ -41,6 +46,19 @@ const YCommentWrapper = styled.div`
 
   .cm-scroller {
     overflow-x: unset;
+  }
+
+  .cm-comment-author-colored {
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--bg);
+      z-index: -3;
+    }
   }
 
   .author-avatar {
@@ -79,6 +97,7 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
           .useDefaultHistory()
           .addUpdateListener(updateHeight)
           .showCommentLineAuthors(lineAuthors)
+          .useRemoveSelectionOnBlur(ytext, ycomments.provider)
           .create(),
       }),
       parent: cmref.current,

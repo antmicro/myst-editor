@@ -1,5 +1,5 @@
 import { highlightActiveLine, keymap } from "@codemirror/view";
-import { EditorState, Prec } from "@codemirror/state";
+import { EditorSelection, EditorState, Prec } from "@codemirror/state";
 import { EditorView, basicSetup, minimalSetup } from "codemirror";
 import { yCollab } from "y-codemirror.next";
 import { markdown } from "@codemirror/lang-markdown";
@@ -8,6 +8,7 @@ import spellcheck from "./spellchecker";
 import { customHighlighter } from "./customHighlights";
 import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
+import { createRelativePositionFromTypeIndex } from "yjs";
 
 const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
@@ -69,6 +70,30 @@ export class ExtensionBuilder {
   useComments({ enabled, ycomments }) {
     if (!enabled) return this;
     this.important.push(commentExtension(ycomments));
+    return this;
+  }
+
+  // Also removes the yjs remote selection if the selection is bound to a type starting with `tname`
+  useRemoveSelectionOnBlur(ytext, provider) {
+    this.base.push(
+      EditorView.domEventHandlers({
+        blur(_, /** @type {EditorView} */ view) {
+          const head = view.state.selection.main.head;
+          provider.awareness.setLocalStateField("cursor", {
+            anchor: createRelativePositionFromTypeIndex(ytext, head),
+            head: createRelativePositionFromTypeIndex(ytext, head),
+          });
+
+          // It is not possible to dispatch a CodeMirror update during an update listener. Putting the dispatch in a setTimeout with timeout ms set to 0 circumvents this.
+          setTimeout(() => {
+            view.dispatch({
+              selection: EditorSelection.create([EditorSelection.range(0, 0)]),
+            });
+          }, 0);
+        },
+      }),
+    );
+
     return this;
   }
 

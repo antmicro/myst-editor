@@ -80,7 +80,7 @@ const CodeEditor = styled.div`
   }
 
   .cm-yLineSelection {
-    margin: 0 2px 0 6px !important;
+    margin: 0 2px 0 6px;
   }
 
   .cm-editor {
@@ -199,6 +199,7 @@ const CodeMirror = ({ text, id, name, mode, collaboration, spellcheckOpts, highl
         })
         .useComments({ enabled: collaboration.commentsEnabled, ycomments })
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString()))
+        .useRemoveSelectionOnBlur(ytext, provider)
         .create(),
     });
 
