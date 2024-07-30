@@ -25889,6 +25889,17 @@ const Hm = class {
       this.lineAuthors(s).delete(), this.lineAuthors(s).appendFrom(n.lineAuthors), this.getTextForComment(s).insert(0, r.toString()), this.display().setVisibility(s, !0);
     }
   }
+  moveOrMerge(e, n) {
+    if (!this.positions().isOccupied(n))
+      this.positions().move(e, n);
+    else {
+      const r = this.findCommentOn(n).commentId;
+      this.lineAuthors(r).appendFrom(this.lineAuthors(e).lineAuthors);
+      const i = this.getTextForComment(r);
+      i.insert(i.length, `
+` + this.getTextForComment(e).toString()), this.deleteComment(e), this.display().setVisibility(r, !0);
+    }
+  }
 };
 let Xo = Hm;
 lo(Xo, "commentsPrefix", "comments/");
@@ -25954,7 +25965,7 @@ const w4 = (t, e, n) => I.widget({
     return Boolean(this.commentId);
   }
   createGutterMarker() {
-    this.gutterMarker = document.createElement("div"), this.gutterMarker.classList.add(ci.MAIN_CLASS), this.lineNumber && (this.gutterMarker.style.width = this.lineNumber.toString().length * 7 + "px", this.gutterMarker.ondrop = () => this.ycomments.positions().move(this.ycomments.draggedComment, this.lineNumber), this.gutterMarker.ondragover = (e) => e.preventDefault());
+    this.gutterMarker = document.createElement("div"), this.gutterMarker.classList.add(ci.MAIN_CLASS), this.lineNumber && (this.gutterMarker.style.width = this.lineNumber.toString().length * 7 + "px", this.gutterMarker.ondrop = () => this.ycomments.moveOrMerge(this.ycomments.draggedComment, this.lineNumber), this.gutterMarker.ondragover = (e) => e.preventDefault());
   }
   createPopupIcon() {
     this.icon = document.createElement("section"), this.icon.classList = ci.ICON_CLASS, !this.draggedComment && !this.commentId ? (this.icon.onmouseenter = () => this.icon.classList.add(ci.COMMENT_IMAGE_CLASS), this.icon.onmouseleave = () => this.icon.classList.remove(ci.COMMENT_IMAGE_CLASS)) : (this.icon.onmouseup = () => this.ycomments.display().switchVisibility(this.commentId), this.icon.onmouseenter = () => {
@@ -26212,7 +26223,9 @@ const I4 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
   collaboration: n
 }) => {
   let r = hn(null);
-  const i = Ie(() => t.lineAuthors(e), [e]), s = ig((a) => a.heightChanged && t.updateHeight(e, r.current.clientHeight), [e]), o = t.parentLineHeight(e) + 3.8;
+  const i = Ie(() => t.lineAuthors(e), [e]), s = ig((a) => a.heightChanged && a.view.requestMeasure({
+    read: (c) => t.updateHeight(e, c.dom.clientHeight)
+  }), [e]), o = t.parentLineHeight(e) + 3.8;
   Ke(() => {
     if (!r.current)
       return;
