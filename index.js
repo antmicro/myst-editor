@@ -1,30 +1,30 @@
 import "./MystEditor2.js";
-import u, { render as l, html as d, defaultButtons as c } from "./MystEditor.js";
+import c, { render as d, html as m, defaultButtons as p } from "./MystEditor.js";
 (function() {
   const o = document.createElement("link").relList;
   if (o && o.supports && o.supports("modulepreload"))
     return;
-  for (const e of document.querySelectorAll('link[rel="modulepreload"]'))
-    n(e);
-  new MutationObserver((e) => {
-    for (const i of e)
+  for (const t of document.querySelectorAll('link[rel="modulepreload"]'))
+    s(t);
+  new MutationObserver((t) => {
+    for (const i of t)
       if (i.type === "childList")
-        for (const a of i.addedNodes)
-          a.tagName === "LINK" && a.rel === "modulepreload" && n(a);
+        for (const n of i.addedNodes)
+          n.tagName === "LINK" && n.rel === "modulepreload" && s(n);
   }).observe(document, { childList: !0, subtree: !0 });
-  function r(e) {
+  function a(t) {
     const i = {};
-    return e.integrity && (i.integrity = e.integrity), e.referrerpolicy && (i.referrerPolicy = e.referrerpolicy), e.crossorigin === "use-credentials" ? i.credentials = "include" : e.crossorigin === "anonymous" ? i.credentials = "omit" : i.credentials = "same-origin", i;
+    return t.integrity && (i.integrity = t.integrity), t.referrerpolicy && (i.referrerPolicy = t.referrerpolicy), t.crossorigin === "use-credentials" ? i.credentials = "include" : t.crossorigin === "anonymous" ? i.credentials = "omit" : i.credentials = "same-origin", i;
   }
-  function n(e) {
-    if (e.ep)
+  function s(t) {
+    if (t.ep)
       return;
-    e.ep = !0;
-    const i = r(e);
-    fetch(e.href, i);
+    t.ep = !0;
+    const i = a(t);
+    fetch(t.href, i);
   }
 })();
-let m = `# h1 is quite big
+let h = `# h1 is quite big
 
 ## [h2 which is a link](https://google.com)
 
@@ -119,52 +119,61 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const s = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], p = "0", h = Math.floor(Math.random() * 1e3).toString(), g = s[Math.floor(Math.random() * s.length)];
-let f = [{
+const u = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], r = new URLSearchParams(window.location.search), g = r.get("room") || "0", l = r.get("username") || Math.floor(Math.random() * 1e3).toString(), f = u[Math.floor(Math.random() * u.length)];
+let b = [{
+  target: "say",
+  transform: async (e) => l + " says: '" + e + "'"
+}], y = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
-  transform: (t) => {
-    const [o, r] = t.split("#");
-    return `<a href="https://github.com/${o}/issues/${r}">${t}</a>`;
+  transform: (e) => {
+    const [o, a] = e.split("#");
+    return `<a href="https://github.com/${o}/issues/${a}">${e}</a>`;
   }
 }, {
   target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
-  transform: (t) => {
-    const [o, r] = t.split("!");
-    return `<a href="https://github.com/${o}/pull/${r}">${t}</a>`;
+  transform: (e) => {
+    const [o, a] = e.split("!");
+    return `<a href="https://github.com/${o}/pull/${a}">${e}</a>`;
   }
 }, {
   target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
-  transform: (t) => `<a href="https://github.com/antmicro/myst-editor/issues/${t.slice(1)}">${t}</a>`
+  transform: (e) => `<a href="https://github.com/antmicro/myst-editor/issues/${e.slice(1)}">${e}</a>`
 }, {
   target: new RegExp("(^|(?<=\\s))!\\d+", "g"),
-  transform: (t) => `<a href="https://github.com/antmicro/myst-editor/pull/${t.slice(1)}">${t}</a>`
+  transform: (e) => `<a href="https://github.com/antmicro/myst-editor/pull/${e.slice(1)}">${e}</a>`
 }, {
   target: /@[0-9a-z\-]+/g,
-  transform: (t) => {
-    const o = t.slice(1);
+  transform: (e) => {
+    const o = e.slice(1);
     return `
           <a href='https://github.com/${o}'>
             ${o}
           </a>`;
   }
+}, {
+  target: /\|date\|/g,
+  transform: (e) => new Promise((o) => o(new Date().toLocaleString("en-GB", {
+    timeZone: "UTC"
+  })))
 }];
-l(d`
-          <${u}
+d(m`
+          <${c}
             templatelist="linkedtemplatelist.json"
-            initialText=${m}
+            initialText=${h}
             title="[MyST Editor](https://github.com/antmicro/myst-editor/) demo"
             id="textarea_id"
-            transforms=${f}
+            transforms=${y}
             collaboration=${{
-  enabled: {}.VITE_COLLAB == "ON",
-  commentsEnabled: {}.VITE_COLLAB == "ON",
-  resolvingCommentsEnabled: {}.VITE_COLLAB == "ON",
-  wsUrl: {}.VITE_WS_URL,
-  username: h,
-  room: p,
-  color: g
+  enabled: {}.VITE_COLLAB == "ON" || r.get("collab"),
+  commentsEnabled: {}.VITE_COLLAB == "ON" || r.get("collab"),
+  wsUrl: {}.VITE_WS_URL || r.get("collab_server"),
+  resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || r.get("collab"),
+  username: l,
+  room: g,
+  color: f
 }}
-            includeButtons=${c.concat([{
+            customRoles=${b}
+            includeButtons=${p.concat([{
   text: "Custom button",
   action: () => alert("Custom button action")
 }])}

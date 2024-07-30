@@ -26417,7 +26417,7 @@ const Y4 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMj
     top=${t.display().offset(e)}
     fade=${t.draggedComment == e}
   >
-    <div style="position:relative">
+    <div class="comment-wrapper" style="position:relative">
       ${t.commentWithPopup == e && j`
         <${V4}
           left=${t.marginLeft()}
@@ -26784,7 +26784,7 @@ const H4 = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="20" viewB
         <${lq}>${t.lineNumber}<//>
         ${t.resolvedLine}
       <//>
-      <${tq} color=${e.get(1).color}>
+      <${tq} className="resolved-comment" color=${e.get(1).color}>
         <${nq}>
           <${iy}>
             <${JC} login=${e.get(1).name} color=${e.get(1).color} avatarUrl=${e.get(1).avatar} />
@@ -27090,7 +27090,7 @@ const yq = ({
       state: b,
       parent: h.current
     });
-    return c.current = y, O == null || O.registerCodeMirror(y), u == null || u.watchCollabolators(l), t.onSync((w) => kq(y, w)), () => {
+    return c.current = y, window.myst_editor.main_editor = y, O == null || O.registerCodeMirror(y), u == null || u.watchCollabolators(l), t.onSync((w) => kq(y, w)), () => {
       i.enabled && (u.disconnect(), p.destroy()), y.destroy();
     };
   }, [g]), j`
