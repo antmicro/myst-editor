@@ -509,4 +509,17 @@ export class YComments {
       this.display().setVisibility(id, true);
     }
   }
+
+  moveOrMerge(commentId, targetLine) {
+    if (!this.positions().isOccupied(targetLine)) {
+      this.positions().move(commentId, targetLine);
+    } else {
+      const id = this.findCommentOn(targetLine).commentId;
+      this.lineAuthors(id).appendFrom(this.lineAuthors(commentId).lineAuthors);
+      const text = this.getTextForComment(id);
+      text.insert(text.length, "\n" + this.getTextForComment(commentId).toString());
+      this.deleteComment(commentId);
+      this.display().setVisibility(id, true);
+    }
+  }
 }

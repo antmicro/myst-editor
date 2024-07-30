@@ -33,7 +33,7 @@ class CommentMarker extends GutterMarker {
 
     if (this.lineNumber) {
       this.gutterMarker.style.width = this.lineNumber.toString().length * 7 + "px";
-      this.gutterMarker.ondrop = () => this.ycomments.positions().move(this.ycomments.draggedComment, this.lineNumber);
+      this.gutterMarker.ondrop = () => this.ycomments.moveOrMerge(this.ycomments.draggedComment, this.lineNumber);
       this.gutterMarker.ondragover = (e) => e.preventDefault();
     }
   }

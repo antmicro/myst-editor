@@ -58,7 +58,10 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
 
   const lineAuthors = useMemo(() => ycomments.lineAuthors(commentId), [commentId]);
 
-  const updateHeight = useCallback((update) => update.heightChanged && ycomments.updateHeight(commentId, cmref.current.clientHeight), [commentId]);
+  const updateHeight = useCallback(
+    (update) => update.heightChanged && update.view.requestMeasure({ read: (view) => ycomments.updateHeight(commentId, view.dom.clientHeight) }),
+    [commentId],
+  );
 
   const parentHeight = ycomments.parentLineHeight(commentId) + 3.8;
 
