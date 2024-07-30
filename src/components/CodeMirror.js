@@ -248,7 +248,7 @@ const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collabor
       html`<div class="editor-msg collab-error">
         ${typeof collaboration.error == "string" ? collaboration.error : "No connection to the collaboration server"}
       </div>`}
-      ${collaboration.opts.enabled &&
+      ${collaboration?.opts?.enabled &&
       !collaboration.ready &&
       !collaboration.error &&
       html`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
