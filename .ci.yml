@@ -10,17 +10,35 @@ stages:
 build:
   stage: build
   script:   
-    - npm run lint
+    - yarn run lint
     - yarn build
+  artifacts:
+    paths:
+      - dist
+
+functional-tests:
+  stage: ui-tests
+  dependencies: [build]
+  script:
+    - ./tests/test-server.sh
+    - yarn
+    - npx playwright install-deps &> /dev/null
+    - npx playwright install
+    - yarn test
+  artifacts:
+    when: always
+    paths:
+      - test-results/.last-run.json
+      - playwright-report/index.html
 
 ui-tests:
   stage: ui-tests
   script:
     - apt-get -qqy update > /dev/null 2> /dev/null
     - apt-get -qqy install --no-install-recommends chromium > /dev/null 2> /dev/null
-    - npm run dev&
+    - yarn run dev&
     - node bin/server.js&
-    - npm run ui-test
+    - yarn run ui-test
   artifacts:
     when: always
     paths:

@@ -232,6 +232,7 @@ const CodeMirror = ({ text, id, name, mode, collaboration, spellcheckOpts, highl
       parent: editorMountpoint.current,
     });
     editorRef.current = view;
+    window.myst_editor.main_editor = view;
 
     ycomments?.registerCodeMirror(view);
     provider?.watchCollabolators(setUsers);

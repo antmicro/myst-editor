@@ -144,7 +144,7 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
     top=${ycomments.display().offset(commentId)}
     fade=${ycomments.draggedComment == commentId}
   >
-    <div style="position:relative">
+    <div class="comment-wrapper" style="position:relative">
       ${ycomments.commentWithPopup == commentId &&
       html`
         <${YCommentPopup}

@@ -112,9 +112,16 @@ HTML:
 
       const usercolors = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"];
 
-      const room = "0";
-      const username = Math.floor(Math.random() * 1000).toString();
+      const urlParams = new URLSearchParams(window.location.search);
+      const room = urlParams.get("room") || "0";
+      const username = urlParams.get("username") || Math.floor(Math.random() * 1000).toString();
       const color = usercolors[Math.floor(Math.random() * usercolors.length)];
+      let exampleCustomRoles = [
+        {
+          target: "say",
+          transform: async (content) => username + " says: '" + content + "'",
+        },
+      ];
 
       let exampleTransforms = [
         {
@@ -160,6 +167,10 @@ HTML:
           </a>`;
           },
         },
+        {
+          target: /\|date\|/g,
+          transform: (match) => new Promise((r) => r(new Date().toLocaleString("en-GB", { timeZone: "UTC" }))),
+        },
       ];
       render(
         html`
@@ -170,14 +181,15 @@ HTML:
             id="textarea_id"
             transforms=${exampleTransforms}
             collaboration=${{
-              enabled: import.meta.env.VITE_COLLAB == "ON",
-              commentsEnabled: import.meta.env.VITE_COLLAB == "ON",
-              resolvingCommentsEnabled: import.meta.env.VITE_COLLAB == "ON",
-              wsUrl: import.meta.env.VITE_WS_URL,
+              enabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
+              commentsEnabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
+              wsUrl: import.meta.env.VITE_WS_URL || urlParams.get("collab_server"),
+              resolvingCommentsEnabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
               username,
               room,
               color,
             }}
+            customRoles=${exampleCustomRoles}
             includeButtons=${defaultButtons.concat([
               {
                 text: "Custom button",

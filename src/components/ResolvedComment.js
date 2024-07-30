@@ -254,7 +254,7 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
         <${LineNumber}>${c.lineNumber}<//>
         ${c.resolvedLine}
       <//>
-      <${CommentContainer} color=${authors.get(1).color}>
+      <${CommentContainer} className="resolved-comment" color=${authors.get(1).color}>
         <${CommentTopbar}>
           <${FlexRow}>
             <${Avatar} login=${authors.get(1).name} color=${authors.get(1).color} avatarUrl=${authors.get(1).avatar} />

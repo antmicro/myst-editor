@@ -2,3 +2,5 @@ dist
 node_modules
 .env
 ui-tests/*.png
+test-results
+playwright-report
