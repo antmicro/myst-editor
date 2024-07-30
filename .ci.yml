@@ -18,6 +18,7 @@ build:
 
 functional-tests:
   stage: ui-tests
+  image: node:20
   dependencies: [build]
   script:
     - ./tests/test-server.sh
