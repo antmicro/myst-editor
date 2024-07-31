@@ -2,11 +2,14 @@
 
 ![MyST Editor](./assets/myst.png)
 
-MyST Editor is a collaborative Markdown editor. It uses [MyST](https://mystmd.org/) - a Markdown flavor meant for technical documentation.
-For a general introduction to the MyST syntax, please refer to [MyST Markdown Guide](https://mystmd.org/guide/quickstart-myst-markdown).
-The goal of this manual is to introduce and describe how to use all the editor features effectively.
+MyST Editor is a collaborative Markdown editor. 
+It uses [MyST](https://mystmd.org/) - a Markdown flavor intended for technical documentation.
+For a general introduction to the MyST syntax, please refer to the [MyST Markdown Guide](https://mystmd.org/guide/quickstart-myst-markdown).
+The goal of this manual is to introduce the editor's features and describe how to use them effectively.
 
-- {doc}`topbar` goes over all the elements on the editor topbar
-- {doc}`collaboration` explains the collaborative functionality of the editor
-- {doc}`rich-links` introduces some special syntax to make convenient links to for ex. issues
-- {doc}`comments` showcases how to use the comment functionality
+This manual consists of the following chapters:
+
+- [](topbar.md) - discusses the elements of the editor topbar
+- [](collaboration.md) - discusses functionalities related to collaborative edition
+- [](rich-links.md) - introduces editor-specific syntax for linking to external entities
+- [](comments.md) - showcases how to use comment functionalities

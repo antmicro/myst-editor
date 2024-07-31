@@ -1,44 +1,58 @@
 # Topbar
 
-The editor topbar contains some useful information and buttons. Starting from the left:
+The editor topbar contains information and buttons.
 
-## Left Side Buttons:
+## Left side buttons
 
-![Left Side Buttons](./assets/left-side.png)
+:::{figure-md} left-side-buttons
+![Left side buttons](./assets/left-side.png)
 
-- `Fullscreen` - toggle fullscreen mode (the editor will take up the entire page)
-- `Copy as HTML` - copies the rendered document as HTML, you might find this useful if you want to paste the document somewhere, for example in an email
-- `Refresh Rich Links` - rerenders all the rich links in the document, for more information refer to {doc}`rich-links`
-- `Print to PDF` - save the rendered document as a PDF file or print it straight away
-- `Templates` - some projects might have templates available, which make starting new documents easier. When you click on a template it will ask for confirmation to apply it.
+Left-side topbar buttons
+:::
+
+Starting from the left, the left side topbar visible in {numref}`left-side-buttons` includes the following buttons:
+
+- `Fullscreen` - toggles fullscreen editor mode
+- `Copy document as HTML` - copies the rendered document exported as HTML
+- `Refresh issue links` - re-renders all [rich links](rich-links.md) in the document
+- `Print to PDF` - save the rendered document as a PDF file or print it
+- `Templates` - applies a template for projects that support the feature.
+  
   ```{warning}
-  Applying a template while there is already text in the document will replace all the text with the template. You can undo this action, however if there where any comments in the document, they will be removed.
+  Applying a template while there is already text in the document will replace all the text with the template. 
+  You can undo this action, however any comments in the document will be removed.
   ```
 
 ## Document Name
 
-Shows the name of the document, for example the name of an issue or documentation page.
+Displays the name of the document, for example the name of an issue, documentation page or meeting.
 
 ## User Avatars
 
-Users who are currently editing the document will be shown (including you). When there are too many users, only a couple are shown and there is an indicator saying how many more are editing.
+Avatars of users currently editing a document will be displayed in the topbar. 
+With several collaborators, only a couple avatars are displayed with an indicator of how many more are editing.
 
 ```{tip}
-Hovering over an avatar or the more users indicator reveals usernames.
+Hovering over an avatar or the "more users" indicator reveals usernames.
 ```
 
 ## Custom Buttons
 
-Depending on the configuration of the editor, additional buttons may be shown.
+Depending on the configuration of the editor, you can add more buttons.
 
 ## View Mode Buttons
 
+:::{figure-md} view-mode-buttons
 ![View Mode Buttons](./assets/view-btns.png)
 
-MyST editor has several view modes:
+View Mode buttons
+:::
+
+MyST editor has several view modes, activated with buttons on the right side of the topbar, as illustrated in {numref}`view-mode-buttons`.
+Starting from the left, the buttons serve the following functions:
 
 - `Source` - only show the Markdown source code
-- `Preview` - only show the rendered document
-- `Dual Pane` **(default)** - show Markdown on the left and a preview on the right
+- `Preview` - only show a rendered document preview
+- `Dual Pane` - **(default)** - show Markdown on the left and a rendered preview on the right
 - `Diff View` - show changes made to the document
-- `Resolved Comments` - show resolved comments, for more information check [Resolving Comments](./comments.md#resolving-comments)
+- `Resolved Comments` - show resolved comments, for more information see [Resolving Comments](comments.md#resolving-comments).
