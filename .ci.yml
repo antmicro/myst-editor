@@ -8,7 +8,7 @@ build:
   stage: build
   image: node:20
   before_script:
-  - yarn
+    - yarn
   script:
     - yarn run lint
     - yarn build
@@ -20,9 +20,10 @@ functional-tests:
   stage: ui-tests
   image: node:20
   dependencies: [build]
+  before_script:
+    - yarn
   script:
     - ./tests/test-server.sh
-    - yarn
     - npx playwright install-deps &> /dev/null
     - npx playwright install
     - yarn test
@@ -55,7 +56,7 @@ ui-tests:
   stage: ui-tests
   image: node:20
   before_script:
-  - yarn
+    - yarn
   script:
     - apt-get -qqy update > /dev/null 2> /dev/null
     - apt-get -qqy install --no-install-recommends chromium > /dev/null 2> /dev/null
