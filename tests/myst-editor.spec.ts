@@ -79,7 +79,7 @@ test.describe.parallel("With collaboration disabled", () => {
                         from: 0,
                         insert: "#".repeat(header) + " Some title",
                     },
-                    (html) => expect(html).toContain(`<h${header}>Some title`)
+                    (html) => expect(html.match(`<h${header}.*>Some title`)).toHaveLength(1)
                 )
             });
         })
