@@ -20,7 +20,7 @@ const exposeText = (text) => () => {
 
 const copyHtmlAsRichText = (/** @type {string} */ txt) => {
   // remove data-source-line from the copied html
-  const sanitizedText = txt.replace(/(?<=\<\S+) data-source-line="\d+"/g, "");
+  const sanitizedText = txt.replace(/(?<=\<\S+) data-line-id="\d+"/g, "");
 
   const listener = (e) => {
     e.clipboardData.setData("text/html", sanitizedText);
