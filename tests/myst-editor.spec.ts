@@ -458,6 +458,87 @@ test.describe.parallel("With collaboration enabled", () => {
             expect(await pageB.locator(".resolved-comment").count()).toBe(0);
         });
     });
+
+    test.describe("Suggestions", () => {
+        test("Can be added without replacement", async ({ context }) => {
+            const collabOpts = defaultCollabOpts();
+            const pageA = await openPageWithOpts(context, collabOpts);
+            const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Initialize the document from pageA and add some content
+            await clearEditor(pageA);
+            await insertChangesAndCheckOutput(
+                pageA,
+                { from: 0, insert: "Line1\nLine2\nLine3\nLine4" },
+                (html) => expect(html).toContain("Line4")
+            );
+
+            // Add a comment from pageA
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("|Line2|");
+
+            // Check if the phrase is highlighted
+            expect(await pageA.locator(".cm-suggestion").innerHTML()).toContain("Line2");
+            expect(await pageB.locator(".cm-suggestion").innerHTML()).toContain("Line2");
+        });
+
+        test("Can be added with replacement", async ({ context }) => {
+            const collabOpts = defaultCollabOpts();
+            const pageA = await openPageWithOpts(context, collabOpts);
+            const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Initialize the document from pageA and add some content
+            await clearEditor(pageA);
+            await insertChangesAndCheckOutput(
+                pageA,
+                { from: 0, insert: "Line1\nLine2\nLine3\nLine4" },
+                (html) => expect(html).toContain("Line4")
+            );
+
+            // Add a comment from pageA
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("|Line2 -> 2Line|");
+
+            // Check if the suggestion shows up
+            expect(await pageA.locator(".replaced").innerHTML()).toContain("Line2");
+            expect(await pageA.locator(".cm-replacement").innerHTML()).toContain("2Line");
+            expect(await pageB.locator(".replaced").innerHTML()).toContain("Line2");
+            expect(await pageB.locator(".cm-replacement").innerHTML()).toContain("2Line");
+        });
+
+        test("Can be applied", async ({ context }) => {
+            const collabOpts = defaultCollabOpts();
+            const pageA = await openPageWithOpts(context, collabOpts);
+            const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Initialize the document from pageA and add some content
+            await clearEditor(pageA);
+            await insertChangesAndCheckOutput(
+                pageA,
+                { from: 0, insert: "Line1\nLine2\nLine3\nLine4" },
+                (html) => expect(html).toContain("Line4")
+            );
+
+            // Add a comment from pageA
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("|Line2 -> 2Line|");
+
+            // Apply suggestion
+            await pageA.locator(".cm-replacement").click();
+
+            // Check if the text changed
+            const currentTextA = await pageA.evaluate(() => window.myst_editor.text);
+            expect(currentTextA).toContain("2Line");
+            const currentTextB = await pageB.evaluate(() => window.myst_editor.text);
+            expect(currentTextB).toContain("2Line");
+        });
+    });
 })
 
 test("dist/MystEditor.js exports src/MystEditor.js module", async () => {
