@@ -269,7 +269,7 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
                   <${RestoreIcon} />
                   <p>${restoreText}</p>
                 <//>
-                <${DropdownButton} onClick=${() => ycomments.resolver().delete(c.commentId)}>
+                <${DropdownButton} className="myst-delete-btn" onClick=${() => ycomments.resolver().delete(c.commentId)}>
                   <${DeleteIcon} />
                   <p>DELETE</p>
                 <//>

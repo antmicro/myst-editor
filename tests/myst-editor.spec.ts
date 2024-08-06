@@ -351,6 +351,113 @@ test.describe.parallel("With collaboration enabled", () => {
         });
     })
 
+    test.describe("Resolved Comments", () => {
+        test("Can be restored", async ({ context }) => {
+            const collabOpts = defaultCollabOpts();
+            const pageA = await openPageWithOpts(context, collabOpts);
+            const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Add a comment from pageA
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+
+            // Resolve the comment
+            await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+            await pageA.locator('#textarea_id-editor').getByText('RESOLVE').click();
+
+            // Restore the comment
+            await pageA.locator(".myst-restore-btn").first().click();
+
+            // Verify it is gone from resolved comments
+            expect(await pageA.locator(".resolved-comment").count()).toBe(0);
+            expect(await pageB.locator(".resolved-comment").count()).toBe(0);
+
+            // Verify it appeared in the editor
+            expect(await pageA.locator(".comment-wrapper").count()).toBe(1);
+            expect(await pageB.locator(".comment-wrapper").count()).toBe(1);
+        });
+
+        test("Can be occupied and restored", async ({ context }) => {
+            const collabOpts = defaultCollabOpts();
+            const pageA = await openPageWithOpts(context, collabOpts);
+            const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Add a comment from pageA
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("1");
+
+            // Resolve the comment
+            await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+            await pageA.locator('#textarea_id-editor').getByText('RESOLVE').click();
+
+            // Add a new comment from pageA
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("2");
+
+            // Restore the comment
+            await pageA.locator(".myst-restore-btn").first().click();
+
+            // Verify it is gone from resolved comments
+            expect(await pageA.locator(".resolved-comment").count()).toBe(0);
+            expect(await pageB.locator(".resolved-comment").count()).toBe(0);
+
+            // Verify it is in the editor and contains both lines
+            expect(await pageA.locator(".cm-comment-author-colored").first().innerHTML()).toContain("2");
+            expect(await pageA.locator(".cm-comment-author-colored").last().innerHTML()).toContain("1");
+            expect(await pageB.locator(".cm-comment-author-colored").first().innerHTML()).toContain("2");
+            expect(await pageB.locator(".cm-comment-author-colored").last().innerHTML()).toContain("1");
+        });
+
+        test("Can be orphaned and restored", async ({ context }) => {
+            const collabOpts = defaultCollabOpts();
+            const pageA = await openPageWithOpts(context, collabOpts);
+            const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Add a comment from pageA
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+
+            // Resolve the comment
+            await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+            await pageA.locator('#textarea_id-editor').getByText('RESOLVE').click();
+
+            await clearEditor(pageA);
+
+            // Restore comment
+            await pageA.locator(".myst-restore-btn").first().click();
+
+            // Verify it is at the end of the document
+            expect(await pageA.locator(".comment-wrapper").count()).toBe(1);
+            expect(await pageB.locator(".comment-wrapper").count()).toBe(1);
+        });
+
+        test("Can be deleted", async ({ context }) => {
+            const collabOpts = defaultCollabOpts();
+            const pageA = await openPageWithOpts(context, collabOpts);
+            const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Add a comment from pageA
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+
+            // Resolve the comment
+            await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+            await pageA.locator('#textarea_id-editor').getByText('RESOLVE').click();
+
+            // Delete the comment
+            await pageA.locator(".myst-delete-btn").first().click();
+
+            // Verify it is gone
+            expect(await pageA.locator(".resolved-comment").count()).toBe(0);
+            expect(await pageB.locator(".resolved-comment").count()).toBe(0);
+        });
+    });
 })
 
 test("dist/MystEditor.js exports src/MystEditor.js module", async () => {
