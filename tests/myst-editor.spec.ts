@@ -285,6 +285,70 @@ test.describe.parallel("With collaboration enabled", () => {
             await pageB.waitForSelector(".resolved-comment");
             expect(await pageB.locator(".resolved-comment").count()).toBe(1);
         })
+
+        test("Can be deleted", async ({ context }) => {
+            const collabOpts = defaultCollabOpts();
+            const pageA = await openPageWithOpts(context, collabOpts);
+            const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Add a comment from pageA
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+
+            // Resolve the comment
+            await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+            await pageA.locator('#textarea_id-editor').getByText('DELETE').click();
+
+            // Verify it is gone
+            expect(await pageA.locator(".comment-wrapper").count()).toBe(0);
+            expect(await pageB.locator(".comment-wrapper").count()).toBe(0);
+        });
+
+        test("Can be merged", async ({ context }) => {
+            const collabOpts = defaultCollabOpts();
+            const pageA = await openPageWithOpts(context, collabOpts);
+            const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Initialize the document from pageA and add some content
+            await clearEditor(pageA);
+            await insertChangesAndCheckOutput(
+                pageA,
+                { from: 0, insert: "Line1\nLine2\nLine3\nLine4" },
+                (html) => expect(html).toContain("Line4")
+            );
+
+            // Add a comment from pageA
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+            expect(placesForCommentA.length).toBe(5)
+            await placesForCommentA[1].hover();
+            await placesForCommentA[1].click();
+            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("1");
+
+            // Add a second comment
+            await placesForCommentA[3].hover();
+            await placesForCommentA[3].click();
+            await pageA.locator(".cm-comment-author-colored").last().pressSequentially("2");
+
+            // Drag the comment
+            const from = await placesForCommentA[1].boundingBox() as
+                { x: number; y: number; width: number; height: number; };
+            const to = await placesForCommentA[3].boundingBox() as
+                { x: number; y: number; width: number; height: number; };
+            await pageA.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+            await pageA.mouse.down();
+            await pageA.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 100 });
+            await pageA.mouse.up();
+
+            expect(await pageA.locator(".comment-wrapper").count()).toBe(1);
+            expect(await pageB.locator(".comment-wrapper").count()).toBe(1);
+
+            // Confirm the comment contents are merged
+            expect(await pageA.locator(".cm-comment-author-colored").first().innerHTML()).toContain("2");
+            expect(await pageA.locator(".cm-comment-author-colored").last().innerHTML()).toContain("1");
+            expect(await pageB.locator(".cm-comment-author-colored").first().innerHTML()).toContain("2");
+            expect(await pageB.locator(".cm-comment-author-colored").last().innerHTML()).toContain("1");
+        });
     })
 
 })
