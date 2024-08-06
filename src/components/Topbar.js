@@ -45,7 +45,6 @@ const Topbar = styled.div`
 
 const Title = styled.div`
   font-size: large;
-  font-family: "Lato", sans-serif;
   white-space: nowrap;
   margin-left: 10px;
 

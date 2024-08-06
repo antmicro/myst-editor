@@ -38,6 +38,10 @@
   }
 }
 
+#myst-css-namespace {
+  font-family: "Lato", sans-serif;
+}
+
 #myst-css-namespace .todo {
   background-color: yellow;
 }

@@ -114,20 +114,6 @@ const CodeEditor = styled.div`
     user-select: none;
   }
 
-  .editor-msg {
-    padding: 10px;
-    border-radius: 2px;
-    text-align: center;
-
-    &.collab-error {
-      background-color: var(--red-500);
-    }
-
-    &.collab-notif {
-      background-color: var(--blue-100);
-    }
-  }
-
   .cm-panels-bottom {
     z-index: 3;
   }
@@ -244,14 +230,6 @@ const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collabor
 
   return html`
     <${CodeEditor} className="myst-main-editor" ref=${editorMountpoint} $mode=${mode} id="${id}-editor">
-      ${collaboration.error &&
-      html`<div class="editor-msg collab-error">
-        ${typeof collaboration.error == "string" ? collaboration.error : "No connection to the collaboration server"}
-      </div>`}
-      ${collaboration?.opts?.enabled &&
-      !collaboration.ready &&
-      !collaboration.error &&
-      html`<div class="editor-msg collab-notif">Connecting to the collaboration server ...</div>`}
       ${collaboration.opts.commentsEnabled &&
       !collaboration.error &&
       html`<${YCommentsParent} ycomments=${collaboration.ycomments} collaboration=${collaboration.opts} />`}

@@ -25,7 +25,6 @@ const AvatarsWrapper = styled.div`
       line-height: 30px;
       color: var(--icon-color);
       border-color: var(--icon-border);
-      font-family: "Lato";
       font-style: normal;
       font-size: small;
       font-weight: 700;

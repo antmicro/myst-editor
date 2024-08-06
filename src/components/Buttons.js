@@ -7,7 +7,6 @@ const DefaultButton = styled.button`
 
   cursor: pointer;
   color: var(--icon-color);
-  font-family: "Lato", sans-serif;
   text-transform: uppercase;
   font-size: 12px;
   font-weight: bold;

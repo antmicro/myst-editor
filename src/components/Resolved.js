@@ -12,7 +12,6 @@ const ResolvedWrapper = styled.div`
   border-left: 1px solid var(--gray-600);
   box-shadow: inset 0px 0px 4px var(--gray-600);
   border-radius: var(--border-radius);
-  font-family: "Lato", sans-serif;
   color: var(--gray-900);
 
   & h1 {

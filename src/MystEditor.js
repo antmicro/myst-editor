@@ -54,6 +54,20 @@ const MystWrapper = styled.div`
 `;
 MystWrapper.defaultProps = { className: "myst-editor-wrapper" };
 
+const StatusBanner = styled.div`
+  height: 40px;
+  position: sticky;
+  z-index: 10;
+  width: 100%;
+  top: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${(props) => (props.error ? "var(--red-500)" : "var(--blue-100)")};
+  color: ${(props) => (props.error ? "white" : "inherit")};
+  font-weight: 600;
+`;
+
 const createExtraScopePlugin = (scope) => {
   const plugin = (element, index, children) => {
     if (element.type == "rule") {
@@ -165,6 +179,8 @@ const MystEditor = ({
             title,
           }}
         />`}
+        ${error && html`<${StatusBanner} error> ${typeof error == "string" ? error : "No connection to the collaboration server"} <//>`}
+        ${collaboration.enabled && !ready && !error && html`<${StatusBanner}>Connecting to the collaboration server ...<//>`}
         <${MystWrapper} fullscreen=${fullscreen}>
           <${CodeMirror}
             ...${{

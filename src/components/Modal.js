@@ -20,7 +20,6 @@ const Container = styled.section`
 `;
 
 const Heading = styled.h3`
-  font-family: "Lato", sans-serif;
   color: var(--gray-900);
 `;
 

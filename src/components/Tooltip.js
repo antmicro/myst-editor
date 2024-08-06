@@ -15,7 +15,6 @@ const TooltipContent = styled.div`
   position: relative;
   background: var(--alert);
   color: var(--icon-color);
-  font-family: "Lato", sans-serif;
   text-align: left;
   padding: 10px 20px 10px 20px;
   border-radius: var(--border-radius);
