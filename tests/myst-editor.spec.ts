@@ -198,11 +198,7 @@ test.describe.parallel("With collaboration enabled", () => {
                 (html) => expect(html).toContain("Line4")
             );
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            expect(placesForCommentA.length).toBe(5)
-            await placesForCommentA[2].hover();
-            await placesForCommentA[2].click();
+            await addComment(pageA, 2);
 
             // Confirm that comment was added
             expect(await pageA.locator(".comment-wrapper").count()).toBe(1);
@@ -230,13 +226,10 @@ test.describe.parallel("With collaboration enabled", () => {
                 (html) => expect(html).toContain("Line4")
             );
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            expect(placesForCommentA.length).toBe(5)
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
+            await addComment(pageA, 1);
 
             // Drag the comment
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
             const from = await pageA.locator(".comment-icon").boundingBox() as
                 { x: number; y: number; width: number; height: number; };
             const to = await placesForCommentA[3].boundingBox() as
@@ -263,10 +256,7 @@ test.describe.parallel("With collaboration enabled", () => {
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
+            await addComment(pageA, 1);
 
             // Resolve the comment
             await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
@@ -274,7 +264,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
             // Verify that it disappeared from the editor
             expect(await pageA.locator(".comment-wrapper").count()).toBe(0);
-            
+
             // Verify that it appeared in the resolved comments
             await pageA.getByTitle("Resolved Comments").click();
             await pageA.waitForSelector(".resolved-comment");
@@ -291,10 +281,7 @@ test.describe.parallel("With collaboration enabled", () => {
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
+            await addComment(pageA, 1);
 
             // Resolve the comment
             await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
@@ -318,19 +305,11 @@ test.describe.parallel("With collaboration enabled", () => {
                 (html) => expect(html).toContain("Line4")
             );
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            expect(placesForCommentA.length).toBe(5)
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
-            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("1");
-
-            // Add a second comment
-            await placesForCommentA[3].hover();
-            await placesForCommentA[3].click();
-            await pageA.locator(".cm-comment-author-colored").last().pressSequentially("2");
+            await addComment(pageA, 1, "1");
+            await addComment(pageA, 3, "2");
 
             // Drag the comment
+            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
             const from = await placesForCommentA[1].boundingBox() as
                 { x: number; y: number; width: number; height: number; };
             const to = await placesForCommentA[3].boundingBox() as
@@ -357,10 +336,7 @@ test.describe.parallel("With collaboration enabled", () => {
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
+            await addComment(pageA, 1);
 
             // Resolve the comment
             await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
@@ -383,20 +359,13 @@ test.describe.parallel("With collaboration enabled", () => {
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
-            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("1");
+            await addComment(pageA, 1, "1");
 
             // Resolve the comment
             await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
             await pageA.locator('#textarea_id-editor').getByText('RESOLVE').click();
 
-            // Add a new comment from pageA
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
-            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("2");
+            await addComment(pageA, 1, "2");
 
             // Restore the comment
             await pageA.locator(".myst-restore-btn").first().click();
@@ -417,10 +386,7 @@ test.describe.parallel("With collaboration enabled", () => {
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
+            await addComment(pageA, 1);
 
             // Resolve the comment
             await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
@@ -441,10 +407,7 @@ test.describe.parallel("With collaboration enabled", () => {
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
+            await addComment(pageA, 1);
 
             // Resolve the comment
             await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
@@ -473,11 +436,7 @@ test.describe.parallel("With collaboration enabled", () => {
                 (html) => expect(html).toContain("Line4")
             );
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
-            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("|Line2|");
+            await addComment(pageA, 1, "|Line2|")
 
             // Check if the phrase is highlighted
             expect(await pageA.locator(".cm-suggestion").innerHTML()).toContain("Line2");
@@ -497,11 +456,7 @@ test.describe.parallel("With collaboration enabled", () => {
                 (html) => expect(html).toContain("Line4")
             );
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
-            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("|Line2 -> 2Line|");
+            await addComment(pageA, 1, "|Line2 -> 2Line|")
 
             // Check if the suggestion shows up
             expect(await pageA.locator(".replaced").innerHTML()).toContain("Line2");
@@ -523,11 +478,7 @@ test.describe.parallel("With collaboration enabled", () => {
                 (html) => expect(html).toContain("Line4")
             );
 
-            // Add a comment from pageA
-            const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-            await placesForCommentA[1].hover();
-            await placesForCommentA[1].click();
-            await pageA.locator(".cm-comment-author-colored").first().pressSequentially("|Line2 -> 2Line|");
+            await addComment(pageA, 1, "|Line2 -> 2Line|")
 
             // Apply suggestion
             await pageA.locator(".cm-replacement").click();
@@ -585,4 +536,13 @@ const openPageWithOpts = async (context: BrowserContext, opts: object) => {
     await page.goto("/?" + query.toString());
     await page.waitForSelector(".cm-content");
     return page;
+}
+
+const addComment = async (page: Page, lineNumber: number, text?: string) => {
+    const placesForComment = await page.locator(".comment-gutter-icon").all();
+    await placesForComment[lineNumber].hover();
+    await placesForComment[lineNumber].click();
+    if (text) {
+        await page.locator(".cm-comment-author-colored").last().pressSequentially(text);
+    }
 }
