@@ -15,6 +15,7 @@
     "test": "PW_TEST_HTML_REPORT_OPEN=never playwright test -c tests/playwright.config.js --reporter html"
   },
   "dependencies": {
+    "@agoose77/markdown-it-mermaid": "^1.1.0",
     "@codemirror/commands": "^6.2.4",
     "@codemirror/lang-markdown": "^6.2.3",
     "@codemirror/merge": "@6.0.0",
