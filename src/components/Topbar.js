@@ -15,7 +15,11 @@ const Topbar = styled.div`
   z-index: 10;
   position: sticky;
   top: 0;
-  display: flex;
+
+  display: grid;
+  grid-template-columns: repeat(5, 45px) min-content auto auto 150px 215px;
+  align-items: center;
+
   width: 100%;
   height: 60px;
   background-color: var(--navbar-bg);
@@ -47,18 +51,11 @@ const Title = styled.div`
   font-size: large;
   white-space: nowrap;
   margin-left: 10px;
-
+  overflow: hidden;
+  text-overflow: ellipsis;
   a {
     color: var(--blue-500);
   }
-`;
-
-const TopbarLeft = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  margin-left: 5px;
 `;
 
 const Alert = styled(DefaultButton)`
@@ -68,18 +65,6 @@ const Alert = styled(DefaultButton)`
   background-color: var(--alert);
   border: none;
   width: fit-content;
-`;
-
-const TopbarRight = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-right: 15px;
-
-  button[active] {
-    pointer-events: none;
-  }
 `;
 
 export const TopbarButton = styled(DefaultButton)`
@@ -210,24 +195,19 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
   }
   const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), []);
   const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), []);
-  return html` <${Topbar}>
-    <${TopbarLeft}>
-      ${buttonsLeft.map(
-        (button) => html`
-          <${TopbarButton} className="icon" type="button" key=${button.id} title=${button.tooltip} name=${button.id} onClick=${button.action}>
-            ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
-          <//>
-        `,
-      )}
-      ${buttons.find((b) => b.id === "template-manager") && templatelist && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
-      ${alert && html`<${Alert}> ${alert} <//>`}
-      <${Title} dangerouslySetInnerHTML=${{ __html: titleHtml }} />
-    <//>
-    <${TopbarRight}>
-      <${Avatars} users=${users} />
-      ${textButtons.map((b) => html`<${DefaultButton} type="button" onClick=${b.action}>${b.text}<//>`)}
-
-      <${ButtonGroup} buttons=${editorModeButtons} initialClickedId=${2} />
-    <//>
+  return html` <${Topbar} nTextButtons=${textButtons.length}>
+    ${buttonsLeft.map(
+      (button) => html`
+        <${TopbarButton} className="icon" type="button" key=${button.id} title=${button.tooltip} name=${button.id} onClick=${button.action}>
+          ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
+        <//>
+      `,
+    )}
+    ${buttons.find((b) => b.id === "template-manager") && templatelist && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
+    <span> ${alert && html`<${Alert}> ${alert} <//>`} </span>
+    <${Title} dangerouslySetInnerHTML=${{ __html: titleHtml }} />
+    <${Avatars} users=${users} />
+    <span> ${textButtons.map((b) => html`<${DefaultButton} type="button" onClick=${b.action}>${b.text}<//>`)} </span>
+    <${ButtonGroup} buttons=${editorModeButtons} initialClickedId=${2} />
   <//>`;
 };
