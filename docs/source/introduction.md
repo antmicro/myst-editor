@@ -13,3 +13,5 @@ This manual consists of the following chapters:
 - [](collaboration.md) - discusses functionalities related to collaborative edition
 - [](rich-links.md) - introduces editor-specific syntax for linking to external entities
 - [](comments.md) - showcases how to use comment functionalities
+
+To try MyST Editor, go to its [current demo](https://antmicro.github.io/myst-editor/).
