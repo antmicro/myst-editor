@@ -25202,14 +25202,16 @@ function t6(e, t, n, r) {
     let d = {
       class: qrt
     };
-    u.cssClass && (d.class = u.cssClass), n && n({
+    u.cssClass && (d.class = u.cssClass);
+    let p;
+    n && (p = n({
       builder: o,
       from: u.from,
       match: f,
       hl: u,
       markParams: d,
       view: e
-    }), o.add(u.from + f.index, u.from + f.index + f[0].length, Bt.mark(d));
+    })), o.add(u.from + f.index, u.from + f.index + f[0].length, Bt.mark(d)), p == null || p();
   }), o.finish();
 }
 const h3 = (e, t, n) => {
@@ -25585,17 +25587,20 @@ function cit({
   markParams: i,
   view: s
 }) {
-  r.color && (i.attributes = {
+  if (r.color && (i.attributes = {
     style: `color: ${r.color}`
-  }), r.replacement && (i.class += " replaced", e.add(t + n.index, t + n.index, Bt.widget({
-    widget: new hit({
-      text: r.replacement,
-      color: r.color,
-      from: t + n.index,
-      to: t + n.index + n[0].length,
-      view: s
-    })
-  })));
+  }), r.replacement)
+    return i.class += " replaced", () => {
+      e.add(t + n.index + n[0].length, t + n.index + n[0].length, Bt.widget({
+        widget: new hit({
+          text: r.replacement,
+          color: r.color,
+          from: t + n.index,
+          to: t + n.index + n[0].length,
+          view: s
+        })
+      }));
+    };
 }
 class hit extends si {
   constructor({
@@ -26588,7 +26593,7 @@ const Rit = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvM
   .cm-replacement {
     font-weight: 700;
     display: inline-block;
-    margin-right: 4px;
+    margin-left: 4px;
     cursor: pointer;
   }
 `, Yit = ue.textarea`
@@ -61600,21 +61605,21 @@ const y0e = function(e) {
   var n;
   return !!(e.match(/^\s*flowchart-elk/) || e.match(/^\s*flowchart|graph/) && ((n = t == null ? void 0 : t.flowchart) == null ? void 0 : n.defaultRenderer) === "elk");
 }, x0e = async () => {
-  const { diagram: e } = await import("./flowchart-elk-definition-170a3958.cf5bdcdc.js");
+  const { diagram: e } = await import("./flowchart-elk-definition-170a3958.79c5609c.js");
   return { id: gV, diagram: e };
 }, v0e = {
   id: gV,
   detector: O0e,
   loader: x0e
 }, _0e = v0e, mV = "timeline", k0e = (e) => e.match(/^\s*timeline/) !== null, w0e = async () => {
-  const { diagram: e } = await import("./timeline-definition-8e5a9bc6.a7dd8fcf.js");
+  const { diagram: e } = await import("./timeline-definition-8e5a9bc6.5de8f2e5.js");
   return { id: mV, diagram: e };
 }, S0e = {
   id: mV,
   detector: k0e,
   loader: w0e
 }, C0e = S0e, yV = "mindmap", T0e = (e) => e.match(/^\s*mindmap/) !== null, E0e = async () => {
-  const { diagram: e } = await import("./mindmap-definition-44684416.fb01a7e2.js");
+  const { diagram: e } = await import("./mindmap-definition-44684416.00cf689c.js");
   return { id: yV, diagram: e };
 }, A0e = {
   id: yV,
