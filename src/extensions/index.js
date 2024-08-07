@@ -92,7 +92,7 @@ export class ExtensionBuilder {
           // It is not possible to dispatch a CodeMirror update during an update listener. Putting the dispatch in a setTimeout with timeout ms set to 0 circumvents this.
           setTimeout(() => {
             view.dispatch({
-              selection: EditorSelection.create([EditorSelection.range(0, 0)]),
+              selection: EditorSelection.create([EditorSelection.range(head, head)]),
             });
           }, 0);
         },
