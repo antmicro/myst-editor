@@ -336,6 +336,10 @@ test.describe.parallel("With collaboration enabled", () => {
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
 
+            // Switch to resolved comments view
+            await pageA.getByTitle("Resolved Comments").first().click();
+            await pageB.getByTitle("Resolved Comments").first().click();
+
             await addComment(pageA, 1);
 
             // Resolve the comment
@@ -359,6 +363,10 @@ test.describe.parallel("With collaboration enabled", () => {
             const collabOpts = defaultCollabOpts();
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Switch to resolved comments view
+            await pageA.getByTitle("Resolved Comments").first().click();
+            await pageB.getByTitle("Resolved Comments").first().click();
 
             await addComment(pageA, 1, "1");
 
@@ -388,6 +396,10 @@ test.describe.parallel("With collaboration enabled", () => {
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
 
+            // Switch to resolved comments view
+            await pageA.getByTitle("Resolved Comments").first().click();
+            await pageB.getByTitle("Resolved Comments").first().click();
+
             await addComment(pageA, 1);
 
             // Resolve the comment
@@ -409,6 +421,10 @@ test.describe.parallel("With collaboration enabled", () => {
             const collabOpts = defaultCollabOpts();
             const pageA = await openPageWithOpts(context, collabOpts);
             const pageB = await openPageWithOpts(context, collabOpts);
+
+            // Switch to resolved comments view
+            await pageA.getByTitle("Resolved Comments").first().click();
+            await pageB.getByTitle("Resolved Comments").first().click();
 
             await addComment(pageA, 1);
 
