@@ -262,7 +262,7 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
           <//>
           <${FlexRow}>
             <${ResolvedBy}>Comment resolved by @${c.resolvedBy.name} ${formatter.format(-difference.amount, difference.unit)}<//>
-            <${OptionsContainer}>
+            <${OptionsContainer} className="myst-dropdown-toggle">
               <${OptionsIcon} />
               <${DropdownContainer}>
                 <${DropdownButton} className="myst-restore-btn" onClick=${() => ycomments.restoreComment(c)}>

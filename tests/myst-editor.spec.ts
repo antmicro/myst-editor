@@ -343,6 +343,7 @@ test.describe.parallel("With collaboration enabled", () => {
             await pageA.locator('#textarea_id-editor').getByText('RESOLVE').click();
 
             // Restore the comment
+            await pageA.locator(".myst-dropdown-toggle").first().hover();
             await pageA.locator(".myst-restore-btn").first().click();
 
             // Verify it is gone from resolved comments
@@ -368,6 +369,7 @@ test.describe.parallel("With collaboration enabled", () => {
             await addComment(pageA, 1, "2");
 
             // Restore the comment
+            await pageA.locator(".myst-dropdown-toggle").first().hover();
             await pageA.locator(".myst-restore-btn").first().click();
 
             // Verify it is gone from resolved comments
@@ -395,6 +397,7 @@ test.describe.parallel("With collaboration enabled", () => {
             await clearEditor(pageA);
 
             // Restore comment
+            await pageA.locator(".myst-dropdown-toggle").first().hover();
             await pageA.locator(".myst-restore-btn").first().click();
 
             // Verify it is at the end of the document
@@ -414,6 +417,7 @@ test.describe.parallel("With collaboration enabled", () => {
             await pageA.locator('#textarea_id-editor').getByText('RESOLVE').click();
 
             // Delete the comment
+            await pageA.locator(".myst-dropdown-toggle").first().hover();
             await pageA.locator(".myst-delete-btn").first().click();
 
             // Verify it is gone
