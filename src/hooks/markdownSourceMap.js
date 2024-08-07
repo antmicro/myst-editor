@@ -96,8 +96,18 @@ function wrapTextInSpan(/** @type {markdownIt} */ md) {
 /** Currently the contents of a fenced code block are treated as a singular string so we need to wrap each line with a `span` to attach line metadata.
     If we ever decide to add syntax highlighting in fenced code blocks, this will need to be changed. **/
 function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
+  const defaultFenceRule = md.renderer.rules.fence;
   md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+    const defaultOutput = defaultFenceRule(tokens, idx, options, env, self);
     const token = tokens[idx];
+    // Some markdown-it extensions use the `fence` rule for other things than code blocks (eg. mermaid graphs) so we don't want to modify those
+    if (!defaultOutput.startsWith("<pre")) {
+      const start = defaultOutput.slice(0, 4);
+      const end = defaultOutput.slice(4);
+      // Mermaid graphs do not get the attributes from the token directly, so we need to add them manually.
+      return start + ` ${self.renderAttrs(token)}` + end;
+    }
+
     const sanitizedContent = escapeHtml(token.content);
     const startLine = token.map[0] + env.startLine - (env.chunkId !== 0);
     let htmlContent = sanitizedContent
