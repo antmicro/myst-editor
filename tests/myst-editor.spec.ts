@@ -443,8 +443,8 @@ test.describe.parallel("With collaboration enabled", () => {
             await addComment(pageA, 1, "|Line2|")
 
             // Check if the phrase is highlighted
-            expect(await pageA.locator(".cm-suggestion").innerHTML()).toContain("Line2");
-            expect(await pageB.locator(".cm-suggestion").innerHTML()).toContain("Line2");
+            expect(await pageA.locator(".cm-suggestion").first().innerHTML()).toContain("Line2");
+            expect(await pageB.locator(".cm-suggestion").first().innerHTML()).toContain("Line2");
         });
 
         test("Can be added with replacement", async ({ context }) => {
@@ -463,10 +463,10 @@ test.describe.parallel("With collaboration enabled", () => {
             await addComment(pageA, 1, "|Line2 -> 2Line|")
 
             // Check if the suggestion shows up
-            expect(await pageA.locator(".replaced").innerHTML()).toContain("Line2");
-            expect(await pageA.locator(".cm-replacement").innerHTML()).toContain("2Line");
-            expect(await pageB.locator(".replaced").innerHTML()).toContain("Line2");
-            expect(await pageB.locator(".cm-replacement").innerHTML()).toContain("2Line");
+            expect(await pageA.locator(".replaced").first().innerHTML()).toContain("Line2");
+            expect(await pageA.locator(".cm-replacement").first().innerHTML()).toContain("2Line");
+            expect(await pageB.locator(".replaced").first().innerHTML()).toContain("Line2");
+            expect(await pageB.locator(".cm-replacement").first().innerHTML()).toContain("2Line");
         });
 
         test("Can be applied", async ({ context }) => {
@@ -485,7 +485,7 @@ test.describe.parallel("With collaboration enabled", () => {
             await addComment(pageA, 1, "|Line2 -> 2Line|")
 
             // Apply suggestion
-            await pageA.locator(".cm-replacement").click();
+            await pageA.locator(".cm-replacement").first().click();
 
             // Check if the text changed
             const currentTextA = await pageA.evaluate(() => window.myst_editor.text);
