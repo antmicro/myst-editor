@@ -25567,7 +25567,7 @@ function lit({
       break;
     let s = t.slice(0, i), o = "";
     s.includes("->") && (o = s.slice(s.indexOf("->") + 2).trimStart(), s = s.slice(0, s.indexOf("->")).trimEnd()), s.length !== 0 && r.push({
-      targetRegexSrc: `(?<=^|[ \\t\\r\\.])${ait(s)}(?=$|[\\s\\.])`,
+      targetRegexSrc: `(?<=^|[ \\t\\r\\.]|\\b)${ait(s)}(?=$|[\\s\\.]|\\b)`,
       targetRegexFlags: "gm",
       id: e,
       cssClass: "cm-suggestion",
@@ -61600,21 +61600,21 @@ const y0e = function(e) {
   var n;
   return !!(e.match(/^\s*flowchart-elk/) || e.match(/^\s*flowchart|graph/) && ((n = t == null ? void 0 : t.flowchart) == null ? void 0 : n.defaultRenderer) === "elk");
 }, x0e = async () => {
-  const { diagram: e } = await import("./flowchart-elk-definition-170a3958.a6d869f7.js");
+  const { diagram: e } = await import("./flowchart-elk-definition-170a3958.24679a1d.js");
   return { id: gV, diagram: e };
 }, v0e = {
   id: gV,
   detector: O0e,
   loader: x0e
 }, _0e = v0e, mV = "timeline", k0e = (e) => e.match(/^\s*timeline/) !== null, w0e = async () => {
-  const { diagram: e } = await import("./timeline-definition-8e5a9bc6.fb606662.js");
+  const { diagram: e } = await import("./timeline-definition-8e5a9bc6.c5c59413.js");
   return { id: mV, diagram: e };
 }, S0e = {
   id: mV,
   detector: k0e,
   loader: w0e
 }, C0e = S0e, yV = "mindmap", T0e = (e) => e.match(/^\s*mindmap/) !== null, E0e = async () => {
-  const { diagram: e } = await import("./mindmap-definition-44684416.7a181590.js");
+  const { diagram: e } = await import("./mindmap-definition-44684416.48e953d6.js");
   return { id: yV, diagram: e };
 }, A0e = {
   id: yV,
