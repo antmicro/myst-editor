@@ -26204,7 +26204,7 @@ class qa {
           head: Bd(t, s)
         }), setTimeout(() => {
           i.dispatch({
-            selection: mt.create([mt.range(0, 0)])
+            selection: mt.create([mt.range(s, s)])
           });
         }, 0);
       }
@@ -61600,21 +61600,21 @@ const y0e = function(e) {
   var n;
   return !!(e.match(/^\s*flowchart-elk/) || e.match(/^\s*flowchart|graph/) && ((n = t == null ? void 0 : t.flowchart) == null ? void 0 : n.defaultRenderer) === "elk");
 }, x0e = async () => {
-  const { diagram: e } = await import("./flowchart-elk-definition-170a3958.37c35614.js");
+  const { diagram: e } = await import("./flowchart-elk-definition-170a3958.cf5bdcdc.js");
   return { id: gV, diagram: e };
 }, v0e = {
   id: gV,
   detector: O0e,
   loader: x0e
 }, _0e = v0e, mV = "timeline", k0e = (e) => e.match(/^\s*timeline/) !== null, w0e = async () => {
-  const { diagram: e } = await import("./timeline-definition-8e5a9bc6.0560f26a.js");
+  const { diagram: e } = await import("./timeline-definition-8e5a9bc6.a7dd8fcf.js");
   return { id: mV, diagram: e };
 }, S0e = {
   id: mV,
   detector: k0e,
   loader: w0e
 }, C0e = S0e, yV = "mindmap", T0e = (e) => e.match(/^\s*mindmap/) !== null, E0e = async () => {
-  const { diagram: e } = await import("./mindmap-definition-44684416.3d23f94d.js");
+  const { diagram: e } = await import("./mindmap-definition-44684416.fb01a7e2.js");
   return { id: yV, diagram: e };
 }, A0e = {
   id: yV,
