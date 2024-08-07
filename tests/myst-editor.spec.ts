@@ -459,6 +459,7 @@ test.describe.parallel("With collaboration enabled", () => {
             await addComment(pageA, 1, "|Line2|")
 
             // Check if the phrase is highlighted
+            expect(await pageA.locator(".cm-comment-author-colored").first().innerHTML()).toContain("|Line2|");
             expect(await pageA.locator(".cm-suggestion").first().innerHTML()).toContain("Line2");
             expect(await pageB.locator(".cm-suggestion").first().innerHTML()).toContain("Line2");
         });
@@ -479,6 +480,7 @@ test.describe.parallel("With collaboration enabled", () => {
             await addComment(pageA, 1, "|Line2 -> 2Line|")
 
             // Check if the suggestion shows up
+            expect(await pageA.locator(".cm-comment-author-colored").first().innerHTML()).toContain("|Line2 -> 2Line|");
             expect(await pageA.locator(".replaced").first().innerHTML()).toContain("Line2");
             expect(await pageA.locator(".cm-replacement").first().innerHTML()).toContain("2Line");
             expect(await pageB.locator(".replaced").first().innerHTML()).toContain("Line2");
@@ -501,6 +503,7 @@ test.describe.parallel("With collaboration enabled", () => {
             await addComment(pageA, 1, "|Line2 -> 2Line|")
 
             // Apply suggestion
+            expect(await pageA.locator(".cm-comment-author-colored").first().innerHTML()).toContain("|Line2 -> 2Line|");
             await pageA.locator(".cm-replacement").first().click();
 
             // Check if the text changed
