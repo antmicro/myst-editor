@@ -135,7 +135,7 @@ const CodeEditor = styled.div`
   .cm-replacement {
     font-weight: 700;
     display: inline-block;
-    margin-right: 4px;
+    margin-left: 4px;
     cursor: pointer;
   }
 `;

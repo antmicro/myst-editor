@@ -31,11 +31,14 @@ function buildDecorations(view, highlights, modifyHighlight, positions) {
       if (hl.cssClass) {
         markParams.class = hl.cssClass;
       }
+
+      let applyDecoration;
       if (modifyHighlight) {
-        modifyHighlight({ builder, from: hl.from, match, hl, markParams, view });
+        applyDecoration = modifyHighlight({ builder, from: hl.from, match, hl, markParams, view });
       }
 
       builder.add(hl.from + match.index, hl.from + match.index + match[0].length, Decoration.mark(markParams));
+      applyDecoration?.();
     });
 
   return builder.finish();

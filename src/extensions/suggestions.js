@@ -49,19 +49,21 @@ export function modifyHighlight({ builder, from, match, hl, markParams, view }) 
 
   if (hl.replacement) {
     markParams.class += " replaced";
-    builder.add(
-      from + match.index,
-      from + match.index,
-      Decoration.widget({
-        widget: new Replacement({
-          text: hl.replacement,
-          color: hl.color,
-          from: from + match.index,
-          to: from + match.index + match[0].length,
-          view,
+    return () => {
+      builder.add(
+        from + match.index + match[0].length,
+        from + match.index + match[0].length,
+        Decoration.widget({
+          widget: new Replacement({
+            text: hl.replacement,
+            color: hl.color,
+            from: from + match.index,
+            to: from + match.index + match[0].length,
+            view,
+          }),
         }),
-      }),
-    );
+      );
+    };
   }
 }
 
