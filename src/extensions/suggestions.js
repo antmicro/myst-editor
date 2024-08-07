@@ -27,7 +27,7 @@ export function parseCommentLine({ commentId, text, color }) {
 
     if (targetStr.length !== 0) {
       suggestions.push({
-        targetRegexSrc: `(?<=^|[ \\t\\r\\.])${escapeRegExp(targetStr)}(?=$|[\\s\\.])`,
+        targetRegexSrc: `(?<=^|[ \\t\\r\\.]|\\b)${escapeRegExp(targetStr)}(?=$|[\\s\\.]|\\b)`,
         targetRegexFlags: "gm",
         id: commentId,
         cssClass: "cm-suggestion",
