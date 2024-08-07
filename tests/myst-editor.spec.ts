@@ -563,6 +563,8 @@ const addComment = async (page: Page, lineNumber: number, text?: string) => {
     await placesForComment[lineNumber].hover();
     await placesForComment[lineNumber].click();
     if (text) {
-        await page.locator(".cm-comment-author-colored").last().pressSequentially(text);
+        const commentText = page.locator(".cm-comment-author-colored").last();
+        await commentText.click();
+        await commentText.pressSequentially(text);
     }
 }
