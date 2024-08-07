@@ -25677,10 +25677,10 @@ class dit {
   move(t, n, r = !0) {
     n > 0 && !this.isOccupied(n) && this.commentPositions.set(t, n), r && this.ycomments.syncSuggestions(t);
   }
-  shift(t, n, r) {
-    n < 0 && this.iter().filter((s) => t + n < s.lineNumber && s.lineNumber <= t).forEach((s) => this.del(s.commentId));
-    const i = this.iter().filter((s) => s.lineNumber >= t).filter((s) => s.lineNumber + n <= r);
-    i.forEach((s) => this.move(s.commentId, s.lineNumber + n, !1)), this.ycomments.syncSuggestions(...i.map((s) => s.commentId));
+  shift(t, n, r, i) {
+    n < 0 && this.iter().filter((o) => t + n < o.lineNumber && o.lineNumber <= t).forEach((o) => this.del(o.commentId));
+    const s = this.iter().filter((o) => i ? o.lineNumber > t : o.lineNumber >= t).filter((o) => o.lineNumber + n <= r);
+    s.forEach((o) => this.move(o.commentId, o.lineNumber + n, !1)), this.ycomments.syncSuggestions(...s.map((o) => o.commentId));
   }
   isOccupied(t) {
     return this.iter().some((n) => n.lineNumber == t);
@@ -25993,8 +25993,8 @@ const yit = (e, t, n) => Bt.widget({
   if (e.isUserEvent("input") || e.isUserEvent("delete")) {
     const n = e.state.doc.lines - e.startState.doc.lines;
     if (n != 0 && e.selection != null) {
-      const r = e.state.doc.lines, i = e.state.doc.lineAt(e.selection.main.from).number - n;
-      t.positions().shift(i, n, r);
+      const r = e.state.doc.lines, i = e.state.doc.lineAt(e.selection.main.from).number - n, s = e.selection.main.from === e.state.doc.lineAt(e.selection.main.from).to;
+      t.positions().shift(i, n, r, s);
     }
   }
 }, _it = bn.define({
@@ -61600,21 +61600,21 @@ const y0e = function(e) {
   var n;
   return !!(e.match(/^\s*flowchart-elk/) || e.match(/^\s*flowchart|graph/) && ((n = t == null ? void 0 : t.flowchart) == null ? void 0 : n.defaultRenderer) === "elk");
 }, x0e = async () => {
-  const { diagram: e } = await import("./flowchart-elk-definition-170a3958.24679a1d.js");
+  const { diagram: e } = await import("./flowchart-elk-definition-170a3958.37c35614.js");
   return { id: gV, diagram: e };
 }, v0e = {
   id: gV,
   detector: O0e,
   loader: x0e
 }, _0e = v0e, mV = "timeline", k0e = (e) => e.match(/^\s*timeline/) !== null, w0e = async () => {
-  const { diagram: e } = await import("./timeline-definition-8e5a9bc6.c5c59413.js");
+  const { diagram: e } = await import("./timeline-definition-8e5a9bc6.0560f26a.js");
   return { id: mV, diagram: e };
 }, S0e = {
   id: mV,
   detector: k0e,
   loader: w0e
 }, C0e = S0e, yV = "mindmap", T0e = (e) => e.match(/^\s*mindmap/) !== null, E0e = async () => {
-  const { diagram: e } = await import("./mindmap-definition-44684416.48e953d6.js");
+  const { diagram: e } = await import("./mindmap-definition-44684416.3d23f94d.js");
   return { id: yV, diagram: e };
 }, A0e = {
   id: yV,
