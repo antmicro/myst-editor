@@ -130,7 +130,7 @@ export class CommentPositionManager {
     }
   }
 
-  shift(startLine, diff, maxLine) {
+  shift(startLine, diff, maxLine, endOfLine) {
     if (diff < 0) {
       this.iter()
         .filter((c) => startLine + diff < c.lineNumber && c.lineNumber <= startLine)
@@ -138,7 +138,7 @@ export class CommentPositionManager {
     }
 
     const filteredComments = this.iter()
-      .filter((c) => c.lineNumber >= startLine)
+      .filter((c) => (endOfLine ? c.lineNumber > startLine : c.lineNumber >= startLine))
       .filter((c) => c.lineNumber + diff <= maxLine);
     filteredComments.forEach((c) => this.move(c.commentId, c.lineNumber + diff, false));
     this.ycomments.syncSuggestions(...filteredComments.map((c) => c.commentId));
