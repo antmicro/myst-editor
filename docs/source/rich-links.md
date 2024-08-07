@@ -1,16 +1,20 @@
 # Rich Links
 
-MyST editor has some convenient syntax for adding links to certain things
+MyST editor offers convenient links for integrating with parts of your chosen infrastructure.
+Below we provide examples of the functionality integrated with GitHub's infrastructure.
+
+You can test these functionalities in the [MyST Editor demo](https://antmicro.github.io/myst-editor/).
 
 ## Issues
 
-Using the number of an issue and optionally the repo name you can link to the issue. Without a git repository name it will assume the same repo MyST is deployed to.
+You can link to an issue by using a issue number and optionally a repository name. 
+Without a repository name, the editor will assume the same repo MyST is deployed to.
 
 ```md
 #<issue number>
 eg. #11111
 
-#<repo><issue number>
+<repo>#<issue number>
 eg. github/docs#11111
 ```
 
@@ -22,22 +26,22 @@ You can link to a pull request by the PR number and optionally the git repositor
 !<PR number>
 eg. !213
 
-!<repo><PR number>
+<repo>!<PR number>
 eg. antmicro/myst-editor!2
 ```
 
 ## Mentions
 
-You can mention another person which will render a link to their profile.
+You can mention another user, which will render a link to their profile.
 
 ```md
 @<username>
-eg. @jkowalski
+eg. @jdoe
 ```
 
-## Say phrase
+## 'Say' phrase
 
-Using a custom role on a inline code block you can put your username next to some text:
+You can put your username next to a string of text within an inline code block by using the `{say}` custom role:
 
 ```md
 {say}`<text>`
@@ -46,4 +50,4 @@ eg. {say}`something` -> will render as: <username> says: 'something'
 
 ## Refreshing Links
 
-There are some scenarios where you might want to refresh these links. To do this press the `Refresh issue links` button in the left of the topbar.
+To refresh all rich links within a document, click the `Refresh issue links` button in the [left section of the topbar](topbar.md#left-side-buttons).
