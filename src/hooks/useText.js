@@ -4,7 +4,6 @@ import markdownIt from "markdown-it";
 import { markdownReplacer, useCustomRoles } from "./markdownReplacer";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "preact/hooks";
 import IMurMurHash from "imurmurhash";
-import markdownItMermaid from "@agoose77/markdown-it-mermaid";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -63,12 +62,7 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
   }, []);
 
   const markdown = useMemo(
-    () =>
-      markdownIt({ breaks: true, linkify: true })
-        .use(markdownitDocutils)
-        .use(markdownReplacer(transforms))
-        .use(useCustomRoles(customRoles))
-        .use(markdownItMermaid),
+    () => markdownIt({ breaks: true, linkify: true }).use(markdownitDocutils).use(markdownReplacer(transforms)).use(useCustomRoles(customRoles)),
     [],
   );
 
