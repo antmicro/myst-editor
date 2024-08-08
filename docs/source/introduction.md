@@ -11,6 +11,7 @@ This manual consists of the following chapters:
 
 - [](topbar.md) - discusses the elements of the editor topbar
 - [](collaboration.md) - discusses functionalities related to collaborative edition
+- [](mermaid.md) - discusses support for [Mermaid diagrams](https://mermaid.js.org/)
 - [](rich-links.md) - introduces editor-specific syntax for linking to external entities
 - [](comments.md) - showcases how to use comment functionalities
 

@@ -6,6 +6,7 @@
 introduction
 topbar
 collaboration
+mermaid
 rich-links
 comments
 ```
