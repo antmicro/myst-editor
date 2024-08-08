@@ -1,30 +1,5 @@
-import "./MystEditorDemo.js";
-import { q as c, m as d, M as m, d as p } from "./MystEditor.js";
-(function() {
-  const o = document.createElement("link").relList;
-  if (o && o.supports && o.supports("modulepreload"))
-    return;
-  for (const t of document.querySelectorAll('link[rel="modulepreload"]'))
-    s(t);
-  new MutationObserver((t) => {
-    for (const i of t)
-      if (i.type === "childList")
-        for (const n of i.addedNodes)
-          n.tagName === "LINK" && n.rel === "modulepreload" && s(n);
-  }).observe(document, { childList: !0, subtree: !0 });
-  function r(t) {
-    const i = {};
-    return t.integrity && (i.integrity = t.integrity), t.referrerpolicy && (i.referrerPolicy = t.referrerpolicy), t.crossorigin === "use-credentials" ? i.credentials = "include" : t.crossorigin === "anonymous" ? i.credentials = "omit" : i.credentials = "same-origin", i;
-  }
-  function s(t) {
-    if (t.ep)
-      return;
-    t.ep = !0;
-    const i = r(t);
-    fetch(t.href, i);
-  }
-})();
-let h = `# h1 is quite big
+import r, { render as n, html as u, defaultButtons as l } from "./MystEditor.js";
+let m = `# h1 is quite big
 
 ## [h2 which is a link](https://google.com)
 
@@ -119,21 +94,21 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const u = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), g = a.get("room") || "0", l = a.get("username") || Math.floor(Math.random() * 1e3).toString(), f = u[Math.floor(Math.random() * u.length)];
-let b = [{
+const a = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], o = new URLSearchParams(window.location.search), d = o.get("room") || "0", s = o.get("username") || Math.floor(Math.random() * 1e3).toString(), c = a[Math.floor(Math.random() * a.length)];
+let h = [{
   target: "say",
-  transform: async (e) => l + " says: '" + e + "'"
-}], y = [{
+  transform: async (e) => s + " says: '" + e + "'"
+}], p = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
-    const [o, r] = e.split("#");
-    return `<a href="https://github.com/${o}/issues/${r}">${e}</a>`;
+    const [t, i] = e.split("#");
+    return `<a href="https://github.com/${t}/issues/${i}">${e}</a>`;
   }
 }, {
   target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
   transform: (e) => {
-    const [o, r] = e.split("!");
-    return `<a href="https://github.com/${o}/pull/${r}">${e}</a>`;
+    const [t, i] = e.split("!");
+    return `<a href="https://github.com/${t}/pull/${i}">${e}</a>`;
   }
 }, {
   target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
@@ -144,36 +119,36 @@ let b = [{
 }, {
   target: /@[0-9a-z\-]+/g,
   transform: (e) => {
-    const o = e.slice(1);
+    const t = e.slice(1);
     return `
-          <a href='https://github.com/${o}'>
-            ${o}
+          <a href='https://github.com/${t}'>
+            ${t}
           </a>`;
   }
 }, {
   target: /\|date\|/g,
-  transform: (e) => new Promise((o) => o(new Date().toLocaleString("en-GB", {
+  transform: (e) => new Promise((t) => t(new Date().toLocaleString("en-GB", {
     timeZone: "UTC"
   })))
 }];
-c(d`
-          <${m}
+n(u`
+          <${r}
             templatelist="linkedtemplatelist.json"
-            initialText=${h}
+            initialText=${m}
             title="[MyST Editor](https://github.com/antmicro/myst-editor/) demo"
             id="textarea_id"
-            transforms=${y}
+            transforms=${p}
             collaboration=${{
-  enabled: {}.VITE_COLLAB == "ON" || a.get("collab"),
-  commentsEnabled: {}.VITE_COLLAB == "ON" || a.get("collab"),
-  wsUrl: {}.VITE_WS_URL || a.get("collab_server"),
-  resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || a.get("collab"),
-  username: l,
-  room: g,
-  color: f
+  enabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
+  commentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
+  wsUrl: {}.VITE_WS_URL || o.get("collab_server"),
+  resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
+  username: s,
+  room: d,
+  color: c
 }}
-            customRoles=${b}
-            includeButtons=${p.concat([{
+            customRoles=${h}
+            includeButtons=${l.concat([{
   text: "Custom button",
   action: () => alert("Custom button action")
 }])}
