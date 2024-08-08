@@ -14,7 +14,6 @@ export default defineConfig({
     lib: {
       entry: [
         resolve(__dirname, 'src/MystEditor.js'),
-        resolve(__dirname, 'src/styles/MystEditor.css'),
         resolve(__dirname, 'src/index.html')
       ],
       formats: ['es'],
@@ -22,19 +21,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         assetFileNames: 'MystEditor.css',
-        chunkFileNames: (chunk) => {
-          if (chunk.name === "MystEditor") {
-            // This will be the main MystEditor library file
-            return "MystEditor.js";
+        manualChunks: (module) => {
+          if (module.includes("index.html")) {
+            return "index";
+          } else {
+            return "MystEditor";
           }
-          return "[name]-[hash].js";
-        },
-        entryFileNames: (chunk) => {
-          if (chunk.name === "MystEditor") {
-            // This will apply to files generated for the index.html MyST demo
-            return "MystEditorDemo.js";
-          }
-          return "[name].js";
         }
       }
     }
