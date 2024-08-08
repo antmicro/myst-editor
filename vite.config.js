@@ -22,6 +22,20 @@ export default defineConfig({
     rollupOptions: {
       output: {
         assetFileNames: 'MystEditor.css',
+        chunkFileNames: (chunk) => {
+          if (chunk.name === "MystEditor") {
+            // This will be the main MystEditor library file
+            return "MystEditor.js";
+          }
+          return "[name]-[hash].js";
+        },
+        entryFileNames: (chunk) => {
+          if (chunk.name === "MystEditor") {
+            // This will apply to files generated for the index.html MyST demo
+            return "MystEditorDemo.js";
+          }
+          return "[name].js";
+        }
       }
     }
   },
