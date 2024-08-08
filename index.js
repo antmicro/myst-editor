@@ -1,5 +1,5 @@
-import "./MystEditor2.js";
-import c, { render as d, html as m, defaultButtons as p } from "./MystEditor.js";
+import "./MystEditorDemo.js";
+import { q as c, m as d, M as m, d as p } from "./MystEditor.js";
 (function() {
   const o = document.createElement("link").relList;
   if (o && o.supports && o.supports("modulepreload"))
@@ -12,7 +12,7 @@ import c, { render as d, html as m, defaultButtons as p } from "./MystEditor.js"
         for (const n of i.addedNodes)
           n.tagName === "LINK" && n.rel === "modulepreload" && s(n);
   }).observe(document, { childList: !0, subtree: !0 });
-  function a(t) {
+  function r(t) {
     const i = {};
     return t.integrity && (i.integrity = t.integrity), t.referrerpolicy && (i.referrerPolicy = t.referrerpolicy), t.crossorigin === "use-credentials" ? i.credentials = "include" : t.crossorigin === "anonymous" ? i.credentials = "omit" : i.credentials = "same-origin", i;
   }
@@ -20,7 +20,7 @@ import c, { render as d, html as m, defaultButtons as p } from "./MystEditor.js"
     if (t.ep)
       return;
     t.ep = !0;
-    const i = a(t);
+    const i = r(t);
     fetch(t.href, i);
   }
 })();
@@ -119,21 +119,21 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const u = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], r = new URLSearchParams(window.location.search), g = r.get("room") || "0", l = r.get("username") || Math.floor(Math.random() * 1e3).toString(), f = u[Math.floor(Math.random() * u.length)];
+const u = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), g = a.get("room") || "0", l = a.get("username") || Math.floor(Math.random() * 1e3).toString(), f = u[Math.floor(Math.random() * u.length)];
 let b = [{
   target: "say",
   transform: async (e) => l + " says: '" + e + "'"
 }], y = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
-    const [o, a] = e.split("#");
-    return `<a href="https://github.com/${o}/issues/${a}">${e}</a>`;
+    const [o, r] = e.split("#");
+    return `<a href="https://github.com/${o}/issues/${r}">${e}</a>`;
   }
 }, {
   target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
   transform: (e) => {
-    const [o, a] = e.split("!");
-    return `<a href="https://github.com/${o}/pull/${a}">${e}</a>`;
+    const [o, r] = e.split("!");
+    return `<a href="https://github.com/${o}/pull/${r}">${e}</a>`;
   }
 }, {
   target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
@@ -156,18 +156,18 @@ let b = [{
     timeZone: "UTC"
   })))
 }];
-d(m`
-          <${c}
+c(d`
+          <${m}
             templatelist="linkedtemplatelist.json"
             initialText=${h}
             title="[MyST Editor](https://github.com/antmicro/myst-editor/) demo"
             id="textarea_id"
             transforms=${y}
             collaboration=${{
-  enabled: {}.VITE_COLLAB == "ON" || r.get("collab"),
-  commentsEnabled: {}.VITE_COLLAB == "ON" || r.get("collab"),
-  wsUrl: {}.VITE_WS_URL || r.get("collab_server"),
-  resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || r.get("collab"),
+  enabled: {}.VITE_COLLAB == "ON" || a.get("collab"),
+  commentsEnabled: {}.VITE_COLLAB == "ON" || a.get("collab"),
+  wsUrl: {}.VITE_WS_URL || a.get("collab_server"),
+  resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || a.get("collab"),
   username: l,
   room: g,
   color: f
