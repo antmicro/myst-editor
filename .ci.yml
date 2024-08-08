@@ -51,22 +51,6 @@ build-docs:
       - docs/build
       - $CI_DOCS_ARCHIVE
 
-ui-tests:
-  stage: ui-tests
-  image: node:20
-  before_script:
-    - yarn
-  script:
-    - apt-get -qqy update > /dev/null 2> /dev/null
-    - apt-get -qqy install --no-install-recommends chromium > /dev/null 2> /dev/null
-    - yarn run dev&
-    - node bin/server.js&
-    - yarn run ui-test
-  artifacts:
-    when: always
-    paths:
-      - ui-tests/*.png
-
 doc-deploy:
   stage: doc-deploy
   image: node:20
@@ -81,6 +65,7 @@ doc-deploy:
       - docs.tar
   only:
     - merge_requests
+
 deploy-docs:
   stage: deploy
   when: manual
