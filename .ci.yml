@@ -70,6 +70,7 @@ ui-tests:
 
 doc-deploy:
   stage: doc-deploy
+  image: node:20
   tags: ["docs"]
   dependencies: [build]
   script:
