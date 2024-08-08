@@ -204,7 +204,7 @@ const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collabor
         })
         .useComments({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments })
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString()))
-        .useRemoveSelectionOnBlur(collaboration.ytext, collaboration.provider)
+        .useRemoveSelectionOnBlur()
         .create(),
     });
 

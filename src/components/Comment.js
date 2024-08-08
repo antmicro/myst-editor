@@ -97,7 +97,7 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
           .useDefaultHistory()
           .addUpdateListener(updateHeight)
           .showCommentLineAuthors(lineAuthors)
-          .useRemoveSelectionOnBlur(ytext, ycomments.provider)
+          .useRemoveSelectionOnBlur()
           .create(),
       }),
       parent: cmref.current,
