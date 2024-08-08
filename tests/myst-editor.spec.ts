@@ -1,6 +1,7 @@
 import { ChangeSpec } from '@codemirror/state';
 import { test, expect, Page, BrowserContext } from '@playwright/test';
 import { EditorView } from 'codemirror';
+import fs from "fs/promises"
 
 declare global {
     interface Window {
@@ -286,6 +287,21 @@ test.describe.parallel("With collaboration enabled", () => {
         })
     })
 
+})
+
+test("dist/MystEditor.js exports src/MystEditor.js module", async () => {
+    const module = await fs.readFile("dist/MystEditor.js");
+    expect(module.length)
+        .toBeGreaterThan(3000);
+
+    const moduleContent = module.toString();
+
+    ["spellcheckOpts",
+        "highlights",
+        "collaboration",
+        "ycomments",
+        "commentsEnabled"]
+        .forEach(s => expect(moduleContent).toContain(s))
 })
 
 ///////////////////////// UTILITY FUNCTIONS /////////////////////////
