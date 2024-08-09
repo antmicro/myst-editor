@@ -568,10 +568,13 @@ const addComment = async (page: Page, lineNumber: number, text?: string) => {
     await placesForComment[lineNumber].hover();
     await placesForComment[lineNumber].click();
     if (text) {
+        await page.locator(".cm-comment-author-colored").last().fill(text);
+        // for some reason yjs does not pick up the changes made above, so we need to add them below
         await page.evaluate(({lineNumber, text}) => {
             const ycomments = window.myst_editor.ycomments
             const commentId = ycomments.findCommentOn(lineNumber + 1)?.commentId;
             ycomments.getTextForComment(commentId).insert(0, text);
+            ycomments.syncSuggestions(commentId);
         }, {lineNumber, text});
     }
 }
