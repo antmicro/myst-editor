@@ -24,8 +24,7 @@ functional-tests:
     - yarn
   script:
     - ./tests/test-server.sh
-    - npx playwright install-deps &> /dev/null
-    - npx playwright install
+    - npx playwright install --with-deps chromium
     - yarn test
   artifacts:
     when: always
