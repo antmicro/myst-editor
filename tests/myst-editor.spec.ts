@@ -2,12 +2,14 @@ import { ChangeSpec } from '@codemirror/state';
 import { test, expect, Page, BrowserContext } from '@playwright/test';
 import { EditorView } from 'codemirror';
 import fs from "fs/promises"
+import { YComments } from '../src/comments/ycomments';
 
 declare global {
     interface Window {
         myst_editor: {
             text: string,
-            main_editor: EditorView
+            main_editor: EditorView,
+            ycomments: YComments
         };
     }
 }
@@ -566,6 +568,10 @@ const addComment = async (page: Page, lineNumber: number, text?: string) => {
     await placesForComment[lineNumber].hover();
     await placesForComment[lineNumber].click();
     if (text) {
-        await page.locator(".cm-comment-author-colored").last().fill(text);
+        await page.evaluate(({lineNumber, text}) => {
+            const ycomments = window.myst_editor.ycomments
+            const commentId = ycomments.findCommentOn(lineNumber + 1)?.commentId;
+            ycomments.getTextForComment(commentId).insert(0, text);
+        }, {lineNumber, text});
     }
 }
