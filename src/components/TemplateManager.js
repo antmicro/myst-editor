@@ -138,15 +138,7 @@ const TemplateManager = ({ text, templatelist }) => {
   useEffect(() => getTemplateConfig(templatelist).then(validateTemplConfig).then(fillTemplatesWithFetchedData).then(setReadyTemplates), []);
 
   if (generalErr.error) {
-    return html` <${TopbarButton}
-        type="button"
-        template=${template}
-        onMouseEnter=${() => setShowTooltip(true)}
-        onMouseLeave=${() => setShowTooltip(false)}
-      >
-        <${TemplateIcon} />
-      <//>
-      <${showTooltip && Tooltip} tooltipOrientation="bottom" errorMessage=${generalErr.message} />`;
+    return null;
   }
 
   if (Object.keys(readyTemplates).length == 0) {
