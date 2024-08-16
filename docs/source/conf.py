@@ -20,6 +20,7 @@ from antmicro_sphinx_utils.defaults import (
     antmicro_html,
     antmicro_latex
 )
+from os import environ
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -71,7 +72,7 @@ html_show_sphinx = False
     html_logo,
     html_theme_options,
     html_context
-) = antmicro_html(pdf_url=f"{basic_filename}.pdf")
+) = antmicro_html(pdf_url=f"{basic_filename}.pdf", gh_slug="antmicro/myst-editor" if environ.get("GITHUB_ACTIONS") == "true" else None)
 
 html_title = project
 
