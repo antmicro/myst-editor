@@ -7,7 +7,8 @@ import { ExtensionBuilder } from "../extensions";
 import { YCommentsParent } from "../components/Comment";
 import commentIcon from "../icons/comment.svg?raw";
 import { customHighlighter } from "../extensions/customHighlights";
-import { suggestionCompartment } from "../extensions/suggestions";
+import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
+import editIcon from "../icons/edit.svg";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -203,6 +204,7 @@ const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collabor
           editorRef,
         })
         .useComments({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments })
+        .useSuggestionPopup({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments })
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString()))
         .useRemoveSelectionOnBlur()
         .create(),
@@ -233,6 +235,10 @@ const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collabor
       ${collaboration.opts.commentsEnabled &&
       !collaboration.error &&
       html`<${YCommentsParent} ycomments=${collaboration.ycomments} collaboration=${collaboration.opts} />`}
+      ${collaboration.opts.commentsEnabled &&
+      html`<${AddSuggestionBtn} style="display: none" className="myst-add-suggestion" title="Suggest Changes">
+        <img src=${editIcon} alt="edit" />
+      <//>`}
     <//>
     <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;

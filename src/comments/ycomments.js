@@ -283,6 +283,11 @@ export class YComments {
     this.draggedComment = null;
     this.commentWithPopup = null;
 
+    /** commentId -> (EditorView) => void - here a listener can be added to wait for an editor for a comment to become available */
+    this.commentEditorsListeners = new Map();
+    /** commentId -> CodeMirror View */
+    this.commentEditors = new Map();
+
     this.suggestions = ydoc.getMap("suggestions");
     this.suggestions.observe(() => {
       if (!this.mainCodeMirror) return;
@@ -554,5 +559,24 @@ export class YComments {
       this.deleteComment(commentId);
       this.display().setVisibility(id, true);
     }
+  }
+
+  registerCommentEditor(commentId, view) {
+    this.commentEditors.set(commentId, view);
+    if (this.commentEditorsListeners.has(commentId)) {
+      this.commentEditorsListeners.get(commentId)(view);
+      this.commentEditorsListeners.delete(commentId);
+    }
+  }
+
+  getEditorForComment(commentId) {
+    return new Promise((resolve) => {
+      if (this.commentEditors.has(commentId)) {
+        resolve(this.commentEditors.get(commentId));
+      } else {
+        // Wait for the editor to be available, then resolve.
+        this.commentEditorsListeners.set(commentId, resolve);
+      }
+    });
   }
 }

@@ -1,5 +1,9 @@
-import { Compartment, StateEffect } from "@codemirror/state";
-import { Decoration, WidgetType } from "@codemirror/view";
+import { Compartment, EditorSelection, StateEffect } from "@codemirror/state";
+import { Decoration, EditorView, ViewUpdate, WidgetType } from "@codemirror/view";
+import { YComments } from "../comments/ycomments";
+import { lineAuthorsEffect } from "../comments/lineAuthors";
+import styled from "styled-components";
+import DefaultButton from "../components/Buttons";
 
 export const suggestionEffect = StateEffect.define();
 
@@ -27,7 +31,7 @@ export function parseCommentLine({ commentId, text, color }) {
 
     if (targetStr.length !== 0) {
       suggestions.push({
-        targetRegexSrc: `(?<=^|[ \\t\\r\\.]|\\b)${escapeRegExp(targetStr)}(?=$|[\\s\\.]|\\b)`,
+        targetRegexSrc: `(?<=^|[ \\t\\r\\.]|\\W)${escapeRegExp(targetStr)}(?=$|[\\s\\.]|\\W)`,
         targetRegexFlags: "gm",
         id: commentId,
         cssClass: "cm-suggestion",
@@ -97,3 +101,102 @@ class Replacement extends WidgetType {
     return replacementText;
   }
 }
+
+export function suggestionPopup(/** @type {ViewUpdate} */ update, /** @type {YComments} */ ycomments) {
+  const addSuggestionBtn = document.querySelector(".myst-add-suggestion");
+  const mainSel = update.state.selection.main;
+  const noSelection = mainSel.head === mainSel.anchor;
+  const multilineSelection = update.state.doc.lineAt(mainSel.head).number !== update.state.doc.lineAt(mainSel.anchor).number;
+  if (!update.selectionSet || noSelection || multilineSelection) {
+    addSuggestionBtn.style.display = "none";
+    return;
+  }
+
+  const startPos = update.view.coordsAtPos(mainSel.from);
+  const endPos = update.view.coordsAtPos(mainSel.to);
+  const middle = (startPos.left + endPos.left) / 2;
+  addSuggestionBtn.style.top = `${startPos.top - 130 + window.scrollY}px`;
+  addSuggestionBtn.style.left = `${middle - 20}px`;
+  addSuggestionBtn.style.display = "block";
+
+  addSuggestionBtn.onmousedown = async (ev) => {
+    // This is to ensure the button does not take focus from CodeMirror
+    ev.preventDefault();
+    const line = update.state.doc.lineAt(mainSel.from);
+
+    let suggestionFrom = mainSel.from;
+    const wordBoundaryRegex = /[ \t\r\W]/;
+    let pos;
+    for (pos = suggestionFrom - 1; pos >= line.from; pos--) {
+      if (wordBoundaryRegex.test(update.state.doc.sliceString(pos, pos + 1))) {
+        break;
+      }
+    }
+    suggestionFrom = pos + 1;
+
+    let suggestionTo = mainSel.to;
+    for (pos = suggestionTo; pos <= line.to; pos++) {
+      if (wordBoundaryRegex.test(update.state.doc.sliceString(pos, pos + 1))) {
+        break;
+      }
+    }
+    suggestionTo = pos;
+
+    let suggestionText = `|${update.state.doc.sliceString(suggestionFrom, suggestionTo)} -> |`;
+    let id = ycomments.findCommentOn(line.number)?.commentId;
+    if (id) {
+      suggestionText = "\n" + suggestionText;
+    } else {
+      id = ycomments.newComment(line.number);
+    }
+
+    ycomments.ydoc.transact(() => {
+      const text = ycomments.getTextForComment(id);
+      text.insert(text.length, suggestionText);
+      const authors = ycomments.lineAuthors(id);
+      authors.mark(authors.lineAuthors.length);
+    }, ycomments.provider.awareness.clientID);
+
+    ycomments.display().setVisibility(id, true);
+    ycomments.updateMainCodeMirror();
+
+    /** @type {EditorView} */
+    const commentView = await ycomments.getEditorForComment(id);
+    commentView.focus();
+    commentView.dispatch({
+      selection: EditorSelection.create([EditorSelection.range(commentView.state.doc.length - 1, commentView.state.doc.length - 1)]),
+      effects: lineAuthorsEffect.of(null),
+    });
+  };
+}
+
+export const AddSuggestionBtn = styled(DefaultButton)`
+  position: absolute;
+  z-index: 10;
+  display: none;
+  transform: translateX(-50%);
+  margin: 0 !important;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+
+  &:hover {
+    background-color: var(--gray-400);
+  }
+
+  img {
+    filter: invert(100%);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    display: block;
+    transform: translate(10px, 8px);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid var(--icon-border);
+  }
+`;

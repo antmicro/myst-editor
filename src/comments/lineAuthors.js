@@ -14,6 +14,8 @@ const lineAuthorsFacet = Facet.define({
 
 ////////////////////////////// LINE-COLORING //////////////////////////////
 
+export const lineAuthorsEffect = StateEffect.define();
+
 /**
  * A CodeMirror extension. Colors line of the editor respective to their authors.
  *
@@ -104,7 +106,7 @@ const commentLineHighlighter = ViewPlugin.fromClass(
 
     /** @param {ViewUpdate} update */
     update(update) {
-      if (update.docChanged || update.viewportChanged) {
+      if (update.docChanged || update.viewportChanged || update.transactions.some((t) => t.effects.some((e) => e.is(lineAuthorsEffect)))) {
         update.transactions.filter(isUserEvent).forEach((t) => this.markLinesEditedInTransaction(t));
 
         this.decorations = this.colorEditorLines(update.view);

@@ -8,6 +8,7 @@ import spellcheck from "./spellchecker";
 import { customHighlighter } from "./customHighlights";
 import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
+import { suggestionPopup } from "./suggestions";
 
 const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
@@ -132,6 +133,13 @@ export class ExtensionBuilder {
           { key: "Mod-Z", run: () => undoManager.redo(), preventDefault: true },
         ]),
       );
+    }
+    return this;
+  }
+
+  useSuggestionPopup({ enabled, ycomments }) {
+    if (enabled) {
+      this.base.push(EditorView.updateListener.of((update) => suggestionPopup(update, ycomments)));
     }
     return this;
   }

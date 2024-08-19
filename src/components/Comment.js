@@ -104,6 +104,7 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
     });
 
     ycomments.syncSuggestions(commentId);
+    ycomments.registerCommentEditor(commentId, view);
     ytext.observe((_, tr) => {
       if (!tr.local) return;
       ycomments.syncSuggestions(commentId);
