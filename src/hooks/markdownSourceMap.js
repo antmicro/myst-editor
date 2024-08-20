@@ -102,8 +102,9 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
     const token = tokens[idx];
     // Some markdown-it extensions use the `fence` rule for other things than code blocks (eg. mermaid graphs) so we don't want to modify those
     if (!defaultOutput.startsWith("<pre")) {
-      const start = defaultOutput.slice(0, 4);
-      const end = defaultOutput.slice(4);
+      const closeIdx = defaultOutput.indexOf(">");
+      const start = defaultOutput.slice(0, closeIdx);
+      const end = defaultOutput.slice(closeIdx);
       // Mermaid graphs do not get the attributes from the token directly, so we need to add them manually.
       return start + ` ${self.renderAttrs(token)}` + end;
     }
