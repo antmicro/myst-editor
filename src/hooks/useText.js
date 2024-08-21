@@ -5,6 +5,7 @@ import { markdownReplacer, useCustomRoles } from "./markdownReplacer";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "preact/hooks";
 import IMurMurHash from "imurmurhash";
 import markdownItMermaid from "@agoose77/markdown-it-mermaid";
+import { backslashLineBreakPlugin } from "./markdownLineBreak";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -27,7 +28,7 @@ const copyHtmlAsRichText = (txt) => {
 };
 
 /** @param {{preview: { current: Element } }} */
-export const useText = ({ initialText, transforms, customRoles, preview }) => {
+export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak }) => {
   const [text, setText] = useState(initialText);
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
@@ -62,15 +63,15 @@ export const useText = ({ initialText, transforms, customRoles, preview }) => {
     return newChunks;
   }, []);
 
-  const markdown = useMemo(
-    () =>
-      markdownIt({ breaks: true, linkify: true })
-        .use(markdownitDocutils)
-        .use(markdownReplacer(transforms))
-        .use(useCustomRoles(customRoles))
-        .use(markdownItMermaid),
-    [],
-  );
+  const markdown = useMemo(() => {
+    const md = markdownIt({ breaks: true, linkify: true })
+      .use(markdownitDocutils)
+      .use(markdownReplacer(transforms))
+      .use(useCustomRoles(customRoles))
+      .use(markdownItMermaid);
+    if (backslashLineBreak) md.use(backslashLineBreakPlugin);
+    return md;
+  }, []);
 
   /** Split and parse markdown into chunks of HTML. If `lookup` is not provided then every chunk will be parsed */
   const splitIntoChunks = useCallback(

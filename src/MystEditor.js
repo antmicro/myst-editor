@@ -121,12 +121,13 @@ const MystEditor = ({
   transforms = [],
   // this will create a bogus random avatar when no specific getAvatar function is provided
   getAvatar = (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
+  backslashLineBreak = true,
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
 
   const preview = useRef(null);
-  const text = useText({ initialText, transforms, customRoles, preview });
+  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak });
 
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer((_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: getAvatar(u.login) })), []);
