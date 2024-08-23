@@ -137,9 +137,9 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useSuggestionPopup({ enabled, ycomments }) {
+  useSuggestionPopup({ enabled, ycomments, editorMountpoint }) {
     if (enabled) {
-      this.base.push(EditorView.updateListener.of((update) => suggestionPopup(update, ycomments)));
+      this.base.push(EditorView.updateListener.of((update) => suggestionPopup(update, ycomments, editorMountpoint)));
     }
     return this;
   }

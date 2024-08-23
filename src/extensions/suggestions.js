@@ -102,8 +102,8 @@ class Replacement extends WidgetType {
   }
 }
 
-export function suggestionPopup(/** @type {ViewUpdate} */ update, /** @type {YComments} */ ycomments) {
-  const addSuggestionBtn = document.querySelector(".myst-add-suggestion");
+export function suggestionPopup(/** @type {ViewUpdate} */ update, /** @type {YComments} */ ycomments, editorMountpoint) {
+  const addSuggestionBtn = editorMountpoint.current.querySelector(".myst-add-suggestion");
   const mainSel = update.state.selection.main;
   const noSelection = mainSel.head === mainSel.anchor;
   const multilineSelection = update.state.doc.lineAt(mainSel.head).number !== update.state.doc.lineAt(mainSel.anchor).number;
@@ -111,12 +111,13 @@ export function suggestionPopup(/** @type {ViewUpdate} */ update, /** @type {YCo
     addSuggestionBtn.style.display = "none";
     return;
   }
-
+  const contentDOM = update.view.dom.getBoundingClientRect();
+  
   const startPos = update.view.coordsAtPos(mainSel.from);
   const endPos = update.view.coordsAtPos(mainSel.to);
   const middle = (startPos.left + endPos.left) / 2;
-  addSuggestionBtn.style.top = `${startPos.top - 130 + window.scrollY}px`;
-  addSuggestionBtn.style.left = `${middle - 20}px`;
+  addSuggestionBtn.style.top = `${startPos.top - contentDOM.top - update.view.defaultLineHeight - 12}px`;
+  addSuggestionBtn.style.left = `${middle - contentDOM.left}px`;
   addSuggestionBtn.style.display = "block";
 
   addSuggestionBtn.onmousedown = async (ev) => {
@@ -174,10 +175,9 @@ export const AddSuggestionBtn = styled(DefaultButton)`
   position: absolute;
   z-index: 10;
   display: none;
-  transform: translateX(-50%);
   margin: 0 !important;
   width: 40px;
-  display: flex;
+  display: block;
   align-items: center;
   justify-content: center;
   padding: 0 !important;

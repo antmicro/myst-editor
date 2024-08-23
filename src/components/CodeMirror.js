@@ -204,7 +204,7 @@ const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collabor
           editorRef,
         })
         .useComments({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments })
-        .useSuggestionPopup({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments })
+        .useSuggestionPopup({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments, editorMountpoint })
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString()))
         .useRemoveSelectionOnBlur()
         .create(),
