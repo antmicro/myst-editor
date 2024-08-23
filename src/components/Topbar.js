@@ -47,6 +47,7 @@ const Title = styled.div`
   font-size: large;
   white-space: nowrap;
   margin-left: 10px;
+  font-family: "Lato";
 
   a {
     color: var(--blue-500);

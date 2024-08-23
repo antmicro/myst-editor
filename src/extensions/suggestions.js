@@ -112,7 +112,7 @@ export function suggestionPopup(/** @type {ViewUpdate} */ update, /** @type {YCo
     return;
   }
   const contentDOM = update.view.dom.getBoundingClientRect();
-  
+
   const startPos = update.view.coordsAtPos(mainSel.from);
   const endPos = update.view.coordsAtPos(mainSel.to);
   const middle = (startPos.left + endPos.left) / 2;

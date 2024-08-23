@@ -41,6 +41,7 @@ const EditorParent = styled.div`
 `;
 
 const MystWrapper = styled.div`
+  font-family: "Lato";
   padding: 20px;
   display: grid;
   grid-auto-flow: column;
