@@ -215,10 +215,13 @@ const MystEditor = ({
   </div>`;
 };
 
-export default (params, target) => {
+export default ({ additionalStyles, ...params }, target) => {
   target.attachShadow({
     mode: "open",
   });
+  if (additionalStyles) {
+    target.shadowRoot.adoptedStyleSheets.push(...(Array.isArray(additionalStyles) ? additionalStyles : [additionalStyles]));
+  }
   params.parent = target.shadowRoot;
   render(html`<${MystEditor} ...${params} />`, target.shadowRoot);
 };

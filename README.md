@@ -154,6 +154,7 @@ Here are the props you can pass to the MystEditor component:
   - `dict` *(default: "en_US")* - Name of the desired dictionary. For an example see `public/dictionaries/en_US`.
   - `dictionaryPath` *(default: "/dictionaries")*  - Path to a folder with dictionaries. For an example see `public/dictionaries/`.
 - `backslashLineBreak` *(default: true)* - treat `\` as a line break even when it is at the end of a paragraph/block
+- `additionalStyles` *(`CSSStylesheet` | `CSSStylesheet[]`)* - extra CSS stylesheets to customize the component
 
 ## License
 
