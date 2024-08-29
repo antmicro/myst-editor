@@ -8,6 +8,7 @@ import { backslashLineBreakPlugin } from "./markdownLineBreak";
 import markdownSourceMap from "./markdownSourceMap";
 import { StateEffect } from "@codemirror/state";
 import markdownMermaid from "./markdownMermaid";
+import { foldedRanges } from "@codemirror/language";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -164,16 +165,42 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
 
   return {
     set(newMarkdown, update) {
-      if (update) {
+      if ((update, update.state)) {
         shiftLineMap(update);
       }
-      setText(newMarkdown);
+      let unfoldedMarkdown = newMarkdown;
+      if (update.state) {
+        const cursor = foldedRanges(update.state).iter(0);
+        const ranges = [];
+        for (let range = cursor; range.value != null; cursor.next()) {
+          ranges.push({ from: range.from, to: range.to });
+        }
+
+        if (ranges.length > 0) {
+          unfoldedMarkdown = ranges.reduce(
+            (acc, { from, to }, idx) => {
+              if (from > acc.lastPos) {
+                acc.result += newMarkdown.slice(acc.lastPos, from);
+              }
+              acc.lastPos = Math.max(acc.lastPos, to);
+              if (idx == ranges.length - 1 && acc.lastPos < newMarkdown.length) {
+                // add remaining part
+                acc.result += newMarkdown.slice(acc.lastPos, newMarkdown.length);
+              }
+              return acc;
+            },
+            { result: "", lastPos: 0 },
+          ).result;
+        }
+      }
+
+      setText(unfoldedMarkdown);
       setTimeout(() => {
         try {
-          updateHtmlChunks({ newMarkdown, view: update?.view });
+          updateHtmlChunks({ newMarkdown: unfoldedMarkdown, view: update?.view });
         } catch (e) {
           console.warn(e);
-          updateHtmlChunks({ newMarkdown, force: true, view: update?.view });
+          updateHtmlChunks({ newMarkdown: unfoldedMarkdown, force: true, view: update?.view });
         }
       });
     },

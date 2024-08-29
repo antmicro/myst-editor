@@ -10,7 +10,7 @@ import { customHighlighter } from "../extensions/customHighlights";
 import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
 import editIcon from "../icons/edit.svg";
 import { syncEditorWithPreviewScroll } from "../extensions/syncDualPane";
-import { foldAll } from "@codemirror/language";
+import { foldEffect, unfoldEffect, foldAll } from "@codemirror/language";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -164,6 +164,8 @@ const setEditorText = (editor, text) => {
   });
 };
 
+const folded = (update) => update.transactions.some((t) => t.effects.some((e) => e.is(foldEffect) || e.is(unfoldEffect)));
+
 const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll, unfoldedHeadings }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
@@ -212,7 +214,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
         .if(collaboration.opts.commentsEnabled, (b) =>
           b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({ ycomments: collaboration.ycomments, editorMountpoint }),
         )
-        .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString(), update))
+        .addUpdateListener((update) => (update.docChanged || folded(update)) && text.set(view.state.doc.toString(), update))
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
         .useCursorIndicator({ lineMap: text.lineMap, preview })
