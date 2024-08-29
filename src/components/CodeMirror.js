@@ -217,6 +217,7 @@ const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collabor
         .useSuggestionPopup({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments, editorMountpoint })
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString()))
         .useFixFoldingScroll(focusScroll)
+        .useSyncFoldedComments(collaboration.ycomments)
         .create(),
     });
 

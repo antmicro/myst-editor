@@ -165,6 +165,29 @@ export class ExtensionBuilder {
     return this;
   }
 
+  useSyncFoldedComments(ycomments) {
+    this.base.push(
+      EditorView.updateListener.of((update) => {
+        if (!update.transactions.some((t) => t.effects.some((e) => e.is(foldEffect) || e.is(unfoldEffect)))) return;
+
+        const isFold = update.transactions[0].effects[0].is(foldEffect);
+        const { from, to } = update.transactions[0].effects[0].value;
+        const fromLine = update.state.doc.lineAt(from).number;
+        const toLine = update.state.doc.lineAt(to).number;
+
+        ycomments
+          .positions()
+          .iter()
+          .filter(({ lineNumber }) => lineNumber >= fromLine && lineNumber <= toLine)
+          .forEach(({ commentId }) => {
+            ycomments.display().setVisibility(commentId, !isFold);
+            ycomments.updateMainCodeMirror();
+          });
+      }),
+    );
+    return this;
+  }
+
   create() {
     return [...this.important, ...this.base, ...this.extensions];
   }
