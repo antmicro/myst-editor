@@ -181,8 +181,8 @@ export class ExtensionBuilder {
           .filter(({ lineNumber }) => lineNumber >= fromLine && lineNumber <= toLine)
           .forEach(({ commentId }) => {
             ycomments.display().setVisibility(commentId, !isFold);
-            ycomments.updateMainCodeMirror();
           });
+        ycomments.updateMainCodeMirror();
       }),
     );
     return this;
