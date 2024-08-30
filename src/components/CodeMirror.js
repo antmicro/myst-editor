@@ -139,6 +139,15 @@ const CodeEditor = styled.div`
     margin-left: 4px;
     cursor: pointer;
   }
+
+  :not(.cm-focused) > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
+    background: transparent;
+  }
+
+  .cm-gutterElement span[title="Fold line"],
+  .cm-gutterElement span[title="Unfold line"] {
+    user-select: none;
+  }
 `;
 
 const HiddenTextArea = styled.textarea`
@@ -158,6 +167,7 @@ const setEditorText = (editor, text) => {
 const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collaboration }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
+  const focusScroll = useRef(null);
 
   useEffect(() => {
     if (collaboration.opts.enabled && collaboration.error) {
@@ -206,7 +216,7 @@ const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collabor
         .useComments({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments })
         .useSuggestionPopup({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments, editorMountpoint })
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString()))
-        .useRemoveSelectionOnBlur()
+        .useFixFoldingScroll(focusScroll)
         .create(),
     });
 

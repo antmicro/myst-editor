@@ -9,6 +9,7 @@ import { customHighlighter } from "./customHighlights";
 import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
 import { suggestionPopup } from "./suggestions";
+import { foldEffect, unfoldEffect } from "@codemirror/language";
 
 const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
@@ -27,6 +28,8 @@ const restoreCursorLocation = (view, location) => {
     scrollIntoView: true,
   });
 };
+
+const folded = (update) => update.transactions.some((t) => t.effects.some((e) => e.is(foldEffect) || e.is(unfoldEffect)));
 
 export class ExtensionBuilder {
   constructor(base = []) {
@@ -78,7 +81,6 @@ export class ExtensionBuilder {
     return this;
   }
 
-  // Also removes the yjs remote selection if the selection is bound to a type starting with `tname`
   useRemoveSelectionOnBlur() {
     this.base.push(
       EditorView.domEventHandlers({
@@ -141,6 +143,25 @@ export class ExtensionBuilder {
     if (enabled) {
       this.base.push(EditorView.updateListener.of((update) => suggestionPopup(update, ycomments, editorMountpoint)));
     }
+    return this;
+  }
+
+  // This is added due to a bug with Chrome and Codemirror, where folding a section will sometimes scroll to that section.
+  useFixFoldingScroll(focusScroll) {
+    this.base.push(
+      EditorState.transactionFilter.of((tr) => {
+        if (tr.effects.some((e) => e.is(foldEffect) || e.is(unfoldEffect))) {
+          focusScroll.current = window.scrollY;
+        }
+        return tr;
+      }),
+      EditorView.updateListener.of((update) => {
+        if (!folded(update) || focusScroll.current == null) return;
+        window.scrollTo({ top: focusScroll.current });
+        focusScroll.current = null;
+      }),
+    );
+
     return this;
   }
 
