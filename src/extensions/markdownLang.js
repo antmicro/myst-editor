@@ -38,7 +38,7 @@ function isHeading(type) {
   return match ? +match[1] : undefined;
 }
 
-const headerIndent = foldService.of((state, start, end) => {
+export const headerIndent = foldService.of((state, start, end) => {
   for (let node = syntaxTree(state).resolveInner(end, -1); node; node = node.parent) {
     if (node.from < start) break;
     let heading = node.type.prop(headingProp);
