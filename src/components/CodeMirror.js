@@ -3,14 +3,13 @@ import { html } from "htm/preact";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import styled from "styled-components";
-import { ExtensionBuilder, skipAndFoldAll } from "../extensions";
+import { ExtensionBuilder, skipAndFoldAll, folded } from "../extensions";
 import { YCommentsParent } from "../components/Comment";
 import commentIcon from "../icons/comment.svg?raw";
 import { customHighlighter } from "../extensions/customHighlights";
 import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
 import editIcon from "../icons/edit.svg";
 import { syncEditorWithPreviewScroll } from "../extensions/syncDualPane";
-import { foldEffect, unfoldEffect, foldAll } from "@codemirror/language";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -163,8 +162,6 @@ const setEditorText = (editor, text) => {
     },
   });
 };
-
-const folded = (update) => update.transactions.some((t) => t.effects.some((e) => e.is(foldEffect) || e.is(unfoldEffect)));
 
 const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll, unfoldedHeadings }) => {
   const editorRef = useRef(null);
