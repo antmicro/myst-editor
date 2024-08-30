@@ -165,6 +165,27 @@ export class ExtensionBuilder {
     return this;
   }
 
+  useMoveCursorAfterFold() {
+    this.base.push(
+      EditorState.transactionFilter.of((tr) => {
+        if (tr.effects.some((e) => e.is(foldEffect))) {
+          const { from, to } = tr.effects[0].value;
+          const { head } = tr.startState.selection.main;
+          if (head >= from && head <= to) {
+            tr.selection = EditorSelection.create([EditorSelection.range(from, from)]);
+          }
+        }
+
+        return tr;
+      }),
+      EditorView.updateListener.of((update) => {
+        if (!folded(update)) return;
+        update.view.focus();
+      }),
+    );
+    return this;
+  }
+
   create() {
     return [...this.important, ...this.base, ...this.extensions];
   }
