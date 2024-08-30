@@ -5,7 +5,7 @@ import { EditorView, ViewUpdate } from "@codemirror/view";
 import { customHighlighter } from "../extensions/customHighlights";
 import { MapMode, Transaction } from "@codemirror/state";
 import { modifyHighlight, parseCommentLine, suggestionCompartment } from "../extensions/suggestions";
-import { foldEffect } from "@codemirror/language";
+import { foldEffect, foldedRanges } from "@codemirror/language";
 import { folded } from "../extensions";
 
 /**
@@ -442,9 +442,19 @@ export class YComments {
     const fromLine = update.state.doc.lineAt(from).number;
     const toLine = update.state.doc.lineAt(to).number;
 
+    const cursor = foldedRanges(update.state).iter(0);
+    const ranges = [];
+    for (let range = cursor; range.value != null; cursor.next()) {
+      if (range.from != from || range.to != to) {
+        ranges.push({ fromLine: update.state.doc.lineAt(range.from).number, toLine: update.state.doc.lineAt(range.to).number });
+      }
+    }
+
     this.positions()
       .iter()
-      .filter(({ lineNumber }) => lineNumber >= fromLine && lineNumber <= toLine)
+      .filter(
+        ({ lineNumber }) => lineNumber >= fromLine && lineNumber <= toLine && !ranges.some((r) => lineNumber >= r.fromLine && lineNumber <= r.toLine),
+      )
       .forEach(({ commentId }) => {
         this.display().setVisibility(commentId, !isFold);
       });
