@@ -5,6 +5,8 @@ import { EditorView, ViewUpdate } from "@codemirror/view";
 import { customHighlighter } from "../extensions/customHighlights";
 import { MapMode, Transaction } from "@codemirror/state";
 import { modifyHighlight, parseCommentLine, suggestionCompartment } from "../extensions/suggestions";
+import { foldEffect } from "@codemirror/language";
+import { folded } from "../extensions";
 
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
@@ -432,6 +434,23 @@ export class YComments {
     });
   }
 
+  syncFoldedComments(update) {
+    if (!folded(update)) return;
+
+    const isFold = update.transactions[0].effects[0].is(foldEffect);
+    const { from, to } = update.transactions[0].effects[0].value;
+    const fromLine = update.state.doc.lineAt(from).number;
+    const toLine = update.state.doc.lineAt(to).number;
+
+    this.positions()
+      .iter()
+      .filter(({ lineNumber }) => lineNumber >= fromLine && lineNumber <= toLine)
+      .forEach(({ commentId }) => {
+        this.display().setVisibility(commentId, !isFold);
+      });
+    this.updateMainCodeMirror();
+  }
+
   /** Full synchronization between Y.js and Preact state */
   /** @param {ViewUpdate} update  */
   syncComments(update) {
@@ -439,6 +458,7 @@ export class YComments {
     if (update.transactions.some((t) => t.isUserEvent("suggestion"))) return;
 
     this.syncCommentLocations(update);
+    this.syncFoldedComments(update);
     this.syncRemoteComments();
     this.removeLocalComments();
     this.syncResolvedComments(update);
