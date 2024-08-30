@@ -11,7 +11,7 @@ const headingProp = new NodeProp();
 const commonmark = parser.configure({
   props: [
     foldNodeProp.add((type) => {
-      return !type.is("Block") || type.is("Document") || isHeading(type) != null || isList(type)
+      return !type.is("Block") || type.is("Document") || isHeading(type) != null
         ? undefined
         : (tree, state) => {
             let from = state.doc.lineAt(tree.from).to;
@@ -38,10 +38,6 @@ function isHeading(type) {
   return match ? +match[1] : undefined;
 }
 
-function isList(type) {
-  return type.name == "OrderedList" || type.name == "BulletList";
-}
-
 const headerIndent = foldService.of((state, start, end) => {
   for (let node = syntaxTree(state).resolveInner(end, -1); node; node = node.parent) {
     if (node.from < start) break;
@@ -64,4 +60,4 @@ function findSectionEnd(headerNode, level) {
   return last.to;
 }
 
-export const customCommonMark = new Language(data, commonmark, [headerIndent]);
+export const customCommonMark = new Language(data, commonmark, [headerIndent], "markdown");
