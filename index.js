@@ -1,5 +1,5 @@
-import r, { render as n, html as u, defaultButtons as l } from "./MystEditor.js";
-let m = `# h1 is quite big
+import n, { defaultButtons as r } from "./MystEditor.js";
+let u = `# h1 is quite big
 
 ## [h2 which is a link](https://google.com)
 
@@ -94,11 +94,11 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const a = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], o = new URLSearchParams(window.location.search), d = o.get("room") || "0", s = o.get("username") || Math.floor(Math.random() * 1e3).toString(), c = a[Math.floor(Math.random() * a.length)];
-let h = [{
+const a = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], o = new URLSearchParams(window.location.search), l = o.get("room") || "0", s = o.get("username") || Math.floor(Math.random() * 1e3).toString(), m = a[Math.floor(Math.random() * a.length)];
+let d = [{
   target: "say",
   transform: async (e) => s + " says: '" + e + "'"
-}], p = [{
+}], c = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
     const [t, i] = e.split("#");
@@ -131,30 +131,28 @@ let h = [{
     timeZone: "UTC"
   })))
 }];
-n(u`
-          <${r}
-            templatelist="linkedtemplatelist.json"
-            initialText=${m}
-            title="[MyST Editor](https://github.com/antmicro/myst-editor/) demo"
-            id="textarea_id"
-            transforms=${p}
-            collaboration=${{
-  enabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
-  commentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
-  wsUrl: {}.VITE_WS_URL || o.get("collab_server"),
-  resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
-  username: s,
-  room: d,
-  color: c
-}}
-            customRoles=${h}
-            includeButtons=${l.concat([{
-  text: "Custom button",
-  action: () => alert("Custom button action")
-}])}
-            spellcheckOpts=${{
-  dict: "en_US",
-  dictionaryPath: "/myst-editor/dictionaries"
-}}
-          />
-        `, document.getElementById("myst"));
+n({
+  templatelist: "linkedtemplatelist.json",
+  initialText: u,
+  title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
+  id: "textarea_id",
+  transforms: c,
+  collaboration: {
+    enabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
+    commentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
+    resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
+    wsUrl: {}.VITE_WS_URL || o.get("collab_server"),
+    username: s,
+    room: l,
+    color: m
+  },
+  customRoles: d,
+  includeButtons: r.concat([{
+    text: "Custom button",
+    action: () => alert("Custom button action")
+  }]),
+  spellcheckOpts: {
+    dict: "en_US",
+    dictionaryPath: "/myst-editor/dictionaries"
+  }
+}, document.getElementById("myst"));
