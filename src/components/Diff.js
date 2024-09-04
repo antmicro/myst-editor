@@ -10,16 +10,17 @@ const MergeViewCodeEditor = styled(CodeEditor)`
   display: block;
 `;
 
-const initMergeView = ({ old, current }) => {
+const initMergeView = ({ old, current, root }) => {
   const extensions = ExtensionBuilder.basicSetup().readonly().create();
   return new MergeView({
     a: { doc: old, extensions },
     b: { doc: current, extensions },
     orientation: "b-a",
+    root,
   });
 };
 
-const Diff = ({ oldText, text }) => {
+const Diff = ({ oldText, text, root }) => {
   let leftRef = useRef(null);
   let rightRef = useRef(null);
   let mergeView = useRef(null);
@@ -31,6 +32,7 @@ const Diff = ({ oldText, text }) => {
     mergeView.current = initMergeView({
       old: oldText,
       current: text.get(),
+      root,
     });
 
     leftRef.current.appendChild(mergeView.current.b.dom);

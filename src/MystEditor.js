@@ -191,6 +191,7 @@ const MystEditor = ({
               text,
               id,
               spellcheckOpts,
+              root: parent,
               highlights: transforms,
               collaboration: {
                 opts: collaboration,
@@ -206,7 +207,7 @@ const MystEditor = ({
             }}
           />
           <${Preview} ref=${preview} />
-          ${mode === "Diff" && html`<${Diff} oldText=${initialText} text=${text} />`}
+          ${mode === "Diff" && html`<${Diff} root=${parent} oldText=${initialText} text=${text} />`}
           ${collaboration.commentsEnabled && collaboration.resolvingCommentsEnabled && !error && html`<${ResolvedComments} ycomments=${ycomments} />`}
         <//>
       <//>

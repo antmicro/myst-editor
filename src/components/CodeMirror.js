@@ -160,7 +160,7 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, id, mode, spellcheckOpts, highlights, collaboration }) => {
+const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
@@ -171,6 +171,7 @@ const CodeMirror = ({ text, id, mode, spellcheckOpts, highlights, collaboration 
       editorRef.current?.destroy();
 
       const view = new EditorView({
+        root,
         state: EditorState.create({
           doc: text.get(),
           extensions: ExtensionBuilder.basicSetup().useHighlighter(highlights).useSpellcheck(spellcheckOpts).readonly().create(),
@@ -197,6 +198,7 @@ const CodeMirror = ({ text, id, mode, spellcheckOpts, highlights, collaboration 
     text.readyToRender();
 
     const startState = EditorState.create({
+      root,
       doc: collaboration.opts.enabled ? collaboration.ytext.toString() : text.get(),
       extensions: ExtensionBuilder.basicSetup()
         .useHighlighter(highlights)
