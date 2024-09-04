@@ -18,6 +18,7 @@ if (!window.myst_editor?.isFresh) {
 }
 
 const EditorParent = styled.div`
+  font-family: "Lato";
   display: flex;
   flex-flow: row wrap;
   width: 100%;
@@ -41,7 +42,6 @@ const EditorParent = styled.div`
 `;
 
 const MystWrapper = styled.div`
-  font-family: "Lato";
   padding: 20px;
   display: grid;
   grid-auto-flow: column;

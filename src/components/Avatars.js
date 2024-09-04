@@ -22,7 +22,7 @@ const AvatarsWrapper = styled.div`
 
     &.placeholder {
       margin-left: -7px;
-      line-height: 30px;
+      line-height: 33px;
       color: var(--icon-color);
       border-color: var(--icon-border);
       font-style: normal;
