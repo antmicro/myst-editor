@@ -20,6 +20,7 @@ const CodeEditor = styled.div`
   border: 0;
   padding: 20px;
   min-height: 500px;
+  scrollbar-width: thin;
   overflow-y: auto;
   color: black;
   position: relative;

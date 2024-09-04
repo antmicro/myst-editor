@@ -13,6 +13,7 @@ const Preview = styled.div`
   word-break: unset;
   position: relative;
   overflow-y: auto;
+  scrollbar-width: thin;
 
   @media print {
     & {
