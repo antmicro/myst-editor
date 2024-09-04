@@ -42,18 +42,21 @@ const AvatarPlaceholder = ({ n, usernames }) =>
     <span class="avatar placeholder">+${n}</span>
   <//>`;
 
-const Avatars = ({ users }) =>
-  html` <${AvatarsWrapper}>
-    ${users.length > MAX_AVATARS
+const Avatars = ({ users }) => {
+  const nUserAvatarsToShow = users.length <= MAX_AVATARS ? users.length : 3;
+
+  return html` <${AvatarsWrapper}>
+    ${nUserAvatarsToShow < users.length
       ? html`<${AvatarPlaceholder}
-          n=${users.length - MAX_AVATARS}
+          n=${users.length - nUserAvatarsToShow}
           usernames=${users
             .filter((_, idx) => idx >= MAX_AVATARS)
             .map((u) => u.login)
             .join(", ")}
         />`
       : ""}
-    ${users.filter((u, idx) => idx < MAX_AVATARS).map((user) => html`<${Avatar} ...${user} />`)}
+    ${users.slice(0, nUserAvatarsToShow).map((user) => html`<${Avatar} ...${user} />`)}
   <//>`;
+};
 
 export default Avatars;
