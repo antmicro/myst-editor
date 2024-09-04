@@ -189,7 +189,6 @@ const MystEditor = ({
             ...${{
               mode,
               text,
-              name,
               id,
               spellcheckOpts,
               highlights: transforms,
@@ -215,7 +214,7 @@ const MystEditor = ({
   </div>`;
 };
 
-export default ({ additionalStyles, ...params }, target) => {
+export default ({ additionalStyles, ...params }, /** @type {HTMLElement} */ target) => {
   target.attachShadow({
     mode: "open",
   });
@@ -223,6 +222,12 @@ export default ({ additionalStyles, ...params }, target) => {
     target.shadowRoot.adoptedStyleSheets.push(...(Array.isArray(additionalStyles) ? additionalStyles : [additionalStyles]));
   }
   params.parent = target.shadowRoot;
+
+  const form = target.closest("form");
+  if (form) {
+    form.addEventListener("formdata", (e) => e.formData.append(params.name, window.myst_editor.text));
+  }
+
   render(html`<${MystEditor} ...${params} />`, target.shadowRoot);
 };
 

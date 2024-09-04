@@ -150,10 +150,6 @@ const CodeEditor = styled.div`
   }
 `;
 
-const HiddenTextArea = styled.textarea`
-  display: none;
-`;
-
 const setEditorText = (editor, text) => {
   editor.dispatch({
     changes: {
@@ -164,7 +160,7 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collaboration }) => {
+const CodeMirror = ({ text, id, mode, spellcheckOpts, highlights, collaboration }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
@@ -251,7 +247,6 @@ const CodeMirror = ({ text, id, name, mode, spellcheckOpts, highlights, collabor
         <img src=${editIcon} alt="edit" />
       <//>`}
     <//>
-    <${HiddenTextArea} value=${text.get()} name=${name} id=${id}><//>
   `;
 };
 
