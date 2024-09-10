@@ -25,7 +25,7 @@ const CommentContainer = styled.div`
   border: 2px solid ${(props) => props.color};
   padding-top: 10px;
   margin-left: -1px;
-  width: calc(100% - 2px);
+  width: calc(100% - 3px);
 `;
 
 const CommentTopbar = styled.div`
@@ -249,7 +249,7 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
   }, [c]);
 
   return html`
-    <div>
+    <div style="position: relative;">
       <${ResolvedLine} orphaned=${c.orphaned}>
         <${LineNumber}>${c.lineNumber}<//>
         ${c.resolvedLine}

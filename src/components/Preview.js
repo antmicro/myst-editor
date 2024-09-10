@@ -12,6 +12,7 @@ const Preview = styled.div`
   color: var(--gray-900);
   word-break: unset;
   position: relative;
+  overflow-y: auto;
 
   @media print {
     & {

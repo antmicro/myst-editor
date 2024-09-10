@@ -9,6 +9,7 @@ import commentIcon from "../icons/comment.svg?raw";
 import { customHighlighter } from "../extensions/customHighlights";
 import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
 import editIcon from "../icons/edit.svg";
+import { syncEditorWithPreviewScroll } from "../extensions/syncDualPane";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -19,6 +20,7 @@ const CodeEditor = styled.div`
   border: 0;
   padding: 20px;
   min-height: 500px;
+  overflow-y: auto;
   color: black;
   position: relative;
   box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
@@ -216,6 +218,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString(), update))
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
+        .useSyncPreviewWithCursor({ lineMap: text.lineMap, preview })
         .useCursorIndicator({ lineMap: text.lineMap, preview })
         .create(),
     });
@@ -226,6 +229,8 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
     });
     editorRef.current = view;
     window.myst_editor.main_editor = view;
+
+    syncEditorWithPreviewScroll(preview.current, text.lineMap, view);
 
     collaboration.ycomments?.registerCodeMirror(view);
     collaboration.provider?.watchCollabolators(collaboration.setUsers);

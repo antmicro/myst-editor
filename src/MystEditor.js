@@ -22,6 +22,7 @@ const EditorParent = styled.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
+  height: 100%;
   ${(props) => props.fullscreen && "position: fixed; left: 0; top: 0; z-index: 10;"}
   ${(props) => {
     switch (props.mode) {
@@ -46,12 +47,13 @@ const MystWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(50%, 1fr);
-  grid-template-rows: max-content;
   box-sizing: border-box;
+  height: calc(100% - 60px);
   width: 100%;
+  height: calc(100vh - 60px);
   position: relative;
   background-color: white;
-  ${(props) => props.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px); overflow-y: scroll;"}
+  ${(props) => props.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px);"}
 `;
 MystWrapper.defaultProps = { className: "myst-editor-wrapper" };
 

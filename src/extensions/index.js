@@ -10,6 +10,7 @@ import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
 import { suggestionPopup } from "./suggestions";
 import { foldEffect, unfoldEffect } from "@codemirror/language";
+import { syncPreviewWithCursor, syncPreviewWithEditorScroll } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
 
 const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
@@ -113,6 +114,11 @@ export class ExtensionBuilder {
 
   useDefaultHistory() {
     this.base.push(history());
+    return this;
+  }
+
+  useSyncPreviewWithCursor({ lineMap, preview }) {
+    this.base.push([syncPreviewWithCursor(lineMap, preview), syncPreviewWithEditorScroll(lineMap, preview)]);
     return this;
   }
 

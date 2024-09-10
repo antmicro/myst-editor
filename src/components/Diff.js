@@ -5,8 +5,16 @@ import { html } from "htm/preact";
 import { styled } from "styled-components";
 import { ExtensionBuilder } from "../extensions";
 
+const DiffContainer = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: max-content;
+  width: 100%;
+  overflow-y: auto;
+`;
+
 const MergeViewCodeEditor = styled(CodeEditor)`
-  width: 50%;
+  overflow-y: visible;
   display: block;
 `;
 
@@ -39,10 +47,10 @@ const Diff = ({ oldText, text, root }) => {
     rightRef.current.appendChild(mergeView.current.a.dom);
   }, []);
 
-  return html` <div style="display:flex; width: 100%">
+  return html` <${DiffContainer}>
     <${MergeViewCodeEditor} ref=${leftRef} />
     <${MergeViewCodeEditor} ref=${rightRef} />
-  </div>`;
+  <//>`;
 };
 Diff.defaultProps = { className: "diff" };
 

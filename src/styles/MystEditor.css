@@ -40,6 +40,7 @@
 
 #myst-css-namespace {
   font-family: "Lato", sans-serif;
+  height: 100%;
 }
 
 #myst-css-namespace .todo {

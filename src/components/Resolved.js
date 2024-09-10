@@ -13,6 +13,7 @@ const ResolvedWrapper = styled.div`
   box-shadow: inset 0px 0px 4px var(--gray-600);
   border-radius: var(--border-radius);
   color: var(--gray-900);
+  overflow-y: auto;
 
   & h1 {
     font-size: 20px;
