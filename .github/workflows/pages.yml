@@ -33,13 +33,11 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y texlive-full
           python -m pip install -r docs/requirements.txt
       - name: Generate documentation
         run: |
           cd docs
-          make html latexpdf
-          cp build/latex/*.pdf build/html/
+          make html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
