@@ -7,7 +7,7 @@ import IMurMurHash from "imurmurhash";
 import markdownItMermaid from "@agoose77/markdown-it-mermaid";
 import { backslashLineBreakPlugin } from "./markdownLineBreak";
 import markdownSourceMap from "./markdownSourceMap";
-import { ViewUpdate } from "@codemirror/view";
+import { StateEffect } from "@codemirror/state";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -32,6 +32,8 @@ const copyHtmlAsRichText = (/** @type {string} */ txt) => {
   document.removeEventListener("copy", listener);
 };
 
+export const markdownUpdatedStateEffect = StateEffect.define();
+
 /** @param {{preview: { current: Element } }} */
 export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak, parent }) => {
   const [text, setText] = useState(initialText);
@@ -44,7 +46,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
    *
    * @type {[{ md: string, html: string }[], Dispatch<{newMarkdown: string, force: boolean }>]}
    */
-  const [htmlChunks, updateHtmlChunks] = useReducer((oldChunks, { newMarkdown, force = false }) => {
+  const [htmlChunks, updateHtmlChunks] = useReducer((oldChunks, { newMarkdown, force = false, view }) => {
     let htmlLookup = {};
     if (!force) {
       htmlLookup = oldChunks.reduce((lookup, { hash, html }) => {
@@ -57,13 +59,20 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
 
     if (newChunks.length !== oldChunks.length || force) {
       // We can't infer which chunks were modified, so we update the entire document
-      preview.current.innerHTML = newChunks.map((c) => `<html-chunk id="html-chunk-${c.id}">` + c.html + "</html-chunk>").join("\n");
+      const toRemove = [...preview.current.childNodes].filter((c) => !c.classList || !c.classList.contains("cm-previewFocus"));
+      toRemove.forEach((c) => preview.current.removeChild(c));
+
+      preview.current.innerHTML += newChunks.map((c) => `<html-chunk id="html-chunk-${c.id}">` + c.html + "</html-chunk>").join("");
       return newChunks;
     }
 
     newChunks // Go through every modified chunk and update its content
       .filter((newChunk, idx) => newChunk.hash !== oldChunks[idx].hash)
       .forEach((chunk) => (preview.current.querySelector("html-chunk#html-chunk-" + chunk.id).innerHTML = chunk.html));
+
+    view?.dispatch({
+      effects: markdownUpdatedStateEffect.of(null),
+    });
 
     return newChunks;
   }, []);
@@ -155,10 +164,10 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       setText(newMarkdown);
       setTimeout(() => {
         try {
-          updateHtmlChunks({ newMarkdown });
+          updateHtmlChunks({ newMarkdown, view: update?.view });
         } catch (e) {
           console.warn(e);
-          updateHtmlChunks({ newMarkdown, force: true });
+          updateHtmlChunks({ newMarkdown, force: true, view: update?.view });
         }
       });
     },
@@ -184,5 +193,6 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
           .join("\n"),
       );
     },
+    lineMap,
   };
 };

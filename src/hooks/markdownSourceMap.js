@@ -124,3 +124,18 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
     return `<pre><code${self.renderAttrs(token)}>${htmlContent}</code></pre>\n`;
   };
 }
+
+export function findNearestElementForLine(lineNumber, lineMap, preview) {
+  let id = null;
+  let match = null;
+  let num = lineNumber;
+  for (; num >= 1; num--) {
+    id = lineMap.current.get(num);
+    if (id) {
+      match = preview.querySelector(`[data-line-id="${id}"]`);
+      if (match) break;
+    }
+  }
+
+  return [match, num];
+}

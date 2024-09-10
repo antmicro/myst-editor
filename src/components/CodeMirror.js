@@ -160,7 +160,7 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration }) => {
+const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration, preview }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
@@ -216,6 +216,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString(), update))
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
+        .useCursorIndicator({ lineMap: text.lineMap, preview })
         .create(),
     });
 

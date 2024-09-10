@@ -10,6 +10,7 @@ import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
 import { suggestionPopup } from "./suggestions";
 import { foldEffect, unfoldEffect } from "@codemirror/language";
+import { cursorIndicator } from "./cursorIndicator";
 
 const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
@@ -112,6 +113,11 @@ export class ExtensionBuilder {
 
   useDefaultHistory() {
     this.base.push(history());
+    return this;
+  }
+
+  useCursorIndicator({ lineMap, preview }) {
+    this.base.push(cursorIndicator(lineMap, preview));
     return this;
   }
 

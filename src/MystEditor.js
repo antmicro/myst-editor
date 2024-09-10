@@ -3,7 +3,7 @@ import { useState, useEffect, useReducer, useRef, useMemo } from "preact/hooks";
 import { html } from "htm/preact";
 import { StyleSheetManager, styled } from "styled-components";
 import CodeMirror from "./components/CodeMirror";
-import Preview from "./components/Preview";
+import Preview, { PreviewFocusHighlight } from "./components/Preview";
 import Diff from "./components/Diff";
 import { resetCache } from "./hooks/markdownReplacer";
 import { useText } from "./hooks/useText";
@@ -193,6 +193,7 @@ const MystEditor = ({
               spellcheckOpts,
               root: parent,
               highlights: transforms,
+              preview,
               collaboration: {
                 opts: collaboration,
                 setUsers,
@@ -206,7 +207,7 @@ const MystEditor = ({
               },
             }}
           />
-          <${Preview} ref=${preview} />
+          <${Preview} ref=${preview} mode=${mode}><${PreviewFocusHighlight} className="cm-previewFocus" /><//>
           ${mode === "Diff" && html`<${Diff} root=${parent} oldText=${initialText} text=${text} />`}
           ${collaboration.commentsEnabled && collaboration.resolvingCommentsEnabled && !error && html`<${ResolvedComments} ycomments=${ycomments} />`}
         <//>

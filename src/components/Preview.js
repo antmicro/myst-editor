@@ -11,6 +11,7 @@ const Preview = styled.div`
   vertical-align: top;
   color: var(--gray-900);
   word-break: unset;
+  position: relative;
 
   @media print {
     & {
@@ -327,7 +328,17 @@ const Preview = styled.div`
       }
     }
   }
+
+  .cm-previewFocus {
+    display: ${(props) => (props.mode === "Both" ? "block" : "none")};
+  }
 `;
 Preview.defaultProps = { className: "myst-preview" };
+
+export const PreviewFocusHighlight = styled.div`
+  position: absolute;
+  width: 5px;
+  background-color: var(--blue-200);
+`;
 
 export default Preview;
