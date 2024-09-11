@@ -1,5 +1,6 @@
 import MarkdownIt from "markdown-it";
 import { Role, rolePlugin } from "markdown-it-docutils";
+import { waitForElement } from "../utils";
 /**
  * @typedef {{
  *  target: string | RegExp,
@@ -27,20 +28,6 @@ class PreviewWrapper {
     this.preview = preview;
   }
 
-  waitForElementWithId(id) {
-    return new Promise((resolve) => {
-      const observer = new MutationObserver(() => {
-        const elem = this.preview.getElementById(id);
-        if (elem) {
-          observer.disconnect();
-          resolve(elem);
-        }
-      });
-
-      observer.observe(this.preview, { childList: true, subtree: true });
-    });
-  }
-
   fillPlaceholder(placeholderId, html) {
     const placeholder = this.preview.getElementById(placeholderId);
     if (placeholder) placeholder.outerHTML = html;
@@ -62,7 +49,7 @@ class PreviewWrapper {
     const placeholderId = "placeholder-" + Math.random().toString().slice(2);
 
     promise
-      .then(this.waitForElementWithId(placeholderId))
+      .then(waitForElement(this.preview, `#${placeholderId}`))
       .then((result) => {
         setCached(input, result);
         this.fillPlaceholder(placeholderId, result);

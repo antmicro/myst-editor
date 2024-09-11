@@ -332,6 +332,13 @@ const Preview = styled.div`
   .cm-previewFocus {
     display: ${(props) => (props.mode === "Both" ? "block" : "none")};
   }
+
+  .mermaid {
+    background-color: transparent;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+  }
 `;
 Preview.defaultProps = { className: "myst-preview" };
 

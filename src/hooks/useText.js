@@ -4,10 +4,10 @@ import markdownIt from "markdown-it";
 import { markdownReplacer, useCustomRoles } from "./markdownReplacer";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
 import IMurMurHash from "imurmurhash";
-import markdownItMermaid from "@agoose77/markdown-it-mermaid";
 import { backslashLineBreakPlugin } from "./markdownLineBreak";
 import markdownSourceMap from "./markdownSourceMap";
 import { StateEffect } from "@codemirror/state";
+import markdownMermaid from "./markdownMermaid";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -82,7 +82,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       .use(markdownitDocutils)
       .use(markdownReplacer(transforms, parent))
       .use(useCustomRoles(customRoles, parent))
-      .use(markdownItMermaid)
+      .use(markdownMermaid, { preview })
       .use(markdownSourceMap);
     if (backslashLineBreak) md.use(backslashLineBreakPlugin);
     return md;
@@ -141,7 +141,13 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
         )
         .map(({ md, startLine }, id) => {
           const hash = new IMurMurHash(md, 42).result();
-          const html = lookup[hash] || purify.sanitize(markdown.render(md, { chunkId: id, startLine, lineMap }));
+          const html =
+            lookup[hash] ||
+            purify.sanitize(markdown.render(md, { chunkId: id, startLine, lineMap }), {
+              // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
+              ADD_TAGS: ["foreignobject"],
+              ADD_ATTR: ["dominant-baseline"],
+            });
           return { md, hash, id, html };
         }),
     [markdown],
