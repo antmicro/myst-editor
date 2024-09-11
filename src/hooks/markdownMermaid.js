@@ -1,7 +1,17 @@
 import mermaid from "mermaid";
 import { waitForElement } from "../utils";
+import { getLineById } from "./markdownSourceMap";
+import IMurMurHash from "imurmurhash";
 
-const markdownItMermaid = (md, { preview }) => {
+// We want to keep a cache based on line numbers to retrieve the previous version.
+// This allows for a flicker-free editing experience.
+// key = line number
+const lineCache = new Map();
+const hashSeed = 42;
+// key = hash of diagram source code
+const contentCache = new Map();
+
+const markdownItMermaid = (md, { preview, lineMap, parent }) => {
   mermaid.initialize({
     theme: "neutral",
     suppressErrorRendering: true,
@@ -21,23 +31,45 @@ const markdownItMermaid = (md, { preview }) => {
     }
 
     const code = token.content.trim();
+    const lineNumber = getLineById(lineMap.current, token.attrGet("data-line-id"));
+    let cached = lineCache.get(lineNumber);
+    if (!cached) {
+      cached = contentCache.get(new IMurMurHash(code, hashSeed).result());
+    }
     const id = Math.random().toString().replace(".", "");
     token.attrSet("data-mermaid-id", id);
 
-    waitForElement(preview.current, `[data-mermaid-id="${id}"]`).then((el) => {
-      mermaid
-        .render(`mermaid-${id}`, code)
-        .then(({ svg }) => {
-          el.innerHTML = svg;
-          el.className = "mermaid";
-        })
-        .catch((err) => {
-          el.innerHTML = `<b>Mermaid error:</b>\n${err}`;
-          el.classList.remove("mermaid");
-        });
-    });
+    if (cached) {
+      token.attrSet("class", "mermaid");
+    }
 
-    return `<pre ${self.renderAttrs(token)}>${code}</pre>`;
+    if (!cached || cached.code !== code) {
+      const container = document.createElement("div");
+      container.style.position = "fixed";
+      container.style.visibility = "none";
+      document.body.appendChild(container);
+
+      waitForElement(preview.current, `[data-mermaid-id="${id}"]`).then((el) => {
+        mermaid
+          .render(`mermaid-${id}`, code, container)
+          .then(({ svg }) => {
+            const saved = { svg, code };
+            lineCache.set(lineNumber, saved);
+            contentCache.set(new IMurMurHash(code, hashSeed).result(), saved);
+            el.innerHTML = svg;
+            el.className = "mermaid";
+          })
+          .catch((err) => {
+            el.innerHTML = `<b>Mermaid error:</b>\n${err}`;
+            el.classList.remove("mermaid");
+          })
+          .finally(() => {
+            container.remove();
+          });
+      });
+    }
+
+    return `<pre ${self.renderAttrs(token)}>${cached?.svg ?? code}</pre>`;
   };
 };
 

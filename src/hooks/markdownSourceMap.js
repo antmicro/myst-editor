@@ -135,3 +135,11 @@ export function findNearestElementForLine(lineNumber, lineMap, preview) {
 
   return [match, num];
 }
+
+export function getLineById(lineMap, id) {
+  for (const [line, value] of lineMap.entries()) {
+    if (value === id) {
+      return line;
+    }
+  }
+}
