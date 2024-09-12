@@ -1,6 +1,6 @@
 import { EditorView } from "codemirror";
 import { markdownUpdatedStateEffect } from "../hooks/useText";
-import { findNearestElementForLine } from "../hooks/markdownSourceMap";
+import { findNearestElementForLine, getLineById } from "../hooks/markdownSourceMap";
 
 export const syncPreviewWithCursor = (lineMap, preview) =>
   EditorView.updateListener.of((update) => {
@@ -149,13 +149,7 @@ export function syncEditorWithPreviewScroll(/** @type {HTMLElement} */ preview, 
           }
         }
         const id = topChild.getAttribute("data-line-id");
-        let line;
-        for (const [lineNum, elId] of lineMap.current.entries()) {
-          if (elId === id) {
-            line = lineNum;
-            break;
-          }
-        }
+        let line = getLineById(lineMap.current, id);
 
         if (line) {
           view.dom.parentElement.scrollTo({
