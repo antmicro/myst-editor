@@ -50,7 +50,6 @@ const MystWrapper = styled.div`
   box-sizing: border-box;
   height: calc(100% - 60px);
   width: 100%;
-  height: calc(100vh - 60px);
   position: relative;
   background-color: white;
   ${(props) => props.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px);"}
@@ -126,6 +125,7 @@ const MystEditor = ({
   getAvatar = (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
   backslashLineBreak = true,
   parent,
+  syncScroll = false,
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
@@ -196,6 +196,7 @@ const MystEditor = ({
               root: parent,
               highlights: transforms,
               preview,
+              syncScroll,
               collaboration: {
                 opts: collaboration,
                 setUsers,

@@ -177,6 +177,15 @@ export class ExtensionBuilder {
     return this;
   }
 
+  /** @param {(b: ExtensionBuilder) => ExtensionBuilder} extender  */
+  if(condition, extender) {
+    if (condition) {
+      return extender(this);
+    } else {
+      return this;
+    }
+  }
+
   useMoveCursorAfterFold() {
     this.base.push(
       EditorState.transactionFilter.of((tr) => {

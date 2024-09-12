@@ -163,7 +163,7 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration, preview }) => {
+const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
@@ -219,8 +219,8 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString(), update))
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
-        .useSyncPreviewWithCursor({ lineMap: text.lineMap, preview })
         .useCursorIndicator({ lineMap: text.lineMap, preview })
+        .if(syncScroll, (b) => b.useSyncPreviewWithCursor({ lineMap: text.lineMap, preview }))
         .create(),
     });
 
@@ -231,7 +231,9 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
     editorRef.current = view;
     window.myst_editor.main_editor = view;
 
-    syncEditorWithPreviewScroll(preview.current, text.lineMap, view);
+    if (syncScroll) {
+      syncEditorWithPreviewScroll(preview.current, text.lineMap, view);
+    }
 
     collaboration.ycomments?.registerCodeMirror(view);
     collaboration.provider?.watchCollabolators(collaboration.setUsers);

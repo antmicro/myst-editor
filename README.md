@@ -155,6 +155,8 @@ Here are the props you can pass to the MystEditor component:
   - `dictionaryPath` *(default: "/dictionaries")*  - Path to a folder with dictionaries. For an example see `public/dictionaries/`.
 - `backslashLineBreak` *(default: true)* - treat `\` as a line break even when it is at the end of a paragraph/block
 - `additionalStyles` *(`CSSStylesheet` | `CSSStylesheet[]`)* - extra CSS stylesheets to customize the component
+- `syncScroll` *(default: false)* - synchronize scrolling of the editor and preview in `Dual Pane` view mode.
+  - > NOTE: This only works if you set a height limit on the MyST parent element.
 
 ## License
 
