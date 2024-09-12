@@ -2,6 +2,8 @@ import { EditorView } from "codemirror";
 import { markdownUpdatedStateEffect } from "../hooks/useText";
 import { findNearestElementForLine, getLineById } from "../hooks/markdownSourceMap";
 
+const previewTopPadding = 20;
+
 export const syncPreviewWithCursor = (lineMap, preview) =>
   EditorView.updateListener.of((update) => {
     const cursorLineBefore = update.startState.doc.lineAt(update.startState.selection.main.head).number;
@@ -13,23 +15,13 @@ export const syncPreviewWithCursor = (lineMap, preview) =>
       return;
     }
 
-    const editorRect = update.view.dom.parentElement.getBoundingClientRect();
-    const topBlock = update.view.lineBlockAtHeight(editorRect.top - update.view.documentTop);
-    const topLine = update.view.state.doc.lineAt(topBlock.from).number + 1;
-    const bottomBlock = update.view.lineBlockAtHeight(editorRect.top + editorRect.height - update.view.documentTop);
-    const bottomLine = update.view.state.doc.lineAt(bottomBlock.from).number;
-
     const [matchingElem, matchingLine] = findNearestElementForLine(cursorLineAfter, lineMap, preview.current);
     if (matchingElem) {
-      const bottomOffset = bottomLine == cursorLineBefore && cursorLineAfter > cursorLineBefore ? 18 : 0;
-      const topOffset =
-        matchingLine !== 1 && (topLine == cursorLineAfter || (topLine == cursorLineBefore && cursorLineAfter <= cursorLineBefore)) ? 18 : 0;
       scrollPreviewElemIntoView({
         view: update.view,
         matchingLine,
         matchingElem,
         behavior: "smooth",
-        offset: -100 + bottomOffset + topOffset,
         preview: preview.current,
       });
     }
@@ -38,16 +30,15 @@ export const syncPreviewWithCursor = (lineMap, preview) =>
 /** @param {Object} param0
  * @param {EditorView} param0.view
  */
-function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior = "auto", offset = 0, preview }) {
+function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior = "auto", preview }) {
   const cursorBlock = view.lineBlockAt(view.state.doc.line(matchingLine).from);
-  const editorRect = view.dom.parentElement.getBoundingClientRect();
   const previewRect = preview.getBoundingClientRect();
+  const editor = view.dom.parentElement;
   let matchingRect = matchingElem.getBoundingClientRect();
 
-  const editorCursorPositionRelative = Math.max((cursorBlock.top - view.dom.parentElement.scrollTop) / editorRect.height, 0);
-  const elemScrollOffset = previewRect.height * editorCursorPositionRelative;
+  const elemScrollOffset = cursorBlock.top + previewTopPadding;
 
-  const top = matchingRect.top + preview.scrollTop - elemScrollOffset + offset;
+  const top = matchingRect.top + preview.scrollTop - elemScrollOffset - previewRect.top + editor.scrollTop;
   if (behavior == "smooth") {
     smoothScrollTo(preview, top);
   } else {
@@ -83,7 +74,6 @@ export const syncPreviewWithEditorScroll = (lineMap, preview) => {
             view,
             matchingLine,
             matchingElem,
-            offset: cursorLine >= topLine ? -100 : -80,
             preview: preview.current,
           });
         }
@@ -124,20 +114,19 @@ export function syncEditorWithPreviewScroll(/** @type {HTMLElement} */ preview, 
         // scroll to match the cursor position
         const [matchingElem, matchingLine] = findNearestElementForLine(cursorLine, lineMap, preview);
         if (matchingElem) {
-          const mystPreviewRect = preview.getBoundingClientRect();
+          const previewRect = preview.getBoundingClientRect();
           const cursorBlock = view.lineBlockAt(view.state.doc.line(matchingLine).from);
           const elemRect = matchingElem.getBoundingClientRect();
 
-          const previewCursorPositionRelative = Math.max(elemRect.top / mystPreviewRect.height, 0);
-          const editorScrollOffset = editorRect.height * previewCursorPositionRelative;
+          const editorScrollOffset = elemRect.top;
+          const top = cursorBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;
           view.dom.parentElement.scrollTo({
-            // +100 is here to account for padding
-            top: cursorBlock.top + 100 - editorScrollOffset,
+            top,
             behavior: "auto",
           });
         }
       } else {
-        // scroll to match the first visible element int the preview
+        // scroll to match the first visible element in the preview
         let topChild;
         const children = preview.getElementsByTagName("*");
         for (const child of children) {
@@ -153,7 +142,7 @@ export function syncEditorWithPreviewScroll(/** @type {HTMLElement} */ preview, 
 
         if (line) {
           view.dom.parentElement.scrollTo({
-            top: view.lineBlockAt(view.state.doc.line(line).from).top + 20,
+            top: view.lineBlockAt(view.state.doc.line(line).from).top + previewTopPadding,
             behavior: "auto",
           });
         }
