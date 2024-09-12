@@ -122,7 +122,7 @@ export function syncEditorWithPreviewScroll(/** @type {HTMLElement} */ preview, 
       const topLine = view.state.doc.lineAt(topBlock.from).number + 1;
       if (cursorLine >= topLine) {
         // scroll to match the cursor position
-        const [matchingElem, matchingLine] = findNearestElementForLine(cursorLine, lineMap);
+        const [matchingElem, matchingLine] = findNearestElementForLine(cursorLine, lineMap, preview);
         if (matchingElem) {
           const mystPreviewRect = preview.getBoundingClientRect();
           const cursorBlock = view.lineBlockAt(view.state.doc.line(matchingLine).from);
