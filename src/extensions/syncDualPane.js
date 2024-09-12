@@ -52,6 +52,8 @@ export const syncPreviewWithEditorScroll = (lineMap, preview) => {
   let wheelTimeout;
 
   return EditorView.domEventHandlers({
+    // This is needed to differentiate between scrolling caused by the user and scrolling caused by this JS file.
+    // A side effect of this is that the scrolling will not sync if using the scrollbar.
     wheel: () => {
       clearTimeout(wheelTimeout);
       wheeling = true;
