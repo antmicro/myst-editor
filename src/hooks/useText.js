@@ -165,11 +165,11 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
 
   return {
     set(newMarkdown, update) {
-      if ((update, update.state)) {
+      if (update) {
         shiftLineMap(update);
       }
       let unfoldedMarkdown = newMarkdown;
-      if (update.state) {
+      if (update?.state) {
         const cursor = foldedRanges(update.state).iter(0);
         const ranges = [];
         for (let range = cursor; range.value != null; cursor.next()) {
