@@ -3,6 +3,7 @@ import styled from "styled-components";
 const Preview = styled.div`
   background-color: white;
   padding: 20px;
+  padding-left: 40px;
   min-height: 150px;
   border: 1px solid var(--gray-400);
   border-left: 1px solid var(--gray-600);
@@ -340,6 +341,24 @@ const Preview = styled.div`
     padding: 0;
     display: flex;
     justify-content: center;
+  }
+
+  *:has(.fold-arrow) {
+    position: relative;
+  }
+
+  .fold-arrow {
+    position: absolute;
+    font-size: inherit;
+    transform: translate(-25px);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+
+    span {
+      font-size: initial;
+    }
   }
 `;
 Preview.defaultProps = { className: "myst-preview" };
