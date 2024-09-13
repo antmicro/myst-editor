@@ -9,6 +9,7 @@ import markdownSourceMap from "./markdownSourceMap";
 import { StateEffect } from "@codemirror/state";
 import markdownMermaid from "./markdownMermaid";
 import { foldedRanges } from "@codemirror/language";
+import { ViewUpdate } from "@codemirror/view";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -164,34 +165,13 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   }, [syncText]);
 
   return {
-    set(newMarkdown, update) {
+    set(newMarkdown, /** @type {ViewUpdate} */ update) {
       if (update) {
         shiftLineMap(update);
       }
       let unfoldedMarkdown = newMarkdown;
       if (update?.state) {
-        const cursor = foldedRanges(update.state).iter(0);
-        const ranges = [];
-        for (let range = cursor; range.value != null; cursor.next()) {
-          ranges.push({ from: range.from, to: range.to });
-        }
-
-        if (ranges.length > 0) {
-          unfoldedMarkdown = ranges.reduce(
-            (acc, { from, to }, idx) => {
-              if (from > acc.lastPos) {
-                acc.result += newMarkdown.slice(acc.lastPos, from);
-              }
-              acc.lastPos = Math.max(acc.lastPos, to);
-              if (idx == ranges.length - 1 && acc.lastPos < newMarkdown.length) {
-                // add remaining part
-                acc.result += newMarkdown.slice(acc.lastPos, newMarkdown.length);
-              }
-              return acc;
-            },
-            { result: "", lastPos: 0 },
-          ).result;
-        }
+        unfoldedMarkdown = update.view.visibleRanges.reduce((acc, { from, to }) => acc + newMarkdown.slice(from, to), "");
       }
 
       setText(unfoldedMarkdown);
