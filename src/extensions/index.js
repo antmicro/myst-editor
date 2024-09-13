@@ -77,8 +77,7 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useComments({ enabled, ycomments }) {
-    if (!enabled) return this;
+  useComments({ ycomments }) {
     this.important.push(commentExtension(ycomments));
     return this;
   }
@@ -127,9 +126,7 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useCollaboration({ enabled = true, ytext, provider, undoManager, editorRef }) {
-    if (!enabled) return this;
-
+  useCollaboration({ ytext, provider, undoManager, editorRef }) {
     this.extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
 
     if (undoManager) {
@@ -151,10 +148,8 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useSuggestionPopup({ enabled, ycomments, editorMountpoint }) {
-    if (enabled) {
-      this.base.push(EditorView.updateListener.of((update) => suggestionPopup(update, ycomments, editorMountpoint)));
-    }
+  useSuggestionPopup({ ycomments, editorMountpoint }) {
+    this.base.push(EditorView.updateListener.of((update) => suggestionPopup(update, ycomments, editorMountpoint)));
     return this;
   }
 

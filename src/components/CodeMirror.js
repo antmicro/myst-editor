@@ -207,15 +207,10 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
         .useHighlighter(highlights)
         .useCompartment(suggestionCompartment, customHighlighter([]))
         .useSpellcheck(spellcheckOpts)
-        .useCollaboration({
-          enabled: collaboration.opts.enabled || false,
-          ytext: collaboration.ytext,
-          undoManager: collaboration.undoManager,
-          provider: collaboration.provider,
-          editorRef,
-        })
-        .useComments({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments })
-        .useSuggestionPopup({ enabled: collaboration.opts.commentsEnabled, ycomments: collaboration.ycomments, editorMountpoint })
+        .if(collaboration.opts.enabled, (b) => b.useCollaboration({ ...collaboration, editorRef }))
+        .if(collaboration.opts.commentsEnabled, (b) =>
+          b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({ ycomments: collaboration.ycomments, editorMountpoint }),
+        )
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString(), update))
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
