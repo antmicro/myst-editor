@@ -1,4 +1,6 @@
 import MarkdownIt from "markdown-it";
+import { getLineById } from "./markdownSourceMap";
+import { foldEffect } from "@codemirror/language";
 
 export function markdownFoldButtons(/** @type {MarkdownIt} */ md) {
   md.use(paragraphFold).use(headingFold);
@@ -26,10 +28,23 @@ function headingFold(/** @type {MarkdownIt} */ md) {
   const baseRule = md.renderer.rules.heading_open ?? md.renderer.renderToken;
   md.renderer.rules.heading_open = (tokens, idx, options, env, self) => {
     const baseOutput = baseRule(tokens, idx, options, env, self);
+
     return addFoldArrow(baseOutput);
   };
 }
 
 const addFoldArrow = (baseOutput) => {
-  return baseOutput + '<button class="fold-arrow" title="Fold line"><span>⌄</span></button>';
+  return baseOutput + `<button class="fold-arrow" title="Fold line"><span>⌄</span></button>`;
 };
+
+export function handlePreviewFold(/** @type {MouseEvent} */ ev, lineMap) {
+  let button = ev.target.className === "fold-arrow" ? ev.target : ev.target.parentElement;
+  if (button.className !== "fold-arrow") return;
+
+  const lineId = button.nextElementSibling.getAttribute("data-line-id");
+  const lineNumber = getLineById(lineMap.current, lineId);
+  const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
+  window.myst_editor.main_editor.dispatch({
+    effects: foldEffect.of({ from: line.to, to: window.myst_editor.main_editor.state.doc.length }),
+  });
+}

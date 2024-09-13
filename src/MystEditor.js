@@ -11,6 +11,7 @@ import { EditorTopbar } from "./components/Topbar";
 import useCollaboration from "./hooks/useCollaboration";
 import useComments from "./hooks/useComments";
 import ResolvedComments from "./components/Resolved";
+import { handlePreviewFold } from "./hooks/markdownFoldButtons";
 
 if (!window.myst_editor?.isFresh) {
   resetCache();
@@ -212,7 +213,9 @@ const MystEditor = ({
               unfoldedHeadings,
             }}
           />
-          <${Preview} ref=${preview} mode=${mode}><${PreviewFocusHighlight} className="cm-previewFocus" /><//>
+          <${Preview} ref=${preview} mode=${mode} onClick=${(ev) => handlePreviewFold(ev, text.lineMap)}
+            ><${PreviewFocusHighlight} className="cm-previewFocus"
+          /><//>
           ${mode === "Diff" && html`<${Diff} root=${parent} oldText=${initialText} text=${text} />`}
           ${collaboration.commentsEnabled && collaboration.resolvingCommentsEnabled && !error && html`<${ResolvedComments} ycomments=${ycomments} />`}
         <//>
