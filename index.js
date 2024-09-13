@@ -1,4 +1,4 @@
-import n, { defaultButtons as r } from "./MystEditor.js";
+import s, { defaultButtons as n } from "./MystEditor.js";
 let u = `# h1 is quite big
 
 ## [h2 which is a link](https://google.com)
@@ -94,11 +94,11 @@ HTML:
 * 4{sup}\`th\` of July
 * {abbr}\`CSS (Cascading Style Sheets)`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const a = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], o = new URLSearchParams(window.location.search), l = o.get("room") || "0", s = o.get("username") || Math.floor(Math.random() * 1e3).toString(), m = a[Math.floor(Math.random() * a.length)];
-let d = [{
+const a = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], o = new URLSearchParams(window.location.search), l = o.get("room") || "0", r = o.get("username") || Math.floor(Math.random() * 1e3).toString(), m = a[Math.floor(Math.random() * a.length)];
+let c = [{
   target: "say",
-  transform: async (e) => s + " says: '" + e + "'"
-}], c = [{
+  transform: async (e) => r + " says: '" + e + "'"
+}], d = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
     const [t, i] = e.split("#");
@@ -131,28 +131,29 @@ let d = [{
     timeZone: "UTC"
   })))
 }];
-n({
+s({
   templatelist: "linkedtemplatelist.json",
   initialText: u,
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
   id: "textarea_id",
-  transforms: c,
+  transforms: d,
   collaboration: {
     enabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
     commentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
     resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
     wsUrl: {}.VITE_WS_URL || o.get("collab_server"),
-    username: s,
+    username: r,
     room: l,
     color: m
   },
-  customRoles: d,
-  includeButtons: r.concat([{
+  customRoles: c,
+  includeButtons: n.concat([{
     text: "Custom button",
     action: () => alert("Custom button action")
   }]),
   spellcheckOpts: {
     dict: "en_US",
     dictionaryPath: "/myst-editor/dictionaries"
-  }
+  },
+  syncScroll: !0
 }, document.getElementById("myst"));
