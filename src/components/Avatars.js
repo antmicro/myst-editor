@@ -4,7 +4,7 @@ import { styled } from "styled-components";
 const MAX_AVATARS = 4;
 
 const AvatarsWrapper = styled.div`
-  min-width: ${(props) => props.n * 35}px;
+  width: 200px;
 
   .avatar {
     border-radius: 50%;
@@ -45,7 +45,7 @@ const AvatarPlaceholder = ({ n, usernames }) =>
 const Avatars = ({ users }) => {
   const nUserAvatarsToShow = users.length <= MAX_AVATARS ? users.length : 3;
 
-  return html` <${AvatarsWrapper} n=${Math.min(users.length, MAX_AVATARS)}>
+  return html` <${AvatarsWrapper}>
     ${nUserAvatarsToShow < users.length
       ? html`<${AvatarPlaceholder}
           n=${users.length - nUserAvatarsToShow}

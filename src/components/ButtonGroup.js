@@ -5,6 +5,8 @@ import DefaultButton from "./Buttons.js";
 
 const GroupContainer = styled.div`
   display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `;
 
 const RadioButton = styled(DefaultButton)`
