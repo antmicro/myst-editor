@@ -1,6 +1,6 @@
 import MarkdownIt from "markdown-it";
 import { getLineById } from "./markdownSourceMap";
-import { foldEffect } from "@codemirror/language";
+import { toggleFold } from "@codemirror/language";
 
 export function markdownFoldButtons(/** @type {MarkdownIt} */ md) {
   md.use(paragraphFold).use(headingFold);
@@ -45,6 +45,7 @@ export function handlePreviewFold(/** @type {MouseEvent} */ ev, lineMap) {
   const lineNumber = getLineById(lineMap.current, lineId);
   const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
   window.myst_editor.main_editor.dispatch({
-    effects: foldEffect.of({ from: line.to, to: window.myst_editor.main_editor.state.doc.length }),
+    selection: { anchor: line.to, head: line.to },
   });
+  toggleFold(window.myst_editor.main_editor);
 }
