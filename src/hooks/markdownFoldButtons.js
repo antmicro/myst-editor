@@ -17,9 +17,9 @@ export function addFoldUI(/** @type {import("markdown-it").Token} */ token, /** 
       });
 
       if (!folded) {
-        return addFoldArrow(baseOutput);
+        return addFoldArrow(baseOutput, id);
       } else {
-        return addUnfoldButtons(baseOutput);
+        return addUnfoldButtons(baseOutput, id);
       }
     }
   }
@@ -27,15 +27,15 @@ export function addFoldUI(/** @type {import("markdown-it").Token} */ token, /** 
   return baseOutput;
 }
 
-const addFoldArrow = (baseOutput) => {
-  return `<button class="fold fold-arrow" title="Fold line"><span>⌄</span></button>` + baseOutput;
+const addFoldArrow = (baseOutput, id) => {
+  return `<button class="fold fold-arrow" data-btn-id="${id}" title="Fold line"><span>⌄</span></button>` + baseOutput;
 };
 
-const addUnfoldButtons = (baseOutput) => {
+const addUnfoldButtons = (baseOutput, id) => {
   return (
-    `<button class="fold fold-arrow" title="Unfold line"><span>›</span></button>` +
+    `<button class="fold fold-arrow" data-btn-id="${id}" title="Unfold line"><span>›</span></button>` +
     baseOutput +
-    `<button class="fold fold-dots" title="unfold"><span>...</span></button>`
+    `<button class="fold fold-dots" data-btn-id="${id}" title="unfold"><span>...</span></button>`
   );
 };
 
@@ -44,12 +44,7 @@ export function handlePreviewFold(/** @type {MouseEvent} */ ev, lineMap) {
   let button = ev.target.classList.contains("fold") ? ev.target : ev.target.parentElement;
   if (!button.classList.contains("fold")) return;
 
-  let current = button;
-  while (current != null) {
-    if (current.classList.contains("fold-arrow")) break;
-    current = current.previousElementSibling;
-  }
-  const lineId = current.nextElementSibling.getAttribute("data-line-id");
+  const lineId = button.getAttribute("data-btn-id");
   const lineNumber = getLineById(lineMap.current, lineId);
   const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
   window.myst_editor.main_editor.dispatch({
