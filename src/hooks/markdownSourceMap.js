@@ -52,8 +52,10 @@ function addLineNumberToTokens(defaultRule, transform) {
     } else if (tokens[idx].map) {
       const line = tokens[idx].map[0] + env.startLine - (env.chunkId !== 0);
       const id = randomLineId();
-      env.lineMap.current.set(line, id);
-      tokens[idx].attrSet(SRC_LINE_ID, id);
+      if (!env.lineMap.current.has(line)) {
+        env.lineMap.current.set(line, id);
+        tokens[idx].attrSet(SRC_LINE_ID, id);
+      }
     }
 
     if (defaultRule) {
@@ -112,8 +114,12 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
       .filter((_, i, lines) => i !== lines.length - 1)
       .map((l, i) => {
         const id = randomLineId();
-        env.lineMap.current.set(startLine + i + 1, id);
-        return `<span ${SRC_LINE_ID}="${id}">${l}</span>`;
+        if (!env.lineMap.current.has(startLine + i + 1)) {
+          env.lineMap.current.set(startLine + i + 1, id);
+          return `<span ${SRC_LINE_ID}="${id}">${l}</span>`;
+        } else {
+          return `<span>${l}</span>`;
+        }
       })
       .join("\n");
 

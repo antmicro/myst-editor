@@ -12,7 +12,7 @@ import { suggestionPopup } from "./suggestions";
 import { foldEffect, unfoldEffect, foldable } from "@codemirror/language";
 import { syncPreviewWithCursor, syncPreviewWithEditorScroll } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
-import { customCommonMark, headerIndent } from "./markdownLang";
+import { customCommonMark, fenceFold, headerIndent } from "./markdownLang";
 
 const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
@@ -55,6 +55,7 @@ export class ExtensionBuilder {
       markdown({ base: customCommonMark }),
       highlightActiveLine(),
       headerIndent,
+      fenceFold,
       keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
     ];
   }

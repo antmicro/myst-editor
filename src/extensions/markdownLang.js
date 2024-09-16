@@ -6,24 +6,20 @@ import { foldNodeProp, indentNodeProp, languageDataProp, defineLanguageFacet, La
 const data = defineLanguageFacet({ commentTokens: { block: { open: "<!--", close: "-->" } } });
 
 const headingProp = new NodeProp();
+const fenceProp = new NodeProp();
 
 // This is here to customize the markdown parser used by Codemirror, in particular the folding nodes.
 const commonmark = parser.configure({
   props: [
     foldNodeProp.add((type) => {
-      return !type.is("Block") || type.is("Document") || isHeading(type) != null
+      return !type.is("Block") || type.is("FencedCode") || type.is("Document") || isHeading(type) != null
         ? undefined
-        : (tree, state) => {
-            let from = state.doc.lineAt(tree.from).to;
-            let to = tree.to;
-            if (state.doc.lineAt(from).text.startsWith("``")) {
-              // leave last line closing the code block unfolded
-              to = state.doc.line(state.doc.lineAt(tree.to).number - 1).to;
-            }
-            return { from, to };
+        : (node, state) => {
+            return { from: state.doc.lineAt(node.from).to, to: node.to };
           };
     }),
     headingProp.add(isHeading),
+    fenceProp.add((type) => type.is("FencedCode")),
     indentNodeProp.add({
       Document: () => null,
     }),
@@ -60,4 +56,19 @@ function findSectionEnd(headerNode, level) {
   return last.to;
 }
 
-export const customCommonMark = new Language(data, commonmark, [headerIndent], "markdown");
+// This foldService disables folding of fenced block images.
+export const fenceFold = foldService.of((state, start, end) => {
+  for (let node = syntaxTree(state).resolveInner(end, -1); node; node = node.parent) {
+    if (node.from < start) break;
+    let fence = node.type.prop(fenceProp);
+    if (fence == false) continue;
+    const line = state.doc.lineAt(node.from);
+    const to = state.doc.line(state.doc.lineAt(node.to).number - 1).to;
+    if (!line.text.includes("```{image}") && !line.text.includes("```{figure}")) {
+      return { from: line.to, to };
+    }
+  }
+  return null;
+});
+
+export const customCommonMark = new Language(data, commonmark, [headerIndent, fenceFold], "markdown");
