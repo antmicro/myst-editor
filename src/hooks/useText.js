@@ -12,6 +12,22 @@ import { ViewUpdate } from "@codemirror/view";
 import { addFoldUI } from "./markdownFoldButtons";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
+const getUnfoldedMarkdown = (src, view) => view.visibleRanges.reduce((acc, { from, to }) => acc + src.slice(from, to), "");
+const getFoldedLines = (view) => {
+  const foldedLines = [];
+  const gaps = view.visibleRanges.reduce((acc, { from, to }, idx) => {
+    let out = acc;
+    if (idx != 0) {
+      out[out.length - 1].to = from;
+    }
+    if (idx != view.visibleRanges.length - 1) {
+      out = [...out, { from: to }];
+    }
+    return out;
+  }, []);
+  gaps.forEach((g) => foldedLines.push({ start: view.state.doc.lineAt(g.from).number + 1, end: view.state.doc.lineAt(g.to).number }));
+  return foldedLines;
+};
 
 const exposeText = (text) => () => {
   if (!window.myst_editor) {
@@ -188,20 +204,10 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
         shiftLineMap(update);
       }
       let unfoldedMarkdown = newMarkdown;
-      const foldedLines = [];
+      let foldedLines = [];
       if (update?.state) {
-        unfoldedMarkdown = update.view.visibleRanges.reduce((acc, { from, to }) => acc + newMarkdown.slice(from, to), "");
-        const gaps = update.view.visibleRanges.reduce((acc, { from, to }, idx) => {
-          let out = acc;
-          if (idx != 0) {
-            out[out.length - 1].to = from;
-          }
-          if (idx != update.view.visibleRanges.length - 1) {
-            out = [...out, { from: to }];
-          }
-          return out;
-        }, []);
-        gaps.forEach((g) => foldedLines.push({ start: update.state.doc.lineAt(g.from).number + 1, end: update.state.doc.lineAt(g.to).number }));
+        unfoldedMarkdown = getUnfoldedMarkdown(newMarkdown, update.view);
+        foldedLines = getFoldedLines(update.view);
       }
 
       setText(unfoldedMarkdown);
@@ -221,7 +227,9 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       setSyncText(true);
     },
     refresh() {
-      updateHtmlChunks({ newMarkdown: window.myst_editor.text, force: true });
+      let unfoldedMarkdown = getUnfoldedMarkdown(window.myst_editor.text, window.myst_editor.main_editor);
+      const foldedLines = getFoldedLines(window.myst_editor.main_editor);
+      updateHtmlChunks({ newMarkdown: unfoldedMarkdown, force: true, foldedLines });
     },
     onSync(action) {
       setOnSync({ action });
