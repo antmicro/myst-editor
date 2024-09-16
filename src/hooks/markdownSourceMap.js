@@ -4,6 +4,16 @@ import { escapeHtml } from "markdown-it/lib/common/utils";
 export const SRC_LINE_ID = "data-line-id";
 const randomLineId = () => Math.random().toString().replace(".", "");
 
+function getLineForToken(token, env) {
+  let line = token.map[0] + env.startLine - (env.chunkId !== 0);
+  for (const range of env.foldedLines) {
+    if (range.start > line) break;
+
+    line += range.end - range.start + 1;
+  }
+  return line;
+}
+
 /** @param {markdownIt} md  */
 export default function markdownSourceMap(md, transform = (token, out, env) => out) {
   md.use(overrideDefaultDirectives);
@@ -50,7 +60,7 @@ function addLineNumberToTokens(defaultRule, transform) {
         }
       }
     } else if (tokens[idx].map) {
-      const line = tokens[idx].map[0] + env.startLine - (env.chunkId !== 0);
+      const line = getLineForToken(tokens[idx], env);
       const id = randomLineId();
       if (!env.lineMap.current.has(line)) {
         env.lineMap.current.set(line, id);
@@ -108,7 +118,7 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
     }
 
     const sanitizedContent = escapeHtml(token.content);
-    const startLine = token.map[0] + env.startLine - (env.chunkId !== 0);
+    const startLine = getLineForToken(token, env);
     let htmlContent = sanitizedContent
       .split("\n")
       .filter((_, i, lines) => i !== lines.length - 1)
