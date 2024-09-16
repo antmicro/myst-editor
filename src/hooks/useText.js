@@ -8,25 +8,40 @@ import { backslashLineBreakPlugin } from "./markdownLineBreak";
 import markdownSourceMap from "./markdownSourceMap";
 import { StateEffect } from "@codemirror/state";
 import markdownMermaid from "./markdownMermaid";
-import { ViewUpdate } from "@codemirror/view";
+import { EditorView, ViewUpdate } from "@codemirror/view";
 import { addFoldUI } from "./markdownFoldButtons";
+import { foldedRanges } from "@codemirror/language";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
-const getUnfoldedMarkdown = (src, view) => view.visibleRanges.reduce((acc, { from, to }) => acc + src.slice(from, to), "");
-const getFoldedLines = (view) => {
-  const foldedLines = [];
-  const gaps = view.visibleRanges.reduce((acc, { from, to }, idx) => {
-    let out = acc;
-    if (idx != 0) {
-      out[out.length - 1].to = from;
-    }
-    if (idx != view.visibleRanges.length - 1) {
-      out = [...out, { from: to }];
-    }
-    return out;
-  }, []);
-  gaps.forEach((g) => foldedLines.push({ start: view.state.doc.lineAt(g.from).number + 1, end: view.state.doc.lineAt(g.to).number }));
-  return foldedLines;
+const getUnfoldedMarkdown = (src, /** @type {EditorView} */ view) => {
+  const folded = foldedRanges(view.state);
+  const ranges = [];
+  const cursor = folded.iter();
+  for (let r = cursor; r.value != null; cursor.next()) {
+    ranges.push({ from: r.from, to: r.to });
+  }
+
+  let unfoldedMarkdown = src;
+  if (ranges.length > 0) {
+    unfoldedMarkdown = ranges.reduce(
+      (acc, { from, to }, idx) => {
+        if (from > acc.lastPos) {
+          acc.result += src.slice(acc.lastPos, from);
+        }
+        acc.lastPos = Math.max(acc.lastPos, to);
+        if (idx == ranges.length - 1 && acc.lastPos < src.length) {
+          // add remaining part
+          acc.result += src.slice(acc.lastPos, src.length);
+        }
+        return acc;
+      },
+      { result: "", lastPos: 0 },
+    ).result;
+  }
+
+  const foldedLines = ranges.map((r) => ({ start: view.state.doc.lineAt(r.from).number + 1, end: view.state.doc.lineAt(r.to).number }));
+
+  return [unfoldedMarkdown, foldedLines];
 };
 
 const exposeText = (text) => () => {
@@ -206,8 +221,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       let unfoldedMarkdown = newMarkdown;
       let foldedLines = [];
       if (update?.state) {
-        unfoldedMarkdown = getUnfoldedMarkdown(newMarkdown, update.view);
-        foldedLines = getFoldedLines(update.view);
+        [unfoldedMarkdown, foldedLines] = getUnfoldedMarkdown(newMarkdown, update.view);
       }
 
       setText(unfoldedMarkdown);
@@ -227,8 +241,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       setSyncText(true);
     },
     refresh() {
-      let unfoldedMarkdown = getUnfoldedMarkdown(window.myst_editor.text, window.myst_editor.main_editor);
-      const foldedLines = getFoldedLines(window.myst_editor.main_editor);
+      const [unfoldedMarkdown, foldedLines] = getUnfoldedMarkdown(window.myst_editor.text, window.myst_editor.main_editor);
       updateHtmlChunks({ newMarkdown: unfoldedMarkdown, force: true, foldedLines });
     },
     onSync(action) {
