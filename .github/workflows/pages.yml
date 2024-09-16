@@ -9,39 +9,35 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-
-      - name: Build
-        run: yarn && yarn build
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == 'refs/heads/main' }}
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-
-  deploy-docs:
-    runs-on: ubuntu-latest
-    steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
       - uses: actions/download-artifact@v3
       - uses: actions/setup-python@v4
         with:
           python-version: 3.9
-      - name: Install dependencies
+
+      - name: Build
+        run: |
+          yarn && yarn build
+          mkdir public
+          mv dist/* public
+
+      - name: Install dependencies for docs
         run: |
           sudo apt-get update
           python -m pip install -r docs/requirements.txt
+
       - name: Generate documentation
         run: |
           cd docs
           make html
+          cd ..
+          mkdir public/docs
+          mv docs/build/html/* public/docs
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build/html
-          destination_dir: docs
+          publish_dir: ./public
