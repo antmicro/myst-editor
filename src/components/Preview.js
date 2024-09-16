@@ -337,6 +337,7 @@ const Preview = styled.div`
   .cm-previewFocus {
     display: ${(props) => (props.mode === "Both" ? "block" : "none")};
     z-index: 1;
+    pointer-events: none;
   }
 
   .mermaid {
@@ -359,10 +360,24 @@ const Preview = styled.div`
     background: transparent;
     border: none;
     padding: 0;
+    padding-right: 25px;
+    opacity: 0;
+
+    &:hover {
+      opacity: 1;
+    }
 
     span {
       font-size: initial;
     }
+  }
+
+  *:hover > .fold-arrow:first-child {
+    opacity: 1;
+  }
+
+  .fold-arrow:has(*:hover) {
+    opacity: 1;
   }
 
   li > .fold-arrow {
@@ -383,10 +398,14 @@ const Preview = styled.div`
     transform: translateY(-50%);
   }
 
-  .unfold span {
-    rotate: -90deg;
-    transform: translateY(-3px);
-    display: inline-block;
+  .unfold {
+    opacity: 1;
+
+    span {
+      rotate: -90deg;
+      transform: translateY(-3px);
+      display: inline-block;
+    }
   }
 `;
 Preview.defaultProps = { className: "myst-preview" };
