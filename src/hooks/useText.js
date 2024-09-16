@@ -56,7 +56,6 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
         return lookup;
       }, {});
     }
-
     const newChunks = splitIntoChunks(newMarkdown, htmlLookup);
 
     if (newChunks.length !== oldChunks.length || force) {
@@ -132,17 +131,23 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
             /** Markdown-it gets passed small chunks of `newMarkdown` so when we get the line number of a token, it is relative to that chunk.
              * In order to get the line number relative to the whole document, we need to keep track of which line a chunk begins at.*/
             const startLine = !lastChunk ? 1 : lastChunk.startLine + lastChunk.md.trimLeft().split("\n").length;
+            const endLine = startLine + newChunk.trimLeft().split("\n").length - 1;
             if (countOccurences(lastChunk?.md, /\n```/g) % 2 != 0) {
-              chunks[lastChunkIdx] = { md: lastChunk.md + newChunk, startLine: lastChunk.startLine };
+              chunks[lastChunkIdx] = { md: lastChunk.md + newChunk, startLine: lastChunk.startLine, endLine };
             } else {
-              chunks.push({ md: newChunk, startLine });
+              chunks.push({ md: newChunk, startLine, endLine });
             }
             return chunks;
           },
           [],
         )
-        .map(({ md, startLine }, id) => {
+        .map(({ md, startLine, endLine }, id) => {
           const hash = new IMurMurHash(md, 42).result();
+          if (!lookup[hash]) {
+            for (let l = startLine; l <= endLine; l++) {
+              lineMap.current.delete(l);
+            }
+          }
           const html =
             lookup[hash] ||
             purify.sanitize(markdown.render(md, { chunkId: id, startLine, lineMap }), {
