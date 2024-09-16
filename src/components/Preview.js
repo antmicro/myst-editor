@@ -345,6 +345,7 @@ const Preview = styled.div`
 
   *:has(.fold-arrow) {
     position: relative;
+    max-width: max-content;
   }
 
   .fold-arrow {
@@ -371,10 +372,10 @@ const Preview = styled.div`
     color: rgb(136, 136, 136);
     border-radius: 0.2rem;
     margin: 0;
-    margin-left: 8px;
     padding: 0 1px;
     cursor: pointer;
     position: absolute;
+    right: -23px;
     top: 50%;
     transform: translateY(-50%);
   }
