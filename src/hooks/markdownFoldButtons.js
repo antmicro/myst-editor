@@ -31,12 +31,14 @@ const addFoldArrow = (baseOutput, id) => {
   return `<button class="fold fold-arrow" data-btn-id="${id}" title="Fold line"><span>⌄</span></button>` + baseOutput;
 };
 
-const addUnfoldButtons = (baseOutput, id) => {
-  return (
-    `<button class="fold fold-arrow" data-btn-id="${id}" title="Unfold line"><span>›</span></button>` +
-    baseOutput +
-    `<button class="fold fold-dots" data-btn-id="${id}" title="unfold"><span>...</span></button>`
-  );
+const addUnfoldButtons = (/** @type {string} */ baseOutput, id) => {
+  const arrow = `<button class="fold fold-arrow" data-btn-id="${id}" title="Unfold line"><span>›</span></button>`;
+  const dots = `<button class="fold fold-dots" data-btn-id="${id}" title="unfold"><span>...</span></button>`;
+  if (baseOutput.endsWith("</pre>\n")) {
+    return arrow + baseOutput.slice(0, baseOutput.indexOf("</pre>")) + dots + "</pre>";
+  } else {
+    return arrow + baseOutput + dots;
+  }
 };
 
 export function handlePreviewFold(/** @type {MouseEvent} */ ev, lineMap) {

@@ -104,6 +104,7 @@ const Preview = styled.div`
   pre {
     white-space: pre-wrap;
     padding: 16px;
+    max-width: calc(100% - 40px) !important;
     & > code {
       padding: 0px;
     }
@@ -114,6 +115,7 @@ const Preview = styled.div`
   }
   aside {
     border-radius: var(--border-radius);
+    max-width: 100% !important;
 
     &.admonition {
       border: var(--border-2) solid var(--green-500);
@@ -344,7 +346,7 @@ const Preview = styled.div`
     justify-content: center;
   }
 
-  *:has(.fold-arrow) {
+  *:has(.fold) {
     position: relative;
     max-width: max-content;
   }
