@@ -382,6 +382,12 @@ const Preview = styled.div`
     top: 50%;
     transform: translateY(-50%);
   }
+
+  .unfold span {
+    rotate: -90deg;
+    transform: translateY(-3px);
+    display: inline-block;
+  }
 `;
 Preview.defaultProps = { className: "myst-preview" };
 

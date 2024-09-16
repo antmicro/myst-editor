@@ -32,7 +32,7 @@ const addFoldArrow = (baseOutput, id) => {
 };
 
 const addUnfoldButtons = (/** @type {string} */ baseOutput, id) => {
-  const arrow = `<button class="fold fold-arrow" data-btn-id="${id}" title="Unfold line"><span>›</span></button>`;
+  const arrow = `<button class="fold fold-arrow unfold" data-btn-id="${id}" title="Unfold line"><span>⌄</span></button>`;
   const dots = `<button class="fold fold-dots" data-btn-id="${id}" title="unfold"><span>...</span></button>`;
   if (baseOutput.endsWith("</pre>\n")) {
     return arrow + baseOutput.slice(0, baseOutput.indexOf("</pre>")) + dots + "</pre>";
