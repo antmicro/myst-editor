@@ -1,11 +1,11 @@
 import markdownIt from "markdown-it";
 import { escapeHtml } from "markdown-it/lib/common/utils";
 
-const SRC_LINE_ID = "data-line-id";
+export const SRC_LINE_ID = "data-line-id";
 const randomLineId = () => Math.random().toString().replace(".", "");
 
 /** @param {markdownIt} md  */
-export default function markdownSourceMap(md) {
+export default function markdownSourceMap(md, transform = (token, out, env) => out) {
   md.use(overrideDefaultDirectives);
   md.use(wrapTextInSpan);
   md.use(wrapFencedLinesInSpan);
@@ -21,11 +21,11 @@ export default function markdownSourceMap(md) {
 
   for (const rule of overrideRules) {
     const temp = md.renderer.rules[rule];
-    md.renderer.rules[rule] = addLineNumberToTokens(temp);
+    md.renderer.rules[rule] = addLineNumberToTokens(temp, transform);
   }
 }
 
-function addLineNumberToTokens(defaultRule) {
+function addLineNumberToTokens(defaultRule, transform) {
   /**
    * @param {import("markdown-it/index.js").Token[]} tokens
    * @param {number} idx
@@ -58,10 +58,10 @@ function addLineNumberToTokens(defaultRule) {
 
     if (defaultRule) {
       // if a rule existed for this token, execute it
-      return defaultRule(tokens, idx, options, env, self);
+      return transform(tokens[idx], defaultRule(tokens, idx, options, env, self), env);
     } else {
       // pass tokens to the default renderer
-      return self.renderToken(tokens, idx, options);
+      return transform(tokens[idx], self.renderToken(tokens, idx, options), env);
     }
   };
 }

@@ -360,6 +360,24 @@ const Preview = styled.div`
       font-size: initial;
     }
   }
+
+  li > .fold-arrow {
+    transform: translate(-42px);
+  }
+
+  .fold-dots {
+    background-color: rgb(238, 238, 238);
+    border: 1px solid rgb(221, 221, 221);
+    color: rgb(136, 136, 136);
+    border-radius: 0.2rem;
+    margin: 0;
+    margin-left: 8px;
+    padding: 0 1px;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 `;
 Preview.defaultProps = { className: "myst-preview" };
 

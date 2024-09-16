@@ -8,9 +8,8 @@ import { backslashLineBreakPlugin } from "./markdownLineBreak";
 import markdownSourceMap from "./markdownSourceMap";
 import { StateEffect } from "@codemirror/state";
 import markdownMermaid from "./markdownMermaid";
-import { foldedRanges } from "@codemirror/language";
 import { ViewUpdate } from "@codemirror/view";
-import { markdownFoldButtons } from "./markdownFoldButtons";
+import { addFoldUI } from "./markdownFoldButtons";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -86,8 +85,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       .use(markdownReplacer(transforms, parent))
       .use(useCustomRoles(customRoles, parent))
       .use(markdownMermaid, { preview, lineMap, parent })
-      .use(markdownSourceMap)
-      .use(markdownFoldButtons);
+      .use(markdownSourceMap, addFoldUI);
     if (backslashLineBreak) md.use(backslashLineBreakPlugin);
     return md;
   }, []);

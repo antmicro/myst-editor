@@ -1,47 +1,55 @@
-import MarkdownIt from "markdown-it";
-import { getLineById } from "./markdownSourceMap";
-import { toggleFold } from "@codemirror/language";
+import { getLineById, SRC_LINE_ID } from "./markdownSourceMap";
+import { toggleFold, foldable, foldedRanges } from "@codemirror/language";
 
-export function markdownFoldButtons(/** @type {MarkdownIt} */ md) {
-  md.use(paragraphFold).use(headingFold);
-}
+export function addFoldUI(/** @type {import("markdown-it").Token} */ token, /** @type {string} */ baseOutput, env) {
+  const id = token.attrGet(SRC_LINE_ID);
+  if (id) {
+    const lineNumber = getLineById(env.lineMap.current, id);
+    const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
+    const range = foldable(window.myst_editor.main_editor.state, line.from, line.to);
+    if (range) {
+      const ranges = foldedRanges(window.myst_editor.main_editor.state);
+      let folded = false;
+      ranges.between(range.from, range.to, (from, to) => {
+        if (from === range.from && to === range.to) {
+          folded = true;
+        }
+      });
 
-function paragraphFold(/** @type {MarkdownIt} */ md) {
-  const baseRule = md.renderer.rules.paragraph_open ?? md.renderer.renderToken;
-  md.renderer.rules.paragraph_open = (tokens, idx, options, env, self) => {
-    const baseOutput = baseRule(tokens, idx, options, env, self);
-    const inlineToken = tokens[idx + 1];
-    let multiline = false;
-    for (const tok of inlineToken.children) {
-      if (tok.type === "softbreak") {
-        multiline = true;
-        break;
+      if (!folded) {
+        return addFoldArrow(baseOutput);
+      } else {
+        return addUnfoldButtons(baseOutput);
       }
     }
-    if (!multiline) return baseOutput;
+  }
 
-    return addFoldArrow(baseOutput);
-  };
-}
-
-function headingFold(/** @type {MarkdownIt} */ md) {
-  const baseRule = md.renderer.rules.heading_open ?? md.renderer.renderToken;
-  md.renderer.rules.heading_open = (tokens, idx, options, env, self) => {
-    const baseOutput = baseRule(tokens, idx, options, env, self);
-
-    return addFoldArrow(baseOutput);
-  };
+  return baseOutput;
 }
 
 const addFoldArrow = (baseOutput) => {
-  return baseOutput + `<button class="fold-arrow" title="Fold line"><span>⌄</span></button>`;
+  return `<button class="fold fold-arrow" title="Fold line"><span>⌄</span></button>` + baseOutput;
+};
+
+const addUnfoldButtons = (baseOutput) => {
+  return (
+    `<button class="fold fold-arrow" title="Unfold line"><span>›</span></button>` +
+    baseOutput +
+    `<button class="fold fold-dots" title="unfold"><span>...</span></button>`
+  );
 };
 
 export function handlePreviewFold(/** @type {MouseEvent} */ ev, lineMap) {
-  let button = ev.target.className === "fold-arrow" ? ev.target : ev.target.parentElement;
-  if (button.className !== "fold-arrow") return;
+  /** @type {HTMLElement} */
+  let button = ev.target.classList.contains("fold") ? ev.target : ev.target.parentElement;
+  if (!button.classList.contains("fold")) return;
 
-  const lineId = button.nextElementSibling.getAttribute("data-line-id");
+  let current = button;
+  while (current != null) {
+    if (current.classList.contains("fold-arrow")) break;
+    current = current.previousElementSibling;
+  }
+  const lineId = current.nextElementSibling.getAttribute("data-line-id");
   const lineNumber = getLineById(lineMap.current, lineId);
   const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
   window.myst_editor.main_editor.dispatch({
