@@ -56,7 +56,8 @@ function findSectionEnd(headerNode, level) {
   return last.to;
 }
 
-// This foldService disables folding of fenced block images.
+// This foldService disables folding of certain fenced block types.
+const disabledBlocks = ["```{image", "```{figure", "```{list-table}"];
 export const fenceFold = foldService.of((state, start, end) => {
   for (let node = syntaxTree(state).resolveInner(end, -1); node; node = node.parent) {
     if (node.from < start) break;
@@ -64,9 +65,10 @@ export const fenceFold = foldService.of((state, start, end) => {
     if (fence == false) continue;
     const line = state.doc.lineAt(node.from);
     const to = state.doc.line(state.doc.lineAt(node.to).number - 1).to;
-    if (!line.text.includes("```{image}") && !line.text.includes("```{figure}")) {
-      return { from: line.to, to };
+    for (const block of disabledBlocks) {
+      if (line.text.includes(block)) return;
     }
+    return { from: line.to, to };
   }
   return null;
 });
