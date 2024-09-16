@@ -334,6 +334,7 @@ const Preview = styled.div`
 
   .cm-previewFocus {
     display: ${(props) => (props.mode === "Both" ? "block" : "none")};
+    z-index: 1;
   }
 
   .mermaid {
