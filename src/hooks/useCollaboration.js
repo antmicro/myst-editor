@@ -32,7 +32,7 @@ export default function useCollaboration(settings) {
   // so we add a hook to `console.error` which checks if it came from Yjs.
   useEffect(() => {
     const defaultError = console.error;
-    const isFromYjs = (err) => err.includes("Caught error while handling a Yjs update");
+    const isFromYjs = (err) => err?.includes("Caught error while handling a Yjs update");
     console.error = (...err) => {
       if (isFromYjs(err[0])) setError("Collaboration error occured. Please check browser logs and restart the MyST Editor");
       defaultError(...err);

@@ -45,7 +45,7 @@ class PreviewWrapper {
    * @param {Promise<string>} promise
    * @returns {string}
    */
-  createTransformPlaceholder(input, promise) {
+  createTransformPlaceholder(input, promise, target) {
     const placeholderId = "placeholder-" + Math.random().toString().slice(2);
 
     promise
@@ -55,7 +55,7 @@ class PreviewWrapper {
         this.fillPlaceholder(placeholderId, result);
       })
       .catch((err) => {
-        console.error(err);
+        console.error("Error in custom transform:", target, "Caused by input:", input, "Error:", err);
         this.cancelTransform(placeholderId);
         setCached(input, input);
       });
@@ -79,7 +79,7 @@ class PreviewWrapper {
         let transformResult = originalTransform(input);
 
         if (typeof transformResult.then == "function") {
-          return this.createTransformPlaceholder(input, transformResult);
+          return this.createTransformPlaceholder(input, transformResult, target);
         }
 
         return transformResult;
