@@ -69,7 +69,9 @@ export const syncPreviewWithEditorScroll = (lineMap, preview) => {
         const editorRect = view.dom.parentElement.getBoundingClientRect();
         const topBlock = view.lineBlockAtHeight(editorRect.top - view.documentTop);
         const topLine = view.state.doc.lineAt(topBlock.from).number + 1;
-        const line = Math.max(cursorLine, topLine);
+        const bottomBlock = view.lineBlockAtHeight(editorRect.bottom - view.documentTop);
+        const bottomLine = view.state.doc.lineAt(bottomBlock.from).number;
+        const line = cursorLine < topLine || cursorLine > bottomLine ? topLine : cursorLine;
         const [matchingElem, matchingLine] = findNearestElementForLine(line, lineMap, preview.current);
         if (matchingElem) {
           scrollPreviewElemIntoView({
@@ -112,7 +114,9 @@ export function syncEditorWithPreviewScroll(/** @type {HTMLElement} */ preview, 
       const editorRect = view.dom.parentElement.getBoundingClientRect();
       const topBlock = view.lineBlockAtHeight(editorRect.top - view.documentTop);
       const topLine = view.state.doc.lineAt(topBlock.from).number + 1;
-      if (cursorLine >= topLine) {
+      const bottomBlock = view.lineBlockAtHeight(editorRect.bottom - editorRect.top + view.dom.parentElement.scrollTop);
+      const bottomLine = view.state.doc.lineAt(bottomBlock.from).number - 2;
+      if (cursorLine >= topLine && cursorLine <= bottomLine) {
         // scroll to match the cursor position
         const [matchingElem, matchingLine] = findNearestElementForLine(cursorLine, lineMap, preview);
         if (matchingElem) {
