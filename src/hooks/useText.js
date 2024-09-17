@@ -178,15 +178,26 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   useEffect(() => {
     if (preview.current == null) return;
 
-    const mutationObserver = new MutationObserver(() => {
+    const resizeObserver = new ResizeObserver(() => {
       window.myst_editor.main_editor.dispatch({
         effects: markdownUpdatedStateEffect.of(null),
       });
+    });
+    const mutationObserver = new MutationObserver((mutationList) => {
+      window.myst_editor.main_editor.dispatch({
+        effects: markdownUpdatedStateEffect.of(null),
+      });
+      for (const mutation of mutationList) {
+        if (mutation.type !== "childList") continue;
+        [...mutation.addedNodes].filter((n) => n.nodeName === "IMG").forEach(resizeObserver.observe);
+        [...mutation.removedNodes].filter((n) => n.nodeName === "IMG").forEach(resizeObserver.unobserve);
+      }
     });
     mutationObserver.observe(preview.current, { childList: true, subtree: true });
 
     return () => {
       mutationObserver.disconnect();
+      resizeObserver.disconnect();
     };
   }, [preview.current]);
 
