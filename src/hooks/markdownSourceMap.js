@@ -27,6 +27,7 @@ export default function markdownSourceMap(md, transform = (token, out, env) => o
     "heading_open",
     "admonition_open",
     "link_open",
+    "list_item_open",
   ];
 
   for (const rule of overrideRules) {
@@ -42,6 +43,13 @@ function addLineNumberToTokens(defaultRule, transform) {
    * @param {import("markdown-it/index.js").Renderer} self
    */
   return (tokens, idx, options, env, self) => {
+    const rule = defaultRule ?? self.renderToken.bind(self);
+
+    if (tokens[idx].type === "list_item_open" && tokens[idx + 1].type !== "list_item_close") {
+      // skip non empty list items
+      return rule(tokens, idx, options, env, self);
+    }
+
     const inlineContainers = ["paragraph_open", "heading_open"];
     if (inlineContainers.includes(tokens[idx].type)) {
       const inlineToken = tokens[idx + 1];
@@ -68,13 +76,7 @@ function addLineNumberToTokens(defaultRule, transform) {
       }
     }
 
-    if (defaultRule) {
-      // if a rule existed for this token, execute it
-      return transform(tokens[idx], defaultRule(tokens, idx, options, env, self), env);
-    } else {
-      // pass tokens to the default renderer
-      return transform(tokens[idx], self.renderToken(tokens, idx, options), env);
-    }
+    return rule(tokens, idx, options, env, self);
   };
 }
 
