@@ -126,6 +126,7 @@ const MystEditor = ({
   backslashLineBreak = true,
   parent,
   syncScroll = false,
+  unfoldedHeadings,
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
@@ -208,6 +209,7 @@ const MystEditor = ({
                 error,
                 ycomments,
               },
+              unfoldedHeadings,
             }}
           />
           <${Preview} ref=${preview} mode=${mode}><${PreviewFocusHighlight} className="cm-previewFocus" /><//>

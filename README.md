@@ -157,6 +157,8 @@ Here are the props you can pass to the MystEditor component:
 - `additionalStyles` *(`CSSStylesheet` | `CSSStylesheet[]`)* - extra CSS stylesheets to customize the component
 - `syncScroll` *(default: false)* - synchronize scrolling of the editor and preview in `Dual Pane` view mode.
   - > NOTE: This only works if you set a height limit on the MyST parent element.
+- `unfoldedHeadings` *(`number?`)* - fold all but the given number of top level syntax nodes on startup.
+  If the option is not set, nothing will be folded by default.
 
 ## License
 

@@ -9,7 +9,7 @@ import { customHighlighter } from "./customHighlights";
 import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
 import { suggestionPopup } from "./suggestions";
-import { foldEffect, unfoldEffect } from "@codemirror/language";
+import { foldEffect, unfoldEffect, foldable } from "@codemirror/language";
 import { syncPreviewWithCursor, syncPreviewWithEditorScroll } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
 
@@ -205,4 +205,21 @@ export class ExtensionBuilder {
   create() {
     return [...this.important, ...this.base, ...this.extensions];
   }
+}
+
+/** This function folds all top level syntax nodes, while skiping a number of them defined by the `skip` parameter */
+export function skipAndFoldAll(/** @type {EditorView} */ view, skip = 0) {
+  let { state } = view;
+  let effects = [];
+  let idx = 0;
+  for (let pos = 0; pos < state.doc.length; ) {
+    let line = view.lineBlockAt(pos),
+      range = foldable(state, line.from, line.to);
+    if (range && idx >= skip) {
+      effects.push(foldEffect.of(range));
+    }
+    pos = (range ? view.lineBlockAt(range.to) : line).to + 1;
+    if (range) idx++;
+  }
+  if (effects.length) view.dispatch({ effects: effects });
 }
