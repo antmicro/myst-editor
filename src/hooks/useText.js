@@ -78,10 +78,6 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       .filter((newChunk, idx) => newChunk.hash !== oldChunks[idx].hash)
       .forEach((chunk) => (preview.current.querySelector("html-chunk#html-chunk-" + chunk.id).innerHTML = chunk.html));
 
-    view?.dispatch({
-      effects: markdownUpdatedStateEffect.of(null),
-    });
-
     return newChunks;
   }, []);
 
@@ -178,6 +174,21 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       setSyncText(false);
     }
   }, [syncText]);
+
+  useEffect(() => {
+    if (preview.current == null) return;
+
+    const mutationObserver = new MutationObserver(() => {
+      window.myst_editor.main_editor.dispatch({
+        effects: markdownUpdatedStateEffect.of(null),
+      });
+    });
+    mutationObserver.observe(preview.current, { childList: true, subtree: true });
+
+    return () => {
+      mutationObserver.disconnect();
+    };
+  }, [preview.current]);
 
   return {
     set(newMarkdown, update) {

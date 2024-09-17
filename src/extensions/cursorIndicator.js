@@ -14,16 +14,18 @@ export const cursorIndicator = (lineMap, preview) =>
     }
 
     const [matchingElem] = findNearestElementForLine(cursorLineAfter, lineMap, preview.current);
+    const previewElement = preview.current.querySelector(".cm-previewFocus");
     if (matchingElem) {
       const previewRect = preview.current.getBoundingClientRect();
       let matchingRect = matchingElem.getBoundingClientRect();
 
-      const previewElement = preview.current.querySelector(".cm-previewFocus");
       previewElement.style.top = `${matchingRect.top - previewRect.top + preview.current.scrollTop}px`;
       // the decoration of a list item is not contained within it's clientRect
       const leftPos =
         matchingRect.left - previewRect.left - 12.5 - (matchingElem.tagName === "LI" || matchingElem.parentElement.tagName === "LI" ? 17 : 0);
       previewElement.style.left = `${leftPos}px`;
       previewElement.style.height = `${matchingRect.height}px`;
+    } else {
+      previewElement.style.height = "0px";
     }
   });
