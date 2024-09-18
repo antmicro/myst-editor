@@ -211,15 +211,15 @@ export class ExtensionBuilder {
 export function skipAndFoldAll(/** @type {EditorView} */ view, skip = 0) {
   let { state } = view;
   let effects = [];
-  let idx = 0;
+  let nProcessedFoldables = 0;
   for (let pos = 0; pos < state.doc.length; ) {
     let line = view.lineBlockAt(pos),
       range = foldable(state, line.from, line.to);
-    if (range && idx >= skip) {
+    if (range && nProcessedFoldables >= skip) {
       effects.push(foldEffect.of(range));
     }
     pos = (range ? view.lineBlockAt(range.to) : line).to + 1;
-    if (range) idx++;
+    if (range) nProcessedFoldables++;
   }
-  if (effects.length) view.dispatch({ effects: effects });
+  if (effects.length) view.dispatch({ effects });
 }
