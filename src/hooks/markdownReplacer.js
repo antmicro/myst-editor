@@ -153,7 +153,8 @@ const useCustomRoles = (transforms, previewNode) => (markdownIt) => {
 
   // Usually a markdownIt renderer rule would escape all html code. Here we create a rule
   // which explicitly does nothing so that all html returned by transforms is rendered.
-  markdownIt.renderer.rules[CUSTOM_ROLE_RULE] = (tokens, idx) => tokens[idx].content;
+  markdownIt.renderer.rules[CUSTOM_ROLE_RULE] = (tokens, idx, options, env, self) =>
+    `<span ${self.renderAttrs(tokens[idx])}>${tokens[idx].content}</span>`;
   markdownIt.use(rolePlugin, { roles: customRoles });
 };
 

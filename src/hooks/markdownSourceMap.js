@@ -62,7 +62,7 @@ function addLineNumberToTokens(defaultRule, transform) {
           continue;
         }
 
-        if (!lineUsed) {
+        if (!lineUsed && !childToken.type.includes("_open")) {
           childToken.map = [tokens[idx].map[0] + lineInParagraph, tokens[idx].map[0] + lineInParagraph + 1];
           lineUsed = true;
         }
