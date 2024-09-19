@@ -37,7 +37,7 @@ const markdownItMermaid = (md, { preview, lineMap, parent }) => {
       cached = contentCache.get(new IMurMurHash(code, hashSeed).result());
     }
     const id = Math.random().toString().replace(".", "");
-    token.attrSet("data-mermaid-id", id);
+    token.attrSet("id", `mermaid-${id}`);
 
     if (cached) {
       token.attrSet("class", "mermaid");
@@ -49,7 +49,7 @@ const markdownItMermaid = (md, { preview, lineMap, parent }) => {
       container.style.visibility = "none";
       document.body.appendChild(container);
 
-      waitForElement(preview.current, `[data-mermaid-id="${id}"]`).then((el) => {
+      waitForElement(preview.current, `mermaid-${id}`).then((el) => {
         mermaid
           .render(`mermaid-${id}`, code, container)
           .then(({ svg }) => {

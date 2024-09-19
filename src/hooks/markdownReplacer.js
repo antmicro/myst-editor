@@ -49,7 +49,7 @@ class PreviewWrapper {
     const placeholderId = "placeholder-" + Math.random().toString().slice(2);
 
     promise
-      .then(waitForElement(this.preview, `#${placeholderId}`))
+      .then(waitForElement(this.preview, placeholderId))
       .then((result) => {
         setCached(input, result);
         this.fillPlaceholder(placeholderId, result);
