@@ -10,6 +10,7 @@ const DefaultButton = styled.button`
   text-transform: uppercase;
   font-size: 12px;
   font-weight: bold;
+  font-family: inherit;
   border: 1px solid var(--icon-border);
   background-color: var(--icon-bg);
   height: 40px;
