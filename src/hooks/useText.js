@@ -252,7 +252,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
     },
     copy() {
       copyHtmlAsRichText(
-        splitIntoChunks(window.myst_editor.text)
+        splitIntoChunks(window.myst_editor.text, {}, [])
           .map((c) => c.html)
           .join("\n"),
       );
