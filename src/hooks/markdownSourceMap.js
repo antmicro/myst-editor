@@ -6,7 +6,7 @@ const randomLineId = () => Math.random().toString().replace(".", "");
 
 function getLineForToken(token, env) {
   let line = token.map[0] + env.startLine - (env.chunkId !== 0);
-  for (const range of env.foldedLines) {
+  for (const range of env.foldedLines ?? []) {
     if (range.start > line) break;
 
     line += range.end - range.start + 1;

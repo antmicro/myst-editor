@@ -179,7 +179,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
           if (!lookup[hash]) {
             let unfoldedStart = startLine;
             let unfoldedEnd = endLine;
-            for (const range of foldedLines) {
+            for (const range of foldedLines ?? []) {
               if (range.start < unfoldedStart) {
                 unfoldedStart += range.end - range.start + 1;
               }
