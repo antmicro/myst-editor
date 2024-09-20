@@ -129,6 +129,21 @@ test.describe.parallel("With collaboration disabled", () => {
         const clipboardContent = await page.evaluate(() => navigator.clipboard.readText());
         expect(clipboardContent).toContain("<h1>");
     });
+
+    test("Mermaid diagrams", async ({page}) => {
+        await clearEditor(page);
+        await insertChangesAndCheckOutput(
+            page,
+            {
+                from: 0,
+                insert: `\`\`\`mermaid
+graph TD
+    A-->B
+\`\`\``,
+            },
+            (html) => expect(html).toContain("<svg")
+        )
+    });
 })
 
 test.describe.parallel("With collaboration enabled", () => {
