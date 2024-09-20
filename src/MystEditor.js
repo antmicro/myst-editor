@@ -183,6 +183,7 @@ const MystEditor = ({
             buttons,
             collaboration,
             setMode,
+            initialMode,
             title,
           }}
         />`}

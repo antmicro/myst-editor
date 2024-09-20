@@ -186,20 +186,28 @@ const icons = {
   "print-to-pdf": PrintPDFIcon,
 };
 
-export const EditorTopbar = ({ alert, users, text, setMode, templatelist, buttons, title, collaboration }) => {
+export const EditorTopbar = ({ alert, users, text, setMode, templatelist, buttons, title, collaboration, initialMode }) => {
   const titleHtml = useMemo(() => purify.sanitize(renderMdLinks(title || ""), []));
+  const editorModeButtons = useMemo(() => {
+    const modeButtons = [
+      { id: "source", tooltip: "Source", action: () => setMode("Source"), icon: SourceIcon },
+      { id: "preview", tooltip: "Preview", action: () => setMode("Preview"), icon: PreviewIcon },
+      { id: "both", tooltip: "Dual Pane", action: () => setMode("Both"), icon: BothIcon },
+      { id: "diff", tooltip: "Diff View", action: () => setMode("Diff"), icon: DiffIcon },
+    ];
+    if (collaboration.resolvingCommentsEnabled) {
+      modeButtons.push({ id: "resolved", tooltip: "Resolved Comments", action: () => setMode("Resolved"), icon: ResolvedIcon });
+    }
 
-  const editorModeButtons = [
-    { id: "source", tooltip: "Source", action: () => setMode("Source"), icon: SourceIcon },
-    { id: "preview", tooltip: "Preview", action: () => setMode("Preview"), icon: PreviewIcon },
-    { id: "both", tooltip: "Dual Pane", action: () => setMode("Both"), icon: BothIcon },
-    { id: "diff", tooltip: "Diff View", action: () => setMode("Diff"), icon: DiffIcon },
-  ];
-  if (collaboration.resolvingCommentsEnabled) {
-    editorModeButtons.push({ id: "resolved", tooltip: "Resolved Comments", action: () => setMode("Resolved"), icon: ResolvedIcon });
-  }
+    return modeButtons;
+  }, []);
+  const initialClickedId = useMemo(
+    () => editorModeButtons.findIndex((b) => b.id[0].toUpperCase() + b.id.slice(1) == initialMode),
+    [editorModeButtons, initialMode],
+  );
   const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), []);
   const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), []);
+
   return html` <${Topbar}>
     <div class="buttons-left">
       ${buttonsLeft.map(
@@ -215,6 +223,6 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
     <${Title} dangerouslySetInnerHTML=${{ __html: titleHtml }} />
     <${Avatars} users=${users} />
     <span> ${textButtons.map((b) => html`<${DefaultButton} type="button" onClick=${b.action}>${b.text}<//>`)} </span>
-    <${ButtonGroup} buttons=${editorModeButtons} initialClickedId=${2} />
+    <${ButtonGroup} buttons=${editorModeButtons} initialClickedId=${initialClickedId} />
   <//>`;
 };
