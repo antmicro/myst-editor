@@ -114,7 +114,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       .use(markdownitDocutils)
       .use(markdownReplacer(transforms, parent))
       .use(useCustomRoles(customRoles, parent))
-      .use(markdownMermaid, { preview, lineMap, parent })
+      .use(markdownMermaid, { lineMap, parent })
       .use(markdownSourceMap, addFoldUI);
     if (backslashLineBreak) md.use(backslashLineBreakPlugin);
     return md;

@@ -11,7 +11,7 @@ const hashSeed = 42;
 // key = hash of diagram source code
 const contentCache = new Map();
 
-const markdownItMermaid = (md, { preview, lineMap, parent }) => {
+const markdownItMermaid = (md, { lineMap, parent }) => {
   mermaid.initialize({
     theme: "neutral",
     suppressErrorRendering: true,
@@ -49,7 +49,7 @@ const markdownItMermaid = (md, { preview, lineMap, parent }) => {
       container.style.visibility = "none";
       document.body.appendChild(container);
 
-      waitForElement(preview.current, `mermaid-${id}`).then((el) => {
+      waitForElement(parent, `mermaid-${id}`).then((el) => {
         mermaid
           .render(`mermaid-${id}`, code, container)
           .then(({ svg }) => {
