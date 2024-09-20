@@ -122,6 +122,13 @@ test.describe.parallel("With collaboration disabled", () => {
             )
         });
     })
+
+    test("Copy as HTML button copies to clipboard", async ({page, context}) => {
+        await context.grantPermissions(["clipboard-write", "clipboard-read"]);
+        await page.getByTitle("Copy document as HTML").click();
+        const clipboardContent = await page.evaluate(() => navigator.clipboard.readText());
+        expect(clipboardContent).toContain("<h1>");
+    });
 })
 
 test.describe.parallel("With collaboration enabled", () => {
