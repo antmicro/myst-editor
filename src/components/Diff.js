@@ -10,6 +10,8 @@ const DiffContainer = styled.div`
   grid-auto-flow: column;
   grid-template-rows: max-content;
   width: 100%;
+  height: 100%;
+  scrollbar-width: thin;
   overflow-y: auto;
 `;
 

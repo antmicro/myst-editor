@@ -28,15 +28,15 @@ const EditorParent = styled.div`
   ${(props) => {
     switch (props.mode) {
       case "Preview":
-        return ".myst-main-editor { display: none } .myst-resolved { display: none }";
+        return "#editor-wrapper { display: none } #resolved-wrapper { display: none }";
       case "Source":
-        return ".myst-preview { display: none } .myst-resolved { display: none }";
+        return "#preview-wrapper { display: none } #resolved-wrapper { display: none }";
       case "Diff":
-        return ".myst-main-editor { display: none }; .myst-preview { display: none } .myst-resolved { display: none }";
+        return "#editor-wrapper { display: none }; #preview-wrapper { display: none } #resolved-wrapper { display: none }";
       case "Both":
-        return ".myst-resolved { display: none }";
+        return "#resolved-wrapper { display: none }";
       case "Resolved":
-        return ".myst-preview { display: none };";
+        return "#preview-wrapper { display: none };";
       default:
         return ``;
     }
@@ -45,9 +45,7 @@ const EditorParent = styled.div`
 
 const MystWrapper = styled.div`
   padding: 20px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(50%, 1fr);
+  display: flex;
   box-sizing: border-box;
   height: calc(100% - 60px);
   width: 100%;
@@ -69,6 +67,15 @@ const StatusBanner = styled.div`
   background-color: ${(props) => (props.error ? "var(--red-500)" : "var(--blue-100)")};
   color: ${(props) => (props.error ? "white" : "inherit")};
   font-weight: 600;
+`;
+
+/** CSS flexbox takes the content size of elements to determine the layout and ignores padding.
+ * This wrapper is here to make sure the padding is added one element deeper and elements are equal width.
+ * Ideally we would use CSS Grid but that has some performance issues with CodeMirror on Chromium. */
+const FlexWrapper = styled.div`
+  flex: 1;
+  height: 100%;
+  min-height: 500px;
 `;
 
 const createExtraScopePlugin = (scope) => {
@@ -190,35 +197,41 @@ const MystEditor = ({
         ${error && html`<${StatusBanner} error> ${typeof error == "string" ? error : "No connection to the collaboration server"} <//>`}
         ${collaboration.enabled && !ready && !error && html`<${StatusBanner}>Connecting to the collaboration server ...<//>`}
         <${MystWrapper} fullscreen=${fullscreen}>
-          <${CodeMirror}
-            ...${{
-              mode,
-              text,
-              id,
-              spellcheckOpts,
-              root: parent,
-              highlights: transforms,
-              preview,
-              syncScroll,
-              collaboration: {
-                opts: collaboration,
-                setUsers,
-                provider,
-                undoManager,
-                ytext,
-                ydoc,
-                ready,
-                error,
-                ycomments,
-              },
-              unfoldedHeadings,
-            }}
-          />
-          <${Preview} ref=${preview} mode=${mode} onClick=${(ev) => handlePreviewFold(ev, text.lineMap)}
-            ><${PreviewFocusHighlight} className="cm-previewFocus"
-          /><//>
-          ${mode === "Diff" && html`<${Diff} root=${parent} oldText=${initialText} text=${text} />`}
-          ${collaboration.commentsEnabled && collaboration.resolvingCommentsEnabled && !error && html`<${ResolvedComments} ycomments=${ycomments} />`}
+          <${FlexWrapper} id="editor-wrapper">
+            <${CodeMirror}
+              ...${{
+                mode,
+                text,
+                id,
+                spellcheckOpts,
+                root: parent,
+                highlights: transforms,
+                preview,
+                syncScroll,
+                collaboration: {
+                  opts: collaboration,
+                  setUsers,
+                  provider,
+                  undoManager,
+                  ytext,
+                  ydoc,
+                  ready,
+                  error,
+                  ycomments,
+                },
+                unfoldedHeadings,
+              }}
+            />
+          <//>
+          <${FlexWrapper} id="preview-wrapper"
+            ><${Preview} ref=${preview} mode=${mode} onClick=${(ev) => handlePreviewFold(ev, text.lineMap)}
+              ><${PreviewFocusHighlight} className="cm-previewFocus" /><//
+          ><//>
+          ${mode === "Diff" && html`<${FlexWrapper}><${Diff} root=${parent} oldText=${initialText} text=${text} /><//>`}
+          ${collaboration.commentsEnabled &&
+          collaboration.resolvingCommentsEnabled &&
+          !error &&
+          html`<${FlexWrapper} id="resolved-wrapper"><${ResolvedComments} ycomments=${ycomments} /><//>`}
         <//>
       <//>
     <//>

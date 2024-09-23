@@ -7,7 +7,8 @@ import CommentIcon from "../icons/comment.svg";
 const ResolvedWrapper = styled.div`
   background-color: white;
   padding: 20px 0;
-  min-height: 150px;
+  box-sizing: border-box;
+  height: 100%;
   border: 1px solid var(--gray-400);
   border-left: 1px solid var(--gray-600);
   box-shadow: inset 0px 0px 4px var(--gray-600);

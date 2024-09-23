@@ -19,7 +19,8 @@ const CodeEditor = styled.div`
   resize: none;
   border: 0;
   padding: 20px;
-  min-height: 500px;
+  box-sizing: border-box;
+  height: 100%;
   scrollbar-width: thin;
   overflow-y: auto;
   color: black;

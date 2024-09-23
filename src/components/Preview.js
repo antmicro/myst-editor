@@ -4,14 +4,15 @@ const Preview = styled.div`
   background-color: white;
   padding: 20px;
   padding-left: 40px;
-  min-height: 150px;
+  box-sizing: border-box;
+  height: 100%;
   border: 1px solid var(--gray-400);
   border-left: 1px solid var(--gray-600);
   box-shadow: inset 0px 0px 4px var(--gray-600);
   border-radius: var(--border-radius);
   vertical-align: top;
   color: var(--gray-900);
-  word-break: unset;
+  word-break: break-all;
   position: relative;
   overflow-y: auto;
   scrollbar-width: thin;
