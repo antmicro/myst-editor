@@ -9,7 +9,6 @@ import commentIcon from "../icons/comment.svg?raw";
 import { customHighlighter } from "../extensions/customHighlights";
 import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
 import editIcon from "../icons/edit.svg";
-import { syncEditorWithPreviewScroll } from "../extensions/syncDualPane";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -229,10 +228,6 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
 
     if (unfoldedHeadings != undefined) {
       skipAndFoldAll(view, unfoldedHeadings);
-    }
-
-    if (syncScroll) {
-      syncEditorWithPreviewScroll(preview.current, text.lineMap, view);
     }
 
     collaboration.ycomments?.registerCodeMirror(view);

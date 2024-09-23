@@ -10,7 +10,7 @@ import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
 import { suggestionPopup } from "./suggestions";
 import { foldEffect, unfoldEffect, foldable } from "@codemirror/language";
-import { syncPreviewWithCursor, syncPreviewWithEditorScroll } from "./syncDualPane";
+import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
 import { customCommonMark, fenceFold, headerIndent } from "./markdownLang";
 
@@ -125,7 +125,7 @@ export class ExtensionBuilder {
   }
 
   useSyncPreviewWithCursor({ lineMap, preview }) {
-    this.base.push([syncPreviewWithCursor(lineMap, preview), syncPreviewWithEditorScroll(lineMap, preview)]);
+    this.base.push(syncPreviewWithCursor(lineMap, preview));
     return this;
   }
 
