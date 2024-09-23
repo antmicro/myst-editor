@@ -189,8 +189,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       });
       for (const mutation of mutationList) {
         if (mutation.type !== "childList") continue;
-        [...mutation.addedNodes].filter((n) => n.nodeName === "IMG").forEach(resizeObserver.observe);
-        [...mutation.removedNodes].filter((n) => n.nodeName === "IMG").forEach(resizeObserver.unobserve);
+        [...mutation.addedNodes].filter((n) => n.nodeName === "IMG").forEach((n) => resizeObserver.observe(n));
+        [...mutation.removedNodes].filter((n) => n.nodeName === "IMG").forEach((n) => resizeObserver.unobserve(n));
       }
     });
     mutationObserver.observe(preview.current, { childList: true, subtree: true });
