@@ -3,9 +3,12 @@ import { markdownUpdatedStateEffect } from "../hooks/useText";
 import { findNearestElementForLine } from "../hooks/markdownSourceMap";
 
 const previewTopPadding = 20;
+const debounceTimeout = 50;
 
-export const syncPreviewWithCursor = (lineMap, preview) =>
-  EditorView.updateListener.of((update) => {
+export const syncPreviewWithCursor = (lineMap, preview) => {
+  let timeout;
+
+  return EditorView.updateListener.of((update) => {
     const cursorLineBefore = update.startState.doc.lineAt(update.startState.selection.main.head).number;
     const cursorLineAfter = update.state.doc.lineAt(update.state.selection.main.head).number;
     const selectionChanged = update.selectionSet && (cursorLineBefore !== cursorLineAfter || cursorLineBefore === 1);
@@ -15,17 +18,23 @@ export const syncPreviewWithCursor = (lineMap, preview) =>
       return;
     }
 
-    const [matchingElem, matchingLine] = findNearestElementForLine(cursorLineAfter, lineMap, preview.current);
-    if (matchingElem) {
-      scrollPreviewElemIntoView({
-        view: update.view,
-        matchingLine,
-        matchingElem,
-        behavior: "smooth",
-        preview: preview.current,
-      });
+    function sync() {
+      const [matchingElem, matchingLine] = findNearestElementForLine(cursorLineAfter, lineMap, preview.current);
+      if (matchingElem) {
+        scrollPreviewElemIntoView({
+          view: update.view,
+          matchingLine,
+          matchingElem,
+          behavior: "smooth",
+          preview: preview.current,
+        });
+      }
     }
+
+    clearTimeout(timeout);
+    timeout = setTimeout(sync, debounceTimeout);
   });
+};
 
 /** @param {Object} param0
  * @param {EditorView} param0.view
