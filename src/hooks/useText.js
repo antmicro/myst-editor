@@ -65,14 +65,12 @@ const copyHtmlAsRichText = (/** @type {string} */ txt) => {
   doc.querySelectorAll("[data-remove]").forEach((n) => n.remove());
   const sanitized = doc.body.innerHTML;
 
-  const listener = (e) => {
-    e.clipboardData.setData("text/html", sanitized);
-    e.clipboardData.setData("text/plain", sanitized);
-    e.preventDefault();
-  };
-  document.addEventListener("copy", listener);
-  document.execCommand("copy");
-  document.removeEventListener("copy", listener);
+  navigator.clipboard.write([
+    new ClipboardItem({
+      "text/plain": new Blob([sanitized], { type: "text/plain" }),
+      "text/html": new Blob([sanitized], { type: "text/html" }),
+    }),
+  ]);
 };
 
 export const markdownUpdatedStateEffect = StateEffect.define();
