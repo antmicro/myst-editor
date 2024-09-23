@@ -1,9 +1,10 @@
 import { EditorView } from "codemirror";
 import { markdownUpdatedStateEffect } from "../hooks/useText";
-import { findNearestElementForLine } from "../hooks/markdownSourceMap";
+import { findNearestElementForLine, getLineById } from "../hooks/markdownSourceMap";
+import { EditorSelection } from "@codemirror/state";
 
 const previewTopPadding = 20;
-const debounceTimeout = 50;
+const debounceTimeout = 100;
 
 export const syncPreviewWithCursor = (lineMap, preview) => {
   let timeout;
@@ -49,4 +50,31 @@ function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior 
 
   const top = matchingRect.top + preview.scrollTop - elemScrollOffset - previewRect.top + editor.scrollTop;
   preview.scrollTo({ top, behavior });
+}
+
+export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} */ ev, lineMap, preview) {
+  const id = ev.target.getAttribute("data-line-id");
+  if (!id) return;
+
+  const lineNumber = getLineById(lineMap.current, id);
+  const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
+  const lineBlock = window.myst_editor.main_editor.lineBlockAt(line.from);
+  const targetRect = ev.target.getBoundingClientRect();
+  const previewRect = preview.current.getBoundingClientRect();
+  const editor = window.myst_editor.main_editor.dom.parentElement;
+
+  const editorScrollOffset = targetRect.top;
+  const top = lineBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;
+  editor.scrollTo({
+    top,
+    behavior: "smooth",
+  });
+  function setCursor() {
+    window.myst_editor.main_editor.dispatch({
+      selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
+    });
+    window.myst_editor.main_editor.focus();
+    editor.removeEventListener("scrollend", setCursor);
+  }
+  editor.addEventListener("scrollend", setCursor);
 }

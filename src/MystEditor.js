@@ -12,6 +12,7 @@ import useCollaboration from "./hooks/useCollaboration";
 import useComments from "./hooks/useComments";
 import ResolvedComments from "./components/Resolved";
 import { handlePreviewFold } from "./hooks/markdownFoldButtons";
+import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
 
 if (!window.myst_editor?.isFresh) {
   resetCache();
@@ -224,7 +225,13 @@ const MystEditor = ({
             />
           <//>
           <${FlexWrapper} id="preview-wrapper"
-            ><${Preview} ref=${preview} mode=${mode} onClick=${(ev) => handlePreviewFold(ev, text.lineMap)}
+            ><${Preview}
+              ref=${preview}
+              mode=${mode}
+              onClick=${(ev) => {
+                handlePreviewFold(ev, text.lineMap);
+                handlePreviewClickToScroll(ev, text.lineMap, preview);
+              }}
               ><${PreviewFocusHighlight} className="cm-previewFocus" /><//
           ><//>
           ${mode === "Diff" && html`<${FlexWrapper}><${Diff} root=${parent} oldText=${initialText} text=${text} /><//>`}
