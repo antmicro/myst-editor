@@ -52,12 +52,22 @@ const exposeText = (text) => () => {
 };
 
 const copyHtmlAsRichText = (/** @type {string} */ txt) => {
-  // remove data-source-line from the copied html
-  const sanitizedText = txt.replace(/(?<=\<\S+) data-line-id="\d+"/g, "");
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(txt, "text/html");
+  doc.querySelectorAll("[data-line-id]").forEach((n) => n.removeAttribute("data-line-id"));
+  // This removes spans added for source mapping purposes.
+  doc.querySelectorAll("span").forEach((n) => {
+    if (n.attributes.length === 0) {
+      n.insertAdjacentHTML("afterend", n.innerHTML);
+      n.remove();
+    }
+  });
+  doc.querySelectorAll("[data-remove]").forEach((n) => n.remove());
+  const sanitized = doc.body.innerHTML;
 
   const listener = (e) => {
-    e.clipboardData.setData("text/html", sanitizedText);
-    e.clipboardData.setData("text/plain", sanitizedText);
+    e.clipboardData.setData("text/html", sanitized);
+    e.clipboardData.setData("text/plain", sanitized);
     e.preventDefault();
   };
   document.addEventListener("copy", listener);
