@@ -5,15 +5,21 @@ import { EditorSelection } from "@codemirror/state";
 
 const previewTopPadding = 20;
 const debounceTimeout = 100;
+/** This is the best way I can think of to check if the user caused the markdown to update.
+ * If it takes longer than this to update the preview, we have bigger problems.
+ */
+const typedToUpdateThreshold = 500;
 
-export const syncPreviewWithCursor = (lineMap, preview) => {
+export const syncPreviewWithCursor = (lineMap, preview, lastTyped) => {
   let timeout;
 
   return EditorView.updateListener.of((update) => {
     const cursorLineBefore = update.startState.doc.lineAt(update.startState.selection.main.head).number;
     const cursorLineAfter = update.state.doc.lineAt(update.state.selection.main.head).number;
     const selectionChanged = update.selectionSet && (cursorLineBefore !== cursorLineAfter || cursorLineBefore === 1);
-    const markdownUpdated = update.transactions.some((t) => t.effects.some((e) => e.is(markdownUpdatedStateEffect)));
+    const timeSinceLastTyped = lastTyped.current === null ? typedToUpdateThreshold : performance.now() - lastTyped.current;
+    const markdownUpdated =
+      update.transactions.some((t) => t.effects.some((e) => e.is(markdownUpdatedStateEffect))) && timeSinceLastTyped < typedToUpdateThreshold;
     const resized = update.geometryChanged && !update.viewportChanged;
     if (update.docChanged || (!selectionChanged && !markdownUpdated && !resized)) {
       return;

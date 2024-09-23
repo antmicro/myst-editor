@@ -185,6 +185,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
+  const lastTyped = useRef(null);
 
   useEffect(() => {
     if (collaboration.opts.enabled && collaboration.error) {
@@ -214,7 +215,13 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
       collaboration.ytext.insert(0, text.get());
     }
 
-    if (collaboration.opts.enabled) text.set(collaboration.ytext.toString());
+    if (collaboration.opts.enabled) {
+      text.set(collaboration.ytext.toString());
+      collaboration.ytext.observe((ev, tr) => {
+        if (!tr.local) return;
+        lastTyped.current = performance.now();
+      });
+    }
 
     text.readyToRender();
 
@@ -233,7 +240,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
         .useCursorIndicator({ lineMap: text.lineMap, preview })
-        .if(syncScroll, (b) => b.useSyncPreviewWithCursor({ lineMap: text.lineMap, preview }))
+        .if(syncScroll, (b) => b.useSyncPreviewWithCursor({ lineMap: text.lineMap, preview, lastTyped }))
         .create(),
     });
 

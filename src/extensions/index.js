@@ -116,8 +116,8 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useSyncPreviewWithCursor({ lineMap, preview }) {
-    this.base.push(syncPreviewWithCursor(lineMap, preview));
+  useSyncPreviewWithCursor({ lineMap, preview, lastTyped }) {
+    this.base.push(syncPreviewWithCursor(lineMap, preview, lastTyped));
     return this;
   }
 
