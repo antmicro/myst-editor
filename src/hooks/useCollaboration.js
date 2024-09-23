@@ -1,7 +1,7 @@
 import * as Y from "yjs";
 import * as awarenessProtocol from "y-protocols/awareness.js";
 import { WebsocketProvider } from "y-websocket";
-import { useEffect, useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 WebsocketProvider.prototype.watchCollabolators = function (hook) {
   this.awareness.on("change", ({ added, removed }) => {
@@ -26,6 +26,8 @@ export default function useCollaboration(settings) {
   const [synced, setSynced] = useState(false);
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState(false);
+  const ytext = useMemo(() => ydoc.getText("codemirror"), []);
+  const changeMap = useRef(new Map());
 
   // Y.js does not throw errors, it only logs them. We want to raise a
   // fatal error when there are any errors in the collaborative state
@@ -57,10 +59,29 @@ export default function useCollaboration(settings) {
     prov.on("sync", setSynced);
     prov.on("status", ({ status }) => setConnected(status == "connected"));
 
+    ytext.observe((_, tr) => {
+      if (!tr.local) return;
+      prov.awareness.setLocalStateField("lastChanged", Date.now());
+    });
+    prov.awareness.on("change", () => {
+      prov.awareness.getStates().forEach((state, id) => {
+        if (id === prov.awareness.clientID || !state.lastChanged || changeMap.current.get(id)?.lastChanged === state.lastChanged) return;
+
+        const oldTimer = changeMap.current.get(id)?.timer;
+        clearTimeout(oldTimer);
+
+        const timer = setTimeout(() => {
+          console.log(`${id} stopped typing`);
+        }, 5000);
+        changeMap.current.set(id, {
+          lastChanged: state.lastChanged,
+          timer,
+        });
+      });
+    });
+
     return prov;
   }, []);
-
-  const ytext = useMemo(() => ydoc.getText("codemirror"), []);
 
   const undoManager = useMemo(
     () =>
