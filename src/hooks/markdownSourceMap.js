@@ -17,6 +17,7 @@ function getLineForToken(token, env) {
 /** @param {markdownIt} md  */
 export default function markdownSourceMap(md, transform = (token, out, env) => out) {
   md.use(overrideDefaultDirectives);
+  md.use(overrideDefaultRole);
   md.use(wrapTextInSpan);
   md.use(wrapFencedLinesInSpan);
 
@@ -94,6 +95,17 @@ function overrideDefaultDirectives(/** @type {markdownIt} */ md) {
 
   md.renderer.rules.directive = newRule(md.renderer.rules.directive);
   md.renderer.rules["directive_error"] = newRule(md.renderer.rules["directive_error"]);
+}
+
+/** Add token attributes to unhandled roles */
+function overrideDefaultRole(/** @type {markdownIt} */ md) {
+  const defaultRule = md.renderer.rules.role;
+  md.renderer.rules.role = (tokens, idx, options, env, self) => {
+    let html = defaultRule(tokens, idx, options, env, self);
+    const spanCloseIdx = html.indexOf(">");
+    html = html.slice(0, spanCloseIdx) + self.renderAttrs(tokens[idx]) + html.slice(spanCloseIdx);
+    return html;
+  };
 }
 
 /** We need some way to add line info to html text, so the idea is to wrap every text token in a span **/
