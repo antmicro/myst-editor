@@ -64,7 +64,6 @@ const CodeEditor = styled.div`
   }
 
   .cm-ySelectionInfo {
-    opacity: 1 !important;
     font-size: 0.6rem;
     padding: 0.25rem 0.5rem !important;
     border-top-left-radius: 10px;
@@ -76,10 +75,6 @@ const CodeEditor = styled.div`
 
   .cm-widgetBuffer {
     margin-bottom: 0;
-  }
-
-  .cm-ySelectionCaretDot {
-    display: none;
   }
 
   .cm-yLineSelection {
