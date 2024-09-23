@@ -77,7 +77,7 @@ function addLineNumberToTokens(defaultRule, transform) {
       }
     }
 
-    return rule(tokens, idx, options, env, self);
+    return transform(tokens[idx], rule(tokens, idx, options, env, self), env);
   };
 }
 
