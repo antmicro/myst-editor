@@ -108,6 +108,7 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
     ytext.observe((_, tr) => {
       if (!tr.local) return;
       ycomments.syncSuggestions(commentId);
+      ycomments.provider.awareness.setLocalStateField("lastChanged", Date.now());
     });
 
     if (ycomments.newLocalComment) {
