@@ -69,12 +69,19 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
     top,
     behavior: "smooth",
   });
+
   function setCursor() {
     window.myst_editor.main_editor.dispatch({
       selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
     });
     window.myst_editor.main_editor.focus();
-    editor.removeEventListener("scrollend", setCursor);
+    if (top >= 0) {
+      editor.removeEventListener("scrollend", setCursor);
+    }
   }
-  editor.addEventListener("scrollend", setCursor);
+  if (top >= 0) {
+    editor.addEventListener("scrollend", setCursor);
+  } else {
+    setCursor();
+  }
 }
