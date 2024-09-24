@@ -12,7 +12,7 @@ const Preview = styled.div`
   border-radius: var(--border-radius);
   vertical-align: top;
   color: var(--gray-900);
-  word-break: break-all;
+  word-wrap: break-word;
   position: relative;
   overflow-y: auto;
   scrollbar-width: thin;

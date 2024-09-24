@@ -75,6 +75,7 @@ const StatusBanner = styled.div`
  * Ideally we would use CSS Grid but that has some performance issues with CodeMirror on Chromium. */
 const FlexWrapper = styled.div`
   flex: 1;
+  min-width: 0;
   height: 100%;
   min-height: 500px;
 `;
