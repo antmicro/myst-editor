@@ -151,6 +151,24 @@ const CodeEditor = styled.div`
   .cm-gutterElement span[title="Unfold line"] {
     user-select: none;
   }
+
+  .cm-line {
+    padding-left: 11px;
+  }
+
+  .cm-activeLine:not(.comment-wrapper *) {
+    position: relative;
+
+    &::before {
+      content: "";
+      display: block;
+      width: 5px;
+      height: 100%;
+      position: absolute;
+      background-color: var(--blue-200);
+      transform: translateX(-11px);
+    }
+  }
 `;
 
 const setEditorText = (editor, text) => {
