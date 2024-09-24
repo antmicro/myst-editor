@@ -70,23 +70,41 @@ export default function useCollaboration(settings, parent) {
         const oldTimer = changeMap.current.get(id)?.timer;
         clearTimeout(oldTimer);
 
-        if (!oldTimer) {
+        const showUsername = () => {
           parent.querySelectorAll(".cm-ySelectionInfo").forEach((/** @type {HTMLElement} */ n) => {
             if (n.innerText !== state.user.name) return;
             n.classList.add("active");
           });
-        }
-        const timer = setTimeout(() => {
+        };
+
+        const hideUsername = () => {
           parent.querySelectorAll(".cm-ySelectionInfo").forEach((/** @type {HTMLElement} */ n) => {
             if (n.innerText !== state.user.name) return;
             n.classList.remove("active");
           });
+        };
+
+        if (!oldTimer) {
+          showUsername();
+          // y-codemirror.next does not expose anything to modify decorations so we need this hack
+          const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+              const editorTarget = mutation.target.className.includes("cm-line");
+              const caretChanged = Boolean([...mutation.removedNodes].find((n) => n.classList?.contains?.("cm-ySelectionCaret")));
+              if (editorTarget && caretChanged) {
+                showUsername();
+              }
+            }
+          });
+          observer.observe(parent, { childList: true, subtree: true });
+          changeMap.current.set(id, { ...changeMap.current.get(id), observer });
+        }
+        const timer = setTimeout(() => {
+          hideUsername();
+          changeMap.current.get(id).observer.disconnect();
           changeMap.current.set(id, { ...changeMap.current.get(id), timer: null });
         }, settings.hideUsernameDelay ?? 5000);
-        changeMap.current.set(id, {
-          lastChanged: state.lastChanged,
-          timer,
-        });
+        changeMap.current.set(id, { ...changeMap.current.get(id), timer, lastChanged: state.lastChanged });
       });
     });
 

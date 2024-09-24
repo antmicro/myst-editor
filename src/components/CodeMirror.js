@@ -71,14 +71,18 @@ const CodeEditor = styled.div`
     border-bottom-right-radius: 10px;
     font-family: "Lato" !important;
     font-weight: 600 !important;
+    transition: none;
 
     &.active {
       opacity: 1;
     }
   }
 
-  .cm-ySelectionCaretDot:has(+ .active) {
-    transform: scale(0);
+  .cm-ySelectionCaretDot {
+    transition: none;
+    &:has(+ .active) {
+      transform: scale(0);
+    }
   }
 
   .cm-widgetBuffer {
