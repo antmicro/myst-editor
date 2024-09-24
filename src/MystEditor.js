@@ -77,7 +77,10 @@ const FlexWrapper = styled.div`
   flex: 1;
   min-width: 0;
   height: 100%;
-  min-height: 500px;
+
+  & > * {
+    min-height: 500px;
+  }
 `;
 
 const createExtraScopePlugin = (scope) => {
