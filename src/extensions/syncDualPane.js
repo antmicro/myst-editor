@@ -79,6 +79,9 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
 
   const editorScrollOffset = targetRect.top;
   const top = lineBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;
+  const direction = Math.sign(editor.scrollTop - top);
+  const canScroll =
+    !(direction === 1 && editor.scrollTop === 0) && !(direction === -1 && editor.scrollTop + editor.clientHeight >= editor.scrollHeight);
   editor.scrollTo({
     top,
     behavior: "smooth",
@@ -89,11 +92,11 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
       selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
     });
     window.myst_editor.main_editor.focus();
-    if (top >= 0) {
+    if (canScroll) {
       editor.removeEventListener("scrollend", setCursor);
     }
   }
-  if (top >= 0) {
+  if (canScroll) {
     editor.addEventListener("scrollend", setCursor);
   } else {
     setCursor();
