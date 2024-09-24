@@ -82,7 +82,7 @@ export default function useCollaboration(settings, parent) {
             n.classList.remove("active");
           });
           changeMap.current.set(id, { ...changeMap.current.get(id), timer: null });
-        }, 5000);
+        }, settings.hideUsernameDelay ?? 5000);
         changeMap.current.set(id, {
           lastChanged: state.lastChanged,
           timer,

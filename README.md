@@ -153,6 +153,7 @@ Here are the props you can pass to the MystEditor component:
   - `username`
   - `room` - name of the room to join, users will see others in the same room
   - `color` - color of the cursor seen by other users
+  - `hideUsernameDelay` *(default: 5000)* - milliseconds of inactivity after which the username attached to a remote cursor will be hidden
 - `spellcheckOpts` - Configuration for the spellchecker. If the value is *null* or *false* then the spellchecker will be disabled.
   - `dict` *(default: "en_US")* - Name of the desired dictionary. For an example see `public/dictionaries/en_US`.
   - `dictionaryPath` *(default: "/dictionaries")*  - Path to a folder with dictionaries. For an example see `public/dictionaries/`.
