@@ -17,6 +17,8 @@ WebsocketProvider.prototype.watchCollabolators = function (hook) {
   });
 };
 
+const loadDate = Date.now();
+
 export default function useCollaboration(settings, parent) {
   if (!settings.enabled) {
     return {};
@@ -65,7 +67,9 @@ export default function useCollaboration(settings, parent) {
     });
     prov.awareness.on("change", () => {
       prov.awareness.getStates().forEach((state, id) => {
-        if (id === prov.awareness.clientID || !state.lastChanged || changeMap.current.get(id)?.lastChanged === state.lastChanged) return;
+        const localState = id === prov.awareness.clientID;
+        const newChange = state.lastChanged && changeMap.current.get(id)?.lastChanged !== state.lastChanged && state.lastChanged >= loadDate;
+        if (localState || !newChange) return;
 
         const oldTimer = changeMap.current.get(id)?.timer;
         clearTimeout(oldTimer);
