@@ -46,7 +46,7 @@ class CommentMarker extends GutterMarker {
       this.icon.onmouseenter = () => this.icon.classList.add(CommentMarker.COMMENT_IMAGE_CLASS);
       this.icon.onmouseleave = () => this.icon.classList.remove(CommentMarker.COMMENT_IMAGE_CLASS);
     } else {
-      this.icon.onmouseup = () => this.ycomments.display().switchVisibility(this.commentId);
+      this.icon.onclick = () => this.ycomments.display().switchVisibility(this.commentId);
       this.icon.onmouseenter = () => {
         this.ycomments.commentWithPopup = this.commentId;
         this.ycomments.updateMainCodeMirror();
@@ -96,7 +96,7 @@ const commentMarker = gutter({
     return new CommentMarker(null, null);
   },
   domEventHandlers: {
-    mouseup(view, line) {
+    click(view, line) {
       let ycomments = view.state.facet(ycommentsFacet.reader);
       let commentId = getOrCreateComment(view, line, ycomments);
       ycomments.display().switchVisibility(commentId);
