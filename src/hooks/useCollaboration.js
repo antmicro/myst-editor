@@ -17,7 +17,7 @@ WebsocketProvider.prototype.watchCollabolators = function (hook) {
   });
 };
 
-export default function useCollaboration(settings) {
+export default function useCollaboration(settings, parent) {
   if (!settings.enabled) {
     return {};
   }
@@ -70,8 +70,18 @@ export default function useCollaboration(settings) {
         const oldTimer = changeMap.current.get(id)?.timer;
         clearTimeout(oldTimer);
 
+        if (!oldTimer) {
+          parent.querySelectorAll(".cm-ySelectionInfo").forEach((/** @type {HTMLElement} */ n) => {
+            if (n.innerText !== state.user.name) return;
+            n.classList.add("active");
+          });
+        }
         const timer = setTimeout(() => {
-          console.log(`${id} stopped typing`);
+          parent.querySelectorAll(".cm-ySelectionInfo").forEach((/** @type {HTMLElement} */ n) => {
+            if (n.innerText !== state.user.name) return;
+            n.classList.remove("active");
+          });
+          changeMap.current.set(id, { ...changeMap.current.get(id), timer: null });
         }, 5000);
         changeMap.current.set(id, {
           lastChanged: state.lastChanged,

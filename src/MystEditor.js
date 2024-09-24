@@ -153,7 +153,7 @@ const MystEditor = ({
     [],
   );
 
-  const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration);
+  const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration, parent);
   const ycomments = useComments(ydoc, provider, getAvatar, getUserUrl);
 
   const alertFor = (alertText, secs) => {
