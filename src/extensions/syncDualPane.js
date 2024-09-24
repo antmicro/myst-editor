@@ -53,13 +53,27 @@ function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior 
 }
 
 export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} */ ev, lineMap, preview) {
-  const id = ev.target.getAttribute("data-line-id");
+  let id = ev.target.getAttribute("data-line-id");
+  let elem = ev.target;
+  if (!id) {
+    // check parents
+    outer: while (elem.tagName !== "HTML-CHUNK") {
+      const parent = elem.parentElement;
+      // check siblings
+      while (elem != null) {
+        id = elem.getAttribute("data-line-id");
+        if (id) break outer;
+        elem = elem.previousElementSibling;
+      }
+      elem = parent;
+    }
+  }
   if (!id) return;
 
   const lineNumber = getLineById(lineMap.current, id);
   const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
   const lineBlock = window.myst_editor.main_editor.lineBlockAt(line.from);
-  const targetRect = ev.target.getBoundingClientRect();
+  const targetRect = elem.getBoundingClientRect();
   const previewRect = preview.current.getBoundingClientRect();
   const editor = window.myst_editor.main_editor.dom.parentElement;
 
