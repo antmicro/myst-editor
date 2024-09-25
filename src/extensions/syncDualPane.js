@@ -56,15 +56,11 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
   let id = ev.target.getAttribute("data-line-id");
   let elem = ev.target;
   if (!id) {
-    // check parents
-    outer: while (elem.tagName !== "HTML-CHUNK") {
+    // check parents and siblings
+    while (elem.tagName !== "HTML-CHUNK") {
       const parent = elem.parentElement;
-      // check siblings
-      while (elem != null) {
-        id = elem.getAttribute("data-line-id");
-        if (id) break outer;
-        elem = elem.previousElementSibling;
-      }
+      [id, elem] = findSoruceMappedPreviousElement(elem);
+      if (id) break;
       elem = parent;
     }
   }
@@ -101,4 +97,15 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
   } else {
     setCursor();
   }
+}
+
+function findSoruceMappedPreviousElement(startingElem) {
+  let elem = startingElem;
+  while (elem != null) {
+    const id = elem.getAttribute("data-line-id");
+    if (id) return [id, elem];
+    elem = elem.previousElementSibling;
+  }
+
+  return [undefined, elem];
 }
