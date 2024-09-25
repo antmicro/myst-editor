@@ -254,10 +254,13 @@ const MystEditor = ({
 };
 
 export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ target) => {
-  target.attachShadow({
-    mode: "open",
-  });
+  if (!target.shadowRoot) {
+    target.attachShadow({
+      mode: "open",
+    });
+  }
   if (additionalStyles) {
+    target.shadowRoot.adoptedStyleSheets = target.shadowRoot.adoptedStyleSheets.filter((s) => !additionalStyles.includes(s));
     target.shadowRoot.adoptedStyleSheets.push(...(Array.isArray(additionalStyles) ? additionalStyles : [additionalStyles]));
   }
   params.parent = target.shadowRoot;
