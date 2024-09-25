@@ -139,13 +139,14 @@ const MystEditor = ({
   parent,
   syncScroll = false,
   unfoldedHeadings,
+  editorId = crypto.randomUUID(),
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
   const editorRef = useRef(null);
 
   const preview = useRef(null);
-  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak, parent, editorRef });
+  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak, parent, editorRef, editorId });
 
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer(
@@ -154,7 +155,7 @@ const MystEditor = ({
   );
 
   const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration, parent);
-  const ycomments = useComments(ydoc, provider, getAvatar, getUserUrl);
+  const ycomments = useComments(ydoc, provider, getAvatar, getUserUrl, editorId);
 
   const alertFor = (alertText, secs) => {
     setAlert(alertText);
@@ -230,6 +231,7 @@ const MystEditor = ({
                     ycomments,
                   },
                   unfoldedHeadings,
+                  editorId,
                 }}
                 onView={(view) => (editorRef.current = view)}
               />
@@ -262,7 +264,7 @@ const MystEditor = ({
   );
 };
 
-export default ({ additionalStyles, ...params }, /** @type {HTMLElement} */ target) => {
+export default ({ additionalStyles, editorId, ...params }, /** @type {HTMLElement} */ target) => {
   target.attachShadow({
     mode: "open",
   });
@@ -271,12 +273,15 @@ export default ({ additionalStyles, ...params }, /** @type {HTMLElement} */ targ
   }
   params.parent = target.shadowRoot;
 
+  const id = editorId ?? crypto.randomUUID();
+  window.myst_editor[id] = {};
+
   const form = target.closest("form");
   if (form) {
-    form.addEventListener("formdata", (e) => e.formData.append(params.name, window.myst_editor.text));
+    form.addEventListener("formdata", (e) => e.formData.append(params.name, window.myst_editor[id].text));
   }
 
-  render(<MystEditor {...params} />, target.shadowRoot);
+  render(html`<${MystEditor} ...${params} />`, target.shadowRoot);
 };
 
 export { defaultButtons, predefinedButtons };

@@ -29,11 +29,8 @@ function checkLinks(/** @type {markdownIt} */ md) {
   };
 }
 
-const exposeText = (text) => () => {
-  if (!window.myst_editor) {
-    window.myst_editor = {};
-  }
-  window.myst_editor.text = text;
+const exposeText = (text, editorId) => () => {
+  window.myst_editor[editorId].text = text;
 };
 
 const copyHtmlAsRichText = (/** @type {string} */ txt) => {
@@ -61,7 +58,7 @@ const copyHtmlAsRichText = (/** @type {string} */ txt) => {
 export const markdownUpdatedStateEffect = StateEffect.define();
 
 /** @param {{preview: { current: Element } }} */
-export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak, parent, editorRef }) => {
+export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak, parent, editorRef, editorId }) => {
   const [text, setText] = useState(initialText);
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
@@ -187,7 +184,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   );
 
   useEffect(() => readyToRender && updateHtmlChunks({ newMarkdown: text }), [readyToRender]);
-  useEffect(exposeText(text), [text]);
+  useEffect(exposeText(text, editorId), [text]);
   useEffect(() => {
     if (syncText) {
       onSync.action(text);
@@ -243,7 +240,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       setSyncText(true);
     },
     refresh() {
-      updateHtmlChunks({ newMarkdown: window.myst_editor.text, force: true });
+      updateHtmlChunks({ newMarkdown: window.myst_editor[editorId].text, force: true });
     },
     onSync(action) {
       setOnSync({ action });
@@ -253,7 +250,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
     },
     copy() {
       copyHtmlAsRichText(
-        splitIntoChunks(window.myst_editor.text, {}, [])
+        splitIntoChunks(window.myst_editor[editorId].text, {}, [])
           .map((c) => c.html)
           .join("\n"),
       );

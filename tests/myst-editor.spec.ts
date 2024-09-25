@@ -6,13 +6,18 @@ import { YComments } from "../src/comments/ycomments";
 
 declare global {
   interface Window {
-    myst_editor: {
-      text: string;
-      main_editor: EditorView;
-      ycomments: YComments;
-    };
+    myst_editor: Record<
+      string,
+      {
+        text: string;
+        main_editor: EditorView;
+        ycomments: YComments;
+      }
+    >;
   }
 }
+
+const id = "demo";
 
 test.describe.parallel("With collaboration disabled", () => {
   test.beforeEach(async ({ page }) => {
@@ -21,7 +26,7 @@ test.describe.parallel("With collaboration disabled", () => {
   });
 
   test("Loads initial document", async ({ page }) => {
-    const editorContent = await page.evaluate(() => window.myst_editor.text);
+    const editorContent = await page.evaluate(() => window.myst_editor[id].text);
     expect(editorContent).toMatch(/^# This is MyST Editor/);
     expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
   });
@@ -144,7 +149,7 @@ test.describe.parallel("With collaboration enabled", () => {
     const collabOpts = { collab_server: "ws://localhost:4455", collab: "true", room: Date.now().toString() };
     const page = await openPageWithOpts(context, collabOpts);
 
-    const editorContent = await page.evaluate(() => window.myst_editor.text);
+    const editorContent = await page.evaluate(() => window.myst_editor[id].text);
     expect(editorContent).toMatch(/^# This is MyST Editor/);
     expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
   });
@@ -160,7 +165,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
     // Open the document as another user and verify that the initial content was ignored
     const pageB = await openPageWithOpts(context, collabOpts);
-    const editorContent = await pageB.evaluate(() => window.myst_editor.text);
+    const editorContent = await pageB.evaluate(() => window.myst_editor[id].text);
 
     expect(editorContent).not.toContain("# This is MyST Editor");
     expect(editorContent).toContain("Some content");
@@ -177,7 +182,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
     // Open the document as another user and add some content
     const pageB = await openPageWithOpts(context, collabOpts);
-    const currentText = await pageB.evaluate(() => window.myst_editor.text);
+    const currentText = await pageB.evaluate(() => window.myst_editor[id].text);
     expect(currentText).toBe("This is from pageA!");
 
     await insertChangesAndCheckOutput(
@@ -515,7 +520,7 @@ const insertToMainEditor = (page: Page, changes: ChangeSpec | null): Promise<voi
   page.evaluate((changes) => window.myst_editor.main_editor.dispatch({ changes }), changes);
 
 const clearEditor = async (page: Page) => {
-  const currentText = await page.evaluate(() => window.myst_editor.text);
+  const currentText = await page.evaluate(() => window.myst_editor[id].text);
   await insertToMainEditor(page, {
     from: 0,
     to: currentText.length,
@@ -549,7 +554,7 @@ const addComment = async (page: Page, lineNumber: number, text?: string) => {
     // for some reason yjs does not pick up the changes made above, so we need to add them below
     await page.evaluate(
       ({ lineNumber, text }) => {
-        const ycomments = window.myst_editor.ycomments;
+        const ycomments = window.myst_editor[id].ycomments;
         const commentId = ycomments.findCommentOn(lineNumber + 1)?.commentId;
         ycomments.getTextForComment(commentId).insert(0, text);
         ycomments.syncSuggestions(commentId);
