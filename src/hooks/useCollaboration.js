@@ -75,6 +75,14 @@ export default function useCollaboration(settings, parent) {
 
   useEffect(() => !provider.ws && setError(true), [connected]);
 
+  useEffect(() => {
+    return () => {
+      // also destoys the WebsocketProvider
+      console.log("cleanup");
+      ydoc.destroy();
+    };
+  }, []);
+
   return {
     provider,
     undoManager,

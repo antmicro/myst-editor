@@ -277,6 +277,18 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
     form.addEventListener("formdata", (e) => e.formData.append(params.name, window.myst_editor[editorId].text));
   }
 
+  // runs Preact cleanup logic when target is removed
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (Array.prototype.some.call(mutation.removedNodes, (n) => n == target)) {
+        delete window.myst_editor[editorId];
+        render(null, target.shadowRoot);
+        observer.disconnect();
+      }
+    }
+  });
+  observer.observe(target.parentElement, { childList: true });
+
   render(
     <MystState.Provider value={createMystState({ id: editorId })}>
       <MystEditor {...params} />

@@ -270,10 +270,6 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
     text.onSync((currentText) => setEditorText(view, currentText));
 
     return () => {
-      if (collaboration.opts.enabled) {
-        collaboration.provider.disconnect();
-        collaboration.ydoc.destroy();
-      }
       view.destroy();
     };
   }, [collaboration.ready]);
