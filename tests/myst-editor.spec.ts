@@ -144,19 +144,6 @@ graph TD
             (html) => expect(html).toContain("<svg")
         )
     });
-
-    test("Folding works in the preview", async ({page}) => {
-        await clearEditor(page);
-        await insertToMainEditor(page, {
-            from: 0,
-            to: 0,
-            insert: "# h1\n\ntest" 
-        });
-        expect(await page.locator(".myst-preview").innerHTML()).toContain("test");
-        await page.locator(".myst-preview button").click();
-        await page.waitForSelector(`.myst-preview button[title="unfold"]`);
-        expect(await page.locator(".myst-preview").innerHTML()).not.toContain("test");
-    });
 })
 
 test.describe.parallel("With collaboration enabled", () => {
