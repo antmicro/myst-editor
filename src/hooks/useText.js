@@ -99,8 +99,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   const markdown = useMemo(() => {
     const md = markdownIt({ breaks: true, linkify: true })
       .use(markdownitDocutils)
-      .use(markdownReplacer(transforms, parent))
-      .use(useCustomRoles(customRoles, parent))
+      .use(markdownReplacer(transforms, parent, editorId))
+      .use(useCustomRoles(customRoles, parent, editorId))
       .use(markdownMermaid, { preview, lineMap, parent })
       .use(markdownSourceMap)
       .use(checkLinks);
