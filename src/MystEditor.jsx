@@ -142,9 +142,10 @@ const MystEditor = ({
 }) => {
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
+  const editorRef = useRef(null);
 
   const preview = useRef(null);
-  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak, parent });
+  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak, parent, editorRef });
 
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer(
@@ -169,7 +170,7 @@ const MystEditor = ({
     refresh: () => {
       resetCache();
       alertFor("Rich links refreshed!", 1);
-      text.refresh();
+      text.refresh(editorRef);
     },
   };
 
@@ -230,6 +231,7 @@ const MystEditor = ({
                   },
                   unfoldedHeadings,
                 }}
+                onView={(view) => (editorRef.current = view)}
               />
             </FlexWrapper>
             <FlexWrapper id="preview-wrapper">
@@ -237,7 +239,7 @@ const MystEditor = ({
                 ref={preview}
                 mode={mode}
                 onClick={(ev) => {
-                  if (syncScroll && mode == "Both") handlePreviewClickToScroll(ev, text.lineMap, preview);
+                  if (syncScroll && mode == "Both") handlePreviewClickToScroll(ev, text.lineMap, preview, editorRef);
                 }}
               >
                 <PreviewFocusHighlight className="cm-previewFocus" />

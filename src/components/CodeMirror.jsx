@@ -187,7 +187,7 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll, unfoldedHeadings }) => {
+const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll, unfoldedHeadings, onView }) => {
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
@@ -259,6 +259,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
     });
     editorRef.current = view;
     window.myst_editor.main_editor = view;
+    onView(view);
 
     if (unfoldedHeadings != undefined) {
       skipAndFoldAll(view, unfoldedHeadings);

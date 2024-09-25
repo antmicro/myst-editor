@@ -61,7 +61,7 @@ const copyHtmlAsRichText = (/** @type {string} */ txt) => {
 export const markdownUpdatedStateEffect = StateEffect.define();
 
 /** @param {{preview: { current: Element } }} */
-export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak, parent }) => {
+export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak, parent, editorRef }) => {
   const [text, setText] = useState(initialText);
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
@@ -81,7 +81,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       }, {});
     }
 
-    const newChunks = splitIntoChunks(newMarkdown, htmlLookup);
+    const newChunks = splitIntoChunks(newMarkdown, htmlLookup, view);
 
     if (newChunks.length !== oldChunks.length || force) {
       // We can't infer which chunks were modified, so we update the entire document
@@ -176,7 +176,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
 
           const html =
             lookup[hash] ||
-            purify.sanitize(markdown.render(md, { chunkId: id, startLine, lineMap }), {
+            purify.sanitize(markdown.render(md, { chunkId: id, startLine, lineMap, view: editorRef?.current }), {
               // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
               ADD_TAGS: ["foreignobject"],
               ADD_ATTR: ["dominant-baseline"],

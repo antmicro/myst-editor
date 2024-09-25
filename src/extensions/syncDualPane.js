@@ -58,7 +58,13 @@ function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior 
   preview.scrollTo({ top, behavior });
 }
 
-export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} */ ev, lineMap, preview) {
+/**
+ * @param {{ target: HTMLElement }} ev
+ * @param {{ current: Map<number, string> }} lineMap
+ * @param {{ current: HTMLElement }} preview
+ * @param {{ current: EditorView }} editorRef
+ */
+export function handlePreviewClickToScroll(ev, lineMap, preview, editorRef) {
   let id = ev.target.getAttribute("data-line-id");
   let elem = ev.target;
   if (!id) {
@@ -73,10 +79,10 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
   if (!id) return;
 
   const lineNumber = getLineById(lineMap.current, id);
-  const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
-  const visible = window.myst_editor.main_editor.visibleRanges[0];
+  const line = editorRef.current.state.doc.line(lineNumber);
+  const visible = editorRef.current.visibleRanges[0];
   function setCursor() {
-    window.myst_editor.main_editor.dispatch({
+    editorRef.current.dispatch({
       selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
     });
   }
@@ -91,7 +97,7 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
 
   if (line.from >= visible.from && line.to <= visible.to) {
     // if visible -> scroll just once
-    const { canScroll, editor } = scrollEditorToLine(elem, preview, line);
+    const { canScroll, editor } = scrollEditorToLine(elem, preview, line, editorRef);
     if (canScroll) {
       editor.addEventListener("scrollend", setCursor, { once: true });
     } else {
@@ -105,11 +111,11 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
   }
 }
 
-function scrollEditorToLine(elem, preview, line) {
-  const lineBlock = window.myst_editor.main_editor.lineBlockAt(line.from);
+function scrollEditorToLine(elem, preview, line, editorRef) {
+  const lineBlock = editorRef.current.lineBlockAt(line.from);
   const targetRect = elem.getBoundingClientRect();
   const previewRect = preview.current.getBoundingClientRect();
-  const editor = window.myst_editor.main_editor.dom.parentElement;
+  const editor = editorRef.current.dom.parentElement;
 
   const editorScrollOffset = targetRect.top;
   const top = lineBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;
