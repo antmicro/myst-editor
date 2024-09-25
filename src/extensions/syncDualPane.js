@@ -88,12 +88,9 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
       selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
     });
     window.myst_editor.main_editor.focus();
-    if (canScroll) {
-      editor.removeEventListener("scrollend", setCursor);
-    }
   }
   if (canScroll) {
-    editor.addEventListener("scrollend", setCursor);
+    editor.addEventListener("scrollend", setCursor, { once: true });
   } else {
     setCursor();
   }
