@@ -26,7 +26,7 @@ test.describe.parallel("With collaboration disabled", () => {
   });
 
   test("Loads initial document", async ({ page }) => {
-    const editorContent = await page.evaluate(() => window.myst_editor[id].text);
+    const editorContent = await page.evaluate((id) => window.myst_editor[id].text, id);
     expect(editorContent).toMatch(/^# This is MyST Editor/);
     expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
   });
@@ -149,7 +149,7 @@ test.describe.parallel("With collaboration enabled", () => {
     const collabOpts = { collab_server: "ws://localhost:4455", collab: "true", room: Date.now().toString() };
     const page = await openPageWithOpts(context, collabOpts);
 
-    const editorContent = await page.evaluate(() => window.myst_editor[id].text);
+    const editorContent = await page.evaluate((id) => window.myst_editor[id].text, id);
     expect(editorContent).toMatch(/^# This is MyST Editor/);
     expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
   });
@@ -165,7 +165,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
     // Open the document as another user and verify that the initial content was ignored
     const pageB = await openPageWithOpts(context, collabOpts);
-    const editorContent = await pageB.evaluate(() => window.myst_editor[id].text);
+    const editorContent = await pageB.evaluate((id) => window.myst_editor[id].text, id);
 
     expect(editorContent).not.toContain("# This is MyST Editor");
     expect(editorContent).toContain("Some content");
@@ -182,7 +182,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
     // Open the document as another user and add some content
     const pageB = await openPageWithOpts(context, collabOpts);
-    const currentText = await pageB.evaluate(() => window.myst_editor[id].text);
+    const currentText = await pageB.evaluate((id) => window.myst_editor[id].text, id);
     expect(currentText).toBe("This is from pageA!");
 
     await insertChangesAndCheckOutput(
@@ -497,9 +497,9 @@ test.describe.parallel("With collaboration enabled", () => {
       await pageA.locator(".cm-replacement").first().click();
 
       // Check if the text changed
-      const currentTextA = await pageA.evaluate(() => window.myst_editor.text);
+      const currentTextA = await pageA.evaluate((id) => window.myst_editor[id].text, id);
       expect(currentTextA).toContain("2Line");
-      const currentTextB = await pageB.evaluate(() => window.myst_editor.text);
+      const currentTextB = await pageB.evaluate((id) => window.myst_editor[id].text, id);
       expect(currentTextB).toContain("2Line");
     });
   });
@@ -517,10 +517,10 @@ test("dist/MystEditor.js exports src/MystEditor.js module", async () => {
 ///////////////////////// UTILITY FUNCTIONS /////////////////////////
 
 const insertToMainEditor = (page: Page, changes: ChangeSpec | null): Promise<void> /** @ts-ignore */ =>
-  page.evaluate((changes) => window.myst_editor.main_editor.dispatch({ changes }), changes);
+  page.evaluate(({ changes, id }) => window.myst_editor[id].main_editor.dispatch({ changes }), { changes, id });
 
 const clearEditor = async (page: Page) => {
-  const currentText = await page.evaluate(() => window.myst_editor[id].text);
+  const currentText = await page.evaluate((id) => window.myst_editor[id].text, id);
   await insertToMainEditor(page, {
     from: 0,
     to: currentText.length,
@@ -553,13 +553,13 @@ const addComment = async (page: Page, lineNumber: number, text?: string) => {
     await page.locator(".cm-comment-author-colored").last().fill(text);
     // for some reason yjs does not pick up the changes made above, so we need to add them below
     await page.evaluate(
-      ({ lineNumber, text }) => {
+      ({ lineNumber, text, id }) => {
         const ycomments = window.myst_editor[id].ycomments;
         const commentId = ycomments.findCommentOn(lineNumber + 1)?.commentId;
         ycomments.getTextForComment(commentId).insert(0, text);
         ycomments.syncSuggestions(commentId);
       },
-      { lineNumber, text },
+      { lineNumber, text, id },
     );
   }
 };
