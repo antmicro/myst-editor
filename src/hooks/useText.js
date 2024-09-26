@@ -61,7 +61,7 @@ export const markdownUpdatedStateEffect = StateEffect.define();
 
 /** @param {{preview: { current: Element } }} */
 export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak, parent }) => {
-  const { id, editorView } = useContext(MystState);
+  const { id, editorView, cache } = useContext(MystState);
   const [text, setText] = useState(initialText);
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
@@ -102,8 +102,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   const markdown = useMemo(() => {
     const md = markdownIt({ breaks: true, linkify: true })
       .use(markdownitDocutils)
-      .use(markdownReplacer(transforms, parent, id.value))
-      .use(useCustomRoles(customRoles, parent, id.value))
+      .use(markdownReplacer(transforms, parent, cache.transform))
+      .use(useCustomRoles(customRoles, parent, cache.transform))
       .use(markdownMermaid, { lineMap, parent })
       .use(markdownSourceMap)
       .use(checkLinks);

@@ -4,7 +4,6 @@ import { StyleSheetManager, styled } from "styled-components";
 import CodeMirror from "./components/CodeMirror";
 import Preview, { PreviewFocusHighlight } from "./components/Preview";
 import Diff from "./components/Diff";
-import { resetCache } from "./hooks/markdownReplacer";
 import { useText } from "./hooks/useText";
 import { EditorTopbar } from "./components/Topbar";
 import useCollaboration from "./hooks/useCollaboration";
@@ -12,11 +11,6 @@ import useComments from "./hooks/useComments";
 import ResolvedComments from "./components/Resolved";
 import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
 import { createMystState, MystState } from "./mystState";
-
-if (!window.myst_editor?.isFresh) {
-  resetCache();
-  window.myst_editor = { isFresh: true };
-}
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -139,7 +133,7 @@ const MystEditor = ({
   syncScroll = false,
   unfoldedHeadings,
 }) => {
-  const { editorView } = useContext(MystState);
+  const { editorView, cache } = useContext(MystState);
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
 
@@ -167,7 +161,7 @@ const MystEditor = ({
     },
     fullscreen: () => setFullscreen((f) => !f),
     refresh: () => {
-      resetCache();
+      cache.transform.value.clear();
       alertFor("Rich links refreshed!", 1);
       text.refresh();
     },
@@ -269,6 +263,7 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   params.parent = target.shadowRoot;
 
   const editorId = id ?? crypto.randomUUID();
+  if (!window.myst_editor) window.myst_editor = {};
   if (editorId in window.myst_editor) {
     throw `Editor with id ${editorId} is already on the page. Pick a different id, or leave it empty for a random one.`;
   }

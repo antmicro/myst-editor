@@ -11,22 +11,10 @@ import { waitForElement } from "../utils";
  * `transform` will be applied to all matches of `target`.
  */
 
-const cachePrefix = "myst-editor/";
-const getCached = (id, key) => sessionStorage.getItem(cachePrefix + `${id}/` + key);
-const setCached = (id, key, value) => sessionStorage.setItem(cachePrefix + `${id}/` + key, value);
-
-const resetCache = () => {
-  for (var key in sessionStorage) {
-    if (key.startsWith("myst-editor")) {
-      sessionStorage.removeItem(key);
-    }
-  }
-};
-
 class PreviewWrapper {
-  constructor(preview, editorId) {
+  constructor(preview, cache) {
     this.preview = preview;
-    this.editorId = editorId;
+    this.cache = cache;
   }
 
   fillPlaceholder(placeholderId, html) {
@@ -52,13 +40,13 @@ class PreviewWrapper {
     promise
       .then(waitForElement(this.preview, placeholderId))
       .then((result) => {
-        setCached(this.editorId, input, result);
+        this.cache.value.set(input, result);
         this.fillPlaceholder(placeholderId, result);
       })
       .catch((err) => {
         console.error("Error in custom transform:", target, "Caused by input:", input, "Error:", err);
         this.cancelTransform(placeholderId);
-        setCached(this.editorId, input, input);
+        this.cache.value.set(input, input);
       });
 
     return `<span id="${placeholderId}">${input}</span>`;
@@ -74,7 +62,7 @@ class PreviewWrapper {
     return {
       target,
       transform: (input) => {
-        const cached = getCached(this.editorId, input);
+        const cached = this.cache.value.get(input);
         if (cached) return cached;
 
         let transformResult = originalTransform(input);
@@ -99,8 +87,8 @@ const applyTransform = (txt, { transform, target }) => txt.replaceAll(target, tr
  * @param {Transform[]} transforms
  * @returns {function(MarkdownIt): void}
  */
-const markdownReplacer = (transforms, editorParent, editorId) => (markdownIt) => {
-  const preview = new PreviewWrapper(editorParent, editorId);
+const markdownReplacer = (transforms, editorParent, cache) => (markdownIt) => {
+  const preview = new PreviewWrapper(editorParent, cache);
 
   const defaultRender = markdownIt.renderer.rules.text;
   markdownIt.renderer.rules.text = function (...args) {
@@ -142,8 +130,8 @@ const toDocutilsRole = ({ target, transform }) => {
  *  @param { Transform[] } transforms
  *  @returns {function(MarkdownIt): void}
  */
-const useCustomRoles = (transforms, previewNode, editorId) => (markdownIt) => {
-  const preview = new PreviewWrapper(previewNode, editorId);
+const useCustomRoles = (transforms, previewNode, cache) => (markdownIt) => {
+  const preview = new PreviewWrapper(previewNode, cache);
   const customRoles = transforms
     .map((t) => preview.overloadTransform(t))
     .map(toDocutilsRole)
@@ -159,4 +147,4 @@ const useCustomRoles = (transforms, previewNode, editorId) => (markdownIt) => {
   markdownIt.use(rolePlugin, { roles: customRoles });
 };
 
-export { markdownReplacer, useCustomRoles, resetCache };
+export { markdownReplacer, useCustomRoles };

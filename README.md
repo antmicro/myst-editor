@@ -147,7 +147,7 @@ of the `MystEditor` function.
 
 Here are the options you can pass to the MystEditor function:
 
-- `id` *(default: `crypto.randomUUID()`)* - this changes where the global state of an editor is stored, it is used when accessing `window.myst_editor` and `sessionStorage`
+- `id` *(default: `crypto.randomUUID()`)* - this changes where the global state of an editor is stored, it is used when accessing `window.myst_editor` and is part of the CodeMirror parent DOM id
 - `name` *(default: "myst_editor_textarea")* - this will change the name of the textarea element which contains your markdown. Useful if you want the editor to be part of an HTML `form`.
 - `initialMode` *(default: "Both", possibleValues: "Source" | "Preview" | "Both")* - changes what is visible when you open the editor. By default, you will see a split view with the text editor and preview.
 - `initialText` *(default: "")* - initial Markdown text
