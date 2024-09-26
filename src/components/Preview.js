@@ -355,34 +355,37 @@ const Preview = styled.div`
 
   .fold-arrow {
     position: absolute;
-    font-size: inherit;
-    transform: translate(-25px);
+    transform: translate(-25px, -50%);
     cursor: pointer;
     background: transparent;
     border: none;
     padding: 0;
     padding-right: 25px;
+    top: 50%;
     opacity: 0;
+
+    img {
+      max-width: unset;
+      height: unset;
+    }
 
     &:hover {
       opacity: 1;
     }
-
-    span {
-      font-size: initial;
-    }
   }
 
-  *:hover > .fold-arrow:first-child {
-    opacity: 1;
+  *:hover > *:not(aside) > .fold-arrow,
+  aside:hover > .fold-arrow {
+    opacity: 1 !important;
   }
 
-  .fold-arrow:has(*:hover) {
-    opacity: 1;
+  li > * > .fold-arrow {
+    transform: translate(-42px, -50%);
   }
 
-  li > .fold-arrow {
-    transform: translate(-42px);
+  aside > .fold-arrow {
+    transform: translate(-28px, -50%);
+    top: 20px;
   }
 
   .fold-dots {
@@ -402,10 +405,8 @@ const Preview = styled.div`
   .unfold {
     opacity: 1;
 
-    span {
+    img {
       rotate: -90deg;
-      transform: translateY(-3px);
-      display: inline-block;
     }
   }
 `;

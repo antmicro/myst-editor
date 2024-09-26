@@ -1,5 +1,6 @@
 import { getLineById, SRC_LINE_ID } from "./markdownSourceMap";
 import { toggleFold, foldable, foldedRanges } from "@codemirror/language";
+import foldIcon from "../icons/fold.svg";
 
 export function addFoldUI(/** @type {import("markdown-it").Token} */ token, /** @type {string} */ baseOutput, env) {
   const id = token.attrGet(SRC_LINE_ID);
@@ -28,16 +29,22 @@ export function addFoldUI(/** @type {import("markdown-it").Token} */ token, /** 
 }
 
 const addFoldArrow = (baseOutput, id) => {
-  return `<button class="fold fold-arrow" data-btn-id="${id}" data-remove title="Fold line"><span>⌄</span></button>` + baseOutput;
+  const firstElementEndIdx = baseOutput.indexOf(">") + 1;
+  return (
+    baseOutput.slice(0, firstElementEndIdx) +
+    `<button class="fold fold-arrow" data-btn-id="${id}" data-remove title="Fold line"><img src=${foldIcon} alt="fold" /></button>` +
+    baseOutput.slice(firstElementEndIdx)
+  );
 };
 
 const addUnfoldButtons = (/** @type {string} */ baseOutput, id) => {
-  const arrow = `<button class="fold fold-arrow unfold" data-btn-id="${id}" data-remove title="Unfold line"><span>⌄</span></button>`;
+  const firstElementEndIdx = baseOutput.indexOf(">") + 1;
+  const arrow = `<button class="fold fold-arrow unfold" data-btn-id="${id}" data-remove title="Unfold line"><img src=${foldIcon} alt="fold" /></button>`;
   const dots = `<button class="fold fold-dots" data-btn-id="${id}" data-remove title="unfold"><span>...</span></button>`;
   if (baseOutput.endsWith("</pre>\n")) {
     return arrow + baseOutput.slice(0, baseOutput.indexOf("</pre>")) + dots + "</pre>";
   } else {
-    return arrow + baseOutput + dots;
+    return baseOutput.slice(0, firstElementEndIdx) + arrow + baseOutput.slice(firstElementEndIdx) + dots;
   }
 };
 
