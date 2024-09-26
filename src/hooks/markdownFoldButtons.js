@@ -45,6 +45,7 @@ export function handlePreviewFold(/** @type {MouseEvent} */ ev, lineMap) {
   /** @type {HTMLElement} */
   let button = ev.target.classList.contains("fold") ? ev.target : ev.target.parentElement;
   if (!button.classList.contains("fold")) return;
+  ev.preventDefault();
 
   const lineId = button.getAttribute("data-btn-id");
   const lineNumber = getLineById(lineMap.current, lineId);
