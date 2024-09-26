@@ -1,11 +1,21 @@
 import markdownIt from "markdown-it";
 import { escapeHtml } from "markdown-it/lib/common/utils";
 
-const SRC_LINE_ID = "data-line-id";
+export const SRC_LINE_ID = "data-line-id";
 const randomLineId = () => Math.random().toString().replace(".", "");
 
+function getLineForToken(token, env) {
+  let line = token.map[0] + env.startLine - (env.chunkId !== 0);
+  for (const range of env.foldedLines ?? []) {
+    if (range.start > line) break;
+
+    line += range.end - range.start + 1;
+  }
+  return line;
+}
+
 /** @param {markdownIt} md  */
-export default function markdownSourceMap(md) {
+export default function markdownSourceMap(md, transform = (token, out, env) => out) {
   md.use(overrideDefaultDirectives);
   md.use(overrideDefaultRole);
   md.use(wrapTextInSpan);
@@ -23,11 +33,11 @@ export default function markdownSourceMap(md) {
 
   for (const rule of overrideRules) {
     const temp = md.renderer.rules[rule];
-    md.renderer.rules[rule] = addLineNumberToTokens(temp);
+    md.renderer.rules[rule] = addLineNumberToTokens(temp, transform);
   }
 }
 
-function addLineNumberToTokens(defaultRule) {
+function addLineNumberToTokens(defaultRule, transform) {
   /**
    * @param {import("markdown-it/index.js").Token[]} tokens
    * @param {number} idx
@@ -59,7 +69,7 @@ function addLineNumberToTokens(defaultRule) {
         }
       }
     } else if (tokens[idx].map) {
-      const line = tokens[idx].map[0] + env.startLine - (env.chunkId !== 0);
+      const line = getLineForToken(tokens[idx], env);
       const id = randomLineId();
       if (!env.lineMap.current.has(line)) {
         env.lineMap.current.set(line, id);
@@ -67,7 +77,7 @@ function addLineNumberToTokens(defaultRule) {
       }
     }
 
-    return rule(tokens, idx, options, env, self);
+    return transform(tokens[idx], rule(tokens, idx, options, env, self), env);
   };
 }
 
@@ -122,14 +132,18 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
     }
 
     const sanitizedContent = escapeHtml(token.content);
-    const startLine = token.map[0] + env.startLine - (env.chunkId !== 0);
+    const startLine = getLineForToken(token, env);
     let htmlContent = sanitizedContent
       .split("\n")
       .filter((_, i, lines) => i !== lines.length - 1)
       .map((l, i) => {
         const id = randomLineId();
-        env.lineMap.current.set(startLine + i + 1, id);
-        return `<span ${SRC_LINE_ID}="${id}">${l}</span>`;
+        if (!env.lineMap.current.has(startLine + i + 1)) {
+          env.lineMap.current.set(startLine + i + 1, id);
+          return `<span ${SRC_LINE_ID}="${id}">${l}</span>`;
+        } else {
+          return `<span>${l}</span>`;
+        }
       })
       .join("\n");
 

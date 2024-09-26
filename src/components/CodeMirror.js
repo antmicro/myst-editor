@@ -3,7 +3,7 @@ import { html } from "htm/preact";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import styled from "styled-components";
-import { ExtensionBuilder, skipAndFoldAll } from "../extensions";
+import { ExtensionBuilder, skipAndFoldAll, folded } from "../extensions";
 import { YCommentsParent } from "../components/Comment";
 import commentIcon from "../icons/comment.svg?raw";
 import { customHighlighter } from "../extensions/customHighlights";
@@ -229,7 +229,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
         .if(collaboration.opts.commentsEnabled, (b) =>
           b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({ ycomments: collaboration.ycomments, editorMountpoint }),
         )
-        .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString(), update))
+        .addUpdateListener((update) => (update.docChanged || folded(update)) && text.set(view.state.doc.toString(), update))
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
         .useCursorIndicator({ lineMap: text.lineMap, preview })

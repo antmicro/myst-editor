@@ -8,8 +8,41 @@ import { backslashLineBreakPlugin } from "./markdownLineBreak";
 import markdownSourceMap from "./markdownSourceMap";
 import { StateEffect } from "@codemirror/state";
 import markdownMermaid from "./markdownMermaid";
+import { EditorView, ViewUpdate } from "@codemirror/view";
+import { addFoldUI } from "./markdownFoldButtons";
+import { foldedRanges } from "@codemirror/language";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
+const getUnfoldedMarkdown = (src, /** @type {EditorView} */ view) => {
+  const folded = foldedRanges(view.state);
+  const ranges = [];
+  const cursor = folded.iter();
+  for (let r = cursor; r.value != null; cursor.next()) {
+    ranges.push({ from: r.from, to: r.to });
+  }
+
+  let unfoldedMarkdown = src;
+  if (ranges.length > 0) {
+    unfoldedMarkdown = ranges.reduce(
+      (acc, { from, to }, idx) => {
+        if (from > acc.lastPos) {
+          acc.result += src.slice(acc.lastPos, from);
+        }
+        acc.lastPos = Math.max(acc.lastPos, to);
+        if (idx == ranges.length - 1 && acc.lastPos < src.length) {
+          // add remaining part
+          acc.result += src.slice(acc.lastPos, src.length);
+        }
+        return acc;
+      },
+      { result: "", lastPos: 0 },
+    ).result;
+  }
+
+  const foldedLines = ranges.map((r) => ({ start: view.state.doc.lineAt(r.from).number + 1, end: view.state.doc.lineAt(r.to).number }));
+
+  return [unfoldedMarkdown, foldedLines];
+};
 
 const exposeText = (text) => () => {
   if (!window.myst_editor) {
@@ -54,7 +87,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
    *
    * @type {[{ md: string, html: string }[], Dispatch<{newMarkdown: string, force: boolean }>]}
    */
-  const [htmlChunks, updateHtmlChunks] = useReducer((oldChunks, { newMarkdown, force = false, view }) => {
+  const [htmlChunks, updateHtmlChunks] = useReducer((oldChunks, { newMarkdown, force = false, view, foldedLines }) => {
     let htmlLookup = {};
     if (!force) {
       htmlLookup = oldChunks.reduce((lookup, { hash, html }) => {
@@ -62,8 +95,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
         return lookup;
       }, {});
     }
-
-    const newChunks = splitIntoChunks(newMarkdown, htmlLookup);
+    const newChunks = splitIntoChunks(newMarkdown, htmlLookup, foldedLines);
 
     if (newChunks.length !== oldChunks.length || force) {
       // We can't infer which chunks were modified, so we update the entire document
@@ -90,8 +122,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       .use(markdownitDocutils)
       .use(markdownReplacer(transforms, parent))
       .use(useCustomRoles(customRoles, parent))
-      .use(markdownMermaid, { preview, lineMap, parent })
-      .use(markdownSourceMap);
+      .use(markdownMermaid, { lineMap, parent })
+      .use(markdownSourceMap, addFoldUI);
     if (backslashLineBreak) md.use(backslashLineBreakPlugin);
     return md;
   }, []);
@@ -127,7 +159,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
 
   /** Split and parse markdown into chunks of HTML. If `lookup` is not provided then every chunk will be parsed */
   const splitIntoChunks = useCallback(
-    (newMarkdown, lookup = {}) =>
+    (newMarkdown, lookup = {}, foldedLines) =>
       newMarkdown
         .split(/(?=\n#{1,3} )/g) // Perform a split without removing the delimeter
         .reduce(
@@ -153,14 +185,24 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
 
           // Clear source mappings for chunk we are rerendering
           if (!lookup[hash]) {
-            for (let l = startLine; l <= endLine; l++) {
+            let unfoldedStart = startLine;
+            let unfoldedEnd = endLine;
+            for (const range of foldedLines ?? []) {
+              if (range.start < unfoldedStart) {
+                unfoldedStart += range.end - range.start + 1;
+              }
+              if (range.start < unfoldedEnd) {
+                unfoldedEnd += range.end - range.start + 1;
+              }
+            }
+            for (let l = unfoldedStart; l <= unfoldedEnd; l++) {
               lineMap.current.delete(l);
             }
           }
 
           const html =
             lookup[hash] ||
-            purify.sanitize(markdown.render(md, { chunkId: id, startLine, lineMap }), {
+            purify.sanitize(markdown.render(md, { chunkId: id, startLine, lineMap, foldedLines }), {
               // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
               ADD_TAGS: ["foreignobject"],
               ADD_ATTR: ["dominant-baseline"],
@@ -180,17 +222,23 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   }, [syncText]);
 
   return {
-    set(newMarkdown, update) {
+    set(newMarkdown, /** @type {ViewUpdate} */ update) {
       if (update) {
         shiftLineMap(update);
       }
-      setText(newMarkdown);
+      let unfoldedMarkdown = newMarkdown;
+      let foldedLines = [];
+      if (update?.state) {
+        [unfoldedMarkdown, foldedLines] = getUnfoldedMarkdown(newMarkdown, update.view);
+      }
+
+      setText(unfoldedMarkdown);
       setTimeout(() => {
         try {
-          updateHtmlChunks({ newMarkdown, view: update?.view });
+          updateHtmlChunks({ newMarkdown: unfoldedMarkdown, view: update?.view, foldedLines });
         } catch (e) {
           console.warn(e);
-          updateHtmlChunks({ newMarkdown, force: true, view: update?.view });
+          updateHtmlChunks({ newMarkdown: unfoldedMarkdown, force: true, view: update?.view, foldedLines });
         }
       });
     },
@@ -201,7 +249,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       setSyncText(true);
     },
     refresh() {
-      updateHtmlChunks({ newMarkdown: window.myst_editor.text, force: true });
+      const [unfoldedMarkdown, foldedLines] = getUnfoldedMarkdown(window.myst_editor.text, window.myst_editor.main_editor);
+      updateHtmlChunks({ newMarkdown: unfoldedMarkdown, force: true, foldedLines });
     },
     onSync(action) {
       setOnSync({ action });
