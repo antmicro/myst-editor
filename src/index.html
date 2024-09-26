@@ -235,10 +235,10 @@ These features include:
 
       MystEditor(
         {
+          id: "demo",
           templatelist: "linkedtemplatelist.json",
           initialText: exampleText,
           title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
-          id: "textarea_id",
           transforms: exampleTransforms,
           collaboration: {
             enabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
@@ -261,7 +261,6 @@ These features include:
             dictionaryPath: "/myst-editor/dictionaries",
           },
           syncScroll: true,
-          editorId: "demo",
         },
         document.getElementById("myst"),
       );

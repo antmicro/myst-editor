@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "preact/hooks";
+import { useContext, useEffect, useRef } from "preact/hooks";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import styled from "styled-components";
@@ -8,6 +8,7 @@ import commentIcon from "../icons/comment.svg?raw";
 import { customHighlighter } from "../extensions/customHighlights";
 import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
 import editIcon from "../icons/edit.svg";
+import { MystState } from "../mystState";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -187,7 +188,8 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll, unfoldedHeadings, onView, editorId }) => {
+const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll, unfoldedHeadings, onView }) => {
+  const { id } = useContext(MystState);
   const editorRef = useRef(null);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
@@ -258,7 +260,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
       parent: editorMountpoint.current,
     });
     editorRef.current = view;
-    window.myst_editor[editorId].main_editor = view;
+    window.myst_editor[id.value].main_editor = view;
     onView(view);
 
     if (unfoldedHeadings != undefined) {

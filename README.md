@@ -147,9 +147,8 @@ of the `MystEditor` function.
 
 Here are the options you can pass to the MystEditor function:
 
-- `editorId` *(default: `crypto.randomUUID()`) - this changes where the global state of an editor is stored, it is used when accessing `window.myst_editor` and `sessionStorage`
+- `id` *(default: `crypto.randomUUID()`)* - this changes where the global state of an editor is stored, it is used when accessing `window.myst_editor` and `sessionStorage`
 - `name` *(default: "myst_editor_textarea")* - this will change the name of the textarea element which contains your markdown. Useful if you want the editor to be part of an HTML `form`.
-- `id` *(default: "myst_editor_textarea")* - changes the ID of the textarea
 - `initialMode` *(default: "Both", possibleValues: "Source" | "Preview" | "Both")* - changes what is visible when you open the editor. By default, you will see a split view with the text editor and preview.
 - `initialText` *(default: "")* - initial Markdown text
 - `includeButtons` *(default: defaultButtons)* - An array of button definitions. A button definition is an object which has an `action: () => void` and either `icon` or `text`. As an example, a button could be defined as `{ text: "Button title", action: () => alert('clicked!') }`

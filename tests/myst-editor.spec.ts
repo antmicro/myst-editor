@@ -268,7 +268,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
       // Resolve the comment
       await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
-      await pageA.locator("#textarea_id-editor").getByText("RESOLVE").click();
+      await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       // Verify that it disappeared from the editor
       expect(await pageA.locator(".comment-wrapper").count()).toBe(0);
@@ -293,7 +293,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
       // Resolve the comment
       await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
-      await pageA.locator("#textarea_id-editor").getByText("DELETE").click();
+      await pageA.locator("#demo-editor").getByText("DELETE").click();
 
       // Verify it is gone
       expect(await pageA.locator(".comment-wrapper").count()).toBe(0);
@@ -346,7 +346,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
       // Resolve the comment
       await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
-      await pageA.locator("#textarea_id-editor").getByText("RESOLVE").click();
+      await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       // Restore the comment
       await pageA.locator(".myst-dropdown-toggle").first().hover();
@@ -374,7 +374,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
       // Resolve the comment
       await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
-      await pageA.locator("#textarea_id-editor").getByText("RESOLVE").click();
+      await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       await addComment(pageA, 1, "2");
 
@@ -406,7 +406,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
       // Resolve the comment
       await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
-      await pageA.locator("#textarea_id-editor").getByText("RESOLVE").click();
+      await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       await clearEditor(pageA);
 
@@ -432,7 +432,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
       // Resolve the comment
       await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
-      await pageA.locator("#textarea_id-editor").getByText("RESOLVE").click();
+      await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       // Delete the comment
       await pageA.locator(".myst-dropdown-toggle").first().hover();

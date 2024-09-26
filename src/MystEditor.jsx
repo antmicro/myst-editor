@@ -1,5 +1,5 @@
 import { render } from "preact";
-import { useState, useEffect, useReducer, useRef, useMemo } from "preact/hooks";
+import { useState, useEffect, useReducer, useRef, useMemo, useContext } from "preact/hooks";
 import { StyleSheetManager, styled } from "styled-components";
 import CodeMirror from "./components/CodeMirror";
 import Preview, { PreviewFocusHighlight } from "./components/Preview";
@@ -11,6 +11,7 @@ import useCollaboration from "./hooks/useCollaboration";
 import useComments from "./hooks/useComments";
 import ResolvedComments from "./components/Resolved";
 import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
+import { createMystState, MystState } from "./mystState";
 
 if (!window.myst_editor?.isFresh) {
   resetCache();
@@ -120,8 +121,6 @@ const defaultButtons = [
 ];
 
 const MystEditor = ({
-  name = "myst_editor_textarea",
-  id = "myst_editor_textarea",
   title = null,
   initialMode = "Both",
   initialText = "",
@@ -139,14 +138,14 @@ const MystEditor = ({
   parent,
   syncScroll = false,
   unfoldedHeadings,
-  editorId = crypto.randomUUID(),
 }) => {
+  const { id } = useContext(MystState);
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
   const editorRef = useRef(null);
 
   const preview = useRef(null);
-  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak, parent, editorRef, editorId });
+  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak, parent, editorRef, editorId: id.value });
 
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer(
@@ -155,7 +154,7 @@ const MystEditor = ({
   );
 
   const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration, parent);
-  const ycomments = useComments(ydoc, provider, getAvatar, getUserUrl, editorId);
+  const ycomments = useComments(ydoc, provider, getAvatar, getUserUrl, id.value);
 
   const alertFor = (alertText, secs) => {
     setAlert(alertText);
@@ -264,7 +263,7 @@ const MystEditor = ({
   );
 };
 
-export default ({ additionalStyles, editorId, ...params }, /** @type {HTMLElement} */ target) => {
+export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ target) => {
   target.attachShadow({
     mode: "open",
   });
@@ -273,15 +272,20 @@ export default ({ additionalStyles, editorId, ...params }, /** @type {HTMLElemen
   }
   params.parent = target.shadowRoot;
 
-  const id = editorId ?? crypto.randomUUID();
-  window.myst_editor[id] = {};
+  const editorId = id ?? crypto.randomUUID();
+  window.myst_editor[editorId] = {};
 
   const form = target.closest("form");
   if (form) {
-    form.addEventListener("formdata", (e) => e.formData.append(params.name, window.myst_editor[id].text));
+    form.addEventListener("formdata", (e) => e.formData.append(params.name, window.myst_editor[editorId].text));
   }
 
-  render(html`<${MystEditor} ...${params} />`, target.shadowRoot);
+  render(
+    <MystState.Provider value={createMystState({ id: editorId })}>
+      <MystEditor {...params} />
+    </MystState.Provider>,
+    target.shadowRoot,
+  );
 };
 
 export { defaultButtons, predefinedButtons };
