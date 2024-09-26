@@ -178,6 +178,10 @@ const CodeEditor = styled.div`
       rotate: -90deg;
     }
   }
+
+  .cm-foldPlaceholder {
+    margin-left: 4px;
+  }
 `;
 
 const setEditorText = (editor, text) => {

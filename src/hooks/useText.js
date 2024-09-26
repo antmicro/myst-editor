@@ -10,7 +10,7 @@ import { StateEffect } from "@codemirror/state";
 import markdownMermaid from "./markdownMermaid";
 import { EditorView, ViewUpdate } from "@codemirror/view";
 import { addFoldUI } from "./markdownFoldButtons";
-import { foldedRanges } from "@codemirror/language";
+import { foldedRanges, ensureSyntaxTree } from "@codemirror/language";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 const getUnfoldedMarkdown = (src, /** @type {EditorView} */ view) => {
@@ -183,8 +183,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
         .map(({ md, startLine, endLine }, id) => {
           const hash = new IMurMurHash(md, 42).result();
 
-          // Clear source mappings for chunk we are rerendering
           if (!lookup[hash]) {
+            // Clear source mappings for chunk we are rerendering
             let unfoldedStart = startLine;
             let unfoldedEnd = endLine;
             for (const range of foldedLines ?? []) {
@@ -198,6 +198,13 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
             for (let l = unfoldedStart; l <= unfoldedEnd; l++) {
               lineMap.current.delete(l);
             }
+
+            const endLineTo = window.myst_editor.main_editor.state.doc.line(unfoldedEnd).to;
+            // This might cause longer startup times for larger documents
+            // Calling this causes the Markdown parser in CodeMirror to parse at least up to the range
+            // being rendered. Thanks to this, we can query the editor about lines being foldable.
+            ensureSyntaxTree(window.myst_editor.main_editor.state, endLineTo, 1000);
+            window.myst_editor.main_editor.dispatch({});
           }
 
           const html =
