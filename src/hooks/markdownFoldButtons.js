@@ -1,5 +1,5 @@
 import { getLineById, SRC_LINE_ID } from "./markdownSourceMap";
-import { toggleFold, foldable, foldedRanges } from "@codemirror/language";
+import { toggleFold, foldable, foldedRanges, foldGutter } from "@codemirror/language";
 import foldIcon from "../icons/fold.svg";
 
 export function addFoldUI(/** @type {import("markdown-it").Token} */ token, /** @type {string} */ baseOutput, env) {
@@ -62,3 +62,17 @@ export function handlePreviewFold(/** @type {MouseEvent} */ ev, lineMap) {
   });
   toggleFold(window.myst_editor.main_editor);
 }
+
+export const foldArrowGutter = foldGutter({
+  markerDOM(open) {
+    const img = document.createElement("img");
+    img.src = foldIcon;
+    img.alt = "fold";
+    img.title = "Fold line";
+    img.classList.add("fold-arrow");
+    if (!open) {
+      img.classList.add("unfold");
+    }
+    return img;
+  },
+});

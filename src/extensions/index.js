@@ -13,8 +13,13 @@ import { foldEffect, unfoldEffect, foldable } from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
 import { customCommonMark, fenceFold, headerIndent } from "./markdownLang";
+import { foldArrowGutter } from "../hooks/markdownFoldButtons";
 
-const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
+const basicExclude = [
+  3, // history
+  4, // default fold gutter
+];
+const basicSetupWithoutHistory = basicSetup.filter((_, i) => !basicExclude.includes(i));
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
 
 const getRelativeCursorLocation = (view) => {
@@ -207,6 +212,11 @@ export class ExtensionBuilder {
         update.view.focus();
       }),
     );
+    return this;
+  }
+
+  useFoldArrows() {
+    this.extensions.push(foldArrowGutter);
     return this;
   }
 

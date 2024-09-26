@@ -169,6 +169,15 @@ const CodeEditor = styled.div`
       transform: translateX(-11px);
     }
   }
+
+  .fold-arrow {
+    padding: 0 4px;
+    cursor: pointer;
+
+    &.unfold {
+      rotate: -90deg;
+    }
+  }
 `;
 
 const setEditorText = (editor, text) => {
@@ -225,6 +234,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
         .useHighlighter(highlights)
         .useCompartment(suggestionCompartment, customHighlighter([]))
         .useSpellcheck(spellcheckOpts)
+        .useFoldArrows()
         .if(collaboration.opts.enabled, (b) => b.useCollaboration({ ...collaboration, editorRef }))
         .if(collaboration.opts.commentsEnabled, (b) =>
           b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({ ycomments: collaboration.ycomments, editorMountpoint }),
