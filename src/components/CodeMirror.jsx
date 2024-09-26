@@ -188,9 +188,8 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll, unfoldedHeadings, onView }) => {
-  const { id } = useContext(MystState);
-  const editorRef = useRef(null);
+const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll, unfoldedHeadings }) => {
+  const { id, editorView } = useContext(MystState);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
@@ -198,7 +197,7 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
   useEffect(() => {
     if (collaboration.opts.enabled && collaboration.error) {
       text.readyToRender();
-      editorRef.current?.destroy();
+      editorView.value?.destroy();
 
       const view = new EditorView({
         root,
@@ -215,7 +214,7 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
 
   useEffect(() => {
     if (collaboration.opts.enabled && !collaboration.ready) return;
-    if (editorRef.current) return;
+    if (editorView.value) return;
     if (collaboration.error) return;
 
     if (collaboration.ytext?.toString().length === 0 && text.get().length > 0) {
@@ -240,7 +239,7 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
         .useHighlighter(highlights)
         .useCompartment(suggestionCompartment, customHighlighter([]))
         .useSpellcheck(spellcheckOpts)
-        .if(collaboration.opts.enabled, (b) => b.useCollaboration({ ...collaboration, editorRef }))
+        .if(collaboration.opts.enabled, (b) => b.useCollaboration({ ...collaboration, editorView }))
         .if(collaboration.opts.commentsEnabled, (b) =>
           b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({
             ycomments: collaboration.ycomments,
@@ -259,9 +258,8 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
       state: startState,
       parent: editorMountpoint.current,
     });
-    editorRef.current = view;
+    editorView.value = view;
     window.myst_editor[id.value].main_editor = view;
-    onView(view);
 
     if (unfoldedHeadings != undefined) {
       skipAndFoldAll(view, unfoldedHeadings);

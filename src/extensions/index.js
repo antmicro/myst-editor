@@ -141,17 +141,17 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useCollaboration({ ytext, provider, undoManager, editorRef }) {
+  useCollaboration({ ytext, provider, undoManager, editorView }) {
     const collab = yCollab(ytext, provider.awareness, { undoManager });
     collab[1] = ySync;
     this.extensions.push(collab);
 
     if (undoManager) {
       undoManager.on("stack-item-added", (event) => {
-        event.stackItem.meta.set("cursor-location", getRelativeCursorLocation(editorRef.current));
+        event.stackItem.meta.set("cursor-location", getRelativeCursorLocation(editorView.value));
       });
       undoManager.on("stack-item-popped", (event) => {
-        restoreCursorLocation(editorRef.current, event.stackItem.meta.get("cursor-location"));
+        restoreCursorLocation(editorView.value, event.stackItem.meta.get("cursor-location"));
       });
 
       this.extensions.push(
@@ -229,7 +229,7 @@ export function skipAndFoldAll(/** @type {EditorView} */ view, skip = 0) {
   let { state } = view;
   let effects = [];
   let nProcessedFoldables = 0;
-  for (let pos = 0; pos < state.doc.length; ) {
+  for (let pos = 0; pos < state.doc.length;) {
     let line = view.lineBlockAt(pos),
       range = foldable(state, line.from, line.to);
     if (range && nProcessedFoldables >= skip) {

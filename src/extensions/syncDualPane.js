@@ -62,9 +62,9 @@ function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior 
  * @param {{ target: HTMLElement }} ev
  * @param {{ current: Map<number, string> }} lineMap
  * @param {{ current: HTMLElement }} preview
- * @param {{ current: EditorView }} editorRef
+ * @param { current: EditorView } editor
  */
-export function handlePreviewClickToScroll(ev, lineMap, preview, editorRef) {
+export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
   let id = ev.target.getAttribute("data-line-id");
   let elem = ev.target;
   if (!id) {
@@ -79,10 +79,10 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editorRef) {
   if (!id) return;
 
   const lineNumber = getLineById(lineMap.current, id);
-  const line = editorRef.current.state.doc.line(lineNumber);
-  const visible = editorRef.current.visibleRanges[0];
+  const line = editor.state.doc.line(lineNumber);
+  const visible = editor.visibleRanges[0];
   function setCursor() {
-    editorRef.current.dispatch({
+    editor.dispatch({
       selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
     });
   }
@@ -97,7 +97,7 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editorRef) {
 
   if (line.from >= visible.from && line.to <= visible.to) {
     // if visible -> scroll just once
-    const { canScroll, editor } = scrollEditorToLine(elem, preview, line, editorRef);
+    const { canScroll, editor } = scrollEditorToLine(elem, preview, line, editor);
     if (canScroll) {
       editor.addEventListener("scrollend", setCursor, { once: true });
     } else {
@@ -111,21 +111,21 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editorRef) {
   }
 }
 
-function scrollEditorToLine(elem, preview, line, editorRef) {
-  const lineBlock = editorRef.current.lineBlockAt(line.from);
+function scrollEditorToLine(elem, preview, line, editor) {
+  const lineBlock = editor.lineBlockAt(line.from);
   const targetRect = elem.getBoundingClientRect();
   const previewRect = preview.current.getBoundingClientRect();
-  const editor = editorRef.current.dom.parentElement;
+  const editorParent = editor.dom.parentElement;
 
   const editorScrollOffset = targetRect.top;
   const top = lineBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;
   const direction = Math.sign(editor.scrollTop - top);
   const threshhold = 5;
   const canScroll =
-    !(direction === 1 && editor.scrollTop === 0) &&
-    !(direction === -1 && editor.scrollTop + editor.clientHeight >= editor.scrollHeight) &&
-    Math.abs(editor.scrollTop - top) > threshhold;
-  editor.scrollTo({
+    !(direction === 1 && editorParent.scrollTop === 0) &&
+    !(direction === -1 && editorParent.scrollTop + editorParent.clientHeight >= editorParent.scrollHeight) &&
+    Math.abs(editorParent.scrollTop - top) > threshhold;
+  editorParent.scrollTo({
     top,
     behavior: "smooth",
   });

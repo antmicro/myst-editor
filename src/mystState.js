@@ -1,13 +1,15 @@
-import { signal } from "@preact/signals";
+import { Signal, signal } from "@preact/signals";
+import { EditorView } from "codemirror";
 import { createContext } from "preact";
 
 /**
  * @param {{id: string}} params
- * @returns
+ * @returns {{ id: Signal<string>, editorView?: Signal<EditorView> }}
  */
 export function createMystState({ id }) {
   return {
     id: signal(id),
+    editorView: signal(null),
   };
 }
 
