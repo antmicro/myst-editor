@@ -1,8 +1,9 @@
 import { MergeView } from "@codemirror/merge";
-import { useRef, useEffect } from "preact/hooks";
+import { useRef, useEffect, useContext } from "preact/hooks";
 import { CodeEditor } from "./CodeMirror";
 import { styled } from "styled-components";
 import { ExtensionBuilder } from "../extensions";
+import { MystState } from "../mystState";
 
 const DiffContainer = styled.div`
   display: grid;
@@ -29,7 +30,8 @@ const initMergeView = ({ old, current, root }) => {
   });
 };
 
-const Diff = ({ oldText, text, root }) => {
+const Diff = ({ text }) => {
+  const { options } = useContext(MystState);
   let leftRef = useRef(null);
   let rightRef = useRef(null);
   let mergeView = useRef(null);
@@ -39,9 +41,9 @@ const Diff = ({ oldText, text, root }) => {
       return false;
     }
     mergeView.current = initMergeView({
-      old: oldText,
+      old: options.initialText,
       current: text.get(),
-      root,
+      root: options.parent,
     });
 
     leftRef.current.appendChild(mergeView.current.b.dom);

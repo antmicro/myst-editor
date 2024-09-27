@@ -203,7 +203,7 @@ const MystEditor = () => {
             </FlexWrapper>
             {options.mode.value === "Diff" && (
               <FlexWrapper>
-                <Diff root={parent} oldText={initialText} text={text} />
+                <Diff text={text} />
               </FlexWrapper>
             )}
             {options.collaboration.value.commentsEnabled && options.collaboration.value.resolvingCommentsEnabled && !error && (
