@@ -3,15 +3,15 @@ import { waitForElement } from "../utils";
 import { getLineById } from "./markdownSourceMap";
 import IMurMurHash from "imurmurhash";
 
-// We want to keep a cache based on line numbers to retrieve the previous version.
-// This allows for a flicker-free editing experience.
-// key = line number
-const lineCache = new Map();
-const hashSeed = 42;
-// key = hash of diagram source code
-const contentCache = new Map();
-
 const markdownItMermaid = (md, { lineMap, parent }) => {
+  // We want to keep a cache based on line numbers to retrieve the previous version.
+  // This allows for a flicker-free editing experience.
+  // key = line number
+  const lineCache = new Map();
+  const hashSeed = 42;
+  // key = hash of diagram source code
+  const contentCache = new Map();
+
   mermaid.initialize({
     theme: "neutral",
     suppressErrorRendering: true,
@@ -33,8 +33,8 @@ const markdownItMermaid = (md, { lineMap, parent }) => {
     const code = token.content.trim();
     const lineNumber = getLineById(lineMap.current, token.attrGet("data-line-id"));
     let cached = lineCache.get(lineNumber);
-    if (!cached) {
-      cached = contentCache.get(new IMurMurHash(code, hashSeed).result());
+    if (!cached || cached.code !== code) {
+      cached = contentCache.get(new IMurMurHash(code, hashSeed).result()) ?? cached;
     }
     const id = Math.random().toString().replace(".", "");
     token.attrSet("id", `mermaid-${id}`);
