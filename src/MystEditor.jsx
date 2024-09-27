@@ -152,12 +152,7 @@ const MystEditor = () => {
                 alert,
                 users,
                 text,
-                templatelist,
                 buttons,
-                collaboration,
-                setMode,
-                mode,
-                title,
               }}
             />
           )}

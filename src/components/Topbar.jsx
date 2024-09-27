@@ -1,11 +1,13 @@
 import { styled } from "styled-components";
-import { useMemo } from "preact/hooks";
+import { useContext, useMemo } from "preact/hooks";
 import purify from "dompurify";
 
 import DefaultButton from "./Buttons";
 import ButtonGroup from "./ButtonGroup";
 import Avatars from "./Avatars";
 import TemplateManager from "./TemplateManager";
+import { MystState } from "../mystState";
+import { useComputed } from "@preact/signals";
 
 const renderMdLinks = (title) =>
   [...title.matchAll(/\[(.+)\]\(([^\s]+)\)/g)].reduce((prev, match) => prev.replace(match[0], `<a href="${match[2]}">${match[1]}</a>`), title);
@@ -194,24 +196,25 @@ const icons = {
   "print-to-pdf": PrintPDFIcon,
 };
 
-export const EditorTopbar = ({ mode, alert, users, text, setMode, templatelist, buttons, title, collaboration }) => {
-  const titleHtml = useMemo(() => purify.sanitize(renderMdLinks(title || ""), []));
-  const editorModeButtons = useMemo(() => {
+export const EditorTopbar = ({ alert, users, text, buttons }) => {
+  const { options } = useContext(MystState);
+  const titleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.title.value)));
+  const editorModeButtons = useComputed(() => {
     const modeButtons = [
-      { id: "source", tooltip: "Source", action: () => setMode("Source"), icon: SourceIcon },
-      { id: "preview", tooltip: "Preview", action: () => setMode("Preview"), icon: PreviewIcon },
-      { id: "both", tooltip: "Dual Pane", action: () => setMode("Both"), icon: BothIcon },
-      { id: "diff", tooltip: "Diff View", action: () => setMode("Diff"), icon: DiffIcon },
+      { id: "source", tooltip: "Source", action: () => (options.mode.value = "Source"), icon: SourceIcon },
+      { id: "preview", tooltip: "Preview", action: () => (options.mode.value = "Preview"), icon: PreviewIcon },
+      { id: "both", tooltip: "Dual Pane", action: () => (options.mode.value = "Both"), icon: BothIcon },
+      { id: "diff", tooltip: "Diff View", action: () => (options.mode.value = "Diff"), icon: DiffIcon },
     ];
-    if (collaboration.resolvingCommentsEnabled) {
-      modeButtons.push({ id: "resolved", tooltip: "Resolved Comments", action: () => setMode("Resolved"), icon: ResolvedIcon });
+    if (options.collaboration.value.resolvingCommentsEnabled) {
+      modeButtons.push({ id: "resolved", tooltip: "Resolved Comments", action: () => (options.mode.value = "Resolved"), icon: ResolvedIcon });
     }
 
     return modeButtons;
-  }, []);
-  const clickedId = useMemo(() => editorModeButtons.findIndex((b) => b.id[0].toUpperCase() + b.id.slice(1) == mode), [editorModeButtons, mode]);
-  const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), []);
-  const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), []);
+  });
+  const clickedId = useComputed(() => editorModeButtons.value.findIndex((b) => b.id[0].toUpperCase() + b.id.slice(1) === options.mode.value));
+  const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), [buttons]);
+  const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), [buttons]);
 
   return (
     <Topbar>
@@ -221,20 +224,19 @@ export const EditorTopbar = ({ mode, alert, users, text, setMode, templatelist, 
             {typeof button.icon == "function" ? <button.icon /> : <img src={button.icon} />}
           </TopbarButton>
         ))}
-        {buttons.find((b) => b.id === "template-manager") && templatelist && <TemplateManager text={text} templatelist={templatelist} />}
+        {buttons.find((b) => b.id === "template-manager") && options.templatelist.value && <TemplateManager text={text} />}
       </div>
       <span> {alert && <Alert className="topbar-alert"> {alert} </Alert>} </span>
-      <Title dangerouslySetInnerHTML={{ __html: titleHtml }} />
+      <Title dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
       <Avatars users={users} />
       <span>
-        {" "}
         {textButtons.map((b) => (
           <DefaultButton type="button" onClick={b.action}>
             {b.text}
           </DefaultButton>
-        ))}{" "}
+        ))}
       </span>
-      <ButtonGroup buttons={editorModeButtons} clickedId={clickedId} />
+      <ButtonGroup buttons={editorModeButtons.value} clickedId={clickedId.value} />
     </Topbar>
   );
 };

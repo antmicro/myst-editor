@@ -1,9 +1,11 @@
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect, useContext } from "preact/hooks";
 import Modal from "./Modal";
 import Tooltip from "./Tooltip";
 import DefaultButton from "./Buttons";
 import { styled } from "styled-components";
 import { TopbarButton } from "./Topbar";
+import { MystState } from "../mystState.js";
+import { useSignalEffect } from "@preact/signals";
 
 const TemplateDropdownContent = styled.div`
   display: none;
@@ -73,7 +75,8 @@ const validateTemplConfig = (templConfig) => {
   return templConfig;
 };
 
-const TemplateManager = ({ text, templatelist }) => {
+const TemplateManager = ({ text }) => {
+  const { options } = useContext(MystState);
   const [template, setTemplate] = useState("");
   const [readyTemplates, setReadyTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -135,7 +138,15 @@ const TemplateManager = ({ text, templatelist }) => {
     return templatesConfig;
   };
 
-  useEffect(() => getTemplateConfig(templatelist).then(validateTemplConfig).then(fillTemplatesWithFetchedData).then(setReadyTemplates), []);
+  useSignalEffect(() => {
+    // reset all and fetch config
+    setTemplate("");
+    setReadyTemplates({});
+    setSelectedTemplate(null);
+    setShowModal(false);
+    setShowTooltip(false);
+    getTemplateConfig(options.templatelist.value).then(validateTemplConfig).then(fillTemplatesWithFetchedData).then(setReadyTemplates);
+  });
 
   if (generalErr.error) {
     return null;
