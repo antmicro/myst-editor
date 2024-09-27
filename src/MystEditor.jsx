@@ -108,7 +108,7 @@ const MystEditor = () => {
   );
 
   const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration();
-  const ycomments = useComments(ydoc, provider, getAvatar, id.value);
+  const ycomments = useComments(ydoc, provider);
 
   const alertFor = (alertText, secs) => {
     setAlert(alertText);
