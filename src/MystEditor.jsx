@@ -162,15 +162,9 @@ const MystEditor = () => {
             <FlexWrapper id="editor-wrapper">
               <CodeMirror
                 {...{
-                  mode,
                   text,
-                  spellcheckOpts,
-                  root: parent,
-                  highlights: transforms,
                   preview,
-                  syncScroll,
                   collaboration: {
-                    opts: collaboration,
                     setUsers,
                     provider,
                     undoManager,
@@ -180,7 +174,6 @@ const MystEditor = () => {
                     error,
                     ycomments,
                   },
-                  unfoldedHeadings,
                 }}
               />
             </FlexWrapper>
@@ -201,7 +194,7 @@ const MystEditor = () => {
                 <Diff text={text} />
               </FlexWrapper>
             )}
-            {options.collaboration.value.commentsEnabled && options.collaboration.value.resolvingCommentsEnabled && !error && (
+            {options.collaboration.value.commentsEnabled && options.collaboration.value.resolvingCommentsEnabled && ycomments && !error && (
               <FlexWrapper id="resolved-wrapper">
                 <ResolvedComments ycomments={ycomments} />
               </FlexWrapper>

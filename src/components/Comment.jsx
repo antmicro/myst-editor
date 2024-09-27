@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback, useMemo } from "preact/hooks";
+import { useRef, useEffect, useState, useCallback, useMemo, useContext } from "preact/hooks";
 import { styled } from "styled-components";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
@@ -7,6 +7,7 @@ import { YComments } from "../comments/ycomments";
 import commentIcon from "../icons/comment.svg?url";
 import trashcanIcon from "../icons/trashcan.svg?url";
 import resolveIcon from "../icons/resolve.svg?url";
+import { MystState } from "../mystState";
 
 const YCommentWrapper = styled.div`
   position: absolute;
@@ -70,7 +71,8 @@ const YCommentWrapper = styled.div`
   }
 `;
 /** @param {{ ycomments: YComments }} */
-const YComment = ({ ycomments, commentId, collaboration }) => {
+const YComment = ({ ycomments, commentId }) => {
+  const { options } = useContext(MystState);
   let cmref = useRef(null);
 
   const lineAuthors = useMemo(() => ycomments.lineAuthors(commentId), [commentId]);
@@ -152,7 +154,7 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
             </svg>
 
             <PopupButton icon={trashcanIcon} bgOnHover={"#e7473c15"} text="DELETE" onClick={() => ycomments.deleteComment(commentId)} />
-            {collaboration.resolvingCommentsEnabled && (
+            {options.collaboration.value.resolvingCommentsEnabled && (
               <PopupButton icon={resolveIcon} bgOnHover={"#AAE17320"} text="RESOLVE" onClick={() => ycomments.resolveComment(commentId)} />
             )}
           </YCommentPopup>
@@ -237,6 +239,6 @@ const PopupButton = ({ icon, onClick, text, bgOnHover }) => {
 };
 
 /** @param {{ ycomments: YComments }} */
-export const YCommentsParent = ({ ycomments, collaboration }) => {
-  return ycomments.comments.value.map(({ commentId }) => <YComment key={commentId} {...{ commentId, ycomments, collaboration }} />);
+export const YCommentsParent = ({ ycomments }) => {
+  return ycomments.comments.value.map(({ commentId }) => <YComment key={commentId} {...{ commentId, ycomments }} />);
 };

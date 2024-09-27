@@ -188,22 +188,22 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboration, preview, syncScroll, unfoldedHeadings }) => {
-  const { id, editorView } = useContext(MystState);
+const CodeMirror = ({ text, collaboration, preview }) => {
+  const { editorView, options } = useContext(MystState);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
 
   useEffect(() => {
-    if (collaboration.opts.enabled && collaboration.error) {
+    if (options.collaboration.value.enabled && collaboration.error) {
       text.readyToRender();
       editorView.value?.destroy();
 
       const view = new EditorView({
-        root,
+        root: options.parent,
         state: EditorState.create({
           doc: text.get(),
-          extensions: ExtensionBuilder.basicSetup().useHighlighter(highlights).useSpellcheck(spellcheckOpts).readonly().create(),
+          extensions: ExtensionBuilder.basicSetup().useHighlighter(options.transforms.value).readonly().create(),
         }),
         parent: editorMountpoint.current,
       });
@@ -213,16 +213,16 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
   }, [collaboration.error]);
 
   useEffect(() => {
-    if (collaboration.opts.enabled && !collaboration.ready) return;
-    if (editorView.value) return;
+    if (options.collaboration.value.enabled && !collaboration.ready) return;
     if (collaboration.error) return;
 
-    if (collaboration.ytext?.toString().length === 0 && text.get().length > 0) {
+    if (collaboration.ytext?.toString().length === 0 && options.initialText.length > 0) {
       console.warn("[Collaboration] Remote state is empty, overriding with local state");
-      collaboration.ytext.insert(0, text.get());
+      text.set(options.initialText);
+      collaboration.ytext.insert(0, options.initialText);
     }
 
-    if (collaboration.opts.enabled) {
+    if (options.collaboration.value.enabled) {
       text.set(collaboration.ytext.toString());
       collaboration.ytext.observe((ev, tr) => {
         if (!tr.local) return;
@@ -233,14 +233,14 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
     text.readyToRender();
 
     const startState = EditorState.create({
-      root,
-      doc: collaboration.opts.enabled ? collaboration.ytext.toString() : text.get(),
+      root: options.parent,
+      doc: options.collaboration.value.enabled ? collaboration.ytext.toString() : text.get(),
       extensions: ExtensionBuilder.basicSetup()
-        .useHighlighter(highlights)
+        .useHighlighter(options.transforms.value)
         .useCompartment(suggestionCompartment, customHighlighter([]))
-        .useSpellcheck(spellcheckOpts)
-        .if(collaboration.opts.enabled, (b) => b.useCollaboration({ ...collaboration, editorView }))
-        .if(collaboration.opts.commentsEnabled, (b) =>
+        .useSpellcheck(options.spellcheckOpts.value)
+        .if(options.collaboration.value.enabled, (b) => b.useCollaboration({ ...collaboration, editorView }))
+        .if(options.collaboration.value.commentsEnabled, (b) =>
           b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({
             ycomments: collaboration.ycomments,
             editorMountpoint,
@@ -250,7 +250,7 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
         .useCursorIndicator({ lineMap: text.lineMap, preview })
-        .if(syncScroll, (b) => b.useSyncPreviewWithCursor({ lineMap: text.lineMap, preview, lastTyped }))
+        .if(options.syncScroll.value, (b) => b.useSyncPreviewWithCursor({ lineMap: text.lineMap, preview, lastTyped }))
         .create(),
     });
 
@@ -259,10 +259,10 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
       parent: editorMountpoint.current,
     });
     editorView.value = view;
-    window.myst_editor[id.value].main_editor = view;
+    window.myst_editor[options.id.value].main_editor = view;
 
-    if (unfoldedHeadings != undefined) {
-      skipAndFoldAll(view, unfoldedHeadings);
+    if (options.unfoldedHeadings.value != undefined) {
+      skipAndFoldAll(view, options.unfoldedHeadings.value);
     }
 
     collaboration.ycomments?.registerCodeMirror(view);
@@ -272,14 +272,22 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
     return () => {
       view.destroy();
     };
-  }, [collaboration.ready]);
+  }, [
+    ...Object.values(collaboration),
+    options.collaboration.value,
+    options.id.value,
+    options.spellcheckOpts.value,
+    options.syncScroll.value,
+    options.transforms.value,
+    options.unfoldedHeadings.value,
+  ]);
 
   return (
-    <CodeEditor className="myst-main-editor" ref={editorMountpoint} $mode={mode} id={`${id}-editor`}>
-      {collaboration.opts.commentsEnabled && !collaboration.error && collaboration.ycomments.mainCodeMirror && (
-        <YCommentsParent ycomments={collaboration.ycomments} collaboration={collaboration.opts} />
+    <CodeEditor className="myst-main-editor" ref={editorMountpoint} $mode={options.mode.value} id={`${options.id.value}-editor`}>
+      {options.collaboration.value.commentsEnabled && !collaboration.error && collaboration.ycomments?.mainCodeMirror && (
+        <YCommentsParent ycomments={collaboration.ycomments} />
       )}
-      {collaboration.opts.commentsEnabled && (
+      {options.collaboration.value.commentsEnabled && (
         <AddSuggestionBtn style="display: none" className="myst-add-suggestion" title="Suggest Changes">
           <img src={editIcon} alt="edit" />
         </AddSuggestionBtn>
