@@ -22,13 +22,50 @@ export const defaultButtons = [
   predefinedButtons.templateManager,
 ];
 
-/**
- * @param {{id: string}} params
- * @returns {{ id: Signal<string>, editorView?: Signal<EditorView>, cache: { transform: Map<string, string> } } }}
- */
-export function createMystState({ id }) {
+const defaults = {
+  id: "",
+  title: "",
+  mode: "Both",
+  initialText: "",
+  includeButtons: defaultButtons,
+  topbar: true,
+  templatelist: "",
+  collaboration: {
+    enabled: false,
+    commentsEnabled: false,
+    resolvingCommentsEnabled: false,
+    wsUrl: "ws://localhost:4444",
+    username: "",
+    room: "0",
+    color: "#ff0000",
+  },
+  spellcheckOpts: { dict: "en_US", dictionaryPath: "/dictionaries" },
+  customRoles: [],
+  transforms: [],
+  // this will create a bogus random avatar when no specific getAvatar function is provided
+  getAvatar: (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
+  getUserUrl: (username) => "#",
+  backslashLineBreak: true,
+  hideUsernameDelay: 5000,
+  parent: null,
+  syncScroll: false,
+  unfoldedHeadings: null,
+};
+
+export function createMystState(/** @type {typeof defaults} */ opts) {
+  const fullOptions = { ...defaults, ...opts };
+  /** @typedef {Omit<typeof defaults, "parent" | "initialText">} SignalOpts */
+  /** @type {{ [key in keyof SignalOpts]: Signal<SignalOpts[key]> } & { parent: DocumentFragment, initialText: string }} */
+  const signalOptions = { parent: fullOptions.parent, initialText: fullOptions.initialText };
+  for (const opt in fullOptions) {
+    if (Object.prototype.hasOwnProperty.call(fullOptions, opt) && opt != "parent" && opt != "initialText") {
+      signalOptions[opt] = signal(fullOptions[opt]);
+    }
+  }
+
   return {
-    id: signal(id),
+    options: signalOptions,
+    /** @type {Signal<EditorView?>} */
     editorView: signal(null),
     cache: {
       transform: new Map(),

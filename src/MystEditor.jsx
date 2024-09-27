@@ -94,27 +94,8 @@ const createExtraScopePlugin = (scope) => {
 
 const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val ? "hidden" : "visible");
 
-const MystEditor = ({
-  title = null,
-  initialMode = "Both",
-  initialText = "",
-  includeButtons = defaultButtons,
-  topbar = true,
-  templatelist,
-  collaboration = {},
-  spellcheckOpts = { dict: "en_US", dictionaryPath: "/dictionaries" },
-  customRoles = [],
-  transforms = [],
-  // this will create a bogus random avatar when no specific getAvatar function is provided
-  getAvatar = (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
-  getUserUrl = (login) => "#",
-  backslashLineBreak = true,
-  parent,
-  syncScroll = false,
-  unfoldedHeadings,
-}) => {
-  const { editorView, cache } = useContext(MystState);
-  const [mode, setMode] = useState(initialMode);
+const MystEditor = () => {
+  const { editorView, cache, options } = useContext(MystState);
   const [fullscreen, setFullscreen] = useState(false);
 
   const preview = useRef(null);
@@ -122,7 +103,7 @@ const MystEditor = ({
 
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer(
-    (_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: getAvatar(u.login), userUrl: getUserUrl(u.login) })),
+    (_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: options.getAvatar.value(u.login), userUrl: options.getUserUrl.value(u.login) })),
     [],
   );
 
@@ -152,20 +133,20 @@ const MystEditor = ({
 
   const buttons = useMemo(
     () =>
-      includeButtons.map((b) => ({
+      options.includeButtons.value.map((b) => ({
         ...b,
         action: b.action || buttonActions[b.id],
       })),
-    [includeButtons, buttonActions],
+    [options.includeButtons.value, buttonActions],
   );
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
 
   return (
     <div style="all: initial" id="myst-css-namespace">
-      <StyleSheetManager target={parent} stylisPlugins={[createExtraScopePlugin("#myst-css-namespace")]}>
-        <EditorParent mode={mode} fullscreen={fullscreen}>
-          {topbar && (
+      <StyleSheetManager target={options.parent} stylisPlugins={[createExtraScopePlugin("#myst-css-namespace")]}>
+        <EditorParent mode={options.mode.value} fullscreen={fullscreen}>
+          {options.topbar.value && (
             <EditorTopbar
               {...{
                 alert,
@@ -181,7 +162,7 @@ const MystEditor = ({
             />
           )}
           {error && <StatusBanner error> {typeof error == "string" ? error : "No connection to the collaboration server"} </StatusBanner>}
-          {collaboration.enabled && !ready && !error && <StatusBanner>Connecting to the collaboration server ...</StatusBanner>}
+          {options.collaboration.enabled && !ready && !error && <StatusBanner>Connecting to the collaboration server ...</StatusBanner>}
           <MystWrapper fullscreen={fullscreen}>
             <FlexWrapper id="editor-wrapper">
               <CodeMirror
@@ -211,20 +192,21 @@ const MystEditor = ({
             <FlexWrapper id="preview-wrapper">
               <Preview
                 ref={preview}
-                mode={mode}
+                mode={options.mode.value}
                 onClick={(ev) => {
-                  if (syncScroll && mode == "Both") handlePreviewClickToScroll(ev, text.lineMap, preview, editorView.value);
+                  if (options.syncScroll.value && options.mode.value == "Both")
+                    handlePreviewClickToScroll(ev, text.lineMap, preview, editorView.value);
                 }}
               >
                 <PreviewFocusHighlight className="cm-previewFocus" />
               </Preview>
             </FlexWrapper>
-            {mode === "Diff" && (
+            {options.mode.value === "Diff" && (
               <FlexWrapper>
                 <Diff root={parent} oldText={initialText} text={text} />
               </FlexWrapper>
             )}
-            {collaboration.commentsEnabled && collaboration.resolvingCommentsEnabled && !error && (
+            {options.collaboration.value.commentsEnabled && options.collaboration.value.resolvingCommentsEnabled && !error && (
               <FlexWrapper id="resolved-wrapper">
                 <ResolvedComments ycomments={ycomments} />
               </FlexWrapper>
@@ -278,12 +260,12 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   });
   observer.observe(target.parentElement, { childList: true });
 
-  const state = createMystState({ id: editorId });
+  const state = createMystState({ id: editorId, ...params });
   window.myst_editor[editorId].state = state;
 
   render(
     <MystState.Provider value={state}>
-      <MystEditor {...params} />
+      <MystEditor />
     </MystState.Provider>,
     target.shadowRoot,
   );
