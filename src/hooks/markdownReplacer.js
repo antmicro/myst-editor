@@ -40,13 +40,13 @@ class PreviewWrapper {
     promise
       .then(waitForElement(this.preview, placeholderId))
       .then((result) => {
-        this.cache.value.set(input, result);
+        this.cache.set(input, result);
         this.fillPlaceholder(placeholderId, result);
       })
       .catch((err) => {
         console.error("Error in custom transform:", target, "Caused by input:", input, "Error:", err);
         this.cancelTransform(placeholderId);
-        this.cache.value.set(input, input);
+        this.cache.set(input, input);
       });
 
     return `<span id="${placeholderId}">${input}</span>`;
@@ -62,7 +62,7 @@ class PreviewWrapper {
     return {
       target,
       transform: (input) => {
-        const cached = this.cache.value.get(input);
+        const cached = this.cache.get(input);
         if (cached) return cached;
 
         let transformResult = originalTransform(input);

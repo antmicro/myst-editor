@@ -161,7 +161,7 @@ const MystEditor = ({
     },
     fullscreen: () => setFullscreen((f) => !f),
     refresh: () => {
-      cache.transform.value.clear();
+      cache.transform.clear();
       alertFor("Rich links refreshed!", 1);
       text.refresh();
     },
