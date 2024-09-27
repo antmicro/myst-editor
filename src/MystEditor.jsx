@@ -99,7 +99,7 @@ const MystEditor = () => {
   const [fullscreen, setFullscreen] = useState(false);
 
   const preview = useRef(null);
-  const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak, parent });
+  const text = useText({ preview });
 
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer(

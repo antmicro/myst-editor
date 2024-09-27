@@ -2,14 +2,16 @@ import markdownitDocutils from "markdown-it-docutils";
 import purify from "dompurify";
 import markdownIt from "markdown-it";
 import { markdownReplacer, useCustomRoles } from "./markdownReplacer";
-import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "preact/hooks";
+import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "preact/hooks";
 import IMurMurHash from "imurmurhash";
 import { backslashLineBreakPlugin } from "./markdownLineBreak";
 import markdownSourceMap from "./markdownSourceMap";
 import { StateEffect } from "@codemirror/state";
 import markdownMermaid from "./markdownMermaid";
 import { EditorView, ViewUpdate } from "@codemirror/view";
+import { ensureSyntaxTree } from "@codemirror/language";
 import { MystState } from "../mystState";
+import { useComputed } from "@preact/signals";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -60,9 +62,9 @@ const copyHtmlAsRichText = async (/** @type {string} */ txt) => {
 export const markdownUpdatedStateEffect = StateEffect.define();
 
 /** @param {{preview: { current: Element } }} */
-export const useText = ({ initialText, transforms, customRoles, preview, backslashLineBreak, parent }) => {
-  const { id, editorView, cache } = useContext(MystState);
-  const [text, setText] = useState(initialText);
+export const useText = ({ preview }) => {
+  const { editorView, cache, options } = useContext(MystState);
+  const [text, setText] = useState(options.initialText);
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
   const [onSync, setOnSync] = useState({ action: (text) => {} });
@@ -99,18 +101,18 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
     return newChunks;
   }, []);
 
-  const markdown = useMemo(() => {
+  const markdown = useComputed(() => {
     const md = markdownIt({ breaks: true, linkify: true })
       .use(markdownitDocutils)
-      .use(markdownReplacer(transforms, parent, cache.transform))
-      .use(useCustomRoles(customRoles, parent, cache.transform))
-      .use(markdownMermaid, { lineMap, parent })
+      .use(markdownReplacer(options.transforms.value, options.parent, cache.transform))
+      .use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))
+      .use(markdownMermaid, { lineMap, parent: options.parent })
       .use(markdownSourceMap)
       .use(checkLinks);
 
-    if (backslashLineBreak) md.use(backslashLineBreakPlugin);
+    if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
     return md;
-  }, []);
+  });
 
   const shiftLineMap = useCallback((/** @type {ViewUpdate} */ update) => {
     if (update.startState.doc.lines === update.state.doc.lines) return;
@@ -181,18 +183,18 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
 
           const html =
             lookup[hash] ||
-            purify.sanitize(markdown.render(md, { chunkId, startLine, lineMap, view: editorView.value }), {
+            purify.sanitize(markdown.value.render(md, { chunkId, startLine, lineMap, view: editorView.value }), {
               // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
               ADD_TAGS: ["foreignobject"],
               ADD_ATTR: ["dominant-baseline"],
             });
           return { md, hash, id: chunkId, html };
         }),
-    [markdown],
+    [markdown.value, options.id.value],
   );
 
   useEffect(() => readyToRender && updateHtmlChunks({ newMarkdown: text }), [readyToRender]);
-  useEffect(exposeText(text, id.value), [text]);
+  useEffect(exposeText(text, options.id.value), [text]);
   useEffect(() => {
     if (syncText) {
       onSync.action(text);
@@ -248,7 +250,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       setSyncText(true);
     },
     refresh() {
-      updateHtmlChunks({ newMarkdown: window.myst_editor[id.value].text, force: true });
+      updateHtmlChunks({ newMarkdown: window.myst_editor[options.id.value].text, force: true });
     },
     onSync(action) {
       setOnSync({ action });
@@ -258,7 +260,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
     },
     async copy() {
       await copyHtmlAsRichText(
-        splitIntoChunks(window.myst_editor[id.value].text, {}, [])
+        splitIntoChunks(window.myst_editor[options.id.value].text, {}, [])
           .map((c) => c.html)
           .join("\n"),
       );
