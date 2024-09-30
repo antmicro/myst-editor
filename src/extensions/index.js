@@ -9,7 +9,7 @@ import { customHighlighter } from "./customHighlights";
 import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
 import { suggestionPopup } from "./suggestions";
-import { foldEffect, unfoldEffect, foldable } from "@codemirror/language";
+import { foldEffect, unfoldEffect, foldable, ensureSyntaxTree } from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
 import { customCommonMark, fenceFold, headerIndent } from "./markdownLang";
@@ -227,6 +227,8 @@ export class ExtensionBuilder {
 
 /** This function folds all top level syntax nodes, while skiping a number of them defined by the `skip` parameter */
 export function skipAndFoldAll(/** @type {EditorView} */ view, skip = 0) {
+  ensureSyntaxTree(window.myst_editor.main_editor.state, view.state.doc.length, 5000);
+  view.dispatch({});
   let { state } = view;
   let effects = [];
   let nProcessedFoldables = 0;
