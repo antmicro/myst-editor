@@ -506,6 +506,59 @@ test.describe.parallel("With collaboration enabled", () => {
       expect(currentTextB).toContain("2Line");
     });
   });
+
+  test.describe("Dynamic options", () => {
+    test("Can modify UI", async ({ context }) => {
+      const collabOpts = defaultCollabOpts();
+      const page = await openPageWithOpts(context, collabOpts);
+      await page.evaluate(() => {
+        window.myst_editor.demo.state.options.title.value = "Playwright";
+        const btns = window.myst_editor.demo.state.options.includeButtons.value;
+        window.myst_editor.demo.state.options.includeButtons.value = [...btns, { id: "test", text: "test" }];
+        window.myst_editor.demo.state.options.mode.value = "Resolved";
+      });
+
+      const title = await page.locator("#document-title").innerHTML();
+      expect(title).toContain("Playwright");
+      expect(page.locator("#topbar > span > button")).toHaveCount(2);
+      const resolvedVisible = await page.isVisible("#resolved-wrapper");
+      expect(resolvedVisible).toBeTruthy();
+    });
+
+    test("Can change rooms", async ({ context }) => {
+      const collabOpts = defaultCollabOpts();
+      // A, B - room 0
+      const pageA = await openPageWithOpts(context, collabOpts);
+      const pageB = await openPageWithOpts(context, collabOpts);
+
+      await clearEditor(pageA);
+      const text0 = "this is room 0";
+      await insertToMainEditor(pageA, { from: 0, insert: text0 });
+      let currentText = await pageB.waitForFunction((id) => window.myst_editor[id].text, id);
+      expect(await currentText.evaluate((str) => str)).toBe(text0);
+
+      const text1 = "this is room 1";
+      // A - join room 1
+      await pageA.evaluate((id) => {
+        const collab = window.myst_editor[id].state.options.collaboration.value;
+        window.myst_editor[id].state.options.collaboration.value = { ...collab, room: "1" };
+      }, id);
+      await pageA.waitForSelector(".cm-content");
+      await clearEditor(pageA);
+      await insertToMainEditor(pageA, { from: 0, insert: text1 });
+      currentText = await pageB.waitForFunction((id) => window.myst_editor[id].text, id);
+      expect(await currentText.evaluate((str) => str)).toBe(text0);
+
+      // B - join room 1
+      await pageB.evaluate((id) => {
+        const collab = window.myst_editor[id].state.options.collaboration.value;
+        window.myst_editor[id].state.options.collaboration.value = { ...collab, room: "1" };
+      }, id);
+      await pageB.waitForSelector(".cm-content");
+      currentText = await pageB.waitForFunction((id) => window.myst_editor[id].text, id);
+      expect(await currentText.evaluate((str) => str)).toBe(text1);
+    });
+  });
 });
 
 test("dist/MystEditor.js exports src/MystEditor.js module", async () => {

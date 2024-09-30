@@ -217,7 +217,7 @@ export const EditorTopbar = ({ alert, users, text, buttons }) => {
   const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), [buttons]);
 
   return (
-    <Topbar>
+    <Topbar id="topbar">
       <div class="buttons-left">
         {buttonsLeft.map((button) => (
           <TopbarButton className="icon" type="button" key={button.id} title={button.tooltip} name={button.id} onClick={button.action}>
@@ -227,7 +227,7 @@ export const EditorTopbar = ({ alert, users, text, buttons }) => {
         {buttons.find((b) => b.id === "template-manager") && options.templatelist.value && <TemplateManager text={text} />}
       </div>
       <span> {alert && <Alert className="topbar-alert"> {alert} </Alert>} </span>
-      <Title dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
+      <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
       <Avatars users={users} />
       <span>
         {textButtons.map((b) => (
