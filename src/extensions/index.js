@@ -9,17 +9,11 @@ import { customHighlighter } from "./customHighlights";
 import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
 import { suggestionPopup } from "./suggestions";
-import { foldEffect, unfoldEffect, foldable, ensureSyntaxTree } from "@codemirror/language";
+import { foldEffect, unfoldEffect, foldable } from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
-import { customCommonMark, fenceFold, headerIndent } from "./markdownLang";
-import { foldArrowGutter } from "../hooks/markdownFoldButtons";
 
-const basicExclude = [
-  3, // history
-  4, // default fold gutter
-];
-const basicSetupWithoutHistory = basicSetup.filter((_, i) => !basicExclude.includes(i));
+const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
 
 const getRelativeCursorLocation = (view) => {
@@ -55,14 +49,7 @@ export class ExtensionBuilder {
   }
 
   static defaultPlugins() {
-    return [
-      EditorView.lineWrapping,
-      markdown({ base: customCommonMark }),
-      highlightActiveLine(),
-      headerIndent,
-      fenceFold,
-      keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
-    ];
+    return [EditorView.lineWrapping, markdown(), highlightActiveLine(), keymap.of([indentWithTab, { key: "Mod-Z", run: redo }])];
   }
 
   disable(keys) {
@@ -215,11 +202,6 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useFoldArrows() {
-    this.extensions.push(foldArrowGutter);
-    return this;
-  }
-
   create() {
     return [...this.important, ...this.base, ...this.extensions];
   }
@@ -227,8 +209,6 @@ export class ExtensionBuilder {
 
 /** This function folds all top level syntax nodes, while skiping a number of them defined by the `skip` parameter */
 export function skipAndFoldAll(/** @type {EditorView} */ view, skip = 0) {
-  ensureSyntaxTree(window.myst_editor.main_editor.state, view.state.doc.length, 5000);
-  view.dispatch({});
   let { state } = view;
   let effects = [];
   let nProcessedFoldables = 0;

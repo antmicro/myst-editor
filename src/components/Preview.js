@@ -3,7 +3,6 @@ import styled from "styled-components";
 const Preview = styled.div`
   background-color: white;
   padding: 20px;
-  padding-left: 40px;
   box-sizing: border-box;
   height: 100%;
   border: 1px solid var(--gray-400);
@@ -105,7 +104,6 @@ const Preview = styled.div`
   pre {
     white-space: pre-wrap;
     padding: 16px;
-    max-width: calc(100% - 40px) !important;
     & > code {
       padding: 0px;
     }
@@ -116,7 +114,6 @@ const Preview = styled.div`
   }
   aside {
     border-radius: var(--border-radius);
-    max-width: 100% !important;
 
     &.admonition {
       border: var(--border-2) solid var(--green-500);
@@ -337,8 +334,6 @@ const Preview = styled.div`
 
   .cm-previewFocus {
     display: ${(props) => (props.mode === "Both" ? "block" : "none")};
-    z-index: 1;
-    pointer-events: none;
   }
 
   .mermaid {
@@ -346,68 +341,6 @@ const Preview = styled.div`
     padding: 0;
     display: flex;
     justify-content: center;
-  }
-
-  *:has(.fold) {
-    position: relative;
-    max-width: max-content;
-  }
-
-  .fold-arrow {
-    position: absolute;
-    transform: translate(-25px, -50%);
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    padding: 0;
-    padding-right: 25px;
-    top: 50%;
-    opacity: 0;
-
-    img {
-      max-width: unset;
-      height: unset;
-    }
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-
-  *:hover > *:not(aside) > .fold-arrow,
-  aside:hover > .fold-arrow {
-    opacity: 1 !important;
-  }
-
-  li > * > .fold-arrow {
-    transform: translate(-42px, -50%);
-  }
-
-  aside > .fold-arrow {
-    transform: translate(-28px, -50%);
-    top: 20px;
-  }
-
-  .fold-dots {
-    background-color: rgb(238, 238, 238);
-    border: 1px solid rgb(221, 221, 221);
-    color: rgb(136, 136, 136);
-    border-radius: 0.2rem;
-    margin: 0;
-    padding: 0 1px;
-    cursor: pointer;
-    position: absolute;
-    right: -23px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  .unfold {
-    opacity: 1;
-
-    img {
-      rotate: -90deg;
-    }
   }
 `;
 Preview.defaultProps = { className: "myst-preview" };
