@@ -232,7 +232,7 @@ const MystEditor = ({
               ref=${preview}
               mode=${mode}
               onClick=${(ev) => {
-                handlePreviewClickToScroll(ev, text.lineMap, preview);
+                if (syncScroll && mode == "Both") handlePreviewClickToScroll(ev, text.lineMap, preview);
               }}
               ><${PreviewFocusHighlight} className="cm-previewFocus" /><//
           ><//>
