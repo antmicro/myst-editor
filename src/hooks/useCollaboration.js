@@ -77,7 +77,7 @@ export default function useCollaboration(settings, parent) {
 
   useEffect(() => {
     return () => {
-      // also destoys the WebsocketProvider
+      provider.destroy();
       ydoc.destroy();
     };
   }, []);
