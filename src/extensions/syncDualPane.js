@@ -68,6 +68,39 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
 
   const lineNumber = getLineById(lineMap.current, id);
   const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
+  const visible = window.myst_editor.main_editor.visibleRanges[0];
+  function setCursor() {
+    window.myst_editor.main_editor.dispatch({
+      selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
+    });
+    window.myst_editor.main_editor.focus();
+  }
+  function keepScrolling() {
+    const { canScroll, editor } = scrollEditorToLine(elem, preview, line);
+    if (canScroll) {
+      editor.addEventListener("scrollend", keepScrolling, { once: true });
+    } else {
+      setCursor();
+    }
+  }
+
+  if (line.from >= visible.from && line.to <= visible.to) {
+    // if visible -> scroll just once
+    const { canScroll, editor } = scrollEditorToLine(elem, preview, line);
+    if (canScroll) {
+      editor.addEventListener("scrollend", setCursor, { once: true });
+    } else {
+      setCursor();
+    }
+  } else {
+    // When the section of the document is not rendered by CodeMirror, we do not have an accurate position of the line.
+    // This is because there is line wrapping, which means some lines will end up with a bigger height
+    // We keep smooth scrolling util we end up with some threshold of the desired position.
+    keepScrolling();
+  }
+}
+
+function scrollEditorToLine(elem, preview, line) {
   const lineBlock = window.myst_editor.main_editor.lineBlockAt(line.from);
   const targetRect = elem.getBoundingClientRect();
   const previewRect = preview.current.getBoundingClientRect();
@@ -76,24 +109,17 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
   const editorScrollOffset = targetRect.top;
   const top = lineBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;
   const direction = Math.sign(editor.scrollTop - top);
+  const threshhold = 5;
   const canScroll =
-    !(direction === 1 && editor.scrollTop === 0) && !(direction === -1 && editor.scrollTop + editor.clientHeight >= editor.scrollHeight);
+    !(direction === 1 && editor.scrollTop === 0) &&
+    !(direction === -1 && editor.scrollTop + editor.clientHeight >= editor.scrollHeight) &&
+    Math.abs(editor.scrollTop - top) > threshhold;
   editor.scrollTo({
     top,
     behavior: "smooth",
   });
 
-  function setCursor() {
-    window.myst_editor.main_editor.dispatch({
-      selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
-    });
-    window.myst_editor.main_editor.focus();
-  }
-  if (canScroll) {
-    editor.addEventListener("scrollend", setCursor, { once: true });
-  } else {
-    setCursor();
-  }
+  return { canScroll, editor };
 }
 
 function findSoruceMappedPreviousElement(startingElem) {
