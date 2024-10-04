@@ -68,30 +68,6 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
 
   const lineNumber = getLineById(lineMap.current, id);
   const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
-  const visible = window.myst_editor.main_editor.visibleRanges[0];
-  if (line.to < visible.to && line.from > visible.from) {
-    scrollEditor(lineNumber, elem, preview, () => {
-      window.myst_editor.main_editor.dispatch({
-        selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
-      });
-      window.myst_editor.main_editor.focus();
-    });
-  } else {
-    scrollEditor(lineNumber, elem, preview, () => {
-      scrollEditor(lineNumber, elem, preview, () => {
-        scrollEditor(lineNumber, elem, preview, () => {
-          window.myst_editor.main_editor.dispatch({
-            selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
-          });
-          window.myst_editor.main_editor.focus();
-        });
-      });
-    });
-  }
-}
-
-function scrollEditor(lineNumber, elem, preview, scrollEnd = () => {}) {
-  const line = window.myst_editor.main_editor.state.doc.line(lineNumber);
   const lineBlock = window.myst_editor.main_editor.lineBlockAt(line.from);
   const targetRect = elem.getBoundingClientRect();
   const previewRect = preview.current.getBoundingClientRect();
@@ -101,18 +77,22 @@ function scrollEditor(lineNumber, elem, preview, scrollEnd = () => {}) {
   const top = lineBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;
   const direction = Math.sign(editor.scrollTop - top);
   const canScroll =
-    !(direction === 1 && editor.scrollTop === 0) &&
-    !(direction === -1 && editor.scrollTop + editor.clientHeight >= editor.scrollHeight) &&
-    editor.scrollTop != top;
+    !(direction === 1 && editor.scrollTop === 0) && !(direction === -1 && editor.scrollTop + editor.clientHeight >= editor.scrollHeight);
   editor.scrollTo({
     top,
     behavior: "smooth",
   });
 
+  function setCursor() {
+    window.myst_editor.main_editor.dispatch({
+      selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
+    });
+    window.myst_editor.main_editor.focus();
+  }
   if (canScroll) {
-    editor.addEventListener("scrollend", scrollEnd, { once: true });
+    editor.addEventListener("scrollend", setCursor, { once: true });
   } else {
-    scrollEnd();
+    setCursor();
   }
 }
 
