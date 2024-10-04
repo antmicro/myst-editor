@@ -31,12 +31,13 @@ const newRandomCommentId = () => "comment-" + Math.random().toString().replace("
  * into Y.Array are immutable (if they are not Y.js primitives).
  */
 export class CommentLineAuthors {
-  constructor(/** @type {Y.Doc} */ ydoc, provider, getAvatar, commentId) {
+  constructor(/** @type {Y.Doc} */ ydoc, provider, getAvatar, getUserUrl, commentId) {
     this.user = provider.awareness.getLocalState().user;
     /** @type {Y.Array<Y.Map<{name: string, color: string, avatar?: string }>>} */
     this.lineAuthors = ydoc.getArray(commentId + "/commentLineAuthors");
     this.ydoc = ydoc;
     this.getAvatar = getAvatar;
+    this.getUserUrl = getUserUrl;
     this.commentId = commentId;
   }
 
@@ -46,6 +47,7 @@ export class CommentLineAuthors {
     if (!authorData) return;
 
     authorData.avatar = this.getAvatar(authorData.name);
+    authorData.url = this.getUserUrl(authorData.name);
     return authorData;
   }
 
@@ -269,10 +271,11 @@ export class YComments {
    * @param {Y.Doc} ydoc
    * @param {WebsocketProvider} provider
    */
-  constructor(ydoc, provider, getAvatar) {
+  constructor(ydoc, provider, getAvatar, getUserUrl) {
     this.ydoc = ydoc;
     this.provider = provider;
     this.getAvatar = getAvatar;
+    this.getUserUrl = getUserUrl;
 
     /** @type {EditorView} The main codemirror instance */
     this.mainCodeMirror = null;
@@ -304,7 +307,7 @@ export class YComments {
   }
 
   lineAuthors(commentId) {
-    return new CommentLineAuthors(this.ydoc, this.provider, this.getAvatar, commentId);
+    return new CommentLineAuthors(this.ydoc, this.provider, this.getAvatar, this.getUserUrl, commentId);
   }
 
   positions() {

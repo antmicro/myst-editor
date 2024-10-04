@@ -135,6 +135,7 @@ const MystEditor = ({
   transforms = [],
   // this will create a bogus random avatar when no specific getAvatar function is provided
   getAvatar = (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
+  getUserUrl = (login) => "#",
   backslashLineBreak = true,
   parent,
   syncScroll = false,
@@ -147,10 +148,13 @@ const MystEditor = ({
   const text = useText({ initialText, transforms, customRoles, preview, backslashLineBreak, parent });
 
   const [alert, setAlert] = useState(null);
-  const [users, setUsers] = useReducer((_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: getAvatar(u.login) })), []);
+  const [users, setUsers] = useReducer(
+    (_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: getAvatar(u.login), userUrl: getUserUrl(u.login) })),
+    [],
+  );
 
   const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration);
-  const ycomments = useComments(ydoc, provider, getAvatar);
+  const ycomments = useComments(ydoc, provider, getAvatar, getUserUrl);
 
   const alertFor = (alertText, secs) => {
     setAlert(alertText);

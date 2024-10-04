@@ -34,8 +34,10 @@ const AvatarsWrapper = styled.div`
   }
 `;
 
-export const Avatar = ({ login, color, avatarUrl }) =>
-  html` <img src=${avatarUrl} key=${login} title=${login} class="avatar" style="border-color: ${color}" />`;
+export const Avatar = ({ login, color, avatarUrl, userUrl }) =>
+  html`<a href=${userUrl || "#"} target="_blank"
+    ><img src=${avatarUrl} key=${login} title=${login} class="avatar" style="border-color: ${color}"
+  /></a>`;
 
 const AvatarPlaceholder = ({ n, usernames }) =>
   html` <${AvatarsWrapper} title=${usernames}>

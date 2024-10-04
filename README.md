@@ -142,6 +142,9 @@ Here are the props you can pass to the MystEditor component:
 - `topbar` *(default: true)* - whether to show the topbar
 - `templateList` - path/url to a JSON file containing your document templates. For an example see `public/linkedtemplatelist.json`.
 - `transforms` - [custom transforms](#custom-transforms)
+- `getAvatar` *(default: (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`)* - a function that returns the avatar for a given username
+- `getUserUrl` *(default: (login) => `#`)* - a function that returns a url to a web page with a users profile
+  It is used when an avatar is clicked.
 - `collaboration` - options related to live collaboration:
   - `enabled` *(default: false)*
   - `wsUrl` *(example: ws://example:4444)* - url of the websocket server
