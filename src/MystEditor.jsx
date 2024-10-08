@@ -263,3 +263,4 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
 };
 
 export { defaultButtons, predefinedButtons, batch, MystEditor as MystEditorPreact };
+export { default as MystEditorGit } from "./myst-git/MystEditorGit";
