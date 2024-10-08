@@ -21,6 +21,7 @@ const DefaultButton = styled.button`
   padding: 0;
   transition: 0.4s ease;
   border-radius: var(--border-radius);
+  font-family: "Lato";
 
   &:not(:has(svg)) {
     padding: 0px 15px;
