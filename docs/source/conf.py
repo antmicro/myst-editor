@@ -18,7 +18,8 @@ from antmicro_sphinx_utils.defaults import (
     myst_enable_extensions as default_myst_enable_extensions,
     myst_fence_as_directive as default_myst_fence_as_directive,
     antmicro_html,
-    antmicro_latex
+    antmicro_latex,
+    relative_to_git
 )
 from os import environ
 
@@ -73,6 +74,16 @@ html_show_sphinx = False
     html_theme_options,
     html_context
 ) = antmicro_html(gh_slug="antmicro/myst-editor" if environ.get("GITHUB_ACTIONS") == "true" else None)
+git_path = relative_to_git(Path(__file__).parent)
+html_theme_options.update({
+    "edit_uri": f"edit/main/{git_path}" if environ.get("GITHUB_ACTIONS") == "true" else f"raw/main/{git_path}",
+})
+html_context.update({
+    "git": {
+        "docs_root": git_path,
+        "github": environ.get("GITHUB_ACTIONS") == "true"
+    }
+})
 
 html_title = project
 
@@ -82,3 +93,5 @@ html_title = project
     latex_logo,
     latex_additional_files
 ) = antmicro_latex(basic_filename, authors, project)
+
+templates_path = ['_templates']

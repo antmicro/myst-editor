@@ -1,0 +1,268 @@
+{# Import the theme's layout. #} {% extends '!layout.html' %} {%- block extrahead %} {% if not git.github %}
+<link rel="stylesheet" href="./MystEditor.css" />
+<link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet" />
+<script type="module">
+  import { MystEditorGit, defaultButtons, effect } from "./MystEditor.js";
+
+  // Get neccessary values from Sphinx conf.py
+  const config = {
+    repoUrl: "{{ config.repo_url }}",
+    repoName: "{{ config.repo_name }}",
+    editUrl: "{{ page.edit_url }}",
+    git: {
+      docsRoot: "{{ git.docs_root }}",
+    },
+    baseUrl: null,
+    apiUrl: null,
+    filePath: null,
+    projectPath: null,
+  };
+  config.baseUrl = config.repoUrl.slice(0, config.repoUrl.indexOf("/git/") + 4);
+  config.apiUrl = config.baseUrl + "/api/v4";
+  config.filePath = config.editUrl.slice(config.editUrl.indexOf("raw/") + 4); // file path with branch
+  config.filePath = config.filePath.slice(config.filePath.indexOf("/") + 1);
+  config.projectPath = encodeURIComponent(config.repoUrl.slice(config.repoUrl.indexOf("/git/") + 5));
+  console.log(config);
+
+  async function getGitlabCsrf() {
+    const response = await fetch(config.baseUrl);
+    if (!response.ok) {
+      return "";
+    }
+    const parser = new DOMParser();
+    const html = parser.parseFromString(await response.text(), "text/html");
+    return html.querySelector("meta[name=csrf-token]").content;
+  }
+
+  async function openMyst() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has("edit")) {
+      window.history.pushState(null, null, "?edit=");
+    }
+
+    // disable Sphinx navigation shortcuts (like s, n, p)
+    window.addEventListener("keydown", (ev) => ev.stopImmediatePropagation(), { capture: true });
+
+    const userData = await (await fetch(`${config.apiUrl}/user`)).json();
+    const username = userData.username;
+    const stringToColor = (str) => {
+      let hash = 0;
+      str.split("").forEach((char) => {
+        hash = char.charCodeAt(0) + ((hash << 5) - hash);
+      });
+      let color = "#";
+      for (let i = 0; i < 3; i++) {
+        const value = (hash >> (i * 8)) & 0xff;
+        color += value.toString(16).padStart(2, "0");
+      }
+      return color;
+    };
+
+    const commitButton = {
+      text: "Commit",
+      action: commitChanges,
+    };
+
+    const mainContainer = document.querySelector("main.md-main");
+    mainContainer.innerHTML = "";
+    mainContainer.style.height = "calc(100vh - 60px)";
+
+    const branches = await getBranches();
+
+    const styles = new CSSStyleSheet();
+    styles.replaceSync(`
+      .myst-main-editor {
+        font-size: 14px !important;
+      }
+    `);
+
+    MystEditorGit(
+      {
+        repo: config.projectPath,
+        initialBranches: branches,
+        getBranches,
+        searchBranches,
+        getCommits,
+        getFiles,
+        getText,
+        additionalStyles: styles,
+        collaboration: {
+          enabled: true,
+          commentsEnabled: true,
+          wsUrl: "/devsignal",
+          resolvingCommentsEnabled: true,
+          username,
+          color: stringToColor(username),
+        },
+        getAvatar: (login) => `/users/${login}.png`,
+        title: config.repoName,
+        includeButtons: defaultButtons,
+        syncScroll: true,
+        id: "sphinx",
+      },
+      mainContainer,
+    );
+
+    function setupButtons() {
+      if (!window.myst_editor.sphinx.git) {
+        setTimeout(setupButtons, 10);
+        return;
+      }
+      effect(() => {
+        if (window.myst_editor.sphinx.git.commit.value == window.myst_editor.sphinx.git.commits.value[0]) {
+          window.myst_editor.sphinx.state.options.includeButtons.value = [...defaultButtons, commitButton];
+        } else {
+          window.myst_editor.sphinx.state.options.includeButtons.value = defaultButtons;
+        }
+      });
+    }
+    setupButtons();
+  }
+
+  const editBtn = document.querySelector(`a[href="{{ page.edit_url }}"]`);
+  if (editBtn) {
+    editBtn.onclick = (ev) => {
+      ev.preventDefault();
+      openMyst();
+    }
+  }
+  window.onload = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("edit")) {
+      openMyst();
+    }
+  };
+
+  async function getBranches() {
+    let page = 1;
+    let branches = [];
+
+    // Branches are returned by pages, so we loop through all pages
+    while (true) {
+      try {
+        const response = await fetch(`${apiUrl}/projects/${projectPath}/repository/branches?page=${page}&per_page=50`);
+        if (!response.ok) {
+          break;
+        }
+        const pageBranches = await response.json();
+        if (pageBranches.length == 0) {
+          break;
+        }
+        branches.push(...pageBranches);
+        page++;
+      } catch (err) {
+        console.error(err);
+        break;
+      }
+    }
+
+    const result = branches.map((b) => b.name);
+    // ensure main is the first branch
+    const mainIdx = result.indexOf("main");
+    if (mainIdx != -1) {
+      [result[0], result[mainIdx]] = [result[mainIdx], result[0]];
+    }
+    return result;
+  }
+
+  async function getCommits(branch) {
+    let page = 1;
+    let commits = [];
+
+    // Branches are returned by pages, so we loop through all pages
+    while (true) {
+      try {
+        const response = await fetch(
+          `${apiUrl}/projects/${projectPath}/repository/commits?ref_name=${encodeURIComponent(branch)}&page=${page}&per_page=50`,
+        );
+        if (!response.ok) {
+          break;
+        }
+        const pageCommits = await response.json();
+        if (pageCommits.length == 0) {
+          break;
+        }
+        commits.push(...pageCommits);
+        page++;
+      } catch (err) {
+        console.error(err);
+        break;
+      }
+    }
+
+    return commits.map((c) => {
+      let firstMsgLineEndIdx = c.message.indexOf("\n");
+      if (firstMsgLineEndIdx == -1) firstMsgLineEndIdx = c.message.length;
+      const firstMsgLine = c.message.slice(0, firstMsgLineEndIdx);
+      return { hash: c.short_id, message: firstMsgLine };
+    });
+  }
+
+  async function getFiles(branch, commit) {
+    let page = 1;
+    let files = [];
+
+    // Branches are returned by pages, so we loop through all pages
+    while (true) {
+      try {
+        const response = await fetch(
+          `${apiUrl}/projects/${projectPath}/repository/tree?path=${docsRoot}&recursive=true&ref=${commit.hash}&page=${page}&per_page=50`,
+        );
+        if (!response.ok) {
+          break;
+        }
+        const pageFiles = await response.json();
+        if (pageFiles.length == 0) {
+          break;
+        }
+        files.push(...pageFiles);
+        page++;
+      } catch (err) {
+        console.error(err);
+        break;
+      }
+    }
+
+    const result = files.filter((f) => f.type == "blob" && f.name.endsWith(".md")).map((f) => f.path);
+    // ensure the current page is the top file
+    const currentPageIdx = result.indexOf(filePath);
+    [result[0], result[currentPageIdx]] = [result[currentPageIdx], result[0]];
+    return result;
+  }
+
+  async function getText(branch, commit, file) {
+    try {
+      const response = await fetch(`${apiUrl}/projects/${projectPath}/repository/files/${encodeURIComponent(file)}/raw?ref=${commit.hash}`);
+      if (!response.ok) {
+        return "";
+      }
+      const content = await response.text();
+      return content;
+    } catch (err) {
+      console.error(err);
+      return "";
+    }
+  }
+  window.getText = getText;
+
+  async function commitChanges() {
+    const csrf = await getGitlabCsrf();
+
+    await fetch(`${apiUrl}/projects/${projectPath}/repository/commits`, {
+      method: "POST",
+      headers: { "X-CSRF-TOKEN": csrf, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        branch: window.myst_editor.sphinx.git.branch.value,
+        commit_message: `MyST: update docs ${window.myst_editor.sphinx.git.file.value}`,
+        actions: [
+          {
+            action: "update",
+            file_path: window.myst_editor.sphinx.git.file.value,
+            content: window.myst_editor.sphinx.text,
+          },
+        ],
+      }),
+    });
+  }
+</script>
+{% endif %} {{ super() }} {%- endblock %}
