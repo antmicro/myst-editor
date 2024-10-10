@@ -1,7 +1,8 @@
 import * as Y from "yjs";
 import * as awarenessProtocol from "y-protocols/awareness.js";
 import { WebsocketProvider } from "y-websocket";
-import { useEffect, useMemo, useRef, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
+import { hideUsernames } from "../extensions/hideUsernames";
 
 WebsocketProvider.prototype.watchCollabolators = function (hook) {
   this.awareness.on("change", ({ added, removed }) => {
@@ -17,8 +18,6 @@ WebsocketProvider.prototype.watchCollabolators = function (hook) {
   });
 };
 
-const loadDate = Date.now();
-
 export default function useCollaboration(settings, parent) {
   if (!settings.enabled) {
     return {};
@@ -29,7 +28,6 @@ export default function useCollaboration(settings, parent) {
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState(false);
   const ytext = useMemo(() => ydoc.getText("codemirror"), []);
-  const changeMap = useRef(new Map());
 
   // Y.js does not throw errors, it only logs them. We want to raise a
   // fatal error when there are any errors in the collaborative state
@@ -61,56 +59,7 @@ export default function useCollaboration(settings, parent) {
     prov.on("sync", setSynced);
     prov.on("status", ({ status }) => setConnected(status == "connected"));
 
-    ytext.observe((_, tr) => {
-      if (!tr.local) return;
-      prov.awareness.setLocalStateField("lastChanged", Date.now());
-    });
-    prov.awareness.on("change", () => {
-      prov.awareness.getStates().forEach((state, id) => {
-        const localState = id === prov.awareness.clientID;
-        const newChange = state.lastChanged && changeMap.current.get(id)?.lastChanged !== state.lastChanged && state.lastChanged >= loadDate;
-        if (localState || !newChange) return;
-
-        const oldTimer = changeMap.current.get(id)?.timer;
-        clearTimeout(oldTimer);
-
-        const showUsername = () => {
-          parent.querySelectorAll(".cm-ySelectionInfo").forEach((/** @type {HTMLElement} */ n) => {
-            if (n.innerText !== state.user.name) return;
-            n.classList.add("active");
-          });
-        };
-
-        const hideUsername = () => {
-          parent.querySelectorAll(".cm-ySelectionInfo").forEach((/** @type {HTMLElement} */ n) => {
-            if (n.innerText !== state.user.name) return;
-            n.classList.remove("active");
-          });
-        };
-
-        if (!oldTimer) {
-          showUsername();
-          // y-codemirror.next does not expose anything to modify decorations so we need this hack
-          const observer = new MutationObserver((mutations) => {
-            for (const mutation of mutations) {
-              const editorTarget = mutation.target.className.includes("cm-line");
-              const caretChanged = Boolean([...mutation.removedNodes].find((n) => n.classList?.contains?.("cm-ySelectionCaret")));
-              if (editorTarget && caretChanged) {
-                showUsername();
-              }
-            }
-          });
-          observer.observe(parent, { childList: true, subtree: true });
-          changeMap.current.set(id, { ...changeMap.current.get(id), observer });
-        }
-        const timer = setTimeout(() => {
-          hideUsername();
-          changeMap.current.get(id).observer.disconnect();
-          changeMap.current.set(id, { ...changeMap.current.get(id), timer: null });
-        }, settings.hideUsernameDelay ?? 5000);
-        changeMap.current.set(id, { ...changeMap.current.get(id), timer, lastChanged: state.lastChanged });
-      });
-    });
+    hideUsernames({ ytext, prov, parent, hideDelay: settings.hideUsernameDelay });
 
     return prov;
   }, []);
