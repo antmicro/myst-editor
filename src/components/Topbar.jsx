@@ -1,5 +1,4 @@
 import { styled } from "styled-components";
-import { html } from "htm/preact";
 import { useMemo } from "preact/hooks";
 import purify from "dompurify";
 
@@ -80,25 +79,27 @@ export const TopbarButton = styled(DefaultButton)`
   width: 40px;
 `;
 
-const FullscreenIcon = () =>
-  html` <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+const FullscreenIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
     <path d="M20.35 1.78003L12.61 9.51003" stroke-width="1.75" />
     <path d="M14.88 1.08008H20.89V7.27008" stroke-width="1.75" />
     <path d="M1.42999 20.3601L9.16999 12.6301" stroke-width="1.75" />
     <path d="M6.90002 21.0601H0.890015V14.8701" stroke-width="1.75" />
-  </svg>`;
+  </svg>
+);
 
-const RefreshIcon = () =>
-  html` <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none">
+const RefreshIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none">
     <path d="M21.75 1V7.66H14.9" stroke-width="1.75" />
     <path
       d="M21.65 12.5899C20.95 17.4199 16.78 21.1399 11.75 21.1399C6.23 21.1399 1.75 16.6599 1.75 11.1399C1.75 5.61989 6.23 1.13989 11.75 1.13989C16.24 1.13989 20.03 4.09989 21.3 8.16989"
       stroke-width="1.75"
     />
-  </svg>`;
+  </svg>
+);
 
-const PreviewIcon = () =>
-  html` <svg xmlns="http://www.w3.org/2000/svg" width="26" height="18" viewBox="0 0 26 18" fill="none">
+const PreviewIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="18" viewBox="0 0 26 18" fill="none">
     <path
       d="M13.01 11.5902C14.5675 11.5902 15.83 10.3276 15.83 8.7702C15.83 7.21275 14.5675 5.9502 13.01 5.9502C11.4526 5.9502 10.1899 7.21275 10.1899 8.7702C10.1899 10.3276 11.4526 11.5902 13.01 11.5902Z"
       stroke-width="1.75"
@@ -107,37 +108,42 @@ const PreviewIcon = () =>
       d="M23.4301 9.80018C23.4301 9.80018 13.75 24.5402 2.58997 9.80018L1.98999 8.95018L2.59998 8.10018C2.59998 8.10018 12.2799 -6.63982 23.4399 8.10018L24.01 8.90018L23.4301 9.80018Z"
       stroke-width="1.75"
     />
-  </svg>`;
+  </svg>
+);
 
-const SourceIcon = () =>
-  html` <svg xmlns="http://www.w3.org/2000/svg" width="21" height="15" viewBox="0 0 21 15" fill="none">
+const SourceIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="21" height="15" viewBox="0 0 21 15" fill="none">
     <path d="M15.31 2.8501L19.56 7.1001L15.19 11.4801" stroke-width="1.75" />
     <path d="M5.75 11.4801L1.5 7.2201L5.88 2.8501" stroke-width="1.75" />
     <path d="M12.35 0.340088L8.72 13.9901" stroke-width="1.75" />
-  </svg>`;
+  </svg>
+);
 
-const CopyIcon = () =>
-  html` <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22" fill="none">
+const CopyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22" fill="none">
     <path d="M13.99 1.04004H1.37V16.64H13.99V1.04004Z" stroke-width="1.75" />
     <path class="inner-copy" d="M18.63 5.51001H6.01001V21.11H18.63V5.51001Z" stroke-width="1.75" />
-  </svg>`;
+  </svg>
+);
 
-const BothIcon = () =>
-  html` <svg xmlns="http://www.w3.org/2000/svg" width="23" height="18" viewBox="0 0 23 18" fill="none">
+const BothIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="23" height="18" viewBox="0 0 23 18" fill="none">
     <path d="M21.84 1.65015H1.83997V16.6701H21.84V1.65015Z" stroke-width="1.75" />
     <path d="M11.84 1.83008V16.6701" stroke-width="1.75" />
-  </svg>`;
+  </svg>
+);
 
-const DiffIcon = () =>
-  html` <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
+const DiffIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="16" viewBox="0 0 24 16" fill="none">
     <path d="M21.23 11.0801H10.29" stroke-width="1.75" />
     <path d="M17.86 6.71997L22.11 10.97L17.73 15.35" stroke-width="1.75" />
     <path d="M2.22998 5.09009H13.17" stroke-width="1.75" />
     <path d="M5.60999 9.44007L1.35999 5.19007L5.73999 0.820068" stroke-width="1.75" />
-  </svg>`;
+  </svg>
+);
 
-const PrintPDFIcon = () =>
-  html`<svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+const PrintPDFIcon = () => (
+  <svg width="21" height="22" viewBox="0 0 21 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path stroke-width="0.2" d="M21 12.4286V11H16.7143V18.1429H18.1429V15.2857H20.2857V13.8571H18.1429V12.4286H21Z" fill="#332D37" />
     <path
       stroke-width="0.2"
@@ -150,10 +156,11 @@ const PrintPDFIcon = () =>
       fill="#332D37"
     />
     <path d="M14 21H9.5H1V1H9M15 10V7.5M9 1H9.5L15 6.5V7.5M9 1V7.5H15" stroke="#332D37" stroke-width="1.75" />
-  </svg> `;
+  </svg>
+);
 
-const ResolvedIcon = () =>
-  html` <svg xmlns="http://www.w3.org/2000/svg" width="26" height="17" viewBox="0.5 -1 17 17" fill="none">
+const ResolvedIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="17" viewBox="0.5 -1 17 17" fill="none">
     <path
       fill-rule="evenodd"
       clip-rule="evenodd"
@@ -177,7 +184,8 @@ const ResolvedIcon = () =>
       stroke="#332D37"
       stroke-width="1.5"
     />
-  </svg>`;
+  </svg>
+);
 
 const icons = {
   fullscreen: FullscreenIcon,
@@ -208,21 +216,28 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
   const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), []);
   const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), []);
 
-  return html` <${Topbar}>
-    <div class="buttons-left">
-      ${buttonsLeft.map(
-        (button) => html`
-          <${TopbarButton} className="icon" type="button" key=${button.id} title=${button.tooltip} name=${button.id} onClick=${button.action}>
-            ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
-          <//>
-        `,
-      )}
-      ${buttons.find((b) => b.id === "template-manager") && templatelist && html`<${TemplateManager} text=${text} templatelist=${templatelist} />`}
-    </div>
-    <span> ${alert && html`<${Alert}> ${alert} <//>`} </span>
-    <${Title} dangerouslySetInnerHTML=${{ __html: titleHtml }} />
-    <${Avatars} users=${users} />
-    <span> ${textButtons.map((b) => html`<${DefaultButton} type="button" onClick=${b.action}>${b.text}<//>`)} </span>
-    <${ButtonGroup} buttons=${editorModeButtons} initialClickedId=${initialClickedId} />
-  <//>`;
+  return (
+    <Topbar>
+      <div class="buttons-left">
+        {buttonsLeft.map((button) => (
+          <TopbarButton className="icon" type="button" key={button.id} title={button.tooltip} name={button.id} onClick={button.action}>
+            {typeof button.icon == "function" ? <button.icon /> : <img src={button.icon} />}
+          </TopbarButton>
+        ))}
+        {buttons.find((b) => b.id === "template-manager") && templatelist && <TemplateManager text={text} templatelist={templatelist} />}
+      </div>
+      <span> {alert && <Alert> {alert} </Alert>} </span>
+      <Title dangerouslySetInnerHTML={{ __html: titleHtml }} />
+      <Avatars users={users} />
+      <span>
+        {" "}
+        {textButtons.map((b) => (
+          <DefaultButton type="button" onClick={b.action}>
+            {b.text}
+          </DefaultButton>
+        ))}{" "}
+      </span>
+      <ButtonGroup buttons={editorModeButtons} initialClickedId={initialClickedId} />
+    </Topbar>
+  );
 };

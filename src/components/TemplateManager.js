@@ -4,7 +4,7 @@ import Modal from "./Modal.js";
 import Tooltip from "./Tooltip.js";
 import DefaultButton from "./Buttons.js";
 import { styled } from "styled-components";
-import { TopbarButton } from "./Topbar.js";
+import { TopbarButton } from "./Topbar.jsx";
 
 const TemplateDropdownContent = styled.div`
   display: none;
