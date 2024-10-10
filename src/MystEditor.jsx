@@ -1,6 +1,5 @@
 import { render } from "preact";
 import { useState, useEffect, useReducer, useRef, useMemo } from "preact/hooks";
-import { html } from "htm/preact";
 import { StyleSheetManager, styled } from "styled-components";
 import CodeMirror from "./components/CodeMirror";
 import Preview, { PreviewFocusHighlight } from "./components/Preview";
@@ -185,70 +184,80 @@ const MystEditor = ({
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
 
-  return html` <div style="all: initial" id="myst-css-namespace">
-    <${StyleSheetManager} target=${parent} stylisPlugins=${[createExtraScopePlugin("#myst-css-namespace")]}>
-      <${EditorParent} mode=${mode} fullscreen=${fullscreen}>
-        ${topbar &&
-        html`<${EditorTopbar}
-          ...${{
-            alert,
-            users,
-            text,
-            templatelist,
-            buttons,
-            collaboration,
-            setMode,
-            initialMode,
-            title,
-          }}
-        />`}
-        ${error && html`<${StatusBanner} error> ${typeof error == "string" ? error : "No connection to the collaboration server"} <//>`}
-        ${collaboration.enabled && !ready && !error && html`<${StatusBanner}>Connecting to the collaboration server ...<//>`}
-        <${MystWrapper} fullscreen=${fullscreen}>
-          <${FlexWrapper} id="editor-wrapper">
-            <${CodeMirror}
-              ...${{
-                mode,
+  return (
+    <div style="all: initial" id="myst-css-namespace">
+      <StyleSheetManager target={parent} stylisPlugins={[createExtraScopePlugin("#myst-css-namespace")]}>
+        <EditorParent mode={mode} fullscreen={fullscreen}>
+          {topbar && (
+            <EditorTopbar
+              {...{
+                alert,
+                users,
                 text,
-                id,
-                spellcheckOpts,
-                root: parent,
-                highlights: transforms,
-                preview,
-                syncScroll,
-                collaboration: {
-                  opts: collaboration,
-                  setUsers,
-                  provider,
-                  undoManager,
-                  ytext,
-                  ydoc,
-                  ready,
-                  error,
-                  ycomments,
-                },
-                unfoldedHeadings,
+                templatelist,
+                buttons,
+                collaboration,
+                setMode,
+                initialMode,
+                title,
               }}
             />
-          <//>
-          <${FlexWrapper} id="preview-wrapper"
-            ><${Preview}
-              ref=${preview}
-              mode=${mode}
-              onClick=${(ev) => {
-                if (syncScroll && mode == "Both") handlePreviewClickToScroll(ev, text.lineMap, preview);
-              }}
-              ><${PreviewFocusHighlight} className="cm-previewFocus" /><//
-          ><//>
-          ${mode === "Diff" && html`<${FlexWrapper}><${Diff} root=${parent} oldText=${initialText} text=${text} /><//>`}
-          ${collaboration.commentsEnabled &&
-          collaboration.resolvingCommentsEnabled &&
-          !error &&
-          html`<${FlexWrapper} id="resolved-wrapper"><${ResolvedComments} ycomments=${ycomments} /><//>`}
-        <//>
-      <//>
-    <//>
-  </div>`;
+          )}
+          {error && <StatusBanner error> {typeof error == "string" ? error : "No connection to the collaboration server"} </StatusBanner>}
+          {collaboration.enabled && !ready && !error && <StatusBanner>Connecting to the collaboration server ...</StatusBanner>}
+          <MystWrapper fullscreen={fullscreen}>
+            <FlexWrapper id="editor-wrapper">
+              <CodeMirror
+                {...{
+                  mode,
+                  text,
+                  id,
+                  spellcheckOpts,
+                  root: parent,
+                  highlights: transforms,
+                  preview,
+                  syncScroll,
+                  collaboration: {
+                    opts: collaboration,
+                    setUsers,
+                    provider,
+                    undoManager,
+                    ytext,
+                    ydoc,
+                    ready,
+                    error,
+                    ycomments,
+                  },
+                  unfoldedHeadings,
+                }}
+              />
+            </FlexWrapper>
+            <FlexWrapper id="preview-wrapper">
+              <Preview
+                ref={preview}
+                mode={mode}
+                onClick={(ev) => {
+                  if (syncScroll && mode == "Both") handlePreviewClickToScroll(ev, text.lineMap, preview);
+                }}
+              >
+                <PreviewFocusHighlight className="cm-previewFocus" />
+              </Preview>
+            </FlexWrapper>
+            {mode === "Diff" && (
+              <FlexWrapper>
+                <Diff root={parent} oldText={initialText} text={text} />
+              </FlexWrapper>
+            )}
+            {collaboration.commentsEnabled && collaboration.resolvingCommentsEnabled && !error && (
+              <FlexWrapper id="resolved-wrapper">
+                <ResolvedComments ycomments={ycomments} />
+              </FlexWrapper>
+            )}
+          </MystWrapper>
+        </EditorParent>
+      </StyleSheetManager>
+    </div>
+  );
 };
 
 export default ({ additionalStyles, ...params }, /** @type {HTMLElement} */ target) => {
@@ -265,7 +274,7 @@ export default ({ additionalStyles, ...params }, /** @type {HTMLElement} */ targ
     form.addEventListener("formdata", (e) => e.formData.append(params.name, window.myst_editor.text));
   }
 
-  render(html`<${MystEditor} ...${params} />`, target.shadowRoot);
+  render(<MystEditor {...params} />, target.shadowRoot);
 };
 
 export { defaultButtons, predefinedButtons };
