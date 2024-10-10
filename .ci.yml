@@ -8,10 +8,10 @@ build:
   stage: build
   image: node:20
   before_script:
-    - yarn
+    - npm ci
   script:
-    - yarn run lint
-    - yarn build
+    - npm run lint
+    - npm run build
   artifacts:
     paths:
       - dist
@@ -21,11 +21,11 @@ functional-tests:
   image: node:20
   dependencies: [build]
   before_script:
-    - yarn
+    - npm ci
   script:
     - ./tests/test-server.sh
     - npx playwright install --with-deps chromium
-    - yarn test
+    - npm run test
   artifacts:
     when: always
     paths:

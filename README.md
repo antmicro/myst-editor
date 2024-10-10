@@ -72,8 +72,7 @@ For more examples see the exampleTransforms object in [the demo HTML](src/index.
 ### Building the component
 
 ```bash
-yarn
-yarn build
+npm i && npm run build
 ```
 
 ### Using as a library
@@ -111,7 +110,7 @@ There is a demo available for the editor with some example markdown and template
 To run it locally, use:
 
 ```bash
-yarn dev
+npm run dev
 ```
 
 Your terminal will display what URL to open to see the demo.
@@ -125,7 +124,7 @@ The example server is located in the `bin` directory. To run it use:
 
 ```bash
 cd bin
-yarn && yarn server
+npm i && npm run server
 ```
 
 You can change the port it runs on with setting a `PORT` environment variable.
