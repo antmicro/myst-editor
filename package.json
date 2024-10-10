@@ -9,9 +9,12 @@
     "preview": "vite preview",
     "host": "vite --host",
     "server": "cd bin && npm install && node server.js",
-    "lint": "prettier --check src --print-width 150",
-    "format": "prettier --write src --print-width 150",
+    "lint": "prettier --check src tests bin package.json vite.config.js .eslintrc.cjs",
+    "format": "prettier --write src tests bin package.json vite.config.js .eslintrc.cjs",
     "test": "PW_TEST_HTML_REPORT_OPEN=never playwright test -c tests/playwright.config.js --reporter html"
+  },
+  "prettier": {
+    "printWidth": 150
   },
   "dependencies": {
     "@codemirror/commands": "^6.2.4",
