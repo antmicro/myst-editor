@@ -1,10 +1,9 @@
 import { useEffect, useRef } from "preact/hooks";
-import { html } from "htm/preact";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import styled from "styled-components";
 import { ExtensionBuilder, skipAndFoldAll } from "../extensions";
-import { YCommentsParent } from "../components/Comment";
+import { YCommentsParent } from "./Comment";
 import commentIcon from "../icons/comment.svg?raw";
 import { customHighlighter } from "../extensions/customHighlights";
 import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
@@ -241,7 +240,10 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
         .useSpellcheck(spellcheckOpts)
         .if(collaboration.opts.enabled, (b) => b.useCollaboration({ ...collaboration, editorRef }))
         .if(collaboration.opts.commentsEnabled, (b) =>
-          b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({ ycomments: collaboration.ycomments, editorMountpoint }),
+          b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({
+            ycomments: collaboration.ycomments,
+            editorMountpoint,
+          }),
         )
         .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString(), update))
         .useFixFoldingScroll(focusScroll)
@@ -275,17 +277,18 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
     };
   }, [collaboration.ready]);
 
-  return html`
-    <${CodeEditor} className="myst-main-editor" ref=${editorMountpoint} $mode=${mode} id="${id}-editor">
-      ${collaboration.opts.commentsEnabled &&
-      !collaboration.error &&
-      html`<${YCommentsParent} ycomments=${collaboration.ycomments} collaboration=${collaboration.opts} />`}
-      ${collaboration.opts.commentsEnabled &&
-      html`<${AddSuggestionBtn} style="display: none" className="myst-add-suggestion" title="Suggest Changes">
-        <img src=${editIcon} alt="edit" />
-      <//>`}
-    <//>
-  `;
+  return (
+    <CodeEditor className="myst-main-editor" ref={editorMountpoint} $mode={mode} id={`${id}-editor`}>
+      {collaboration.opts.commentsEnabled && !collaboration.error && (
+        <YCommentsParent ycomments={collaboration.ycomments} collaboration={collaboration.opts} />
+      )}
+      {collaboration.opts.commentsEnabled && (
+        <AddSuggestionBtn style="display: none" className="myst-add-suggestion" title="Suggest Changes">
+          <img src={editIcon} alt="edit" />
+        </AddSuggestionBtn>
+      )}
+    </CodeEditor>
+  );
 };
 
 export default CodeMirror;
