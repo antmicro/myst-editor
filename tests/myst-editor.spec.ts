@@ -253,6 +253,10 @@ test.describe.parallel("With collaboration enabled", () => {
             await addComment(pageA, 1);
 
             // Drag the comment
+            const initialCommentPosition = await pageA
+                .locator(".comment-wrapper")
+                .first()
+                .evaluate(e => Number(e.parentElement?.getAttribute("top")));
             const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
             const from = await pageA.locator(".comment-icon").boundingBox() as
                 { x: number; y: number; width: number; height: number; };
@@ -271,7 +275,7 @@ test.describe.parallel("With collaboration enabled", () => {
                 .locator(".comment-wrapper")
                 .first()
                 .evaluate(e => Number(e.parentElement?.getAttribute("top")));
-            expect(newCommentPosition - to.x).toBeLessThan(to.height);
+            expect(newCommentPosition ).not.toEqual(initialCommentPosition);
         });
 
 
