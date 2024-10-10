@@ -14,7 +14,7 @@ const CodeEditor = styled.div`
   border-radius: var(--border-radius);
   background: var(--gray-200);
   font-family: monospace;
-  font-size: 0.94em;
+  font-size: 0.875rem;
   resize: none;
   border: 0;
   padding: 20px;
