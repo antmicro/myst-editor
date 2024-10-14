@@ -1,4 +1,3 @@
-import { html } from "htm/preact";
 import { css, styled } from "styled-components";
 
 const TooltipBox = styled.div`
@@ -52,9 +51,11 @@ const TooltipContent = styled.div`
 `;
 
 const Tooltip = ({ tooltipOrientation, errorMessage }) => {
-  return html` <${TooltipBox} $orientation=${tooltipOrientation}>
-    <${TooltipContent} $orientation=${tooltipOrientation}> ${errorMessage} <//>
-  <//>`;
+  return (
+    <TooltipBox orientation={tooltipOrientation}>
+      <TooltipContent orientation={tooltipOrientation}> {errorMessage} </TooltipContent>
+    </TooltipBox>
+  );
 };
 
 export default Tooltip;
