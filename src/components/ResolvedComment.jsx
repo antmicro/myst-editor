@@ -1,4 +1,3 @@
-import { html } from "htm/preact";
 import { useState, useEffect, useRef, useMemo } from "preact/hooks";
 import styled from "styled-components";
 import { Avatar } from "./Avatars";
@@ -142,7 +141,7 @@ const DropdownButton = styled.button`
   }
 `;
 
-const OptionsIcon = () => html`
+const OptionsIcon = () => (
   <svg width="20" height="5" viewBox="0 0 20 5" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       fill-rule="evenodd"
@@ -163,9 +162,8 @@ const OptionsIcon = () => html`
       fill="#6C6C6C"
     />
   </svg>
-`;
-
-const DeleteIcon = () => html`
+);
+const DeleteIcon = () => (
   <svg width="25" height="26" viewBox="0 0 26 21" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M7.71387 6.14294V12.5715" stroke="#E7473C" stroke-width="1.75" />
     <path d="M10.2852 6.14288V12.5715" stroke="#E7473C" stroke-width="1.75" />
@@ -173,9 +171,8 @@ const DeleteIcon = () => html`
     <path d="M0 2.28564H18" stroke="#E7473C" stroke-width="1.75" />
     <path d="M1.92871 2.28564L3.85728 18.3571H14.143L16.0716 2.28564" stroke="#E7473C" stroke-width="1.75" />
   </svg>
-`;
-
-const RestoreIcon = () => html`
+);
+const RestoreIcon = () => (
   <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M1.00169 1V6.66103H6.82422" stroke="black" stroke-width="1.75" />
     <path
@@ -184,8 +181,7 @@ const RestoreIcon = () => html`
       stroke-width="1.75"
     />
   </svg>
-`;
-
+);
 const formatter = new Intl.RelativeTimeFormat("en", { style: "long" });
 
 const ResolvedComment = ({ c, authors, ycomments, content }) => {
@@ -249,39 +245,46 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
     }
   }, [c]);
 
-  return html`
+  return (
     <div style="position: relative;">
-      <${ResolvedLine} orphaned=${c.orphaned}>
-        <${LineNumber}>${c.lineNumber}<//>
-        ${c.resolvedLine}
-      <//>
-      <${CommentContainer} className="resolved-comment" color=${authors.get(1).color}>
-        <${CommentTopbar}>
-          <${FlexRow}>
-            <${Avatar} login=${authors.get(1).name} color=${authors.get(1).color} avatarUrl=${authors.get(1).avatar} userUrl=${authors.get(1).url} />
-            <${CommentAuthor}>${authors.get(1).name}<//>
-          <//>
-          <${FlexRow}>
-            <${ResolvedBy}>Comment resolved by @${c.resolvedBy.name} ${formatter.format(-difference.amount, difference.unit)}<//>
-            <${OptionsContainer} className="myst-dropdown-toggle">
-              <${OptionsIcon} />
-              <${DropdownContainer}>
-                <${DropdownButton} className="myst-restore-btn" onClick=${() => ycomments.restoreComment(c)}>
-                  <${RestoreIcon} />
-                  <p>${restoreText}</p>
-                <//>
-                <${DropdownButton} className="myst-delete-btn" onClick=${() => ycomments.resolver().delete(c.commentId)}>
-                  <${DeleteIcon} />
+      <ResolvedLine orphaned={c.orphaned}>
+        <LineNumber>{c.lineNumber}</LineNumber>
+        {c.resolvedLine}
+      </ResolvedLine>
+      <CommentContainer className="resolved-comment" color={authors.get(1).color}>
+        <CommentTopbar>
+          <FlexRow>
+            <Avatar login={authors.get(1).name} color={authors.get(1).color} avatarUrl={authors.get(1).avatar} userUrl={authors.get(1).url} />
+            <CommentAuthor>{authors.get(1).name}</CommentAuthor>
+          </FlexRow>
+          <FlexRow>
+            <ResolvedBy>
+              Comment resolved by @{c.resolvedBy.name} {formatter.format(-difference.amount, difference.unit)}
+            </ResolvedBy>
+            <OptionsContainer className="myst-dropdown-toggle">
+              <OptionsIcon />
+              <DropdownContainer>
+                <DropdownButton className="myst-restore-btn" onClick={() => ycomments.restoreComment(c)}>
+                  <RestoreIcon />
+                  <p>{restoreText}</p>
+                </DropdownButton>
+                <DropdownButton className="myst-delete-btn" onClick={() => ycomments.resolver().delete(c.commentId)}>
+                  <DeleteIcon />
                   <p>DELETE</p>
-                <//>
-              <//>
-            <//>
-          <//>
-        <//>
-        <${CommentContent}> ${groupedLines.map((lineData) => html` <${CommentLine} color=${lineData.author.color}>${lineData.text}<//> `)} <//>
-      <//>
+                </DropdownButton>
+              </DropdownContainer>
+            </OptionsContainer>
+          </FlexRow>
+        </CommentTopbar>
+        <CommentContent>
+          {" "}
+          {groupedLines.map((lineData) => (
+            <CommentLine color={lineData.author.color}>{lineData.text}</CommentLine>
+          ))}{" "}
+        </CommentContent>
+      </CommentContainer>
     </div>
-  `;
+  );
 };
 
 export default ResolvedComment;
