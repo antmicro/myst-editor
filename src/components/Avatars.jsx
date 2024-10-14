@@ -1,4 +1,3 @@
-import { html } from "htm/preact";
 import { styled } from "styled-components";
 
 const MAX_AVATARS = 4;
@@ -34,31 +33,39 @@ const AvatarsWrapper = styled.div`
   }
 `;
 
-export const Avatar = ({ login, color, avatarUrl, userUrl }) =>
-  html`<a href=${userUrl || "#"} target="_blank"
-    ><img src=${avatarUrl} key=${login} title=${login} class="avatar" style="border-color: ${color}"
-  /></a>`;
+export const Avatar = ({ login, color, avatarUrl, userUrl }) => (
+  <a href={userUrl || "#"} target="_blank">
+    <img src={avatarUrl} key={login} title={login} class="avatar" style={`border-color: ${color}`} />
+  </a>
+);
 
-const AvatarPlaceholder = ({ n, usernames }) =>
-  html` <${AvatarsWrapper} title=${usernames}>
-    <span class="avatar placeholder">+${n}</span>
-  <//>`;
+const AvatarPlaceholder = ({ n, usernames }) => (
+  <AvatarsWrapper title={usernames}>
+    <span class="avatar placeholder">+{n}</span>
+  </AvatarsWrapper>
+);
 
 const Avatars = ({ users }) => {
   const nUserAvatarsToShow = users.length <= MAX_AVATARS ? users.length : 3;
 
-  return html` <${AvatarsWrapper} n=${Math.min(users.length, MAX_AVATARS)}>
-    ${nUserAvatarsToShow < users.length
-      ? html`<${AvatarPlaceholder}
-          n=${users.length - nUserAvatarsToShow}
-          usernames=${users
+  return (
+    <AvatarsWrapper n={Math.min(users.length, MAX_AVATARS)}>
+      {nUserAvatarsToShow < users.length ? (
+        <AvatarPlaceholder
+          n={users.length - nUserAvatarsToShow}
+          usernames={users
             .filter((_, idx) => idx >= MAX_AVATARS)
             .map((u) => u.login)
             .join(", ")}
-        />`
-      : ""}
-    ${users.slice(0, nUserAvatarsToShow).map((user) => html`<${Avatar} ...${user} />`)}
-  <//>`;
+        />
+      ) : (
+        ""
+      )}
+      {users.slice(0, nUserAvatarsToShow).map((user) => (
+        <Avatar {...user} />
+      ))}
+    </AvatarsWrapper>
+  );
 };
 
 export default Avatars;
