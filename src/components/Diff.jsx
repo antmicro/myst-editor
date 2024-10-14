@@ -1,7 +1,6 @@
 import { MergeView } from "@codemirror/merge";
 import { useRef, useEffect } from "preact/hooks";
 import { CodeEditor } from "./CodeMirror";
-import { html } from "htm/preact";
 import { styled } from "styled-components";
 import { ExtensionBuilder } from "../extensions";
 
@@ -49,10 +48,12 @@ const Diff = ({ oldText, text, root }) => {
     rightRef.current.appendChild(mergeView.current.a.dom);
   }, []);
 
-  return html` <${DiffContainer}>
-    <${MergeViewCodeEditor} ref=${leftRef} />
-    <${MergeViewCodeEditor} ref=${rightRef} />
-  <//>`;
+  return (
+    <DiffContainer>
+      <MergeViewCodeEditor ref={leftRef} />
+      <MergeViewCodeEditor ref={rightRef} />
+    </DiffContainer>
+  );
 };
 Diff.defaultProps = { className: "diff" };
 
