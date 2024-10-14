@@ -1,10 +1,9 @@
-import { html } from "htm/preact";
 import { useState, useEffect } from "preact/hooks";
-import Modal from "./Modal.js";
-import Tooltip from "./Tooltip.js";
-import DefaultButton from "./Buttons.js";
+import Modal from "./Modal";
+import Tooltip from "./Tooltip";
+import DefaultButton from "./Buttons";
 import { styled } from "styled-components";
-import { TopbarButton } from "./Topbar.jsx";
+import { TopbarButton } from "./Topbar";
 
 const TemplateDropdownContent = styled.div`
   display: none;
@@ -20,13 +19,14 @@ const TemplateDropdownContent = styled.div`
   z-index: 20;
 `;
 
-const TemplateIcon = () =>
-  html`<svg width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+const TemplateIcon = () => (
+  <svg width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M5 16L11 16" stroke="#332D37" stroke-width="1.75" />
     <path d="M1 21H10H19V12V6.5L13.5 1H1V6.5V12V21Z" stroke="#332D37" stroke-width="1.75" stroke-dasharray="6 3" />
     <path d="M5 12L15 12" stroke="#332D37" stroke-width="1.75" />
     <path d="M5 8L15 8" stroke="#332D37" stroke-width="1.75" />
-  </svg> `;
+  </svg>
+);
 
 const TemplateButton = styled(DefaultButton)`
   width: 90%;
@@ -142,58 +142,63 @@ const TemplateManager = ({ text, templatelist }) => {
   }
 
   if (Object.keys(readyTemplates).length == 0) {
-    return html` <${TopbarButton}
-      type="button"
-      title="Templates"
-      template=${template}
-      onMouseEnter=${() => setShowTooltip(true)}
-      onMouseLeave=${() => setShowTooltip(false)}
-    >
-      <${TemplateIcon} />
-    <//>`;
+    return (
+      <TopbarButton
+        type="button"
+        title="Templates"
+        template={template}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        <TemplateIcon />
+      </TopbarButton>
+    );
   }
 
-  return html`
-    ${showModal &&
-    html`<${Modal}
-      selectedTemplate=${selectedTemplate}
-      closeModal=${() => {
-        setShowModal(false);
-        setSelectedTemplate(false);
-      }}
-      changeDocumentTemplate=${changeDocumentTemplate}
-    />`}
-    <${Dropdown}>
-      <${TopbarButton} className="icon" title="Templates" type="button"><${TemplateIcon} /><//>
-      <${TemplatesList}>
-        <${TemplateDropdownContent}>
-          ${Object.keys(readyTemplates).map(
-            (key) => html`
-              ${readyTemplates[key].errorMessage
-                ? html`
-                    <${ButtonTooltipFlex}>
-                      <${showTooltip === key && Tooltip} tooltipOrientation="left" errorMessage="${readyTemplates[key].errorMessage}" />
-                      <${TemplateButton} type="button" onMouseEnter=${() => setShowTooltip(key)} onMouseLeave=${() => setShowTooltip(false)}
-                        >${readyTemplates[key].id}
-                      <//>
-                    <//>
-                  `
-                : html`
-                    <${TemplateButton}
-                      type="button"
-                      onClick=${() => {
-                        setShowModal(true);
-                        setSelectedTemplate(key);
-                      }}
-                      >${readyTemplates[key].id}
-                    <//>
-                  `}
-            `,
-          )}
-        <//>
-      <//>
-    <//>
-  `;
+  return (
+    <>
+      {showModal && (
+        <Modal
+          selectedTemplate={selectedTemplate}
+          closeModal={() => {
+            setShowModal(false);
+            setSelectedTemplate(false);
+          }}
+          changeDocumentTemplate={changeDocumentTemplate}
+        />
+      )}
+      <Dropdown>
+        <TopbarButton className="icon" title="Templates" type="button">
+          <TemplateIcon />
+        </TopbarButton>
+        <TemplatesList>
+          <TemplateDropdownContent>
+            {Object.keys(readyTemplates).map((key) =>
+              readyTemplates[key].errorMessage ? (
+                <ButtonTooltipFlex>
+                  {showTooltip === key && <Tooltip tooltipOrientation="left" errorMessage={readyTemplates[key].errorMessage} />}
+                  <TemplateButton type="button" onMouseEnter={() => setShowTooltip(key)} onMouseLeave={() => setShowTooltip(false)}>
+                    {readyTemplates[key].id}
+                  </TemplateButton>
+                </ButtonTooltipFlex>
+              ) : (
+                <TemplateButton
+                  type="button"
+                  class="tmpl-butn"
+                  onClick={() => {
+                    setShowModal(true);
+                    setSelectedTemplate(key);
+                  }}
+                >
+                  {readyTemplates[key].id}
+                </TemplateButton>
+              ),
+            )}
+          </TemplateDropdownContent>
+        </TemplatesList>
+      </Dropdown>
+    </>
+  );
 };
 
 export default TemplateManager;
