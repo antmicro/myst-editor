@@ -245,11 +245,8 @@ const PopupButton = ({ icon, onClick, text, bgOnHover }) => {
 
 /** @param {{ ycomments: YComments }} */
 export const YCommentsParent = ({ ycomments, collaboration }) => {
-  let createWidget = ({ commentId }) => <YComment {...{ key: commentId, commentId, ycomments, collaboration }} />;
-  let createWidgets = () => ycomments.iterComments().map(createWidget);
-  let [widgets, setWidgets] = useState(createWidgets());
+  const [comments, setComments] = useState(ycomments.iterComments());
+  useEffect(() => ycomments.display().onUpdate(() => setComments(ycomments.iterComments())), [ycomments]);
 
-  ycomments.display().onUpdate(() => setWidgets(createWidgets()));
-
-  return <>{widgets}</>;
+  return comments.map(({ commentId }) => <YComment key={commentId} {...{ commentId, ycomments, collaboration }} />);
 };
