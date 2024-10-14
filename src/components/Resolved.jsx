@@ -1,4 +1,3 @@
-import { html } from "htm/preact";
 import { useState, useMemo, useEffect } from "preact/hooks";
 import styled from "styled-components";
 import ResolvedComment from "./ResolvedComment";
@@ -80,26 +79,23 @@ const ResolvedComments = ({ ycomments }) => {
     ycomments.resolver().onUpdate((comments) => setResolvedComments(comments.sort(dateComparator)));
   }, []);
 
-  return html` <${ResolvedWrapper}>
-    <h1>Resolved comments</h1>
-    <${VerticalSparator} />
-    <${CommentsContainer}>
-      ${resolvedComments.length === 0
-        ? html`<${NoCommentsText}
-            >No resolved comments yet, to resolve a comment hover over it's icon <img src=${CommentIcon} /> and click <span>RESOLVE</span><//
-          >`
-        : resolvedComments.map(
-            (c, idx) =>
-              html`<${ResolvedComment}
-                key=${c.commentId}
-                c=${c}
-                authors=${authors[idx]}
-                ycomments=${ycomments}
-                content=${commentContents[c.commentId]}
-              />`,
-          )}
-    <//>
-  <//>`;
+  return (
+    <ResolvedWrapper>
+      <h1>Resolved comments</h1>
+      <VerticalSparator />
+      <CommentsContainer>
+        {resolvedComments.length === 0 ? (
+          <NoCommentsText>
+            No resolved comments yet, to resolve a comment hover over it's icon <img src={CommentIcon} /> and click <span>RESOLVE</span>
+          </NoCommentsText>
+        ) : (
+          resolvedComments.map((c, idx) => (
+            <ResolvedComment key={c.commentId} c={c} authors={authors[idx]} ycomments={ycomments} content={commentContents[c.commentId]} />
+          ))
+        )}
+      </CommentsContainer>
+    </ResolvedWrapper>
+  );
 };
 
 export default ResolvedComments;
