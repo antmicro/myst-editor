@@ -1,5 +1,4 @@
 import { useEffect, useState } from "preact/hooks";
-import { html } from "htm/preact";
 import styled from "styled-components";
 import DefaultButton from "./Buttons.js";
 
@@ -37,25 +36,26 @@ const ButtonGroup = ({ buttons, initialClickedId = 2 }) => {
     buttons[initialClickedId].action();
   }, [initialClickedId]);
 
-  return html` <${GroupContainer}>
-    ${buttons.map(
-      (button, i) =>
-        html` <${RadioButton}
+  return (
+    <GroupContainer>
+      {buttons.map((button, i) => (
+        <RadioButton
           className="icon radio-icon"
           type="button"
-          key=${button.id}
-          name=${button.id}
-          onClick=${() => {
+          key={button.id}
+          name={button.id}
+          onClick={() => {
             setClickedId(i);
             button.action();
           }}
-          title=${button.tooltip}
-          active=${i === clickedId}
+          title={button.tooltip}
+          active={i === clickedId}
         >
-          ${typeof button.icon == "function" ? html`<${button.icon} />` : html`<img src=${button.icon} />`}
-        <//>`,
-    )}
-  <//>`;
+          {typeof button.icon == "function" ? <button.icon /> : <img src={button.icon} />}
+        </RadioButton>
+      ))}
+    </GroupContainer>
+  );
 };
 
 export default ButtonGroup;
