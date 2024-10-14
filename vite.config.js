@@ -13,7 +13,7 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: [
-        resolve(__dirname, 'src/MystEditor.js'),
+        resolve(__dirname, 'src/MystEditor.jsx'),
         resolve(__dirname, 'src/index.html')
       ],
       formats: ['es'],
