@@ -1,4 +1,3 @@
-import { html } from "htm/preact";
 import { styled } from "styled-components";
 import DefaultButton from "./Buttons";
 
@@ -40,15 +39,19 @@ const ModalButton = styled(DefaultButton)`
 `;
 
 const Modal = ({ changeDocumentTemplate, selectedTemplate, closeModal }) => {
-  return html`
-    <${Container}>
-      <${Heading}>Are you sure you want to change the current template?<//>
-      <${ButtonContainer}>
-        <${ModalButton} type="button" onClick=${() => changeDocumentTemplate(selectedTemplate)}>✓ Yes<//>
-        <${ModalButton} $negative type="button" onClick=${closeModal}>x Cancel<//>
-      <//>
-    <//>
-  `;
+  return (
+    <Container>
+      <Heading>Are you sure you want to change the current template?</Heading>
+      <ButtonContainer>
+        <ModalButton type="button" onClick={() => changeDocumentTemplate(selectedTemplate)}>
+          ✓ Yes
+        </ModalButton>
+        <ModalButton $negative type="button" onClick={closeModal}>
+          x Cancel
+        </ModalButton>
+      </ButtonContainer>
+    </Container>
+  );
 };
 
 export default Modal;
