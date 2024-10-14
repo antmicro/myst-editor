@@ -1,4 +1,3 @@
-import { html } from "htm/preact";
 import { useRef, useEffect, useState, useCallback, useMemo } from "preact/hooks";
 import { styled } from "styled-components";
 import { EditorView } from "codemirror";
@@ -141,37 +140,35 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
     };
   }, [popupIcon.current, ycomments.commentWithPopup]);
 
-  return html` <${YCommentWrapper}
-    left=${ycomments.marginLeft()}
-    top=${ycomments.display().offset(commentId)}
-    fade=${ycomments.draggedComment == commentId}
-  >
-    <div class="comment-wrapper" style="position:relative">
-      ${ycomments.commentWithPopup == commentId &&
-      html`
-        <${YCommentPopup}
-          left=${ycomments.marginLeft()}
-          shift=${parentHeight}
-          onMouseLeave=${() => {
-            ycomments.commentWithPopup = null;
-            ycomments.updateMainCodeMirror();
-          }}
-        >
-          <img class="comment-icon" ref=${popupIcon} src=${commentIcon} />
+  return (
+    <YCommentWrapper left={ycomments.marginLeft()} top={ycomments.display().offset(commentId)} fade={ycomments.draggedComment == commentId}>
+      <div class="comment-wrapper" style="position:relative">
+        {ycomments.commentWithPopup == commentId && (
+          <YCommentPopup
+            left={ycomments.marginLeft()}
+            shift={parentHeight}
+            onMouseLeave={() => {
+              ycomments.commentWithPopup = null;
+              ycomments.updateMainCodeMirror();
+            }}
+          >
+            <img class="comment-icon" ref={popupIcon} src={commentIcon} />
 
-          <svg width="3" height="22" viewBox="0 10 2 19" fill="none">
-            <path d="M1 1V25" stroke="#DDDDDD" stroke-width="0.75" stroke-linecap="round" />
-          </svg>
+            <svg width="3" height="22" viewBox="0 10 2 19" fill="none">
+              <path d="M1 1V25" stroke="#DDDDDD" stroke-width="0.75" stroke-linecap="round" />
+            </svg>
 
-          <${PopupButton} icon=${trashcanIcon} bgOnHover=${"#e7473c15"} text="DELETE" onClick=${() => ycomments.deleteComment(commentId)} />
-          ${collaboration.resolvingCommentsEnabled &&
-          html`<${PopupButton} icon=${resolveIcon} bgOnHover=${"#AAE17320"} text="RESOLVE" onClick=${() => ycomments.resolveComment(commentId)} />`}
-        <//>
-      `}
+            <PopupButton icon={trashcanIcon} bgOnHover={"#e7473c15"} text="DELETE" onClick={() => ycomments.deleteComment(commentId)} />
+            {collaboration.resolvingCommentsEnabled && (
+              <PopupButton icon={resolveIcon} bgOnHover={"#AAE17320"} text="RESOLVE" onClick={() => ycomments.resolveComment(commentId)} />
+            )}
+          </YCommentPopup>
+        )}
 
-      <div style="display: ${ycomments.display().isShown(commentId) ? "block" : "none"}" ref=${cmref}></div>
-    </div>
-  <//>`;
+        <div style={`display: ${ycomments.display().isShown(commentId) ? "block" : "none"}`} ref={cmref}></div>
+      </div>
+    </YCommentWrapper>
+  );
 };
 
 const YCommentPopup = styled.div`
@@ -238,21 +235,21 @@ const PopupButtonWrapper = styled.div`
 `;
 
 const PopupButton = ({ icon, onClick, text, bgOnHover }) => {
-  return html`
-    <${PopupButtonWrapper} bgOnHover=${bgOnHover} onClick=${onClick}>
-      <img class="resolve-icon" src=${icon} />
-      <span class="resolve-btn"> ${text} </span>
-    <//>
-  `;
+  return (
+    <PopupButtonWrapper bgOnHover={bgOnHover} onClick={onClick}>
+      <img class="resolve-icon" src={icon} />
+      <span class="resolve-btn"> {text} </span>
+    </PopupButtonWrapper>
+  );
 };
 
 /** @param {{ ycomments: YComments }} */
 export const YCommentsParent = ({ ycomments, collaboration }) => {
-  let createWidget = ({ commentId }) => html`<${YComment} ...${{ key: commentId, commentId, ycomments, collaboration }} />`;
+  let createWidget = ({ commentId }) => <YComment {...{ key: commentId, commentId, ycomments, collaboration }} />;
   let createWidgets = () => ycomments.iterComments().map(createWidget);
   let [widgets, setWidgets] = useState(createWidgets());
 
   ycomments.display().onUpdate(() => setWidgets(createWidgets()));
 
-  return html` ${widgets} `;
+  return <>{widgets}</>;
 };
