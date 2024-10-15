@@ -30,6 +30,7 @@ const MystEditorGit = ({
 
   useEffect(() => {
     window.myst_editor[props.id].state = mystState.current;
+    window.myst_editor[props.id].git = { branch, commits, commit, files, file, initialText, room };
   }, [mystState.current, props.id]);
 
   useSignalEffect(() => {
