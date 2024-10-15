@@ -11,7 +11,7 @@ import useComments from "./hooks/useComments";
 import ResolvedComments from "./components/Resolved";
 import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
 import { createMystState, MystState, predefinedButtons, defaultButtons } from "./mystState";
-import { batch } from "@preact/signals";
+import { batch, computed, signal, effect } from "@preact/signals";
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -262,5 +262,5 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   return state;
 };
 
-export { defaultButtons, predefinedButtons, batch, MystEditor as MystEditorPreact };
+export { defaultButtons, predefinedButtons, batch, computed, signal, effect, MystEditor as MystEditorPreact };
 export { default as MystEditorGit } from "./myst-git/MystEditorGit";
