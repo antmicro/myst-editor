@@ -87,9 +87,9 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
     });
   }
   function keepScrolling() {
-    const { canScroll, editor } = scrollEditorToLine(elem, preview, line);
+    const { canScroll, editorParent } = scrollEditorToLine(elem, preview, line, editor);
     if (canScroll) {
-      editor.addEventListener("scrollend", keepScrolling, { once: true });
+      editorParent.addEventListener("scrollend", keepScrolling, { once: true });
     } else {
       setCursor();
     }
@@ -97,9 +97,9 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
 
   if (line.from >= visible.from && line.to <= visible.to) {
     // if visible -> scroll just once
-    const { canScroll, editor } = scrollEditorToLine(elem, preview, line, editor);
+    const { canScroll, editorParent } = scrollEditorToLine(elem, preview, line, editor);
     if (canScroll) {
-      editor.addEventListener("scrollend", setCursor, { once: true });
+      editorParent.addEventListener("scrollend", setCursor, { once: true });
     } else {
       setCursor();
     }
@@ -119,7 +119,7 @@ function scrollEditorToLine(elem, preview, line, editor) {
 
   const editorScrollOffset = targetRect.top;
   const top = lineBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;
-  const direction = Math.sign(editor.scrollTop - top);
+  const direction = Math.sign(editorParent.scrollTop - top);
   const threshhold = 5;
   const canScroll =
     !(direction === 1 && editorParent.scrollTop === 0) &&
@@ -130,7 +130,7 @@ function scrollEditorToLine(elem, preview, line, editor) {
     behavior: "smooth",
   });
 
-  return { canScroll, editor };
+  return { canScroll, editorParent };
 }
 
 function findSoruceMappedPreviousElement(startingElem) {
