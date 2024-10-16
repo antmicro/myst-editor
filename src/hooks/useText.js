@@ -16,7 +16,14 @@ function checkLinks(/** @type {markdownIt} */ md) {
   const defaultRule = md.renderer.rules.link_open;
   md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
     const href = tokens[idx].attrs?.find((a) => a[0] == "href")?.[1];
-    if (href?.startsWith("(")) return href;
+    if (href?.startsWith("(")) {
+      const linkLabel = tokens[idx + 1];
+      const linkClose = tokens[idx + 2];
+      linkLabel.content = `[${linkLabel.content}]`;
+      linkClose.type = "text";
+      linkClose.content = `(${href})`;
+      return "";
+    }
 
     return defaultRule(tokens, idx, options, env, self);
   };
