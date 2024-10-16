@@ -11,6 +11,17 @@ import markdownMermaid from "./markdownMermaid";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
+/** Extension to markdownIt which invalidates links starting with `(` */
+function checkLinks(/** @type {markdownIt} */ md) {
+  const defaultRule = md.renderer.rules.link_open;
+  md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+    const href = tokens[idx].attrs?.find((a) => a[0] == "href")?.[1];
+    if (href?.startsWith("(")) return href;
+
+    return defaultRule(tokens, idx, options, env, self);
+  };
+}
+
 const exposeText = (text) => () => {
   if (!window.myst_editor) {
     window.myst_editor = {};
@@ -87,7 +98,9 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
       .use(markdownReplacer(transforms, parent))
       .use(useCustomRoles(customRoles, parent))
       .use(markdownMermaid, { preview, lineMap, parent })
-      .use(markdownSourceMap);
+      .use(markdownSourceMap)
+      .use(checkLinks);
+
     if (backslashLineBreak) md.use(backslashLineBreakPlugin);
     return md;
   }, []);
