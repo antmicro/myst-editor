@@ -79,7 +79,6 @@ export function handlePreviewClickToScroll(/** @type {{ target: HTMLElement }} *
     window.myst_editor.main_editor.dispatch({
       selection: EditorSelection.create([EditorSelection.range(line.to, line.to)]),
     });
-    window.myst_editor.main_editor.focus();
   }
   function keepScrolling() {
     const { canScroll, editor } = scrollEditorToLine(elem, preview, line);
