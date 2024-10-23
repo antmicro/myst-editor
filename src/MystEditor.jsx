@@ -139,7 +139,7 @@ const MystEditor = ({
   syncScroll = false,
   unfoldedHeadings,
 }) => {
-  const { id, editorView } = useContext(MystState);
+  const { editorView } = useContext(MystState);
   const [mode, setMode] = useState(initialMode);
   const [fullscreen, setFullscreen] = useState(false);
 
@@ -153,7 +153,7 @@ const MystEditor = ({
   );
 
   const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration(collaboration, parent);
-  const ycomments = useComments(ydoc, provider, getAvatar, getUserUrl, id.value);
+  const ycomments = useComments(ydoc, provider, getAvatar, getUserUrl);
 
   const alertFor = (alertText, secs) => {
     setAlert(alertText);
