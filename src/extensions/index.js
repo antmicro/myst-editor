@@ -38,7 +38,7 @@ export const folded = (update) => update.transactions.some((t) => t.effects.some
 export class ExtensionBuilder {
   constructor(base = []) {
     this.important = [EditorState.lineSeparator.of("\n")];
-    this.base = base;
+    this.base = [...base];
     this.extensions = ExtensionBuilder.defaultPlugins();
   }
 
