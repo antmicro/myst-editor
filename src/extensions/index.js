@@ -98,7 +98,7 @@ export class ExtensionBuilder {
   }
 
   useRemoveSelectionOnBlur() {
-    this.base.push(
+    this.extensions.push(
       EditorView.domEventHandlers({
         blur(_, /** @type {EditorView} */ view) {
           const head = view.state.selection.main.head;
@@ -132,12 +132,12 @@ export class ExtensionBuilder {
   }
 
   useSyncPreviewWithCursor({ lineMap, preview, lastTyped }) {
-    this.base.push(syncPreviewWithCursor(lineMap, preview, lastTyped));
+    this.extensions.push(syncPreviewWithCursor(lineMap, preview, lastTyped));
     return this;
   }
 
   useCursorIndicator({ lineMap, preview }) {
-    this.base.push(cursorIndicator(lineMap, preview));
+    this.extensions.push(cursorIndicator(lineMap, preview));
     return this;
   }
 
@@ -166,13 +166,13 @@ export class ExtensionBuilder {
   }
 
   useSuggestionPopup({ ycomments, editorMountpoint }) {
-    this.base.push(EditorView.updateListener.of((update) => suggestionPopup(update, ycomments, editorMountpoint)));
+    this.extensions.push(EditorView.updateListener.of((update) => suggestionPopup(update, ycomments, editorMountpoint)));
     return this;
   }
 
   // This is added due to a bug with Chrome and Codemirror, where folding a section will sometimes scroll to that section.
   useFixFoldingScroll(focusScroll) {
-    this.base.push(
+    this.extensions.push(
       EditorState.transactionFilter.of((tr) => {
         if (tr.effects.some((e) => e.is(foldEffect) || e.is(unfoldEffect))) {
           focusScroll.current = window.scrollY;
@@ -199,7 +199,7 @@ export class ExtensionBuilder {
   }
 
   useMoveCursorAfterFold() {
-    this.base.push(
+    this.extensions.push(
       EditorState.transactionFilter.of((tr) => {
         if (tr.effects.some((e) => e.is(foldEffect))) {
           const { from, to } = tr.effects[0].value;
