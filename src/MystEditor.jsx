@@ -269,6 +269,9 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   params.parent = target.shadowRoot;
 
   const editorId = id ?? crypto.randomUUID();
+  if (editorId in window.myst_editor) {
+    throw `Editor with id ${editorId} is already on the page. Pick a different id, or leave it empty for a random one.`;
+  }
   window.myst_editor[editorId] = {};
 
   const form = target.closest("form");
