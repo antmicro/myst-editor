@@ -15,6 +15,10 @@ class Comment extends WidgetType {
     this.isShown = isShown;
   }
 
+  eq(widget) {
+    return this.commentId == widget.commentId && this.isShown == widget.isShown && this.height == widget.height;
+  }
+
   toDOM() {
     const btn = document.createElement("div");
     btn.id = this.commentId;
