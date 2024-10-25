@@ -16,6 +16,7 @@
     apiUrl: null,
     filePath: null,
     projectPath: null,
+    defaultBranch: null,
   };
   config.baseUrl = config.repoUrl.slice(0, config.repoUrl.indexOf("/git/") + 4);
   config.apiUrl = config.baseUrl + "/api/v4";
@@ -32,6 +33,20 @@
     const parser = new DOMParser();
     const html = parser.parseFromString(await response.text(), "text/html");
     return html.querySelector("meta[name=csrf-token]").content;
+  }
+
+  async function getDefaultBranch() {
+    try {
+      const response = await fetch(`${config.apiUrl}/projects/${config.projectPath}`);
+      if (!response.ok) {
+        return undefined;
+      }
+      const data = await response.json();
+      return data.default_branch;
+    } catch (error) {
+      console.error(error);
+      return undefined;
+    }
   }
 
   async function openMyst() {
@@ -58,6 +73,8 @@
       return color;
     };
 
+    config.defaultBranch = await getDefaultBranch();
+
     const commitButton = {
       text: "Commit",
       action: commitChanges,
@@ -67,7 +84,11 @@
     mainContainer.innerHTML = "";
     mainContainer.style.height = "calc(100vh - 60px)";
 
-    const branches = await getBranches();
+    const branches = await getBranches(1);
+    // ensure default branch is there
+    if (!branches.includes(config.defaultBranch)) {
+      branches.unshift(config.defaultBranch);
+    }
 
     const styles = new CSSStyleSheet();
     styles.replaceSync(`
@@ -83,6 +104,7 @@
         getBranches,
         searchBranches,
         getCommits,
+        searchCommits,
         getFiles,
         getText,
         additionalStyles: styles,
@@ -133,106 +155,133 @@
     }
   };
 
-  async function getBranches() {
-    let page = 1;
-    let branches = [];
-
-    // Branches are returned by pages, so we loop through all pages
-    while (true) {
-      try {
-        const response = await fetch(`${apiUrl}/projects/${projectPath}/repository/branches?page=${page}&per_page=50`);
-        if (!response.ok) {
-          break;
-        }
-        const pageBranches = await response.json();
-        if (pageBranches.length == 0) {
-          break;
-        }
-        branches.push(...pageBranches);
-        page++;
-      } catch (err) {
-        console.error(err);
-        break;
+  async function getBranches(page) {
+    try {
+      const response = await fetch(`${config.apiUrl}/projects/${config.projectPath}/repository/branches?page=${page}&per_page=10&sort=updated_desc`);
+      if (!response.ok) {
+        return [];
       }
-    }
+      const branches = await response.json();
 
-    const result = branches.map((b) => b.name);
-    // ensure main is the first branch
-    const mainIdx = result.indexOf("main");
-    if (mainIdx != -1) {
-      [result[0], result[mainIdx]] = [result[mainIdx], result[0]];
+      let result = branches.map((b) => b.name);
+      // default branch will always be part of the first page
+      if (page != 1) {
+        result = result.filter((b) => b != config.defaultBranch);
+      }
+
+      // ensure default branch is the first branch
+      const defaultIdx = result.indexOf(config.defaultBranch);
+      if (defaultIdx != -1) {
+        result.splice(defaultIdx, 1);
+        result.unshift(config.defaultBranch);
+      }
+      return result;
+    } catch (err) {
+      console.error(err);
+      return [];
     }
-    return result;
   }
 
-  async function getCommits(branch) {
-    let page = 1;
-    let commits = [];
-
-    // Branches are returned by pages, so we loop through all pages
-    while (true) {
-      try {
-        const response = await fetch(
-          `${apiUrl}/projects/${projectPath}/repository/commits?ref_name=${encodeURIComponent(branch)}&page=${page}&per_page=50`,
-        );
-        if (!response.ok) {
-          break;
-        }
-        const pageCommits = await response.json();
-        if (pageCommits.length == 0) {
-          break;
-        }
-        commits.push(...pageCommits);
-        page++;
-      } catch (err) {
-        console.error(err);
-        break;
+  async function searchBranches(input) {
+    try {
+      const response = await fetch(
+        `${config.apiUrl}/projects/${config.projectPath}/repository/branches?per_page=10&search=${encodeURIComponent(input)}&sort=updated_desc`,
+      );
+      if (!response.ok) {
+        return [];
       }
-    }
+      const branches = await response.json();
 
-    return commits.map((c) => {
-      let firstMsgLineEndIdx = c.message.indexOf("\n");
-      if (firstMsgLineEndIdx == -1) firstMsgLineEndIdx = c.message.length;
-      const firstMsgLine = c.message.slice(0, firstMsgLineEndIdx);
-      return { hash: c.short_id, message: firstMsgLine };
-    });
+      return branches.map((b) => b.name);
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
   }
 
+  async function getCommits(branch, page) {
+    try {
+      const response = await fetch(
+        `${config.apiUrl}/projects/${config.projectPath}/repository/commits?ref_name=${encodeURIComponent(branch)}&page=${page}&per_page=10`,
+      );
+      if (!response.ok) {
+        return [];
+      }
+      const commits = await response.json();
+
+      return commits.map((c) => {
+        let firstMsgLineEndIdx = c.message.indexOf("\n");
+        if (firstMsgLineEndIdx == -1) firstMsgLineEndIdx = c.message.length;
+        const firstMsgLine = c.message.slice(0, firstMsgLineEndIdx);
+        return { hash: c.short_id, message: firstMsgLine };
+      });
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  }
+
+  async function searchCommits(input, branch) {
+    try {
+      const response = await fetch(
+        `${config.apiUrl}/projects/${config.projectPath}/search?scope=commits&ref=${encodeURIComponent(branch)}&per_page=10&search=${encodeURIComponent(input)}`,
+      );
+      if (!response.ok) {
+        return [];
+      }
+      const commits = await response.json();
+
+      return commits.map((c) => {
+        let firstMsgLineEndIdx = c.message.indexOf("\n");
+        if (firstMsgLineEndIdx == -1) firstMsgLineEndIdx = c.message.length;
+        const firstMsgLine = c.message.slice(0, firstMsgLineEndIdx);
+        return { hash: c.short_id, message: firstMsgLine };
+      });
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  }
+
+  // loads all files in docs
   async function getFiles(branch, commit) {
+    const allFiles = [];
     let page = 1;
-    let files = [];
-
-    // Branches are returned by pages, so we loop through all pages
     while (true) {
       try {
         const response = await fetch(
-          `${apiUrl}/projects/${projectPath}/repository/tree?path=${docsRoot}&recursive=true&ref=${commit.hash}&page=${page}&per_page=50`,
+          `${config.apiUrl}/projects/${config.projectPath}/repository/tree?path=${encodeURIComponent(config.git.docsRoot)}&recursive=true&ref=${commit.hash}&page=${page}&per_page=100`,
         );
         if (!response.ok) {
           break;
         }
-        const pageFiles = await response.json();
-        if (pageFiles.length == 0) {
+        const files = await response.json();
+        if (files.length == 0) {
           break;
         }
-        files.push(...pageFiles);
+
+        allFiles.push(...files);
         page++;
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
         break;
       }
     }
 
-    const result = files.filter((f) => f.type == "blob" && f.name.endsWith(".md")).map((f) => f.path);
+    const result = allFiles.filter((f) => f.type == "blob" && f.name.endsWith(".md")).map((f) => f.path);
     // ensure the current page is the top file
-    const currentPageIdx = result.indexOf(filePath);
-    [result[0], result[currentPageIdx]] = [result[currentPageIdx], result[0]];
+    const currentPageIdx = result.indexOf(config.filePath);
+    if (currentPageIdx != -1) {
+      [result[0], result[currentPageIdx]] = [result[currentPageIdx], result[0]];
+    }
     return result;
   }
 
   async function getText(branch, commit, file) {
     try {
-      const response = await fetch(`${apiUrl}/projects/${projectPath}/repository/files/${encodeURIComponent(file)}/raw?ref=${commit.hash}`);
+      const response = await fetch(
+        `${config.apiUrl}/projects/${config.projectPath}/repository/files/${encodeURIComponent(file)}/raw?ref=${commit.hash}`,
+      );
       if (!response.ok) {
         return "";
       }
@@ -243,12 +292,11 @@
       return "";
     }
   }
-  window.getText = getText;
 
   async function commitChanges() {
     const csrf = await getGitlabCsrf();
 
-    await fetch(`${apiUrl}/projects/${projectPath}/repository/commits`, {
+    await fetch(`${config.apiUrl}/projects/${config.projectPath}/repository/commits`, {
       method: "POST",
       headers: { "X-CSRF-TOKEN": csrf, "Content-Type": "application/json" },
       body: JSON.stringify({
