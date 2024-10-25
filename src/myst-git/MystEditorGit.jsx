@@ -4,22 +4,49 @@ import { useEffect, useRef } from "preact/hooks";
 import { batch, useComputed, useSignal, useSignalEffect } from "@preact/signals";
 import { createMystState, MystState } from "../mystState";
 import styled, { StyleSheetManager } from "styled-components";
+import Select from "./Select";
 
 const MystContainer = styled.div`
   display: grid;
   grid-template-columns: 300px 1fr;
+  grid-template-rows: 100%;
   height: 100%;
+  font-family: "Lato";
+`;
+
+const GitSidebar = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 25px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 24px;
+  overscroll-behavior: contain;
+
+  label {
+    display: block;
+    color: white;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 14px;
+  }
 `;
 
 const MystEditorGit = ({
   repo = "repo",
-  branches = ["main"],
+  initialBranches = ["main"],
+  getBranches = async () => [],
+  searchBranches = async () => [],
   getCommits = async () => [],
+  searchCommits = async () => [],
   getFiles = async () => [],
   getText = async () => "",
   ...props
 }) => {
-  const branch = useSignal(branches[0]);
+  const branches = useSignal(initialBranches);
+  const branch = useSignal(initialBranches[0]);
   const commits = useSignal([]);
   const commit = useSignal();
   const files = useSignal([]);
@@ -42,8 +69,11 @@ const MystEditorGit = ({
     mystState.current.options.collaboration.value = { ...collaboration, room: room.value };
   });
 
-  async function switchBranch(newBranch) {
-    const resolvedCommits = await getCommits(newBranch);
+  async function switchBranch(newBranch, isNew = false) {
+    if (isNew) {
+      branches.value = [newBranch, ...branches.value];
+    }
+    const resolvedCommits = await getCommits(newBranch, 1);
     const resolvedFiles = await getFiles(newBranch, resolvedCommits[0]);
     const currentFile = file.peek();
     const resolvedFile = resolvedFiles.includes(currentFile) ? currentFile : resolvedFiles[0];
@@ -58,12 +88,20 @@ const MystEditorGit = ({
     });
   }
 
+  async function loadBranches(page) {
+    const moreBranches = await getBranches(page);
+    branches.value = [...branches.value, ...moreBranches];
+  }
+
   // Since we need to make some async calls, we cannot just pass initial values to signals
   useEffect(() => {
-    switchBranch(branches[0]);
-  }, [branches]);
+    switchBranch(initialBranches[0]);
+  }, [initialBranches]);
 
-  async function switchCommit(newCommit) {
+  async function switchCommit(newCommit, isNew = false) {
+    if (isNew) {
+      commits.value = [newCommit, ...commits.value];
+    }
     const newCommitFromList = commits.peek().find((c) => c.hash == newCommit.hash);
     const resolvedFiles = await getFiles(branch.peek(), newCommitFromList);
     const currentFile = file.peek();
@@ -77,6 +115,11 @@ const MystEditorGit = ({
     });
   }
 
+  async function loadCommits(page) {
+    const moreCommits = await getCommits(branch.value, page);
+    commits.value = [...commits.value, ...moreCommits];
+  }
+
   async function switchFile(newFile) {
     const text = await getText(branch.peek(), commit.peek(), newFile);
     batch(() => {
@@ -85,44 +128,52 @@ const MystEditorGit = ({
     });
   }
 
+  const branchToSelectOpt = (b) => ({ label: b, value: b });
+  const commitToSelectOpt = (c) => ({ label: c.message, value: c.hash });
+  const fileToSelectOpt = (f) => ({ label: f, value: f });
+
   return (
-    <StyleSheetManager target={props.parent}>
-      <MystContainer>
-        <div>
-          <label>
-            Branch:
-            <select value={branch.name} onChange={(e) => switchBranch(e.target.value)}>
-              {branches.map((b) => (
-                <option value={b} key={b}>
-                  {b}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Commit:
-            <select value="{commit.value?.name}" onChange={(e) => switchCommit({ hash: e.target.value })}>
-              {commits.value.map((c) => (
-                <option value={c.hash} key={c}>
-                  {c.message}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            File:
-            <select value={file.value?.name} onChange={(e) => switchFile(e.target.value)}>
-              {files.value.map((f) => (
-                <option value={f} key={f}>
-                  {f}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <MystState.Provider value={mystState.current}>{room.value && <MystEditorPreact />}</MystState.Provider>
-      </MystContainer>
-    </StyleSheetManager>
+    <div style="all: initial;">
+      <StyleSheetManager target={props.parent}>
+        <MystContainer>
+          <GitSidebar>
+            <div>
+              <label>Branch:</label>
+              <Select
+                options={branches.value.map(branchToSelectOpt)}
+                inputPlaceholder="Search branches"
+                onChange={(o, isNew) => switchBranch(o.value, isNew)}
+                initialValue={branch.value}
+                loadMore={loadBranches}
+                searchOptions={(input) => searchBranches(input).then((branches) => branches.map(branchToSelectOpt))}
+              />
+            </div>
+            <div>
+              <label>Commit:</label>
+              <Select
+                options={commits.value.map(commitToSelectOpt)}
+                inputPlaceholder="Search commits"
+                onChange={(o, isNew) => switchCommit({ hash: o.value, message: o.label }, isNew)}
+                loadMore={loadCommits}
+                initialValue={commit.value?.hash}
+                searchOptions={(input) => searchCommits(input, branch.value).then((commits) => commits.map(commitToSelectOpt))}
+              />
+            </div>
+            <div>
+              <label>File:</label>
+              <Select
+                options={files.value.map(fileToSelectOpt)}
+                inputPlaceholder="Search files"
+                onChange={(o) => switchFile(o.value)}
+                initialValue={file.value}
+                searchOptions={async (input) => files.value.filter((f) => f.toLowerCase().includes(input.toLowerCase())).map(fileToSelectOpt)}
+              />
+            </div>
+          </GitSidebar>
+          <MystState.Provider value={mystState.current}>{room.value && <MystEditorPreact />}</MystState.Provider>
+        </MystContainer>
+      </StyleSheetManager>
+    </div>
   );
 };
 
