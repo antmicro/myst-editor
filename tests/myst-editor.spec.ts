@@ -22,7 +22,7 @@ test.describe.parallel("With collaboration disabled", () => {
 
   test("Loads initial document", async ({ page }) => {
     const editorContent = await page.evaluate(() => window.myst_editor.text);
-    expect(editorContent).toMatch(/^# h1 is quite big/);
+    expect(editorContent).toMatch(/^# This is MyST Editor/);
     expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
   });
 
@@ -145,7 +145,7 @@ test.describe.parallel("With collaboration enabled", () => {
     const page = await openPageWithOpts(context, collabOpts);
 
     const editorContent = await page.evaluate(() => window.myst_editor.text);
-    expect(editorContent).toMatch(/^# h1 is quite big/);
+    expect(editorContent).toMatch(/^# This is MyST Editor/);
     expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
   });
 
@@ -162,7 +162,7 @@ test.describe.parallel("With collaboration enabled", () => {
     const pageB = await openPageWithOpts(context, collabOpts);
     const editorContent = await pageB.evaluate(() => window.myst_editor.text);
 
-    expect(editorContent).not.toContain("# h1 is quite big");
+    expect(editorContent).not.toContain("# This is MyST Editor");
     expect(editorContent).toContain("Some content");
     expect(editorContent.indexOf("Some content")).toBe(editorContent.lastIndexOf("Some content")); // Assert that content isn't duplicated
   });

@@ -16,9 +16,140 @@
       }
     </style>
     <script type="module">
-      let exampleText = `# h1 is quite big
+      let exampleText = `# This is MyST Editor
 
-## [h2 which is a link](https://google.com)
+A Markdown editor using the [markdown-it parser](https://github.com/markdown-it/markdown-it), based on the [CommonMark specification](https://spec.commonmark.org/0.31.2/).
+We added some extensions so that users can make use of various features of the [MyST Markdown flavor](https://mystmd.org/).
+
+## Admonitions
+
+You can bring more attention to sections of your documents by putting them inside an admonition block. There are many types to choose from.
+
+~~~{note}
+You can find more information on https://mystmd.org/guide/admonitions.
+~~~
+
+~~~{important}
+Notice that the link in the previous admonition is rendered, even without the standard Markdown link syntax.
+~~~
+
+~~~~{tip}
+Admonitions can be nested.
+~~~{note}
+Like so.
+~~~
+~~~~
+
+## Dual Pane sync
+
+- In the default dual pane view mode in MyST Editor, you will notice a blue cursor appear both in the editor and in the preview.
+- The editor is aware of the correspondence between the lines and the respective HTML segments, and will highlight them accordingly.
+- The preview pane will also scroll if needed, so that you can always see where you are typing.
+
+~~~{tip}
+Try clicking something in the preview, the cursor in the editor should jump to the end of the corresponding line.
+~~~
+
+## Images
+
+Apart from the standard Markdown image syntax:
+
+![](https://picsum.photos/400/300)
+
+You can also use:
+- The image directive:
+  ~~~{image} https://picsum.photos/400/300
+  :alt: placeholder
+  :width: 200px
+  ~~~
+
+- The figure directive
+  ~~~{figure} https://picsum.photos/400/300
+  :alt: placeholder
+  :width: 200px
+
+  An example figure.
+  ~~~
+
+## Mermaid diagrams
+
+We have integrated the [Mermaid](https://mermaid.js.org/) diagramming tool with our editor, enabling you to add various diagrams and flowcharts to your documents.
+An overview of the Mermaid syntax is available [here](https://mermaid.js.org/intro/).
+
+### Graphs
+
+~~~mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+~~~
+
+### Sequence diagrams
+
+~~~mermaid
+sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>John: Hello John, how are you?
+    loop HealthCheck
+        John->>John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts <br/>prevail!
+    John-->>Alice: Great!
+    John->>Bob: How about you?
+    Bob-->>John: Jolly good!
+~~~
+
+### Git graphs
+
+~~~mermaid
+gitGraph
+   commit
+   commit
+   branch develop
+   commit
+   commit
+   commit
+   checkout main
+   commit
+   commit
+~~~
+
+## Copy document, print to PDF, templates
+
+In the top left you will find some useful buttons that can be customized when integrating the editor with a website.
+Some of the buttons include:
+- \`Copy document as HTML\`
+- \`Print document as PDF\`
+- \`Templates\` - allows you to apply various document templates, depends on the configuration of the  MyST Editor
+
+## View modes
+
+In the top right corner you will find various view modes, including the source mode, preview mode, dual pane mode and the text diff mode, allowing you to see what changes were made.
+
+## Custom transforms
+
+The editor allows you to easily extend the standard Markdown syntax without having to write your own \`markdown-it\` plugins using the custom transforms feature.
+You can specify a regular expression and what the output should look like, e.g.:
+
+~~~js
+{
+  // Same repo issue links
+  target: /(^|(?<=s))#d+/g,
+  transform: (match) => {
+    const issueId = match.slice(1);
+    return \`<a href="https://github.com/antmicro/myst-editor/issues/\${issueId}">\${match}</a>\`;
+  },
+}
+~~~
+
+~~~{tip}
+The \`transform\` function can also be async. These async transforms will be cached, so that the editor doesn't make too many calls.
+~~~
+
+Examples of transforms included in the demo:
 
 Issue in this repo: #1
 PR in this repo: !2
@@ -26,90 +157,15 @@ Issue in another repo: github/docs#30828
 PR in another repo: github/docs!100
 Person/org handle: @antmicro
 
-### h3
+## Collaboration
 
-#### h4
-
-##### h5
-
-###### h6 is the size of the regular font
-
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore
-
-Veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-
-  * Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed [do eiusmod tempor incididunt](site.com) ut labore et dolore magna aliqua
-  * Consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt
-    * Nam libero tempore, cum soluta \`nobis est eligendi\` optio cumque nihil impedit quo minus id quod maxime
-    * Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores tempor incididunt ut \`labore et dolore\` magna aliqua
-      * Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
-        Eos qui ratione voluptatem sequi nesciunt
-    * Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
-  * Lorem Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores
-
-Unhandled role: {unknown}\`content\` in paragraph.
-
-Raw role: {raw}\`content\`
-
-Unhandled directive:
-
-\`\`\`{unknown} argument
-content
-\`\`\`
-
-Erroneous directive:
-
-\`\`\`{admonition}
-\`\`\`
-
-Admonition with title
-
-\`\`\`{admonition} A **Title**
-Some *content*
-\`\`\`
-
-Nested admonitions:
-
-\`\`\`\`{note} This is a note
-\`\`\`{warning} This is a nested warning
-\`\`\`
-\`\`\`\`
-
-Images and figures:
-
-\`\`\`{image} https://via.placeholder.com/150
-:align: center
-\`\`\`
-
-\`\`\`{figure} https://via.placeholder.com/150
-:align: center
-:name: placeholder
-
-A **caption**
-\`\`\`
-
-The placeholder figure is {numref}\`Figure %s <placeholder>\`.
-The \`ref\` link is: {ref}\`placeholder\`.
-We can also see {eq}\`math_label\` which is below!
-
-Tables:
-
-\`\`\`{list-table} Caption *text*
-:header-rows: 1
-
-- * Heading, Column 1
-  * Heading, Column 2
-- * Row, Column 1
-  * Row, Column 2
-
-    Second paragraph
-\`\`\`
-
-HTML:
-
-* H{sub}\`2\`O
-* 4{sup}\`th\` of July
-* {abbr}\`CSS (Cascading Style Sheets)`;
+Collaborative features are not available in this demo, you will need to run the collaborative server to use them.
+These features include:
+- real-time editing with other people
+- seeing remote cursors
+- comments - add some text that does not show up in the preview
+  - resolved comments - a new view to see comments that were resolved
+  - suggestions - non-destructively suggest changes to the document`;
       console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
 
       import MystEditor, { defaultButtons } from "./MystEditor.jsx";

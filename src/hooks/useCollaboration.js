@@ -36,7 +36,7 @@ export default function useCollaboration(settings, parent) {
     const defaultError = console.error;
     const isFromYjs = (err) => err?.includes("Caught error while handling a Yjs update");
     console.error = (...err) => {
-      if (isFromYjs(err[0])) setError("Collaboration error occured. Please check browser logs and restart the MyST Editor");
+      if (isFromYjs(err[0])) setError("Collaboration error occured. Please check browser logs and restart MyST Editor");
       defaultError(...err);
     };
   }, []);
