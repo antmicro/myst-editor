@@ -5,6 +5,7 @@ import { batch, useComputed, useSignal, useSignalEffect } from "@preact/signals"
 import { createMystState, MystState } from "../mystState";
 import styled, { StyleSheetManager } from "styled-components";
 import Select from "./Select";
+import * as Y from "yjs";
 
 const MystContainer = styled.div`
   display: grid;
@@ -34,6 +35,54 @@ const GitSidebar = styled.div`
   }
 `;
 
+const ChangeHistory = styled.div`
+  color: white;
+  font-size: 12px;
+  width: 100%;
+
+  p:first-child {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .history-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  button {
+    cursor: pointer;
+    background: white;
+    border: none;
+    font-family: "Lato";
+    font-weight: 600;
+    display: flex;
+    text-align: left;
+    padding: 0.25rem;
+    border-radius: var(--border-radius);
+    flex-direction: column;
+    gap: 0.5rem;
+
+    &:hover {
+      background: var(--icon-selected);
+    }
+
+    .hash,
+    .date {
+      font-weight: normal;
+    }
+
+    .commit-msg {
+      display: block;
+    }
+  }
+`;
+
 const MystEditorGit = ({
   repo = "repo",
   initialBranches = ["main"],
@@ -43,6 +92,8 @@ const MystEditorGit = ({
   searchCommits = async () => [],
   getFiles = async () => [],
   getText = async () => "",
+  initialHistory = [],
+  storeHistory = () => {},
   ...props
 }) => {
   const branches = useSignal(initialBranches);
@@ -54,6 +105,7 @@ const MystEditorGit = ({
   const initialText = useSignal("");
   const room = useComputed(() => (commit.value && file.value ? `${repo}/${commit.value.hash}/${encodeURIComponent(file.value)}` : ""));
   const mystState = useRef(createMystState({ ...props }));
+  const changeHistory = useSignal(initialHistory);
 
   useEffect(() => {
     window.myst_editor[props.id].state = mystState.current;
@@ -132,6 +184,40 @@ const MystEditorGit = ({
   const commitToSelectOpt = (c) => ({ label: c.message, value: c.hash });
   const fileToSelectOpt = (f) => ({ label: f, value: f });
 
+  useSignalEffect(() => {
+    const doc = mystState.current.collab.ydoc.value;
+    if (!doc) return;
+
+    const handleChange = (/** @type {Y.Transaction} */ tr) => {
+      if (tr.local && tr.origin) {
+        const old = changeHistory.peek().filter((ch) => ch.room != room.peek());
+        changeHistory.value = [{ branch: branch.peek(), commit: commit.peek(), file: file.peek(), room: room.peek(), timestamp: Date.now() }, ...old];
+        storeHistory(changeHistory.peek());
+        doc.off("afterTransaction", handleChange);
+      }
+    };
+    doc.on("afterTransaction", handleChange);
+
+    return () => doc.off("afterTransaction", handleChange);
+  });
+
+  const gotoChangeFromHistory = (histEntry) => {
+    batch(() => {
+      if (!branches.value.includes(histEntry.branch)) {
+        branches.value = [histEntry.branch, ...branches.value];
+      }
+      branch.value = histEntry.branch;
+
+      if (!commits.value.find((c) => c.hash == histEntry.commit.hash)) {
+        commits.value = [histEntry.commit, ...commits.value];
+      }
+      commit.value = histEntry.commit;
+
+      file.value = histEntry.file;
+      initialText.value = "";
+    });
+  };
+
   return (
     <div style="all: initial;">
       <StyleSheetManager target={props.parent}>
@@ -169,6 +255,25 @@ const MystEditorGit = ({
                 searchOptions={async (input) => files.value.filter((f) => f.toLowerCase().includes(input.toLowerCase())).map(fileToSelectOpt)}
               />
             </div>
+            <ChangeHistory>
+              <p>History:</p>
+              {changeHistory.value.length == 0 ? (
+                <p>When you make any changes, you will be able to go back to them later from this panel.</p>
+              ) : (
+                <div className="history-wrapper">
+                  {changeHistory.value.map((ch) => (
+                    <button key={ch.timestamp} onClick={() => gotoChangeFromHistory(ch)}>
+                      <div className="date">{new Date(ch.timestamp).toLocaleString()}</div>
+                      <div>{ch.branch}</div>
+                      <div>
+                        <span className="hash">{ch.commit.hash}</span> <span className="commit-msg">{ch.commit.message}</span>
+                      </div>
+                      <div>{ch.file}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </ChangeHistory>
           </GitSidebar>
           <MystState.Provider value={mystState.current}>{room.value && <MystEditorPreact />}</MystState.Provider>
         </MystContainer>

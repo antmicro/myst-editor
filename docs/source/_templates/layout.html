@@ -96,6 +96,11 @@
         font-size: 14px !important;
       }
     `);
+    let changeHistory = localStorage.getItem(`myst/${config.repoName}/history`);
+    changeHistory = changeHistory ? JSON.parse(changeHistory) : [];
+    const storeHistory = (history) => {
+      localStorage.setItem(`myst/${config.repoName}/history`, JSON.stringify(history));
+    };
 
     MystEditorGit(
       {
@@ -108,6 +113,8 @@
         getFiles,
         getText,
         additionalStyles: styles,
+        storeHistory,
+        initialHistory: changeHistory,
         collaboration: {
           enabled: true,
           commentsEnabled: true,

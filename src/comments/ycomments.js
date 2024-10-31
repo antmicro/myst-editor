@@ -126,11 +126,14 @@ export class CommentPositionManager {
       }));
     });
     this.ycomments = ycomments;
+    this.ydoc = ydoc;
   }
 
   move(commentId, targetLine, syncSuggestions = true) {
     if (targetLine > 0 && !this.isOccupied(targetLine)) {
-      this.syncedPositions.set(commentId, targetLine);
+      this.ydoc.transact(() => {
+        this.syncedPositions.set(commentId, targetLine);
+      }, "comments");
     }
     if (syncSuggestions) {
       this.ycomments.syncSuggestions(commentId);
@@ -146,11 +149,11 @@ export class CommentPositionManager {
   }
 
   set(commentId, lineNumber) {
-    return this.syncedPositions.set(commentId, lineNumber);
+    this.ydoc.transact(() => this.syncedPositions.set(commentId, lineNumber), "comments");
   }
 
   del(commentId) {
-    this.syncedPositions.delete(commentId);
+    this.ydoc.transact(() => this.syncedPositions.delete(commentId), "comments");
   }
 }
 
@@ -190,6 +193,7 @@ export class ResolvedComments {
   constructor(provider, /** @type {Y.Doc} */ ydoc) {
     this.user = provider.awareness.getLocalState().user;
     this.resolvedComments = ydoc.getMap("resolved-comments");
+    this.ydoc = ydoc;
   }
 
   resolve(commentId, resolvedLine, lineNumber, pos) {
@@ -197,7 +201,7 @@ export class ResolvedComments {
   }
 
   delete(commentId) {
-    this.resolvedComments.delete(commentId);
+    this.ydoc.transact(() => this.resolvedComments.delete(commentId), "comments");
   }
 
   resolved() {
