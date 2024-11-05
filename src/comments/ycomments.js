@@ -7,6 +7,7 @@ import { MapMode, Transaction } from "@codemirror/state";
 import { modifyHighlight, parseCommentLine, suggestionCompartment } from "../extensions/suggestions";
 import { foldEffect, foldedRanges } from "@codemirror/language";
 import { folded } from "../extensions";
+import { computed, Signal, signal } from "@preact/signals";
 
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
@@ -114,20 +115,21 @@ export class CommentPositionManager {
   /** @param {Y.Doc} ydoc */
   constructor(ydoc, ycomments) {
     /** @type {Y.Map<string>} A map from line numbers to comment ids */
-    this.commentPositions = ydoc.getMap(YComments.dataPath);
+    this.syncedPositions = ydoc.getMap(YComments.dataPath);
+    /** @type {Signal<{commentId: string, lineNumber: number}[]>} */
+    this.positions = signal([]);
+    this.syncedPositions.observe(() => {
+      this.positions.value = [...this.syncedPositions.entries()].map(([commentId, lineNumber]) => ({
+        commentId,
+        lineNumber: parseInt(lineNumber),
+      }));
+    });
     this.ycomments = ycomments;
-  }
-
-  iter() {
-    return [...this.commentPositions.entries()].map(([commentId, lineNumber]) => ({
-      commentId,
-      lineNumber: parseInt(lineNumber),
-    }));
   }
 
   move(commentId, targetLine, syncSuggestions = true) {
     if (targetLine > 0 && !this.isOccupied(targetLine)) {
-      this.commentPositions.set(commentId, targetLine);
+      this.syncedPositions.set(commentId, targetLine);
     }
     if (syncSuggestions) {
       this.ycomments.syncSuggestions(commentId);
@@ -136,12 +138,10 @@ export class CommentPositionManager {
 
   shift(startLine, diff, maxLine, endOfLine) {
     if (diff < 0) {
-      this.iter()
-        .filter((c) => startLine + diff < c.lineNumber && c.lineNumber <= startLine)
-        .forEach((c) => this.del(c.commentId));
+      this.positions.value.filter((c) => startLine + diff < c.lineNumber && c.lineNumber <= startLine).forEach((c) => this.del(c.commentId));
     }
 
-    const filteredComments = this.iter()
+    const filteredComments = this.positions.value
       .filter((c) => (endOfLine ? c.lineNumber > startLine : c.lineNumber >= startLine))
       .filter((c) => c.lineNumber + diff <= maxLine);
     filteredComments.forEach((c) => this.move(c.commentId, c.lineNumber + diff, false));
@@ -149,19 +149,19 @@ export class CommentPositionManager {
   }
 
   isOccupied(lineNumber) {
-    return this.iter().some((c) => c.lineNumber == lineNumber);
+    return this.positions.value.some((c) => c.lineNumber == lineNumber);
   }
 
   get(commentId) {
-    return this.commentPositions.get(commentId);
+    return this.syncedPositions.get(commentId);
   }
 
   set(commentId, lineNumber) {
-    return this.commentPositions.set(commentId, lineNumber);
+    return this.syncedPositions.set(commentId, lineNumber);
   }
 
   del(commentId) {
-    this.commentPositions.delete(commentId);
+    this.syncedPositions.delete(commentId);
   }
 }
 
@@ -171,69 +171,29 @@ export class CommentPositionManager {
  *  method is provided, which allows modifying a component when `DisplayManager`'s state changes. */
 export class DisplayManager {
   constructor() {
-    this.comments = {};
-    this._onUpdate = () => {};
-  }
-
-  onUpdate(f) {
-    this._onUpdate = f;
+    this.comments = signal({});
   }
 
   switchVisibility(commentId) {
-    const state = this.isShown(commentId);
-    const newState = !state;
-    this.setVisibility(commentId, newState);
-    return newState;
+    const shown = this.isShown(commentId);
+    this.updateComment(commentId, { isShown: !shown });
   }
 
-  setVisibility(commentId, state) {
-    this.update((comments) => {
-      if (!comments[commentId]) comments[commentId] = {};
-      comments[commentId].isShown = state;
-      return comments;
-    });
-  }
-
-  setHeight(commentId, height) {
-    this.update((ci) => {
-      ci[commentId] ||= {};
-      ci[commentId].height = height;
-      return ci;
-    });
-  }
-
-  offset(commentId) {
-    return this.comments[commentId].top;
+  updateComment(id, fields) {
+    this.comments.value = { ...this.comments.value, [id]: { ...this.comments.value[id], ...fields } };
   }
 
   isShown(commentId) {
-    if (this.comments[commentId]) {
-      return this.comments[commentId].isShown && this.comments[commentId].top;
-    }
-    return true;
+    return this.comments.value[commentId]?.isShown && this.comments.value[commentId]?.top;
   }
 
   del(commentId) {
-    this.update((comments) => {
-      delete comments[commentId];
-      return comments;
-    });
+    const { [commentId]: _, ...comments } = this.comments.value;
+    this.comments.value = comments;
   }
 
   new(commentId) {
-    this.update((comments) => {
-      comments[commentId] = { height: 18, isShown: false };
-      return comments;
-    });
-  }
-
-  update(f) {
-    if (f) this.comments = f(this.comments);
-    this._onUpdate();
-  }
-
-  show(commentId) {
-    this.setVisibility(commentId, true);
+    this.comments.value = { ...this.comments.value, [commentId]: { height: 18, isShown: false } };
   }
 }
 
@@ -285,8 +245,15 @@ export class YComments {
     this.positionManager = new CommentPositionManager(ydoc, this);
     this.displayManager = new DisplayManager(provider);
     this.commentResolver = new ResolvedComments(provider, ydoc);
-    this.draggedComment = null;
-    this.commentWithPopup = null;
+    this.draggedComment = signal(null);
+    this.commentWithPopup = signal(null);
+    this.comments = computed(() =>
+      this.positions().positions.value.map(({ commentId, lineNumber }) => ({
+        ...this.display().comments.value[commentId],
+        lineNumber,
+        commentId,
+      })),
+    );
 
     /** commentId -> (EditorView) => void - here a listener can be added to wait for an editor for a comment to become available */
     this.commentEditorsListeners = new Map();
@@ -303,7 +270,7 @@ export class YComments {
       });
     });
 
-    this.positionManager.commentPositions.observeDeep(() => this.updateMainCodeMirror());
+    this.positionManager.syncedPositions.observeDeep(() => this.updateMainCodeMirror());
   }
 
   lineAuthors(commentId) {
@@ -374,9 +341,7 @@ export class YComments {
   }
 
   findCommentOn(lineNumber) {
-    return this.positions()
-      .iter()
-      .find((c) => c.lineNumber == lineNumber);
+    return this.positions().positions.value.find((c) => c.lineNumber == lineNumber);
   }
 
   parentLineHeight(commentId) {
@@ -388,53 +353,40 @@ export class YComments {
   }
 
   updateHeight(commentId, height) {
-    this.display().setHeight(commentId, height);
+    this.display().updateComment(commentId, { height });
     this.updateMainCodeMirror();
   }
 
   /** Look for comment boxes in the main `CodeMirror` instance */
   syncCommentLocations(update) {
-    this.display().update(
-      // sync comments locations
-      (comments) => {
-        update.view.dom.querySelectorAll(".comment-box").forEach((box) => {
-          comments[box.id] ||= {};
-          comments[box.id].top = box.offsetTop;
-        });
-        return comments;
-      },
-    );
+    update.view.dom.querySelectorAll(".comment-box").forEach((box) => {
+      this.display().updateComment(box.id, { top: box.offsetTop });
+    });
   }
 
   /** Fetch comments which are in Y.js state but not in Preact */
   syncRemoteComments() {
-    this.display().update((comments) => {
-      this.positions()
-        .iter()
-        .filter((c) => !comments[c.commentId] || comments[c.commentId].isShown == undefined)
-        .forEach((c) => {
-          comments[c.commentId] = { isShown: true, height: 17 };
-          this.updateMainCodeMirror();
-        });
-      return comments;
-    });
+    this.positions()
+      .positions.value.filter(
+        (c) => !(c.commentId in this.display().comments.value) || this.display().comments.value[c.commentId].isShown == undefined,
+      )
+      .forEach((c) => {
+        this.display().new(c.commentId);
+        this.display().updateComment(c.commentId, { isShown: true });
+        this.updateMainCodeMirror();
+      });
   }
 
   /** Remove comments which are in Preact state but not in Y.js */
   removeLocalComments() {
-    let remoteComments = this.positions()
-      .iter()
-      .map((c) => c.commentId);
+    let remoteComments = this.positions().positions.value.map((c) => c.commentId);
 
-    this.display().update((comments) => {
-      for (let commentId in comments) {
-        if (!remoteComments.includes(commentId)) {
-          delete comments[commentId];
-          this.suggestions.set(commentId, []);
-        }
+    for (let commentId in this.display().comments.value) {
+      if (!remoteComments.includes(commentId)) {
+        this.display().del(commentId);
+        this.suggestions.set(commentId, []);
       }
-      return comments;
-    });
+    }
   }
 
   syncFoldedComments(update) {
@@ -454,12 +406,11 @@ export class YComments {
     }
 
     this.positions()
-      .iter()
-      .filter(
+      .positions.value.filter(
         ({ lineNumber }) => lineNumber >= fromLine && lineNumber <= toLine && !ranges.some((r) => lineNumber >= r.fromLine && lineNumber <= r.toLine),
       )
       .forEach(({ commentId }) => {
-        this.display().setVisibility(commentId, !isFold);
+        this.display().updateComment(commentId, { isShown: !isFold });
       });
     this.updateMainCodeMirror();
   }
@@ -477,21 +428,11 @@ export class YComments {
     this.syncResolvedComments(update);
   }
 
-  iterComments() {
-    const addPreactState = ({ lineNumber, commentId }) => ({
-      ...this.displayManager.comments[commentId],
-      lineNumber,
-      commentId,
-    });
-    return this.positions().iter().map(addPreactState);
-  }
-
   /** If multiple ids are passed, they are updated in one yjs transaction */
   syncSuggestions(...commentIds) {
     let suggestions = {};
     for (const commentId of commentIds) {
       const text = this.getTextForComment(commentId).toString();
-      const docLineNumber = parseInt(this.positions().get(commentId));
       const authors = this.lineAuthors(commentId);
       const lines = text.split("\n").map((text, i) => ({
         text,
@@ -571,13 +512,13 @@ export class YComments {
       this.lineAuthors(newId).appendFrom(authors.lineAuthors);
       const newText = this.getTextForComment(newId);
       newText.insert(0, oldText.toString());
-      this.display().setVisibility(newId, true);
+      this.display().updateComment(newId, { isShown: true });
     } else {
       const id = this.findCommentOn(lineNumber).commentId;
       this.lineAuthors(id).appendFrom(authors.lineAuthors);
       const text = this.getTextForComment(id);
       text.insert(text.length, "\n" + oldText.toString());
-      this.display().setVisibility(id, true);
+      this.display().updateComment(id, { isShown: true });
     }
   }
 
@@ -590,7 +531,7 @@ export class YComments {
       const text = this.getTextForComment(id);
       text.insert(text.length, "\n" + this.getTextForComment(commentId).toString());
       this.deleteComment(commentId);
-      this.display().setVisibility(id, true);
+      this.display().updateComment(id, { isShown: true });
     }
   }
 

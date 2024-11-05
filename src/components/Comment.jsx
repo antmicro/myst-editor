@@ -120,39 +120,32 @@ const YComment = ({ ycomments, commentId, collaboration }) => {
     };
   }, [cmref]);
 
-  const popupIcon = useRef(null);
-  useEffect(() => {
-    if (!popupIcon.current) return;
-
-    popupIcon.current.onmouseup = () => {
-      ycomments.display().switchVisibility(commentId);
-      ycomments.updateMainCodeMirror();
-    };
-
-    popupIcon.current.ondragstart = () => {
-      ycomments.draggedComment = commentId;
-      ycomments.display().update();
-    };
-
-    popupIcon.current.ondragend = () => {
-      ycomments.draggedComment = null;
-      ycomments.display().update();
-    };
-  }, [popupIcon.current, ycomments.commentWithPopup]);
-
   return (
-    <YCommentWrapper left={ycomments.marginLeft()} top={ycomments.display().offset(commentId)} fade={ycomments.draggedComment == commentId}>
+    <YCommentWrapper
+      left={ycomments.marginLeft()}
+      top={ycomments.display().comments.value[commentId]?.top}
+      fade={ycomments.draggedComment.value == commentId}
+    >
       <div class="comment-wrapper" style="position:relative">
-        {ycomments.commentWithPopup == commentId && (
+        {ycomments.commentWithPopup.value == commentId && (
           <YCommentPopup
             left={ycomments.marginLeft()}
             shift={parentHeight}
             onMouseLeave={() => {
-              ycomments.commentWithPopup = null;
+              ycomments.commentWithPopup.value = null;
               ycomments.updateMainCodeMirror();
             }}
           >
-            <img class="comment-icon" ref={popupIcon} src={commentIcon} />
+            <img
+              class="comment-icon"
+              src={commentIcon}
+              onMouseUp={() => {
+                ycomments.display().switchVisibility(commentId);
+                ycomments.updateMainCodeMirror();
+              }}
+              onDragStart={() => (ycomments.draggedComment.value = commentId)}
+              onDragEnd={() => (ycomments.draggedComment.value = null)}
+            />
 
             <svg width="3" height="22" viewBox="0 10 2 19" fill="none">
               <path d="M1 1V25" stroke="#DDDDDD" stroke-width="0.75" stroke-linecap="round" />
@@ -245,8 +238,5 @@ const PopupButton = ({ icon, onClick, text, bgOnHover }) => {
 
 /** @param {{ ycomments: YComments }} */
 export const YCommentsParent = ({ ycomments, collaboration }) => {
-  const [comments, setComments] = useState(ycomments.iterComments());
-  useEffect(() => ycomments.display().onUpdate(() => setComments(ycomments.iterComments())), [ycomments]);
-
-  return comments.map(({ commentId }) => <YComment key={commentId} {...{ commentId, ycomments, collaboration }} />);
+  return ycomments.comments.value.map(({ commentId }) => <YComment key={commentId} {...{ commentId, ycomments, collaboration }} />);
 };

@@ -279,7 +279,7 @@ const CodeMirror = ({ text, id, root, mode, spellcheckOpts, highlights, collabor
 
   return (
     <CodeEditor className="myst-main-editor" ref={editorMountpoint} $mode={mode} id={`${id}-editor`}>
-      {collaboration.opts.commentsEnabled && !collaboration.error && (
+      {collaboration.opts.commentsEnabled && !collaboration.error && collaboration.ycomments.mainCodeMirror && (
         <YCommentsParent ycomments={collaboration.ycomments} collaboration={collaboration.opts} />
       )}
       {collaboration.opts.commentsEnabled && (

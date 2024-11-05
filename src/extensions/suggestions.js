@@ -158,7 +158,7 @@ export function suggestionPopup(/** @type {ViewUpdate} */ update, /** @type {YCo
       authors.mark(authors.lineAuthors.length);
     }, ycomments.provider.awareness.clientID);
 
-    ycomments.display().setVisibility(id, true);
+    ycomments.display().updateComment(id, { isShown: true });
     ycomments.updateMainCodeMirror();
 
     /** @type {EditorView} */

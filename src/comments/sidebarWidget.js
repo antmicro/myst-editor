@@ -33,7 +33,7 @@ class CommentMarker extends GutterMarker {
 
     if (this.lineNumber) {
       this.gutterMarker.style.width = this.lineNumber.toString().length * 7 + "px";
-      this.gutterMarker.ondrop = () => this.ycomments.moveOrMerge(this.ycomments.draggedComment, this.lineNumber);
+      this.gutterMarker.ondrop = () => this.ycomments.moveOrMerge(this.ycomments.draggedComment.value, this.lineNumber);
       this.gutterMarker.ondragover = (e) => e.preventDefault();
     }
   }
@@ -48,7 +48,7 @@ class CommentMarker extends GutterMarker {
     } else {
       this.icon.onclick = () => this.ycomments.display().switchVisibility(this.commentId);
       this.icon.onmouseenter = () => {
-        this.ycomments.commentWithPopup = this.commentId;
+        this.ycomments.commentWithPopup.value = this.commentId;
         this.ycomments.updateMainCodeMirror();
       };
     }

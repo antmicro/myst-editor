@@ -100,8 +100,7 @@ const commentStateEffect = StateField.define({
 
       moveComments(transaction, ycomments);
 
-      return ycomments
-        .iterComments()
+      return ycomments.comments.value
         .sort(sortByLine)
         .reduce(...buildTextareaWidgets(transaction))
         .finish();
