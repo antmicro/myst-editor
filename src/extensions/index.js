@@ -12,6 +12,7 @@ import { suggestionPopup } from "./suggestions";
 import { foldEffect, unfoldEffect, foldable } from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
+import { yaml } from "@codemirror/lang-yaml";
 
 const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
@@ -48,8 +49,21 @@ export class ExtensionBuilder {
     return new ExtensionBuilder(basicSetupWithoutHistory);
   }
 
+  static codeLanguage(name) {
+    if (name == "yaml") {
+      return yaml().language;
+    } else {
+      return null;
+    }
+  }
+
   static defaultPlugins() {
-    return [EditorView.lineWrapping, markdown(), highlightActiveLine(), keymap.of([indentWithTab, { key: "Mod-Z", run: redo }])];
+    return [
+      EditorView.lineWrapping,
+      markdown({ codeLanguages: this.codeLanguage }),
+      highlightActiveLine(),
+      keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
+    ];
   }
 
   disable(keys) {
