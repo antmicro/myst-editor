@@ -136,18 +136,6 @@ export class CommentPositionManager {
     }
   }
 
-  shift(startLine, diff, maxLine, endOfLine) {
-    if (diff < 0) {
-      this.positions.value.filter((c) => startLine + diff < c.lineNumber && c.lineNumber <= startLine).forEach((c) => this.del(c.commentId));
-    }
-
-    const filteredComments = this.positions.value
-      .filter((c) => (endOfLine ? c.lineNumber > startLine : c.lineNumber >= startLine))
-      .filter((c) => c.lineNumber + diff <= maxLine);
-    filteredComments.forEach((c) => this.move(c.commentId, c.lineNumber + diff, false));
-    this.ycomments.syncSuggestions(...filteredComments.map((c) => c.commentId));
-  }
-
   isOccupied(lineNumber) {
     return this.positions.value.some((c) => c.lineNumber == lineNumber);
   }
