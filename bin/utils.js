@@ -100,7 +100,7 @@ class WSSharedDoc extends Y.Doc {
     this.name = name;
     /**
      * Maps from conn to set of controlled user ids. Delete all user ids from awareness when this conn is closed
-     * @type {Map<Object, Set<number>>}
+     * @type {Map<WebSocket, Set<number>>}
      */
     this.conns = new Map();
     /**
@@ -325,6 +325,36 @@ export const setupWSConnection = (conn, req, { docName = req.url.slice(1).split(
       encoding.writeVarUint(encoder, messageAwareness);
       encoding.writeVarUint8Array(encoder, awarenessProtocol.encodeAwarenessUpdate(doc.awareness, Array.from(awarenessStates.keys())));
       send(doc, conn, encoding.toUint8Array(encoder));
+    }
+  }
+};
+
+export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
+  const params = new URLSearchParams(request.url?.split("?")[1]);
+
+  if (!params.get("users")) {
+    return;
+  }
+
+  if (request.url.startsWith("/connections/") && request.method == "PATCH") {
+    const room = request.url?.split("?")[0].replace("/connections/", "");
+    const doc = docs.get(room);
+    if (!doc) return;
+
+    logAsync(doc.name, {
+      event: "remove-connections",
+      msg: `Received a request to drop connections to ${doc.name} with users which are not ${params.get("users")}`,
+    });
+
+    const usersWithAccess = params.get("users").split(",");
+    for (const conn of doc.conns.keys()) {
+      if (!usersWithAccess.includes(conn.__username)) {
+        conn.close();
+        logAsync(doc.name, {
+          event: "remove-connections",
+          msg: `Dropping connection with ${conn.__username}`,
+        });
+      }
     }
   }
 };

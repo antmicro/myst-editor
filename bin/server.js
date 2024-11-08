@@ -6,13 +6,19 @@
 import WebSocket from "ws";
 import http from "http";
 const wss = new WebSocket.Server({ noServer: true });
-import { setupWSConnection } from "./utils.js";
+import { setupWSConnection, handleRequest } from "./utils.js";
 
 const port = process.env.PORT || 4444;
 
 const server = http.createServer((request, response) => {
-  response.writeHead(200, { "Content-Type": "text/plain" });
-  response.end("okay");
+  try {
+    handleRequest(request);
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    response.end("okay");
+  } catch (e) {
+    console.error(e);
+    response.writeHead(500);
+  }
 });
 
 wss.on("connection", setupWSConnection);
