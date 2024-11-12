@@ -8,6 +8,7 @@ import { modifyHighlight, parseCommentLine, suggestionCompartment } from "../ext
 import { foldEffect, foldedRanges } from "@codemirror/language";
 import { folded } from "../extensions";
 import { computed, Signal, signal } from "@preact/signals";
+import { yRemoteAnnotation } from "../extensions/collab";
 
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
@@ -447,11 +448,9 @@ export class YComments {
 
   /** @param {ViewUpdate} update  */
   syncResolvedComments(update) {
-    if (
-      (!update.docChanged || update.startState.doc.lines == update.state.doc.lines) &&
-      !update.transactions.some((t) => t.effects.some((e) => e.is(updateShownComments)))
-    )
-      return;
+    const noLocalChange = !update.docChanged || update.transactions.some((t) => t.annotation(yRemoteAnnotation));
+    const commentUpdate = update.transactions.some((t) => t.effects.some((e) => e.is(updateShownComments)));
+    if (noLocalChange && !commentUpdate) return;
 
     const resolvedComments = this.resolver().resolved();
     for (const comment of resolvedComments) {
