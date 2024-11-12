@@ -13,6 +13,7 @@ import { foldEffect, unfoldEffect, foldable } from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
 import { yaml } from "@codemirror/lang-yaml";
+import { ySync } from "./collab";
 
 const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
 const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
@@ -141,7 +142,9 @@ export class ExtensionBuilder {
   }
 
   useCollaboration({ ytext, provider, undoManager, editorRef }) {
-    this.extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
+    const collab = yCollab(ytext, provider.awareness, { undoManager });
+    collab[1] = ySync;
+    this.extensions.push(collab);
 
     if (undoManager) {
       undoManager.on("stack-item-added", (event) => {
