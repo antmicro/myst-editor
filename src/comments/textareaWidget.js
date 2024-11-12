@@ -67,8 +67,7 @@ const buildTextareaWidgets = (transaction) => [
  * @param {YComments} ycomments
  */
 const moveComments = (transaction, ycomments) => {
-  console.log(transaction);
-  if (transaction.isUserEvent("input") || transaction.isUserEvent("delete")) {
+  if ((transaction.isUserEvent("input") || transaction.isUserEvent("delete")) && transaction.startState.doc.lines != transaction.state.doc.lines) {
     const moved = [];
     ycomments.positions().positions.value.forEach((pos) => {
       const oldPos = transaction.startState.doc.line(pos.lineNumber).from;

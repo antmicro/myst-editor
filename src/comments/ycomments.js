@@ -447,7 +447,11 @@ export class YComments {
 
   /** @param {ViewUpdate} update  */
   syncResolvedComments(update) {
-    if (!update.docChanged && !update.transactions.some((t) => t.effects.some((e) => e.is(updateShownComments)))) return;
+    if (
+      (!update.docChanged || update.startState.doc.lines == update.state.doc.lines) &&
+      !update.transactions.some((t) => t.effects.some((e) => e.is(updateShownComments)))
+    )
+      return;
 
     const resolvedComments = this.resolver().resolved();
     for (const comment of resolvedComments) {
