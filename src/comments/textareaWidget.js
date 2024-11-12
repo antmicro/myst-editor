@@ -1,6 +1,6 @@
 import { EditorView } from "@codemirror/view";
 import { Decoration, WidgetType } from "@codemirror/view";
-import { RangeSetBuilder, RangeSet, StateField, Transaction } from "@codemirror/state";
+import { RangeSetBuilder, RangeSet, StateField, Transaction, MapMode } from "@codemirror/state";
 import { ycommentsFacet, updateShownComments } from "./state";
 import { YComments } from "./ycomments";
 import { yHistoryAnnotation } from "../extensions/collab";
@@ -76,7 +76,12 @@ const moveComments = (transaction, ycomments) => {
     ycomments.positions().positions.value.forEach((pos) => {
       const oldPos = transaction.startState.doc.line(pos.lineNumber).from;
       const newPos = transaction.changes.mapPos(oldPos, 1);
-      if (oldPos != newPos) {
+      const lineDeletedViaSelection = transaction.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
+      const lineDeletedViaBackspace = transaction.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null;
+
+      if (lineDeletedViaSelection || lineDeletedViaBackspace) {
+        ycomments.deleteComment(pos.commentId);
+      } else if (oldPos != newPos) {
         moved.push(pos.commentId);
         ycomments.positions().move(pos.commentId, transaction.state.doc.lineAt(newPos).number, false);
       }
