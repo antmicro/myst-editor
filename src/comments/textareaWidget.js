@@ -3,6 +3,7 @@ import { Decoration, WidgetType } from "@codemirror/view";
 import { RangeSetBuilder, RangeSet, StateField, Transaction } from "@codemirror/state";
 import { ycommentsFacet, updateShownComments } from "./state";
 import { YComments } from "./ycomments";
+import { yHistoryAnnotation } from "../extensions/collab";
 
 /** A placeholder. The role of this element is to reserve enough vertical and horizontal space for real comment.
  * The real comment HTML element is rendered on the top of the textarea, outside the DOM tree of Code Mirror.
@@ -67,7 +68,10 @@ const buildTextareaWidgets = (transaction) => [
  * @param {YComments} ycomments
  */
 const moveComments = (transaction, ycomments) => {
-  if ((transaction.isUserEvent("input") || transaction.isUserEvent("delete")) && transaction.startState.doc.lines != transaction.state.doc.lines) {
+  if (
+    (transaction.isUserEvent("input") || transaction.isUserEvent("delete") || transaction.annotation(yHistoryAnnotation)) &&
+    transaction.startState.doc.lines != transaction.state.doc.lines
+  ) {
     const moved = [];
     ycomments.positions().positions.value.forEach((pos) => {
       const oldPos = transaction.startState.doc.line(pos.lineNumber).from;
