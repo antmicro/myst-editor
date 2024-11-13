@@ -79,7 +79,7 @@ const moveComments = (transaction, ycomments) => {
       const lineDeletedViaSelection = transaction.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
       const lineDeletedViaBackspace = transaction.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null;
 
-      if (lineDeletedViaSelection || lineDeletedViaBackspace) {
+      if (lineDeletedViaSelection || (lineDeletedViaBackspace && !transaction.isUserEvent('delete.cut'))) {
         ycomments.deleteComment(pos.commentId);
       } else if (oldPos != newPos) {
         moved.push(pos.commentId);
