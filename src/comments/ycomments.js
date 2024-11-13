@@ -475,7 +475,14 @@ export class YComments {
       const lineDeletedViaSelection = update.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
       const backspacePressedOnEmptyLine =
         update.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "";
-      if (lineDeletedViaSelection || backspacePressedOnEmptyLine) {
+      let lineCut = false;
+      update.changes.iterChangedRanges((from, to) => {
+        if (from == oldPos) {
+          lineCut = true;
+        }
+      });
+      lineCut = lineCut && update.transactions.some(t => t.isUserEvent('delete.cut'));
+      if (lineDeletedViaSelection || backspacePressedOnEmptyLine || lineCut) {
         this.resolver().updateComment(comment.commentId, { orphaned: true });
         continue;
       }

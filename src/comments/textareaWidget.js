@@ -78,8 +78,15 @@ const moveComments = (transaction, ycomments) => {
       const newPos = transaction.changes.mapPos(oldPos, 1);
       const lineDeletedViaSelection = transaction.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
       const lineDeletedViaBackspace = transaction.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null;
+      let lineCut = false;
+      transaction.changes.iterChangedRanges((from) => {
+        if (from == oldPos) {
+          lineCut = true;
+        }
+      });
+      lineCut = lineCut && transaction.isUserEvent('delete.cut');
 
-      if (lineDeletedViaSelection || (lineDeletedViaBackspace && !transaction.isUserEvent('delete.cut'))) {
+      if (lineDeletedViaSelection || (lineDeletedViaBackspace && (!transaction.isUserEvent('delete.cut'))) || lineCut) {
         ycomments.deleteComment(pos.commentId);
       } else if (oldPos != newPos) {
         moved.push(pos.commentId);
