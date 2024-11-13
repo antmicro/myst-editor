@@ -542,20 +542,22 @@ export class YComments {
     const oldPos = transaction.startState.doc.line(comment.lineNumber).from;
     const newPos = transaction.changes.mapPos(oldPos, 1);
     const lineDeletedViaSelection = transaction.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
-    const lineDeletedViaBackspace = transaction.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null && (!keepNonEmptyLines || transaction.startState.doc.line(comment.lineNumber).text == "");
+    const lineDeletedViaBackspace =
+      transaction.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null &&
+      (!keepNonEmptyLines || transaction.startState.doc.line(comment.lineNumber).text == "");
     let lineCut = false;
     transaction.changes.iterChangedRanges((from) => {
       if (from == oldPos) {
         lineCut = true;
       }
     });
-    lineCut = lineCut && transaction.isUserEvent('delete.cut');
+    lineCut = lineCut && transaction.isUserEvent("delete.cut");
 
     return {
-      deleted: lineDeletedViaSelection || (lineDeletedViaBackspace && (!transaction.isUserEvent('delete.cut'))) || lineCut,
+      deleted: lineDeletedViaSelection || (lineDeletedViaBackspace && !transaction.isUserEvent("delete.cut")) || lineCut,
       oldPos,
       newPos,
-      newLine: transaction.state.doc.lineAt(newPos).number
+      newLine: transaction.state.doc.lineAt(newPos).number,
     };
   }
 }
