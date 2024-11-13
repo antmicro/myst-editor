@@ -74,23 +74,13 @@ const moveComments = (transaction, ycomments) => {
   ) {
     const moved = [];
     ycomments.positions().positions.value.forEach((pos) => {
-      const oldPos = transaction.startState.doc.line(pos.lineNumber).from;
-      const newPos = transaction.changes.mapPos(oldPos, 1);
-      const lineDeletedViaSelection = transaction.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
-      const lineDeletedViaBackspace = transaction.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null;
-      let lineCut = false;
-      transaction.changes.iterChangedRanges((from) => {
-        if (from == oldPos) {
-          lineCut = true;
-        }
-      });
-      lineCut = lineCut && transaction.isUserEvent('delete.cut');
+      const { deleted, oldPos, newPos, newLine } = ycomments.mapThroughChanges(pos, transaction);
 
-      if (lineDeletedViaSelection || (lineDeletedViaBackspace && (!transaction.isUserEvent('delete.cut'))) || lineCut) {
+      if (deleted) {
         ycomments.deleteComment(pos.commentId);
       } else if (oldPos != newPos) {
         moved.push(pos.commentId);
-        ycomments.positions().move(pos.commentId, transaction.state.doc.lineAt(newPos).number, false);
+        ycomments.positions().move(pos.commentId, newLine, false);
       }
     });
     ycomments.syncSuggestions(...moved);

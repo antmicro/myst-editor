@@ -467,31 +467,17 @@ export class YComments {
 
       if (doNotUpdate) continue;
 
-      const oldPos = update.startState.doc.line(comment.lineNumber).from;
-      const newPos = update.changes.mapPos(oldPos, 1);
-      const newLineNumber = update.state.doc.lineAt(newPos).number;
-
-      // check if the resolved line was deleted
-      const lineDeletedViaSelection = update.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
-      const backspacePressedOnEmptyLine =
-        update.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null && update.startState.doc.line(comment.lineNumber).text == "";
-      let lineCut = false;
-      update.changes.iterChangedRanges((from, to) => {
-        if (from == oldPos) {
-          lineCut = true;
-        }
-      });
-      lineCut = lineCut && update.transactions.some(t => t.isUserEvent('delete.cut'));
-      if (lineDeletedViaSelection || backspacePressedOnEmptyLine || lineCut) {
+      const { deleted, newLine } = this.mapThroughChanges(comment, update.transactions[0], true);
+      if (deleted) {
         this.resolver().updateComment(comment.commentId, { orphaned: true });
         continue;
       }
 
-      this.resolver().updateComment(comment.commentId, { occupied: this.positions().isOccupied(newLineNumber) });
+      this.resolver().updateComment(comment.commentId, { occupied: this.positions().isOccupied(newLine) });
 
       if (!comment.orphaned) {
-        this.resolver().updateComment(comment.commentId, { lineNumber: newLineNumber });
-        const text = update.state.doc.line(newLineNumber).text;
+        this.resolver().updateComment(comment.commentId, { lineNumber: newLine });
+        const text = update.state.doc.line(newLine).text;
         this.resolver().updateComment(comment.commentId, { resolvedLine: text });
       }
     }
@@ -550,5 +536,26 @@ export class YComments {
         this.commentEditorsListeners.set(commentId, resolve);
       }
     });
+  }
+
+  mapThroughChanges(comment, transaction, keepNonEmptyLines = false) {
+    const oldPos = transaction.startState.doc.line(comment.lineNumber).from;
+    const newPos = transaction.changes.mapPos(oldPos, 1);
+    const lineDeletedViaSelection = transaction.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
+    const lineDeletedViaBackspace = transaction.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null && (!keepNonEmptyLines || transaction.startState.doc.line(comment.lineNumber).text == "");
+    let lineCut = false;
+    transaction.changes.iterChangedRanges((from) => {
+      if (from == oldPos) {
+        lineCut = true;
+      }
+    });
+    lineCut = lineCut && transaction.isUserEvent('delete.cut');
+
+    return {
+      deleted: lineDeletedViaSelection || (lineDeletedViaBackspace && (!transaction.isUserEvent('delete.cut'))) || lineCut,
+      oldPos,
+      newPos,
+      newLine: transaction.state.doc.lineAt(newPos).number
+    };
   }
 }
