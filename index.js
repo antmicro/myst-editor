@@ -150,10 +150,10 @@ These features include:
   - resolved comments - a new view to see comments that were resolved
   - suggestions - non-destructively suggest changes to the document`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const i = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], o = new URLSearchParams(window.location.search), d = o.get("room") || "0", s = o.get("username") || Math.floor(Math.random() * 1e3).toString(), h = i[Math.floor(Math.random() * i.length)];
+const s = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], o = new URLSearchParams(window.location.search), d = o.get("room") || "0", i = o.get("username") || Math.floor(Math.random() * 1e3).toString(), h = s[Math.floor(Math.random() * s.length)];
 let l = [{
   target: "say",
-  transform: async (e) => s + " says: '" + e + "'"
+  transform: async (e) => i + " says: '" + e + "'"
 }], c = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
@@ -188,17 +188,17 @@ let l = [{
   })))
 }];
 n({
+  id: "demo",
   templatelist: "linkedtemplatelist.json",
   initialText: m,
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
-  id: "textarea_id",
   transforms: c,
   collaboration: {
     enabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
     commentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
     resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
     wsUrl: {}.VITE_WS_URL || o.get("collab_server"),
-    username: s,
+    username: i,
     room: d,
     color: h
   },
