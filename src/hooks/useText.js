@@ -65,7 +65,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   const [text, setText] = useState(initialText);
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
-  const [onSync, setOnSync] = useState({ action: (text) => { } });
+  const [onSync, setOnSync] = useState({ action: (text) => {} });
   const lineMap = useRef(new Map());
   /**
    * Split the document into chunks and re-render only the chunks which were changed
