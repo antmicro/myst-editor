@@ -161,8 +161,8 @@ const MystEditor = ({
   };
 
   const buttonActions = {
-    "copy-html": () => {
-      text.copy();
+    "copy-html": async () => {
+      await text.copy();
       alertFor("copied!", 2);
     },
     fullscreen: () => setFullscreen((f) => !f),

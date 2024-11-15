@@ -35,7 +35,7 @@ const exposeText = (text, editorId) => () => {
   window.myst_editor[editorId].text = text;
 };
 
-const copyHtmlAsRichText = (/** @type {string} */ txt) => {
+const copyHtmlAsRichText = async (/** @type {string} */ txt) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(txt, "text/html");
   doc.querySelectorAll("[data-line-id]").forEach((n) => n.removeAttribute("data-line-id"));
@@ -49,7 +49,7 @@ const copyHtmlAsRichText = (/** @type {string} */ txt) => {
   doc.querySelectorAll("[data-remove]").forEach((n) => n.remove());
   const sanitized = doc.body.innerHTML;
 
-  navigator.clipboard.write([
+  await navigator.clipboard.write([
     new ClipboardItem({
       "text/plain": new Blob([sanitized], { type: "text/plain" }),
       "text/html": new Blob([sanitized], { type: "text/html" }),
@@ -65,7 +65,7 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
   const [text, setText] = useState(initialText);
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
-  const [onSync, setOnSync] = useState({ action: (text) => {} });
+  const [onSync, setOnSync] = useState({ action: (text) => { } });
   const lineMap = useRef(new Map());
   /**
    * Split the document into chunks and re-render only the chunks which were changed
@@ -251,8 +251,8 @@ export const useText = ({ initialText, transforms, customRoles, preview, backsla
     readyToRender() {
       setReadyToRender(true);
     },
-    copy() {
-      copyHtmlAsRichText(
+    async copy() {
+      await copyHtmlAsRichText(
         splitIntoChunks(window.myst_editor[id.value].text, {}, [])
           .map((c) => c.html)
           .join("\n"),
