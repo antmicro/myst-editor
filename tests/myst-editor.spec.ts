@@ -124,7 +124,7 @@ test.describe.parallel("With collaboration disabled", () => {
   test("Copy as HTML button copies to clipboard", async ({ page, context }) => {
     await context.grantPermissions(["clipboard-write", "clipboard-read"]);
     await page.getByTitle("Copy document as HTML").click();
-    const clipboardHandle = await page.waitForFunction(async () => await navigator.clipboard.readText());
+    const clipboardHandle = await page.waitForFunction(() => navigator.clipboard.readText());
     expect(await clipboardHandle.evaluate((v) => v)).toContain("<h1>");
   });
 
