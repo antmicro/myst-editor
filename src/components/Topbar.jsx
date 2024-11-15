@@ -226,7 +226,7 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
         ))}
         {buttons.find((b) => b.id === "template-manager") && templatelist && <TemplateManager text={text} templatelist={templatelist} />}
       </div>
-      <span> {alert && <Alert> {alert} </Alert>} </span>
+      <span> {alert && <Alert className="topbar-alert"> {alert} </Alert>} </span>
       <Title dangerouslySetInnerHTML={{ __html: titleHtml }} />
       <Avatars users={users} />
       <span>
