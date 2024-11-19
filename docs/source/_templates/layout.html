@@ -23,7 +23,6 @@
   config.filePath = config.editUrl.slice(config.editUrl.indexOf("raw/") + 4); // file path with branch
   config.filePath = config.filePath.slice(config.filePath.indexOf("/") + 1);
   config.projectPath = encodeURIComponent(config.repoUrl.slice(config.repoUrl.indexOf("/git/") + 5));
-  console.log(config);
 
   async function getGitlabCsrf() {
     const response = await fetch(config.baseUrl);
@@ -49,12 +48,7 @@
     }
   }
 
-  async function openMyst() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (!urlParams.has("edit")) {
-      window.history.pushState(null, null, "?edit=");
-    }
-
+  async function openMyst(initialRoom) {
     // disable Sphinx navigation shortcuts (like s, n, p)
     window.addEventListener("keydown", (ev) => ev.stopImmediatePropagation(), { capture: true });
 
@@ -89,7 +83,7 @@
     if (!branches.includes(config.defaultBranch)) {
       branches.unshift(config.defaultBranch);
     }
-
+   
     const styles = new CSSStyleSheet();
     styles.replaceSync(`
       .myst-main-editor {
@@ -101,6 +95,12 @@
     const storeHistory = (history) => {
       localStorage.setItem(`myst/${config.repoName}/history`, JSON.stringify(history));
     };
+   
+    const initialState = initialRoom ? {
+      commit: { hash: initialRoom.split("/")[1], message: await getCommitMessage(initialRoom.split("/")[1]) },
+      file: decodeURIComponent(initialRoom.split("/")[2]),
+      branch: decodeURIComponent(initialRoom.split("/")[3])
+    } : null;
 
     MystEditorGit(
       {
@@ -114,6 +114,7 @@
         getText,
         additionalStyles: styles,
         storeHistory,
+        initialState,
         initialHistory: changeHistory,
         collaboration: {
           enabled: true,
@@ -132,11 +133,12 @@
       mainContainer,
     );
 
-    function setupButtons() {
+    function setupHooks() {
       if (!window.myst_editor.sphinx.git) {
-        setTimeout(setupButtons, 10);
+        setTimeout(setupHooks, 10);
         return;
       }
+
       effect(() => {
         if (window.myst_editor.sphinx.git.commit.value == window.myst_editor.sphinx.git.commits.value[0]) {
           window.myst_editor.sphinx.state.options.includeButtons.value = [...defaultButtons, commitButton];
@@ -144,8 +146,17 @@
           window.myst_editor.sphinx.state.options.includeButtons.value = defaultButtons;
         }
       });
+      
+      effect(() => {
+        const room = window.myst_editor.sphinx.git.room.value;
+        const branch = window.myst_editor.sphinx.git.branch.value; 
+        if (room) {
+          const edit =`?edit=${encodeURIComponent(room) + encodeURIComponent(`/${branch}`)}`;
+          window.history.pushState(null, null, edit);
+        }
+      });
     }
-    setupButtons();
+    setupHooks();
   }
 
   const editBtn = document.querySelector(`a[href="{{ page.edit_url }}"]`);
@@ -158,7 +169,7 @@
   window.onload = () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("edit")) {
-      openMyst();
+      openMyst(urlParams.get('edit'));
     }
   };
 
@@ -247,6 +258,20 @@
     } catch (error) {
       console.error(error);
       return [];
+    }
+  }
+  
+  async function getCommitMessage(shortHash) {
+    try {
+      const response = await fetch(`${config.apiUrl}/projects/${config.projectPath}/repository/commits/${shortHash}`);
+      if (!response.ok) {
+        return "";
+      }
+      const data = await response.json();
+      return data.message.split("\n")[0];
+    } catch (error) {
+      console.error(error)
+      return "";
     }
   }
 

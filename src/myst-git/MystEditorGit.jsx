@@ -94,6 +94,7 @@ const MystEditorGit = ({
   getText = async () => "",
   initialHistory = [],
   storeHistory = () => {},
+  initialState = null,
   ...props
 }) => {
   const branches = useSignal(initialBranches);
@@ -145,10 +146,53 @@ const MystEditorGit = ({
     branches.value = [...branches.value, ...moreBranches];
   }
 
+  const gotoChangeFromHistory = (histEntry) => {
+    batch(() => {
+      if (!branches.value.includes(histEntry.branch)) {
+        branches.value = [histEntry.branch, ...branches.value];
+      }
+      branch.value = histEntry.branch;
+
+      if (!commits.value.find((c) => c.hash == histEntry.commit.hash)) {
+        commits.value = [histEntry.commit, ...commits.value];
+      }
+      commit.value = histEntry.commit;
+
+      file.value = histEntry.file;
+      initialText.value = "";
+    });
+  };
+
+  const gotoRoomFromUrl = async () => {
+    if (!branches.value.includes(initialState.branch)) {
+      branches.value = [initialState.branch, ...branches.value];
+    }
+
+    let resolvedCommits = await getCommits(initialState.branch, 1);
+    if (!resolvedCommits.some((c) => c.hash == initialState.commit.hash)) {
+      resolvedCommits = [initialState.commit, ...resolvedCommits];
+    }
+    const resolvedFiles = await getFiles(initialState.branch, initialState.commit);
+    const text = await getText(initialState.branch, initialState.commit, initialState.file);
+
+    batch(() => {
+      branch.value = initialState.branch;
+      commits.value = resolvedCommits;
+      commit.value = initialState.commit;
+      files.value = resolvedFiles;
+      file.value = initialState.file;
+      initialText.value = text;
+    });
+  };
+
   // Since we need to make some async calls, we cannot just pass initial values to signals
   useEffect(() => {
-    switchBranch(initialBranches[0]);
-  }, [initialBranches]);
+    if (initialState) {
+      gotoRoomFromUrl(initialState);
+    } else {
+      switchBranch(initialBranches[0]);
+    }
+  }, [initialBranches, initialState]);
 
   async function switchCommit(newCommit, isNew = false) {
     if (isNew) {
@@ -200,23 +244,6 @@ const MystEditorGit = ({
 
     return () => doc.off("afterTransaction", handleChange);
   });
-
-  const gotoChangeFromHistory = (histEntry) => {
-    batch(() => {
-      if (!branches.value.includes(histEntry.branch)) {
-        branches.value = [histEntry.branch, ...branches.value];
-      }
-      branch.value = histEntry.branch;
-
-      if (!commits.value.find((c) => c.hash == histEntry.commit.hash)) {
-        commits.value = [histEntry.commit, ...commits.value];
-      }
-      commit.value = histEntry.commit;
-
-      file.value = histEntry.file;
-      initialText.value = "";
-    });
-  };
 
   return (
     <div style="all: initial;">
