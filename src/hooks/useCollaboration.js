@@ -21,12 +21,11 @@ WebsocketProvider.prototype.watchCollabolators = function (hook) {
 };
 
 export default function useCollaboration() {
-  const { options } = useContext(MystState);
+  const { options, collab } = useContext(MystState);
   if (!options.collaboration.value.enabled) {
     return {};
   }
 
-  const [ydoc, setYdoc] = useState(new Y.Doc());
   const [provider, setProvider] = useState(null);
   const [synced, setSynced] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -69,7 +68,7 @@ export default function useCollaboration() {
     hideUsernames({ ytext: doc.getText("codemirror"), prov, parent: options.parent, hideDelay: options.hideUsernameDelay.value });
 
     setProvider(prov);
-    setYdoc(doc);
+    collab.ydoc.value = doc;
 
     return () => {
       prov.destroy();
@@ -77,7 +76,7 @@ export default function useCollaboration() {
     };
   });
 
-  const ytext = useMemo(() => ydoc.getText("codemirror"), [ydoc]);
+  const ytext = useMemo(() => collab.ydoc.value?.getText?.("codemirror"), [collab.ydoc.value]);
 
   const undoManager = useMemo(
     () =>
@@ -95,7 +94,7 @@ export default function useCollaboration() {
     provider,
     undoManager,
     ytext,
-    ydoc,
+    ydoc: collab.ydoc.value,
     error,
     ready: synced && connected,
   };

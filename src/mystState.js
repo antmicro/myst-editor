@@ -1,6 +1,7 @@
 import { Signal, signal } from "@preact/signals";
 import { EditorView } from "codemirror";
 import { createContext } from "preact";
+import { Doc } from "yjs";
 
 export const predefinedButtons = {
   printToPdf: {
@@ -69,6 +70,10 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     editorView: signal(null),
     cache: {
       transform: new Map(),
+    },
+    collab: {
+      /** @type {Signal<Doc?>} */
+      ydoc: signal(null),
     },
   };
 }
