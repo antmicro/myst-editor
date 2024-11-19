@@ -332,14 +332,14 @@ export const setupWSConnection = (conn, req, { docName = req.url.slice(1).split(
 export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
   const params = new URLSearchParams(request.url?.split("?")[1]);
 
-  if (!params.get("users")) {
-    return;
-  }
-
   if (request.url.startsWith("/connections/") && request.method == "PATCH") {
     const room = request.url?.split("?")[0].replace("/connections/", "");
     const doc = docs.get(room);
-    if (!doc) return;
+    if (!doc) return { code: 404, error: `Room ${room} does not exist` };
+
+    if (!params.get("users")) {
+      return { code: 400, error: "No users were supplied" };
+    }
 
     logAsync(doc.name, {
       event: "remove-connections",
@@ -357,4 +357,6 @@ export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
       }
     }
   }
+
+  return { error: null };
 };

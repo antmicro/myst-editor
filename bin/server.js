@@ -12,12 +12,18 @@ const port = process.env.PORT || 4444;
 
 const server = http.createServer((request, response) => {
   try {
-    handleRequest(request);
-    response.writeHead(200, { "Content-Type": "text/plain" });
-    response.end("okay");
+    const result = handleRequest(request);
+    if (result.error) {
+      response.writeHead(result.code);
+      response.end(result.error);
+    } else {
+      response.writeHead(200, { "Content-Type": "text/plain" });
+      response.end("okay");
+    }
   } catch (e) {
     console.error(e);
     response.writeHead(500);
+    response.end("error");
   }
 });
 
