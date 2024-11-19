@@ -33,8 +33,9 @@ const markdownItMermaid = (md, { lineMap, parent }) => {
     const code = token.content.trim();
     const lineNumber = getLineById(lineMap.current, token.attrGet("data-line-id"));
     let cached = lineCache.get(lineNumber);
-    if (!cached || cached.code !== code) {
-      cached = contentCache.get(new IMurMurHash(code, hashSeed).result()) ?? cached;
+    const hash = new IMurMurHash(code, hashSeed).result();
+    if (!cached || cached.hash !== hash) {
+      cached = contentCache.get(hash) ?? cached;
     }
     const id = Math.random().toString().replace(".", "");
     token.attrSet("id", `mermaid-${id}`);
@@ -53,9 +54,9 @@ const markdownItMermaid = (md, { lineMap, parent }) => {
         mermaid
           .render(`mermaid-${id}`, code, container)
           .then(({ svg }) => {
-            const saved = { svg, code };
+            const saved = { svg, code, hash };
             lineCache.set(lineNumber, saved);
-            contentCache.set(new IMurMurHash(code, hashSeed).result(), saved);
+            contentCache.set(hash, saved);
             el.innerHTML = svg;
             el.className = "mermaid";
           })
