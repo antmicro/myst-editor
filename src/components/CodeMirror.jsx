@@ -217,11 +217,6 @@ const CodeMirror = ({ text, root, mode, spellcheckOpts, highlights, collaboratio
     if (editorView.value) return;
     if (collaboration.error) return;
 
-    if (collaboration.ytext?.toString().length === 0 && text.get().length > 0) {
-      console.warn("[Collaboration] Remote state is empty, overriding with local state");
-      collaboration.ytext.insert(0, text.get());
-    }
-
     if (collaboration.opts.enabled) {
       text.set(collaboration.ytext.toString());
       collaboration.ytext.observe((ev, tr) => {
