@@ -7,5 +7,3 @@ BUILDDIR      = build
 # $(O) is meant as a shortcut for $(SPHINXOPTS).
 %:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-	cp source/assets/MystEditor.js build/html
-	cp source/assets/MystEditor.css build/html

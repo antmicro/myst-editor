@@ -42,6 +42,8 @@ build-docs:
     - pip3 install -r requirements.txt
   script:
     - cd docs
+    - |
+      printf "\nfrom antmicro_sphinx_utils.defaults import relative_to_git\ngit_path = relative_to_git(Path(__file__).parent)\nhtml_css_files = ['/stylesheets/MystEditor.css']\nhtml_js_files = [(f'/javascripts/myst_loader.js?docs-root={str(git_path).replace(\"/\", \"%%2F\")}', { 'type': 'module' })]" >> source/conf.py
     - make html
     - cd ..
     - tar cf $CI_DOCS_ARCHIVE -C docs/build/html/ .
