@@ -302,7 +302,13 @@ export const setupWSConnection = async (conn, req, { docName = req.url.slice(1).
   // get doc, initialize if it does not exist yet
   const docPromise = getYDoc(docName, gc);
 
-  conn.on("message", /** @param {ArrayBuffer} message */ (message) => docPromise.then((doc) => messageListener(conn, doc, new Uint8Array(message))));
+  conn.on(
+    "message",
+    /** @param {ArrayBuffer} message */ (message) =>
+      docPromise.then((doc) => {
+        if (doc) messageListener(conn, doc, new Uint8Array(message));
+      }),
+  );
 
   const doc = await docPromise;
   if (!doc) {
