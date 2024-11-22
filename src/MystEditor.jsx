@@ -272,6 +272,12 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   }
   window.myst_editor[editorId] = {};
 
+  // cleanup function
+  window.myst_editor[editorId].remove = () => {
+    delete window.myst_editor[editorId];
+    render(null, target.shadowRoot);
+  };
+
   const form = target.closest("form");
   if (form) {
     form.addEventListener("formdata", (e) => e.formData.append(params.name, window.myst_editor[editorId].text));
