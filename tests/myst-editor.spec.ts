@@ -3,6 +3,7 @@ import { test, expect, Page, BrowserContext } from "@playwright/test";
 import { EditorView } from "codemirror";
 import fs from "fs/promises";
 import { YComments } from "../src/comments/ycomments";
+import { createMystState } from "../src/mystState";
 
 declare global {
   interface Window {
@@ -12,6 +13,7 @@ declare global {
         text: string;
         main_editor: EditorView;
         ycomments: YComments;
+        state: ReturnType<typeof createMystState>;
       }
     >;
   }
