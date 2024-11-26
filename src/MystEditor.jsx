@@ -278,12 +278,17 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   });
   observer.observe(target.parentElement, { childList: true });
 
+  const state = createMystState({ id: editorId });
+  window.myst_editor[editorId].state = state;
+
   render(
-    <MystState.Provider value={createMystState({ id: editorId })}>
+    <MystState.Provider value={state}>
       <MystEditor {...params} />
     </MystState.Provider>,
     target.shadowRoot,
   );
+
+  return state;
 };
 
 export { defaultButtons, predefinedButtons };
