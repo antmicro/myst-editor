@@ -134,18 +134,21 @@ const MystEditor = ({
     setTimeout(() => setAlert(null), secs * 1000);
   };
 
-  const buttonActions = {
-    "copy-html": async () => {
-      await text.copy();
-      alertFor("copied!", 2);
-    },
-    fullscreen: () => setFullscreen((f) => !f),
-    refresh: () => {
-      cache.transform.clear();
-      alertFor("Rich links refreshed!", 1);
-      text.refresh();
-    },
-  };
+  const buttonActions = useMemo(
+    () => ({
+      "copy-html": async () => {
+        await text.copy();
+        alertFor("copied!", 2);
+      },
+      fullscreen: () => setFullscreen((f) => !f),
+      refresh: () => {
+        cache.transform.clear();
+        alertFor("Rich links refreshed!", 1);
+        text.refresh();
+      },
+    }),
+    [text],
+  );
 
   const buttons = useMemo(
     () =>
@@ -153,7 +156,7 @@ const MystEditor = ({
         ...b,
         action: b.action || buttonActions[b.id],
       })),
-    [],
+    [includeButtons, buttonActions],
   );
 
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
