@@ -10,7 +10,7 @@ import useCollaboration from "./hooks/useCollaboration";
 import useComments from "./hooks/useComments";
 import ResolvedComments from "./components/Resolved";
 import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
-import { createMystState, MystState } from "./mystState";
+import { createMystState, MystState, predefinedButtons, defaultButtons } from "./mystState";
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -93,26 +93,6 @@ const createExtraScopePlugin = (scope) => {
 };
 
 const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val ? "hidden" : "visible");
-
-const predefinedButtons = {
-  printToPdf: {
-    id: "print-to-pdf",
-    tooltip: "Print document as pdf",
-    action: () => window.print(),
-  },
-  templateManager: { id: "template-manager" },
-  copyHtml: { id: "copy-html", tooltip: "Copy document as HTML" },
-  fullscreen: { id: "fullscreen", tooltip: "Fullscreen" },
-  refresh: { id: "refresh", tooltip: "Refresh issue links" },
-};
-
-const defaultButtons = [
-  predefinedButtons.fullscreen,
-  predefinedButtons.copyHtml,
-  predefinedButtons.refresh,
-  predefinedButtons.printToPdf,
-  predefinedButtons.templateManager,
-];
 
 const MystEditor = ({
   title = null,
