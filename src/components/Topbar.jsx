@@ -194,7 +194,7 @@ const icons = {
   "print-to-pdf": PrintPDFIcon,
 };
 
-export const EditorTopbar = ({ alert, users, text, setMode, templatelist, buttons, title, collaboration, initialMode }) => {
+export const EditorTopbar = ({ mode, alert, users, text, setMode, templatelist, buttons, title, collaboration }) => {
   const titleHtml = useMemo(() => purify.sanitize(renderMdLinks(title || ""), []));
   const editorModeButtons = useMemo(() => {
     const modeButtons = [
@@ -209,10 +209,7 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
 
     return modeButtons;
   }, []);
-  const initialClickedId = useMemo(
-    () => editorModeButtons.findIndex((b) => b.id[0].toUpperCase() + b.id.slice(1) == initialMode),
-    [editorModeButtons, initialMode],
-  );
+  const clickedId = useMemo(() => editorModeButtons.findIndex((b) => b.id[0].toUpperCase() + b.id.slice(1) == mode), [editorModeButtons, mode]);
   const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), []);
   const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), []);
 
@@ -237,7 +234,7 @@ export const EditorTopbar = ({ alert, users, text, setMode, templatelist, button
           </DefaultButton>
         ))}{" "}
       </span>
-      <ButtonGroup buttons={editorModeButtons} initialClickedId={initialClickedId} />
+      <ButtonGroup buttons={editorModeButtons} clickedId={clickedId} />
     </Topbar>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import styled from "styled-components";
 import DefaultButton from "./Buttons.js";
 
@@ -29,12 +29,10 @@ const RadioButton = styled(DefaultButton)`
   }
 `;
 
-const ButtonGroup = ({ buttons, initialClickedId = 2 }) => {
-  const [clickedId, setClickedId] = useState(initialClickedId);
-
+const ButtonGroup = ({ buttons, clickedId }) => {
   useEffect(() => {
-    buttons[initialClickedId].action();
-  }, [initialClickedId]);
+    buttons[clickedId].action();
+  }, []);
 
   return (
     <GroupContainer>
@@ -44,10 +42,7 @@ const ButtonGroup = ({ buttons, initialClickedId = 2 }) => {
           type="button"
           key={button.id}
           name={button.id}
-          onClick={() => {
-            setClickedId(i);
-            button.action();
-          }}
+          onClick={() => button.action()}
           title={button.tooltip}
           active={i === clickedId}
         >

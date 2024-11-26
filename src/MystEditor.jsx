@@ -175,7 +175,7 @@ const MystEditor = ({
                 buttons,
                 collaboration,
                 setMode,
-                initialMode,
+                mode,
                 title,
               }}
             />
