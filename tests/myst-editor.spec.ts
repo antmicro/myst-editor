@@ -512,7 +512,7 @@ test("dist/MystEditor.js exports src/MystEditor.js module", async () => {
 
   const moduleContent = module.toString();
 
-  ["spellcheckOpts", "highlights", "collaboration", "ycomments", "commentsEnabled"].forEach((s) => expect(moduleContent).toContain(s));
+  ["spellcheckOpts", "transforms", "collaboration", "ycomments", "commentsEnabled"].forEach((s) => expect(moduleContent).toContain(s));
 });
 
 ///////////////////////// UTILITY FUNCTIONS /////////////////////////
