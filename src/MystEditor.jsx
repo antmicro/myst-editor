@@ -262,4 +262,4 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   return state;
 };
 
-export { defaultButtons, predefinedButtons, batch };
+export { defaultButtons, predefinedButtons, batch, MystEditor as MystEditorPreact };
