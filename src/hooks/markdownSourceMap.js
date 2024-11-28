@@ -19,6 +19,7 @@ export default function markdownSourceMap(md) {
     "admonition_open",
     "link_open",
     "list_item_open",
+    "checkbox_input",
   ];
 
   for (const rule of overrideRules) {
