@@ -10,7 +10,10 @@ import { MystState } from "../mystState";
 import { useComputed } from "@preact/signals";
 
 const renderMdLinks = (title) =>
-  [...title.matchAll(/\[(.+)\]\(([^\s]+)\)/g)].reduce((prev, match) => prev.replace(match[0], `<a href="${match[2]}">${match[1]}</a>`), title);
+  [...(title || "").matchAll(/\[(.+)\]\(([^\s]+)\)/g)].reduce(
+    (prev, match) => prev.replace(match[0], `<a href="${match[2]}">${match[1]}</a>`),
+    title,
+  );
 
 const Topbar = styled.div`
   z-index: 10;
