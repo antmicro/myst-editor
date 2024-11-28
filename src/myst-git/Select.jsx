@@ -152,10 +152,14 @@ const Select = ({ options, initialValue, onChange, inputPlaceholder, loadMore, s
       search.value.trim().length == 0
     ) {
       loading.current = true;
-      loadMore?.(nextPage.peek())?.then?.(() => {
-        nextPage.value++;
-        setTimeout(() => (loading.current = false), 500);
-      });
+      loadMore?.(nextPage.peek())
+        ?.then?.(() => {
+          nextPage.value++;
+          setTimeout(() => (loading.current = false), 500);
+        })
+        ?.catch?.((err) => {
+          console.warn("Error while loading more options: ", err);
+        });
     }
   };
 

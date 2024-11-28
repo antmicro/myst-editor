@@ -143,6 +143,7 @@ const MystEditorGit = ({
 
   async function loadBranches(page) {
     const moreBranches = await getBranches(page);
+    if (moreBranches.length == 0) throw "Empty branches";
     branches.value = [...branches.value, ...moreBranches];
   }
 
@@ -213,6 +214,7 @@ const MystEditorGit = ({
 
   async function loadCommits(page) {
     const moreCommits = await getCommits(branch.value, page);
+    if (moreCommits.length == 0) throw "Empty commits";
     commits.value = [...commits.value, ...moreCommits];
   }
 
