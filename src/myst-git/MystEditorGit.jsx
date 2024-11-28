@@ -144,7 +144,7 @@ const MystEditorGit = ({
   async function loadBranches(page) {
     const moreBranches = await getBranches(page);
     if (moreBranches.length == 0) throw "Empty branches";
-    branches.value = [...branches.value, ...moreBranches];
+    branches.value = [...new Set([...branches.value, ...moreBranches])];
   }
 
   const gotoChangeFromHistory = (histEntry) => {
@@ -213,8 +213,9 @@ const MystEditorGit = ({
   }
 
   async function loadCommits(page) {
-    const moreCommits = await getCommits(branch.value, page);
+    let moreCommits = await getCommits(branch.value, page);
     if (moreCommits.length == 0) throw "Empty commits";
+    moreCommits = moreCommits.filter((newC) => !commits.value.some((oldC) => newC.hash == oldC.hash));
     commits.value = [...commits.value, ...moreCommits];
   }
 
