@@ -12,6 +12,7 @@ import ResolvedComments from "./components/Resolved";
 import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
 import { createMystState, MystState, predefinedButtons, defaultButtons } from "./mystState";
 import { batch, computed, signal, effect } from "@preact/signals";
+import { syncCheckboxes } from "./hooks/markdownCheckboxes";
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -183,6 +184,7 @@ const MystEditor = () => {
                 ref={preview}
                 mode={options.mode.value}
                 onClick={(ev) => {
+                  syncCheckboxes(ev, text.lineMap, editorView.value);
                   if (options.syncScroll.value && options.mode.value == "Both")
                     handlePreviewClickToScroll(ev, text.lineMap, preview, editorView.value);
                 }}

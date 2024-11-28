@@ -62,7 +62,7 @@ function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior 
  * @param {{ target: HTMLElement }} ev
  * @param {{ current: Map<number, string> }} lineMap
  * @param {{ current: HTMLElement }} preview
- * @param { current: EditorView } editor
+ * @param { EditorView } editor
  */
 export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
   let id = ev.target.getAttribute("data-line-id");
