@@ -342,6 +342,12 @@ const Preview = styled.div`
     display: flex;
     justify-content: center;
   }
+
+  input[type="checkbox"] {
+    margin: 0;
+    margin-right: 8px;
+    transform: translateY(2px);
+  }
 `;
 Preview.defaultProps = { className: "myst-preview" };
 

@@ -12,6 +12,7 @@ import { EditorView, ViewUpdate } from "@codemirror/view";
 import { ensureSyntaxTree } from "@codemirror/language";
 import { MystState } from "../mystState";
 import { useComputed } from "@preact/signals";
+import markdownCheckboxes from "markdown-it-checkbox";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -108,7 +109,8 @@ export const useText = ({ preview }) => {
       .use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))
       .use(markdownMermaid, { lineMap, parent: options.parent })
       .use(markdownSourceMap)
-      .use(checkLinks);
+      .use(checkLinks)
+      .use(markdownCheckboxes);
 
     if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
     return md;
