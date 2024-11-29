@@ -8,6 +8,7 @@ const randomLineId = () => Math.random().toString().replace(".", "");
 export default function markdownSourceMap(md) {
   md.use(overrideDefaultDirectives);
   md.use(overrideDefaultRole);
+  md.use(overrideHTML);
   md.use(wrapTextInSpan);
   md.use(wrapFencedLinesInSpan);
 
@@ -20,6 +21,8 @@ export default function markdownSourceMap(md) {
     "link_open",
     "list_item_open",
     "checkbox_input",
+    "html_block",
+    "html_inline",
   ];
 
   for (const rule of overrideRules) {
@@ -97,6 +100,18 @@ function overrideDefaultRole(/** @type {markdownIt} */ md) {
     html = html.slice(0, spanCloseIdx) + self.renderAttrs(tokens[idx]) + html.slice(spanCloseIdx);
     return html;
   };
+}
+
+function overrideHTML(/** @type {markdownIt} */ md) {
+  const override = (defaultRule) => (tokens, idx, options, env, self) => {
+    let html = defaultRule(tokens, idx, options, env, self);
+    const tagCloseIdx = html.indexOf(">");
+    html = html.slice(0, tagCloseIdx) + self.renderAttrs(tokens[idx]) + html.slice(tagCloseIdx);
+    return html;
+  };
+
+  md.renderer.rules.html_block = override(md.renderer.rules.html_block);
+  md.renderer.rules.html_inline = override(md.renderer.rules.html_inline);
 }
 
 /** We need some way to add line info to html text, so the idea is to wrap every text token in a span **/
