@@ -193,7 +193,7 @@ export const useText = ({ preview }) => {
             lookup[hash] ||
             purify.sanitize(markdown.value.render(md, { chunkId, startLine, lineMap, view: editorView.value, mapUrl: options.mapUrl.value }), {
               // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
-              ADD_TAGS: ["foreignobject"],
+              ADD_TAGS: ["foreignobject", "iframe"],
               ADD_ATTR: ["dominant-baseline"],
             });
           return { md, hash, id: chunkId, html };
