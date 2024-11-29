@@ -14,6 +14,7 @@ import { MystState } from "../mystState";
 import { useComputed } from "@preact/signals";
 import markdownCheckboxes from "markdown-it-checkbox";
 import { colonFencedBlocks } from "./markdownFence";
+import { markdownItMapUrls } from "./markdownUrlMapping";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -112,6 +113,7 @@ export const useText = ({ preview }) => {
       .use(markdownSourceMap)
       .use(checkLinks)
       .use(colonFencedBlocks)
+      .use(markdownItMapUrls)
       .use(markdownCheckboxes);
 
     if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
@@ -187,14 +189,14 @@ export const useText = ({ preview }) => {
 
           const html =
             lookup[hash] ||
-            purify.sanitize(markdown.value.render(md, { chunkId, startLine, lineMap, view: editorView.value }), {
+            purify.sanitize(markdown.value.render(md, { chunkId, startLine, lineMap, view: editorView.value, mapUrl: options.mapUrl.value }), {
               // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
               ADD_TAGS: ["foreignobject"],
               ADD_ATTR: ["dominant-baseline"],
             });
           return { md, hash, id: chunkId, html };
         }),
-    [markdown.value, options.id.value],
+    [markdown.value, options.id.value, options.mapUrl.value],
   );
 
   useEffect(() => readyToRender && updateHtmlChunks({ newMarkdown: text }), [readyToRender]);

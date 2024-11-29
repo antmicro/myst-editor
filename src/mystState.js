@@ -51,6 +51,7 @@ const defaults = {
   parent: null,
   syncScroll: false,
   unfoldedHeadings: null,
+  mapUrl: (tag, url) => url,
 };
 
 export function createMystState(/** @type {typeof defaults} */ opts) {
