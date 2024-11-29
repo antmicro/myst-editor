@@ -13,6 +13,7 @@ import { ensureSyntaxTree } from "@codemirror/language";
 import { MystState } from "../mystState";
 import { useComputed } from "@preact/signals";
 import markdownCheckboxes from "markdown-it-checkbox";
+import { colonFencedBlocks } from "./markdownFence";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -110,6 +111,7 @@ export const useText = ({ preview }) => {
       .use(markdownMermaid, { lineMap, parent: options.parent })
       .use(markdownSourceMap)
       .use(checkLinks)
+      .use(colonFencedBlocks)
       .use(markdownCheckboxes);
 
     if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
