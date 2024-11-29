@@ -106,7 +106,7 @@ export const useText = ({ preview }) => {
   }, []);
 
   const markdown = useComputed(() => {
-    const md = markdownIt({ breaks: true, linkify: true })
+    const md = markdownIt({ breaks: true, linkify: true, html: true })
       .use(markdownitDocutils, { directives: { ...directivesDefault, "figure-md": FigureMd } })
       .use(markdownReplacer(options.transforms.value, options.parent, cache.transform))
       .use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))
