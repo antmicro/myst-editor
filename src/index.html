@@ -180,6 +180,13 @@ These features include:
         },
       ];
 
+      let exampleCustomDirectives = [
+        {
+          target: "bold",
+          transform: (_, data) => `<b style="white-space: pre-wrap;">${data.body}</b>`,
+        },
+      ];
+
       let exampleTransforms = [
         {
           // Other repo issue links
@@ -247,6 +254,7 @@ These features include:
             color,
           },
           customRoles: exampleCustomRoles,
+          customDirectives: exampleCustomDirectives,
           includeButtons: defaultButtons.concat([
             {
               text: "Custom button",
