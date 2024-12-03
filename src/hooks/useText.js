@@ -1,4 +1,4 @@
-import markdownitDocutils from "markdown-it-docutils";
+import markdownitDocutils, { directivesDefault } from "markdown-it-docutils";
 import purify from "dompurify";
 import markdownIt from "markdown-it";
 import { markdownReplacer, useCustomRoles } from "./markdownReplacer";
@@ -15,6 +15,7 @@ import { useComputed } from "@preact/signals";
 import markdownCheckboxes from "markdown-it-checkbox";
 import { colonFencedBlocks } from "./markdownFence";
 import { markdownItMapUrls } from "./markdownUrlMapping";
+import { FigureMd } from "./markdownFigureMd";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -106,7 +107,7 @@ export const useText = ({ preview }) => {
 
   const markdown = useComputed(() => {
     const md = markdownIt({ breaks: true, linkify: true })
-      .use(markdownitDocutils)
+      .use(markdownitDocutils, { directives: { ...directivesDefault, "figure-md": FigureMd } })
       .use(markdownReplacer(options.transforms.value, options.parent, cache.transform))
       .use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))
       .use(markdownMermaid, { lineMap, parent: options.parent })

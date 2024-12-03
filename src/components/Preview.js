@@ -348,6 +348,11 @@ const Preview = styled.div`
     margin-right: 8px;
     transform: translateY(2px);
   }
+
+  figcaption {
+    text-align: center;
+    margin-top: 12px;
+  }
 `;
 Preview.defaultProps = { className: "myst-preview" };
 
