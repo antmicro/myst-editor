@@ -61,11 +61,11 @@ class PreviewWrapper {
   overloadTransform({ transform: originalTransform, target, ...rest }) {
     return {
       target,
-      transform: (input) => {
+      transform: (input, ...params) => {
         const cached = this.cache.get(input);
         if (cached) return cached;
 
-        let transformResult = originalTransform(input);
+        let transformResult = originalTransform(input, ...params);
 
         if (typeof transformResult.then == "function") {
           return this.createTransformPlaceholder(input, transformResult, target);
@@ -161,7 +161,8 @@ const toDocutilsDirective = ({ target, transform, required_arguments = 0, option
         map: data.map,
         block: true,
       });
-      token.content = transform(data);
+      // We should support caching and async directives
+      token.content = transform(data.body + JSON.stringify(data.args) + JSON.stringify(data.options), data);
       return [token];
     }
   };
