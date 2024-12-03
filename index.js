@@ -1,4 +1,4 @@
-import n, { defaultButtons as r } from "./MystEditor.js";
+import r, { defaultButtons as n } from "./MystEditor.js";
 let m = `# This is MyST Editor
 
 A Markdown editor using the [markdown-it parser](https://github.com/markdown-it/markdown-it), based on the [CommonMark specification](https://spec.commonmark.org/0.31.2/).
@@ -155,6 +155,9 @@ let l = [{
   target: "say",
   transform: async (e) => i + " says: '" + e + "'"
 }], c = [{
+  target: "bold",
+  transform: (e, t) => `<b style="white-space: pre-wrap;">${t.body}</b>`
+}], u = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
     const [t, a] = e.split("#");
@@ -187,12 +190,12 @@ let l = [{
     timeZone: "UTC"
   })))
 }];
-n({
+r({
   id: "demo",
   templatelist: "linkedtemplatelist.json",
   initialText: m,
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
-  transforms: c,
+  transforms: u,
   collaboration: {
     enabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
     commentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
@@ -203,7 +206,8 @@ n({
     color: h
   },
   customRoles: l,
-  includeButtons: r.concat([{
+  customDirectives: c,
+  includeButtons: n.concat([{
     text: "Custom button",
     action: () => alert("Custom button action")
   }]),
