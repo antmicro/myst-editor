@@ -58,7 +58,7 @@ class PreviewWrapper {
    * @param {Transform}
    * @returns {Transform}
    */
-  overloadTransform({ transform: originalTransform, target }) {
+  overloadTransform({ transform: originalTransform, target, ...rest }) {
     return {
       target,
       transform: (input) => {
@@ -73,6 +73,7 @@ class PreviewWrapper {
 
         return transformResult;
       },
+      ...rest,
     };
   }
 }
@@ -149,20 +150,23 @@ const useCustomRoles = (transforms, previewNode, cache) => (markdownIt) => {
 
 const CUSTOM_DIRECTIVE_RULE = "custom_directive";
 
-const toDocutilsDirective = ({target, transform}) => {
+const toDocutilsDirective = ({ target, transform, required_arguments = 0, optional_arguments = 0, option_spec = {} }) => {
   const DocutilsDirective = class extends Directive {
     has_content = true;
+    required_arguments = required_arguments;
+    optional_arguments = optional_arguments;
+    option_spec = option_spec;
     run(data) {
       const token = this.createToken(CUSTOM_DIRECTIVE_RULE, "div", 1, {
         map: data.map,
-        block: true
+        block: true,
       });
       token.content = transform(data);
       return [token];
     }
-  }
-  
-  return {name: target, directive: DocutilsDirective}
+  };
+
+  return { name: target, directive: DocutilsDirective };
 };
 
 const useCustomDirectives = (transforms, previewNode, cache) => (markdownIt) => {
