@@ -1,5 +1,5 @@
 import MarkdownIt from "markdown-it";
-import { Role, rolePlugin } from "markdown-it-docutils";
+import { Directive, directivePlugin, Role, rolePlugin } from "markdown-it-docutils";
 import { waitForElement } from "../utils";
 /**
  * @typedef {{
@@ -147,4 +147,37 @@ const useCustomRoles = (transforms, previewNode, cache) => (markdownIt) => {
   markdownIt.use(rolePlugin, { roles: customRoles });
 };
 
-export { markdownReplacer, useCustomRoles };
+const CUSTOM_DIRECTIVE_RULE = "custom_directive";
+
+const toDocutilsDirective = ({target, transform}) => {
+  const DocutilsDirective = class extends Directive {
+    has_content = true;
+    run(data) {
+      const token = this.createToken(CUSTOM_DIRECTIVE_RULE, "div", 1, {
+        map: data.map,
+        block: true
+      });
+      token.content = transform(data);
+      return [token];
+    }
+  }
+  
+  return {name: target, directive: DocutilsDirective}
+};
+
+const useCustomDirectives = (transforms, previewNode, cache) => (markdownIt) => {
+  const preview = new PreviewWrapper(previewNode, cache);
+  const customDirectives = transforms
+    .map((t) => preview.overloadTransform(t))
+    .map(toDocutilsDirective)
+    .reduce((directives, { name, directive }) => {
+      directives[name] = directive;
+      return directives;
+    }, {});
+
+  markdownIt.renderer.rules[CUSTOM_DIRECTIVE_RULE] = (tokens, idx, options, env, self) =>
+    `<div ${self.renderAttrs(tokens[idx])}>${tokens[idx].content}</div>`;
+  markdownIt.use(directivePlugin, { directives: customDirectives });
+};
+
+export { markdownReplacer, useCustomRoles, useCustomDirectives };

@@ -1,7 +1,7 @@
 import markdownitDocutils, { directivesDefault } from "markdown-it-docutils";
 import purify from "dompurify";
 import markdownIt from "markdown-it";
-import { markdownReplacer, useCustomRoles } from "./markdownReplacer";
+import { markdownReplacer, useCustomDirectives, useCustomRoles } from "./markdownReplacer";
 import { useCallback, useContext, useEffect, useReducer, useRef, useState } from "preact/hooks";
 import IMurMurHash from "imurmurhash";
 import { backslashLineBreakPlugin } from "./markdownLineBreak";
@@ -110,6 +110,7 @@ export const useText = ({ preview }) => {
       .use(markdownitDocutils, { directives: { ...directivesDefault, "figure-md": FigureMd } })
       .use(markdownReplacer(options.transforms.value, options.parent, cache.transform))
       .use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))
+      .use(useCustomDirectives(options.customDirectives.value, options.parent, cache.transform))
       .use(markdownMermaid, { lineMap, parent: options.parent })
       .use(markdownSourceMap)
       .use(checkLinks)
