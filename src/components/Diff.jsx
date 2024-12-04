@@ -13,10 +13,12 @@ const DiffContainer = styled.div`
   height: 100%;
   scrollbar-width: thin;
   overflow-y: auto;
+  overscroll-behavior: contain;
 `;
 
 const MergeViewCodeEditor = styled(CodeEditor)`
   overflow-y: visible;
+  overscroll-behavior: contain;
   display: block;
 `;
 

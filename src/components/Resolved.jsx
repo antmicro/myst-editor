@@ -14,6 +14,7 @@ const ResolvedWrapper = styled.div`
   border-radius: var(--border-radius);
   color: var(--gray-900);
   overflow-y: auto;
+  overscroll-behavior: contain;
 
   & h1 {
     font-size: 20px;

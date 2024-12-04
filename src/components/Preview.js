@@ -14,6 +14,7 @@ const Preview = styled.div`
   word-wrap: break-word;
   position: relative;
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
 
   @media print {
