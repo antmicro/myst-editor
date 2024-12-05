@@ -128,7 +128,7 @@ const MystEditorGit = ({
     action: commitChanges,
   };
   useSignalEffect(() => {
-    if (commit.value == commits.value[0]) {
+    if (commit.value?.hash == commits.value[0]?.hash) {
       mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
     } else {
       mystState.current.options.includeButtons.value = defaultButtons;
@@ -184,7 +184,7 @@ const MystEditorGit = ({
 
     let resolvedCommits = await getCommits(initialState.branch, 1);
     if (!resolvedCommits.some((c) => c.hash == initialState.commit.hash)) {
-      resolvedCommits = [initialState.commit, ...resolvedCommits];
+      resolvedCommits.push(initialState.commit);
     }
     const resolvedFiles = await getFiles(initialState.branch, initialState.commit);
     const text = await getText(initialState.branch, initialState.commit, initialState.file);
