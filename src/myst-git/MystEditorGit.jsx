@@ -105,6 +105,11 @@ const Toast = styled.div`
     font-family: inherit;
     font-size: inherit;
   }
+
+  a {
+    display: inline-block;
+    color: var(--blue-500);
+  }
 `;
 
 const MystEditorGit = ({
@@ -152,12 +157,14 @@ const MystEditorGit = ({
     text: "Commit",
     action: async () => {
       try {
-        const newCommit = await commitChanges();
-        toast.value = "Changes have been commited.";
-        switchCommit(newCommit, true);
+        mystState.current.options.includeButtons.value = defaultButtons;
+        const { hash, message, webUrl } = await commitChanges();
+        toast.value = { text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } };
+        switchCommit({ hash, message }, true);
       } catch (error) {
         console.error(error);
-        toast.value = `Error occured while commiting: ${error}`;
+        toast.value = { text: `Error occured while commiting: ${error}` };
+        mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
       }
       setTimeout(() => (toast.value = null), 8000);
     },
@@ -355,7 +362,14 @@ const MystEditorGit = ({
           </GitSidebar>
           {toast.value && (
             <Toast id="toast">
-              <span>{toast.value}</span>
+              <span>
+                {toast.value.text}
+                {toast.value.link && (
+                  <a href={toast.value.link.href} target="_blank">
+                    {toast.value.link.text}
+                  </a>
+                )}
+              </span>
               <button title="Dismiss" onClick={() => (toast.value = null)}>
                 x
               </button>
