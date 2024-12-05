@@ -1,4 +1,4 @@
-import { MystEditorPreact } from "../MystEditor";
+import { MystEditorPreact, defaultButtons } from "../MystEditor";
 import { render } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { batch, useComputed, useSignal, useSignalEffect } from "@preact/signals";
@@ -95,6 +95,7 @@ const MystEditorGit = ({
   initialHistory = [],
   storeHistory = () => {},
   initialState = null,
+  commitChanges = async () => {},
   ...props
 }) => {
   const branches = useSignal(initialBranches);
@@ -120,6 +121,18 @@ const MystEditorGit = ({
   useSignalEffect(() => {
     const collaboration = mystState.current.options.collaboration.peek();
     mystState.current.options.collaboration.value = { ...collaboration, room: room.value };
+  });
+
+  const commitButton = {
+    text: "Commit",
+    action: commitChanges,
+  };
+  useSignalEffect(() => {
+    if (commit.value == commits.value[0]) {
+      mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
+    } else {
+      mystState.current.options.includeButtons.value = defaultButtons;
+    }
   });
 
   async function switchBranch(newBranch, isNew = false) {
