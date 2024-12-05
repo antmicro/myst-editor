@@ -13,6 +13,7 @@ const MystContainer = styled.div`
   grid-template-rows: 100%;
   height: 100%;
   font-family: "Lato";
+  position: relative;
 `;
 
 const GitSidebar = styled.div`
@@ -83,6 +84,29 @@ const ChangeHistory = styled.div`
   }
 `;
 
+const Toast = styled.div`
+  background-color: white;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 15px;
+  gap: 15px;
+  border-radius: var(--border-radius);
+
+  button {
+    color: gray;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+  }
+`;
+
 const MystEditorGit = ({
   repo = "repo",
   initialBranches = ["main"],
@@ -108,6 +132,7 @@ const MystEditorGit = ({
   const room = useComputed(() => (commit.value && file.value ? `${repo}/${commit.value.hash}/${encodeURIComponent(file.value)}` : ""));
   const mystState = useRef(createMystState({ ...props }));
   const changeHistory = useSignal(initialHistory);
+  const toast = useSignal(null);
 
   useEffect(() => {
     window.myst_editor[props.id].state = mystState.current;
@@ -125,7 +150,16 @@ const MystEditorGit = ({
 
   const commitButton = {
     text: "Commit",
-    action: commitChanges,
+    action: async () => {
+      try {
+        await commitChanges();
+        toast.value = "Changes have been commited.";
+      } catch (error) {
+        console.error(error);
+        toast.value = `Error occured while commiting: ${error}`;
+      }
+      setTimeout(() => (toast.value = null), 8000);
+    },
   };
   useSignalEffect(() => {
     if (commit.value?.hash == commits.value[0]?.hash) {
@@ -318,6 +352,14 @@ const MystEditorGit = ({
               )}
             </ChangeHistory>
           </GitSidebar>
+          {toast.value && (
+            <Toast id="toast">
+              <span>{toast.value}</span>
+              <button title="Dismiss" onClick={() => (toast.value = null)}>
+                x
+              </button>
+            </Toast>
+          )}
           <MystState.Provider value={mystState.current}>{room.value && <MystEditorPreact />}</MystState.Provider>
         </MystContainer>
       </StyleSheetManager>
