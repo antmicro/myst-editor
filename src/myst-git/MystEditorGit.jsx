@@ -152,8 +152,9 @@ const MystEditorGit = ({
     text: "Commit",
     action: async () => {
       try {
-        await commitChanges();
+        const newCommit = await commitChanges();
         toast.value = "Changes have been commited.";
+        switchCommit(newCommit, true);
       } catch (error) {
         console.error(error);
         toast.value = `Error occured while commiting: ${error}`;
