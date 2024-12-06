@@ -15,7 +15,7 @@ import { useComputed } from "@preact/signals";
 import markdownCheckboxes from "markdown-it-checkbox";
 import { colonFencedBlocks } from "./markdownFence";
 import { markdownItMapUrls } from "./markdownUrlMapping";
-import { FigureMd } from "./markdownFigureMd";
+import newDirectives from "./markdownDirectives";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -107,7 +107,7 @@ export const useText = ({ preview }) => {
 
   const markdown = useComputed(() => {
     const md = markdownIt({ breaks: true, linkify: true, html: true })
-      .use(markdownitDocutils, { directives: { ...directivesDefault, "figure-md": FigureMd } })
+      .use(markdownitDocutils, { directives: { ...directivesDefault, ...newDirectives } })
       .use(markdownReplacer(options.transforms.value, options.parent, cache.transform))
       .use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))
       .use(useCustomDirectives(options.customDirectives.value, options.parent, cache.transform))

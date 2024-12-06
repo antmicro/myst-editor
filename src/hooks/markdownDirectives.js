@@ -13,7 +13,7 @@ const shared_option_spec = {
   name: directiveOptions.unchanged,
 };
 
-export class FigureMd extends directivesDefault.image {
+class FigureMd extends directivesDefault.image {
   option_spec = {
     ...shared_option_spec,
     align: directiveOptions.create_choice(["left", "center", "right"]),
@@ -62,30 +62,33 @@ export class FigureMd extends directivesDefault.image {
         imageToken.attrJoin("class", data.options.class.join(" "));
       }
 
-      const [caption, ...legendParts] = data.body.split("\n\n").slice(1);
-      const legend = legendParts.join("\n\n");
-      const captionMap = data.bodyMap[0] + 2;
-      const openCaption = this.createToken("figure_caption_open", "figcaption", 1, {
-        block: true,
-      });
-      if (target) {
-        openCaption.attrSet("number", `${target.number}`);
-      }
-      const captionBody = this.nestedParse(caption, captionMap);
-      const closeCaption = this.createToken("figure_caption_close", "figcaption", -1, {
-        block: true,
-      });
-      captionTokens = [openCaption, ...captionBody, closeCaption];
-      if (legend) {
-        const legendMap = captionMap + caption.split("\n").length + 1;
-        const openLegend = this.createToken("figure_legend_open", "", 1, {
+      const captionSplit = data.body.split("\n\n");
+      if (captionSplit.length > 1) {
+        const [caption, ...legendParts] = captionSplit.slice(1);
+        const legend = legendParts.join("\n\n");
+        const captionMap = data.bodyMap[0] + 2;
+        const openCaption = this.createToken("figure_caption_open", "figcaption", 1, {
           block: true,
         });
-        const legendBody = this.nestedParse(legend, legendMap);
-        const closeLegend = this.createToken("figure_legend_close", "", -1, {
+        if (target) {
+          openCaption.attrSet("number", `${target.number}`);
+        }
+        const captionBody = this.nestedParse(caption, captionMap);
+        const closeCaption = this.createToken("figure_caption_close", "figcaption", -1, {
           block: true,
         });
-        legendTokens = [openLegend, ...legendBody, closeLegend];
+        captionTokens = [openCaption, ...captionBody, closeCaption];
+        if (legend) {
+          const legendMap = captionMap + caption.split("\n").length + 1;
+          const openLegend = this.createToken("figure_legend_open", "", 1, {
+            block: true,
+          });
+          const legendBody = this.nestedParse(legend, legendMap);
+          const closeLegend = this.createToken("figure_legend_close", "", -1, {
+            block: true,
+          });
+          legendTokens = [openLegend, ...legendBody, closeLegend];
+        }
       }
     }
     const closeToken = this.createToken("figure_close", "figure", -1, { block: true });
@@ -135,4 +138,8 @@ function getNamespacedMeta(token) {
   if (!token.meta) token.meta = {};
   if (!token.meta.docutils) token.meta.docutils = meta;
   return meta;
+}
+
+export default {
+  'figure-md': FigureMd
 }
