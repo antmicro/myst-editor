@@ -1,7 +1,7 @@
 // https://github.com/executablebooks/markdown-it-docutils/blob/main/src/directives/images.ts
 // figure-md seems to be a myst-parser (MyST+Sphinx) thing but the MyST project seems to be
 // evolving away from Sphinx towards mystmd, so slim chance of mainlining this
-import { directiveOptions, directivesDefault } from "markdown-it-docutils";
+import { Directive, directiveOptions, directivesDefault } from "markdown-it-docutils";
 
 const shared_option_spec = {
   alt: directiveOptions.unchanged,
@@ -140,6 +140,41 @@ function getNamespacedMeta(token) {
   return meta;
 }
 
-export default {
-  'figure-md': FigureMd
+class Table extends Directive {
+  optional_arguments = 1;
+  has_content = true;
+  final_argument_whitespace = true;
+  run(data) {
+    const tableTokens = this.nestedParse(data.body, data.map);
+    let prefixTokens = [];
+    let suffixTokens = [];
+    if (data.args.length > 0) {
+      const openToken = this.createToken("figure_open", "figure", 1, {
+        map: data.map,
+        block: true,
+      });
+      const target = newTarget(this.state, openToken, "fig", data.args[0], data.body.trim());
+      openToken.attrJoin("class", "numbered");
+      const openCaption = this.createToken("figure_caption_open", "figcaption", 1, {
+        block: true,
+      });
+      openCaption.attrSet("style", "text-align: left");
+      if (target) {
+        openCaption.attrSet("number", `${target.number}`);
+      }
+      const captionBody = this.nestedParse(data.args[0], data.map[0]);
+      const closeCaption = this.createToken("figure_caption_close", "figcaption", -1, {
+        block: true,
+      });
+      prefixTokens = [openToken, openCaption, ...captionBody, closeCaption];
+      suffixTokens = [this.createToken("figure_close", "figure", -1, { block: true })];
+    }
+
+    return [...prefixTokens, ...tableTokens, ...suffixTokens];
+  }
 }
+
+export default {
+  "figure-md": FigureMd,
+  table: Table,
+};
