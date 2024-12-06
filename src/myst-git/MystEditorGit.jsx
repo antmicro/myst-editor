@@ -6,6 +6,7 @@ import { createMystState, MystState } from "../mystState";
 import styled, { StyleSheetManager } from "styled-components";
 import Select from "./Select";
 import * as Y from "yjs";
+import CommitModal, { Popup } from "./CommitModal";
 
 const MystContainer = styled.div`
   display: grid;
@@ -84,7 +85,7 @@ const ChangeHistory = styled.div`
   }
 `;
 
-const Toast = styled.div`
+const Toast = styled(Popup)`
   background-color: white;
   position: absolute;
   top: 10px;
@@ -138,6 +139,7 @@ const MystEditorGit = ({
   const mystState = useRef(createMystState({ ...props }));
   const changeHistory = useSignal(initialHistory);
   const toast = useSignal(null);
+  const commitSummary = useSignal(null);
 
   useEffect(() => {
     window.myst_editor[props.id].state = mystState.current;
@@ -155,20 +157,28 @@ const MystEditorGit = ({
 
   const commitButton = {
     text: "Commit",
-    action: async () => {
-      try {
-        mystState.current.options.includeButtons.value = defaultButtons;
-        const { hash, message, webUrl } = await commitChanges();
-        toast.value = { text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } };
-        switchCommit({ hash, message }, true);
-      } catch (error) {
-        console.error(error);
-        toast.value = { text: `Error occured while commiting: ${error}` };
-        mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
-      }
-      setTimeout(() => (toast.value = null), 8000);
+    action: () => {
+      mystState.current.options.includeButtons.value = defaultButtons;
+      commitSummary.value = `MyST: update docs ${file.value}`;
     },
   };
+  async function onCommit({ summary, message }) {
+    try {
+      commitSummary.value = null;
+      const { hash, webUrl } = await commitChanges(message);
+      toast.value = { text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } };
+      switchCommit({ hash, message: summary }, true);
+    } catch (error) {
+      console.error(error);
+      toast.value = { text: `Error occured while commiting: ${error}` };
+      mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
+    }
+    setTimeout(() => (toast.value = null), 8000);
+  }
+  function onCommitCancel() {
+    commitSummary.value = null;
+    mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
+  }
   useSignalEffect(() => {
     if (commit.value?.hash == commits.value[0]?.hash) {
       mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
@@ -375,6 +385,7 @@ const MystEditorGit = ({
               </button>
             </Toast>
           )}
+          {commitSummary.value && <CommitModal initialSummary={commitSummary} onSubmit={onCommit} onClose={onCommitCancel} />}
           <MystState.Provider value={mystState.current}>{room.value && <MystEditorPreact />}</MystState.Provider>
         </MystContainer>
       </StyleSheetManager>
