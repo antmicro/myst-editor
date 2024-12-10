@@ -170,7 +170,8 @@ export const useText = ({ preview }) => {
             }
 
             const endLine = startLine + newChunk.trimLeft().split("\n").length - 1;
-            if (countOccurences(lastChunk?.md, /\n```/g) % 2 != 0) {
+            const fenceRegex = /^[`:~]{3}/gm;
+            if (countOccurences(lastChunk?.md, fenceRegex) % 2 != 0) {
               chunks[lastChunkIdx] = { md: lastChunk.md + newChunk, startLine: lastChunk.startLine, endLine };
             } else {
               chunks.push({ md: newChunk, startLine, endLine });
