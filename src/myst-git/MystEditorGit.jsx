@@ -138,7 +138,7 @@ const MystEditorGit = ({
   const room = useComputed(() => (commit.value && file.value ? `${repo}/${commit.value.hash}/${encodeURIComponent(file.value)}` : ""));
   const mystState = useRef(createMystState({ ...props }));
   const changeHistory = useSignal(initialHistory);
-  const toast = useSignal(null);
+  const toast = useSignal({ content: null, timeout: null });
   const commitSummary = useSignal(null);
   const commentStateToApply = useRef(null);
 
@@ -156,9 +156,21 @@ const MystEditorGit = ({
     mystState.current.options.collaboration.value = { ...collaboration, room: room.value };
   });
 
+  function toastNotify(content) {
+    if (toast.value.timeout) {
+      clearTimeout(toast.value.timeout);
+    }
+    toast.value = { content, timeout: setTimeout(() => (toast.value = { content: null }), 5000) };
+  }
+
   const commitButton = {
     text: "Commit",
     action: () => {
+      const textChanged = mystState.current.editorView.value.state.doc.toString() != initialText.value;
+      if (!textChanged) {
+        toastNotify({ text: "No changes to commit" });
+        return;
+      }
       mystState.current.options.includeButtons.value = defaultButtons;
       commitSummary.value = `MyST: update docs ${file.value}`;
     },
@@ -168,14 +180,13 @@ const MystEditorGit = ({
       commitSummary.value = null;
       const { hash, webUrl } = await commitChanges(message);
       commentStateToApply.current = window.myst_editor[props.id].ycomments.encodeState();
-      toast.value = { text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } };
+      toastNotify({ text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } });
       switchCommit({ hash, message: summary }, true);
     } catch (error) {
       console.error(error);
-      toast.value = { text: `Error occured while commiting: ${error}` };
+      toastNotify({ text: `Error occured while commiting: ${error}` });
       mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
     }
-    setTimeout(() => (toast.value = null), 8000);
   }
   function onCommitCancel() {
     commitSummary.value = null;
@@ -380,17 +391,23 @@ const MystEditorGit = ({
               )}
             </ChangeHistory>
           </GitSidebar>
-          {toast.value && (
+          {toast.value.content && (
             <Toast id="toast">
               <span>
-                {toast.value.text}
-                {toast.value.link && (
-                  <a href={toast.value.link.href} target="_blank">
-                    {toast.value.link.text}
+                {toast.value.content.text}
+                {toast.value.content.link && (
+                  <a href={toast.value.content.link.href} target="_blank">
+                    {toast.value.content.link.text}
                   </a>
                 )}
               </span>
-              <button title="Dismiss" onClick={() => (toast.value = null)}>
+              <button
+                title="Dismiss"
+                onClick={() => {
+                  clearTimeout(toast.value.timeout);
+                  toast.value = { content: null };
+                }}
+              >
                 x
               </button>
             </Toast>
