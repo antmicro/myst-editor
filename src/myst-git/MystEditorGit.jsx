@@ -140,6 +140,7 @@ const MystEditorGit = ({
   const changeHistory = useSignal(initialHistory);
   const toast = useSignal(null);
   const commitSummary = useSignal(null);
+  const commentStateToApply = useRef(null);
 
   useEffect(() => {
     window.myst_editor[props.id].state = mystState.current;
@@ -166,6 +167,7 @@ const MystEditorGit = ({
     try {
       commitSummary.value = null;
       const { hash, webUrl } = await commitChanges(message);
+      commentStateToApply.current = window.myst_editor[props.id].ycomments.encodeState();
       toast.value = { text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } };
       switchCommit({ hash, message: summary }, true);
     } catch (error) {
@@ -310,6 +312,14 @@ const MystEditorGit = ({
     };
     doc.on("afterTransaction", handleChange);
 
+    // This is done to keep this signal effect from running in a cycle when some singals are updated in applyState.
+    queueMicrotask(() => {
+      if (commentStateToApply.current != null) {
+        window.myst_editor[props.id].ycomments.applyState(commentStateToApply.current);
+        commentStateToApply.current = null;
+      }
+    });
+
     return () => doc.off("afterTransaction", handleChange);
   });
 
@@ -385,7 +395,7 @@ const MystEditorGit = ({
               </button>
             </Toast>
           )}
-          {commitSummary.value && <CommitModal initialSummary={commitSummary} onSubmit={onCommit} onClose={onCommitCancel} />}
+          {commitSummary.value && <CommitModal initialSummary={commitSummary.value} onSubmit={onCommit} onClose={onCommitCancel} />}
           <MystState.Provider value={mystState.current}>{room.value && <MystEditorPreact />}</MystState.Provider>
         </MystContainer>
       </StyleSheetManager>

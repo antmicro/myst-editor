@@ -564,4 +564,49 @@ export class YComments {
       newLine: transaction.state.doc.lineAt(newPos).number,
     };
   }
+
+  encodeState() {
+    const positions = this.positions().syncedPositions.toJSON();
+    const suggestions = this.suggestions.toJSON();
+    const resolved = this.resolver().resolvedComments.toJSON();
+    const lineAuthors = {};
+    const text = {};
+    const allComments = [...this.comments.peek(), ...this.resolver().resolved()];
+    for (const { commentId } of allComments) {
+      const lineData = this.lineAuthors(commentId);
+      lineAuthors[commentId] = lineData.lineAuthors.toJSON();
+      const commentText = this.getTextForComment(commentId);
+      text[commentId] = commentText.toString();
+    }
+
+    return { positions, suggestions, resolved, lineAuthors, text };
+  }
+
+  applyState({ positions, suggestions, resolved, lineAuthors, text }) {
+    this.ydoc.transact(() => {
+      for (const id in positions) {
+        this.positions().syncedPositions.set(id, positions[id]);
+      }
+      for (const id in suggestions) {
+        this.suggestions.set(id, suggestions[id]);
+      }
+      for (const id in resolved) {
+        this.resolver().resolvedComments.set(id, resolved[id]);
+      }
+      for (const id in lineAuthors) {
+        const lineData = this.lineAuthors(id);
+        lineAuthors[id].forEach((line) => {
+          const map = new Y.Map();
+          if (line.author) {
+            map.set("author", line.author);
+          }
+          lineData.lineAuthors.push([map]);
+        });
+      }
+      for (const id in text) {
+        const commentText = this.getTextForComment(id);
+        commentText.insert(0, text[id]);
+      }
+    });
+  }
 }

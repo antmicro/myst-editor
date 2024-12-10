@@ -78,7 +78,7 @@ const ResolvedComments = ({ ycomments }) => {
   useEffect(() => {
     setResolvedComments(ycomments.resolver().resolved().sort(dateComparator));
     ycomments.resolver().onUpdate((comments) => setResolvedComments(comments.sort(dateComparator)));
-  }, []);
+  }, [ycomments]);
 
   return (
     <ResolvedWrapper>
