@@ -118,10 +118,10 @@ const Preview = styled.div`
 
     &.admonition {
       border: var(--border-2) solid var(--green-500);
-      margin-bottom: 1rem;
+      margin-bottom: 16px;
 
       .admonition {
-        margin: 0rem 1.4rem 0.9rem 1.4rem;
+        margin: 0 22px 14px 22px;
       }
 
       & > header,
@@ -140,7 +140,7 @@ const Preview = styled.div`
 
     &[class="admonition"] {
       .admonition {
-        margin-top: 0.9rem;
+        margin-top: 14px;
       }
     }
 
@@ -278,7 +278,7 @@ const Preview = styled.div`
     border-left: 5px solid var(--green-500);
     margin-left: 0;
     margin-top: 0;
-    padding-left: 0.75rem;
+    padding-left: 12px;
   }
 
   table {

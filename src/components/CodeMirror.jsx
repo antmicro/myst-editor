@@ -9,12 +9,11 @@ import { customHighlighter } from "../extensions/customHighlights";
 import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
 import editIcon from "../icons/edit.svg";
 import { MystState } from "../mystState";
-
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
   background: var(--gray-200);
   font-family: monospace;
-  font-size: 0.875rem;
+  font-size: 14px;
   resize: none;
   border: 0;
   padding: 20px;
@@ -65,8 +64,8 @@ const CodeEditor = styled.div`
   }
 
   .cm-ySelectionInfo {
-    font-size: 0.6rem;
-    padding: 0.25rem 0.5rem !important;
+    font-size: 10px;
+    padding: 4px 8px !important;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;

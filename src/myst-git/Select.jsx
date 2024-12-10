@@ -80,8 +80,8 @@ const OptionList = styled.ul`
   padding: 0;
   width: 100%;
   margin: 0;
-  margin-top: 0.5rem;
-  max-height: 10rem;
+  margin-top: 12px;
+  max-height: 240px;
   overflow-y: auto;
   scrollbar-width: thin;
   overscroll-behavior: contain;
@@ -91,7 +91,7 @@ const OptionList = styled.ul`
     width: 100%;
     cursor: pointer;
     border-radius: var(--border-radius);
-    height: 2rem;
+    height: 48px;
     padding: 0 5px;
     display: flex;
     align-items: center;

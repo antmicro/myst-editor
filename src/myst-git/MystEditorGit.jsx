@@ -30,8 +30,8 @@ const GitSidebar = styled.div`
   label {
     display: block;
     color: white;
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
+    margin-top: 24px;
+    margin-bottom: 12px;
     font-weight: 600;
     font-size: 14px;
   }
@@ -43,8 +43,8 @@ const ChangeHistory = styled.div`
   width: 100%;
 
   p:first-child {
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
+    margin-top: 24px;
+    margin-bottom: 12px;
     font-weight: 600;
     font-size: 14px;
   }
@@ -52,7 +52,7 @@ const ChangeHistory = styled.div`
   .history-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 24px;
     overflow-y: auto;
     scrollbar-width: thin;
   }
@@ -65,10 +65,10 @@ const ChangeHistory = styled.div`
     font-weight: 600;
     display: flex;
     text-align: left;
-    padding: 0.25rem;
+    padding: 6px;
     border-radius: var(--border-radius);
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 12px;
 
     &:hover {
       background: var(--icon-selected);
