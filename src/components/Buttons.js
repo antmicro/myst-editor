@@ -5,6 +5,10 @@ const DefaultButton = styled.button`
     outline: 0 !important;
   }
 
+  &:disabled {
+    cursor: default;
+  }
+
   cursor: pointer;
   color: var(--icon-color);
   text-transform: uppercase;

@@ -14,7 +14,7 @@ const RadioButton = styled(DefaultButton)`
   border-left: none;
   border-radius: 0;
 
-  &:hover {
+  &:hover:not(&:disabled) {
     background-color: var(--icon-main-selected);
   }
 
@@ -40,9 +40,11 @@ const ButtonGroup = ({ buttons, clickedId }) => {
         <RadioButton
           className="icon radio-icon"
           type="button"
+          disabled={button.disabled}
           key={button.id}
           name={button.id}
           onClick={() => button.action()}
+          onMouseOver={() => button.hover?.()}
           title={button.tooltip}
           active={i === clickedId}
         >

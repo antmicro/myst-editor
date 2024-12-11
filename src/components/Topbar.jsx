@@ -7,7 +7,7 @@ import ButtonGroup from "./ButtonGroup";
 import Avatars from "./Avatars";
 import TemplateManager from "./TemplateManager";
 import { MystState } from "../mystState";
-import { useComputed } from "@preact/signals";
+import { useComputed, useSignal } from "@preact/signals";
 
 const renderMdLinks = (title) =>
   [...(title || "").matchAll(/\[(.+)\]\(([^\s]+)\)/g)].reduce(
@@ -200,14 +200,22 @@ const icons = {
 };
 
 export const EditorTopbar = ({ alert, users, text, buttons }) => {
-  const { options } = useContext(MystState);
+  const { options, editorView } = useContext(MystState);
   const titleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.title.value)));
+  const emptyDiff = useSignal(false);
   const editorModeButtons = useComputed(() => {
     const modeButtons = [
       { id: "source", tooltip: "Source", action: () => (options.mode.value = "Source"), icon: SourceIcon },
       { id: "preview", tooltip: "Preview", action: () => (options.mode.value = "Preview"), icon: PreviewIcon },
       { id: "both", tooltip: "Dual Pane", action: () => (options.mode.value = "Both"), icon: BothIcon },
-      { id: "diff", tooltip: "Diff View", action: () => (options.mode.value = "Diff"), icon: DiffIcon },
+      {
+        id: "diff",
+        tooltip: emptyDiff.value ? "No changes to show" : "Diff View",
+        disabled: emptyDiff.value,
+        action: () => (options.mode.value = "Diff"),
+        hover: () => (emptyDiff.value = options.initialText == editorView.value?.state?.doc?.toString?.()),
+        icon: DiffIcon,
+      },
     ];
     if (options.collaboration.value.resolvingCommentsEnabled) {
       modeButtons.push({ id: "resolved", tooltip: "Resolved Comments", action: () => (options.mode.value = "Resolved"), icon: ResolvedIcon });
