@@ -362,11 +362,13 @@ export const setupWSConnection = async (conn, req, { docName = req.url.slice(1).
   }
 };
 
+const URL_PREFIX = process.env.URL_PREFIX || "";
+
 export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
   const params = new URLSearchParams(request.url?.split("?")[1]);
 
-  if (request.url.startsWith("/connections/") && request.method == "PATCH") {
-    const room = request.url?.split("?")[0].replace("/connections/", "");
+  if (request.url.startsWith(URL_PREFIX + "/connections/") && request.method == "PATCH") {
+    const room = request.url?.split("?")[0].replace(URL_PREFIX + "/connections/", "");
     const doc = docs.get(room);
     if (!doc) return { code: 404, error: `Room ${room} does not exist` };
 
@@ -389,7 +391,9 @@ export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
         });
       }
     }
+
+    return { error: null };
   }
 
-  return { error: null };
+  return { error: "Unknown endpoint", code: 404 };
 };
