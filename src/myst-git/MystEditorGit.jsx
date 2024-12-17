@@ -135,7 +135,7 @@ const MystEditorGit = ({
   const files = useSignal([]);
   const file = useSignal();
   const initialText = useSignal("");
-  const room = useComputed(() => (commit.value && file.value ? `${repo}/${commit.value.hash}/${encodeURIComponent(file.value)}` : ""));
+  const room = useComputed(() => (commit.value && file.value ? `${repo}/${branch.value}/${commit.value.hash}/${file.value}` : ""));
   const mystState = useRef(createMystState({ ...props }));
   const changeHistory = useSignal(initialHistory);
   const toast = useSignal({ content: null, timeout: null });
