@@ -338,8 +338,14 @@ export class YComments {
   }
 
   parentLineHeight(commentId) {
-    let elem = this.mainCodeMirror.dom.querySelector("#" + commentId)?.previousSibling;
-    if (elem) return elem.clientHeight;
+    let elem;
+    if (this.display().isShown(commentId)) {
+      elem = this.mainCodeMirror.dom.querySelector("#" + commentId)?.previousSibling;
+      if (elem) return elem.clientHeight + 5;
+    } else {
+      elem = this.mainCodeMirror.dom.querySelector("#" + commentId)?.parentElement;
+      if (elem) return elem.clientHeight;
+    }
 
     let parentLineNumber = this.positionManager.get(commentId);
     return [...this.mainCodeMirror.dom.querySelectorAll(`.cm-gutterElement`)].find((e) => e.textContent == parentLineNumber)?.clientHeight;

@@ -82,7 +82,7 @@ const YComment = ({ ycomments, commentId }) => {
     [commentId],
   );
 
-  const parentHeight = ycomments.parentLineHeight(commentId) + 3.8;
+  const parentHeight = ycomments.parentLineHeight(commentId) - 1;
 
   useEffect(() => {
     if (!cmref.current) {
