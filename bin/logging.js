@@ -14,11 +14,15 @@ if (process.env.LOGDIR) {
 
 const logFile = (room) => path.join(process.env.LOGDIR, room + ".log");
 
-export const logAsync = (room, obj) =>
-  process.env.LOGDIR &&
-  new Promise((r) => r(JSON.stringify({ time: new Date().toISOString().slice(0, -2), ...obj }) + "\n")).then((data) =>
-    fs.appendFileSync(logFile(room), data),
-  );
+export const logAsync = async (room, obj) => {
+  if (!process.env.LOGDIR) return;
+
+  return await new Promise((r) => r(JSON.stringify({ time: new Date().toISOString().slice(0, -2), ...obj }) + "\n")).then((data) => {
+    const logFilePath = logFile(room);
+    fs.mkdirSync(path.dirname(logFilePath), { recursive: true });
+    fs.appendFileSync(logFilePath, data);
+  });
+};
 
 const humanReadableDelta = (delta) => {
   delta.filter((d) => typeof d.insert?.join == "function").forEach((delta) => (delta.insert = delta.insert.join("")));
