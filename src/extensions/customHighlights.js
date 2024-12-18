@@ -37,7 +37,9 @@ function buildDecorations(view, highlights, modifyHighlight, positions) {
         applyDecoration = modifyHighlight({ builder, from: hl.from, match, hl, markParams, view });
       }
 
-      builder.add(hl.from + match.index, hl.from + match.index + match[0].length, Decoration.mark(markParams));
+      if (!hl.remove) {
+        builder.add(hl.from + match.index, hl.from + match.index + match[0].length, Decoration.mark(markParams));
+      }
       applyDecoration?.();
     });
 

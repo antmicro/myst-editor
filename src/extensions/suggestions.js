@@ -24,8 +24,14 @@ export function parseCommentLine({ commentId, text, color }) {
 
     let targetStr = text.slice(0, endIdx);
     let replacement = "";
+    let remove = false;
     if (targetStr.includes("->")) {
-      replacement = targetStr.slice(targetStr.indexOf("->") + 2).trimStart();
+      const rightSide = targetStr.slice(targetStr.indexOf("->") + 2).trimStart();
+      if (rightSide.length === 0) {
+        remove = true;
+      } else {
+        replacement = rightSide;
+      }
       targetStr = targetStr.slice(0, targetStr.indexOf("->")).trimEnd();
     }
 
@@ -37,6 +43,7 @@ export function parseCommentLine({ commentId, text, color }) {
         cssClass: "cm-suggestion",
         replacement,
         color,
+        remove,
       });
     }
 
@@ -49,6 +56,25 @@ export function parseCommentLine({ commentId, text, color }) {
 export function modifyHighlight({ builder, from, match, hl, markParams, view }) {
   if (hl.color) {
     markParams.attributes = { style: `color: ${hl.color}` };
+  }
+
+  if (hl.remove) {
+    return () => {
+      builder.add(
+        from + match.index,
+        from + match.index + match[0].length,
+        Decoration.replace({
+          widget: new Replacement({
+            text: view.state.doc.toString().slice(from + match.index, from + match.index + match[0].length),
+            color: hl.color,
+            from: from + match.index,
+            to: from + match.index + match[0].length,
+            view,
+            remove: true,
+          }),
+        }),
+      );
+    };
   }
 
   if (hl.replacement) {
@@ -72,28 +98,29 @@ export function modifyHighlight({ builder, from, match, hl, markParams, view }) 
 }
 
 class Replacement extends WidgetType {
-  constructor({ text, color, from, to, view }) {
+  constructor({ text, color, from, to, view, remove }) {
     super();
     this.text = text;
     this.color = color;
     this.from = from;
     this.to = to;
     this.view = view;
+    this.remove = remove;
   }
 
   toDOM() {
     const replacementText = document.createElement("span");
     replacementText.innerText = this.text;
     replacementText.style.color = this.color;
-    replacementText.classList.add("cm-replacement");
-    replacementText.title = "Accept suggestion";
+    replacementText.classList.add(this.remove ? "cm-suggestion-remove" : "cm-replacement");
+    replacementText.title = this.remove ? "Remove section" : "Accept suggestion";
 
     replacementText.addEventListener("mouseup", () => {
       this.view.dispatch({
         changes: {
           from: this.from,
-          to: this.to,
-          insert: this.text,
+          to: this.remove ? this.to + 1 : this.to,
+          insert: this.remove ? "" : this.text,
         },
       });
     });

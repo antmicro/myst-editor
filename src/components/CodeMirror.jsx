@@ -143,6 +143,12 @@ const CodeEditor = styled.div`
     }
   }
 
+  .cm-suggestion-remove {
+    text-decoration: line-through;
+    font-weight: initial;
+    cursor: pointer;
+  }
+
   .cm-replacement {
     font-weight: 700;
     display: inline-block;
