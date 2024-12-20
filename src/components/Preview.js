@@ -315,6 +315,17 @@ const Preview = styled.div`
       margin-bottom: 0;
     }
   }
+  table:not(:has(thead)) > tbody > tr:first-of-type > td {
+    border-top: 1px solid var(--gray-500);
+
+    &:first-of-type {
+      border-top-left-radius: var(--border-radius);
+    }
+
+    &:last-of-type {
+      border-top-right-radius: var(--border-radius);
+    }
+  }
   tr {
     &:nth-child(2n + 2) {
       background: var(--gray-100);
