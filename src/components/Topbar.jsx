@@ -19,18 +19,24 @@ const Topbar = styled.div`
   z-index: 10;
   position: sticky;
   top: 0;
-
-  display: grid;
-  grid-template-columns: min-content min-content auto auto min-content min-content 15px;
-  align-items: center;
-
-  .buttons-left {
-    display: flex;
-  }
-
+  padding: 0 15px;
   width: 100%;
   height: 60px;
   background-color: var(--navbar-bg);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .side {
+    display: flex;
+    align-items: center;
+  }
+
+  .btns {
+    display: flex;
+    gap: 10px;
+  }
 
   svg > path {
     stroke: var(--icon-color);
@@ -69,7 +75,7 @@ const Title = styled.div`
 
 const Alert = styled(DefaultButton)`
   padding: 0px 15px;
-  margin: 5px;
+  margin-left: 10px;
   pointer-events: none;
   background-color: var(--alert);
   border: none;
@@ -80,7 +86,6 @@ export const TopbarButton = styled(DefaultButton)`
   color: ${(props) => (props.active ? "white" : "var(--icon-color)")};
   border: ${(props) => (props.active ? "1px solid var(--icon-main-active)" : "1px solid var(--icon-border)")};
   background-color: ${(props) => (props.active ? "var(--icon-main-active)" : "var(--icon-bg)")};
-  margin: 5px;
   width: 40px;
 `;
 
@@ -229,25 +234,29 @@ export const EditorTopbar = ({ alert, users, text, buttons }) => {
 
   return (
     <Topbar id="topbar">
-      <div class="buttons-left">
-        {buttonsLeft.map((button) => (
-          <TopbarButton className="icon" type="button" key={button.id} title={button.tooltip} name={button.id} onClick={button.action}>
-            {typeof button.icon == "function" ? <button.icon /> : <img src={button.icon} />}
-          </TopbarButton>
-        ))}
-        {buttons.find((b) => b.id === "template-manager") && options.templatelist.value && <TemplateManager text={text} />}
+      <div className="side">
+        <div class="btns">
+          {buttonsLeft.map((button) => (
+            <TopbarButton className="icon" type="button" key={button.id} title={button.tooltip} name={button.id} onClick={button.action}>
+              {typeof button.icon == "function" ? <button.icon /> : <img src={button.icon} />}
+            </TopbarButton>
+          ))}
+          {buttons.find((b) => b.id === "template-manager") && options.templatelist.value && <TemplateManager text={text} />}
+        </div>
+        {alert && <Alert className="topbar-alert"> {alert} </Alert>}
+        <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
       </div>
-      <span> {alert && <Alert className="topbar-alert"> {alert} </Alert>} </span>
-      <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
-      <Avatars users={users} />
-      <span>
-        {textButtons.map((b) => (
-          <DefaultButton type="button" onClick={b.action}>
-            {b.text}
-          </DefaultButton>
-        ))}
-      </span>
-      <ButtonGroup buttons={editorModeButtons.value} clickedId={clickedId.value} />
+      <div className="side">
+        <Avatars users={users} />
+        <div className="btns">
+          {textButtons.map((b) => (
+            <DefaultButton type="button" onClick={b.action}>
+              {b.text}
+            </DefaultButton>
+          ))}
+        </div>
+        <ButtonGroup buttons={editorModeButtons.value} clickedId={clickedId.value} />
+      </div>
     </Topbar>
   );
 };

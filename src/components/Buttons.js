@@ -20,7 +20,6 @@ const DefaultButton = styled.button`
   height: 40px;
   display: flex;
   justify-content: center;
-  margin-top: 0px;
   align-items: center;
   padding: 0;
   transition: 0.4s ease;
@@ -29,7 +28,6 @@ const DefaultButton = styled.button`
 
   &:not(:has(svg)) {
     padding: 0px 15px;
-    margin: 5px;
   }
 `;
 

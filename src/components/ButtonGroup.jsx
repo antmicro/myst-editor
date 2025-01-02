@@ -4,6 +4,7 @@ import DefaultButton from "./Buttons.js";
 
 const GroupContainer = styled.div`
   display: flex;
+  margin-left: 10px;
 `;
 
 const RadioButton = styled(DefaultButton)`
@@ -21,7 +22,6 @@ const RadioButton = styled(DefaultButton)`
   &:first-child {
     border-left: 1px solid var(--icon-border) !important;
     border-radius: var(--border-radius) 0 0 var(--border-radius);
-    margin-left: 10px;
   }
 
   &:last-child {

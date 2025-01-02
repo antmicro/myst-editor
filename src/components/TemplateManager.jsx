@@ -1,24 +1,22 @@
 import { useState, useEffect, useContext } from "preact/hooks";
 import Modal from "./Modal";
-import Tooltip from "./Tooltip";
 import DefaultButton from "./Buttons";
-import { styled } from "styled-components";
+import { css, styled } from "styled-components";
 import { TopbarButton } from "./Topbar";
 import { MystState } from "../mystState.js";
 import { useSignalEffect } from "@preact/signals";
 
 const TemplateDropdownContent = styled.div`
   display: none;
-  margin-left: 5px;
-  margin-right: 5px;
   text-transform: uppercase;
   white-space: nowrap;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   color: var(--icon-color);
   background-color: var(--icon-bg);
-  width: 210%;
   z-index: 20;
+  gap: 5px;
+  padding: 5px;
 `;
 
 const TemplateIcon = () => (
@@ -31,12 +29,20 @@ const TemplateIcon = () => (
 );
 
 const TemplateButton = styled(DefaultButton)`
-  width: 90%;
-  color: var(--icon-color);
-  border: 1px solid var(--icon-border);
+  color: ${(props) => (props.error ? "var(--red-500)" : "var(--icon-color)")};
+  border: 1px solid ${(props) => (props.error ? "var(--red-500)" : "var(--icon-border)")};
   padding: 0 10px 0 10px;
   margin-top: 0px;
-  text-wrap: wrap;
+
+  ${(props) =>
+    props.error &&
+    css`
+      cursor: default;
+      &:hover {
+        border: 1px solid var(--red-500) !important;
+        background-color: var(--icon-bg) !important;
+      }
+    `}
 `;
 
 const Dropdown = styled.div`
@@ -58,7 +64,6 @@ const ButtonTooltipFlex = styled.div`
 
 const TemplatesList = styled.div`
   position: absolute;
-  width: 100%;
   padding-top: 5px;
 `;
 
@@ -184,27 +189,21 @@ const TemplateManager = ({ text }) => {
         </TopbarButton>
         <TemplatesList>
           <TemplateDropdownContent>
-            {Object.keys(readyTemplates).map((key) =>
-              readyTemplates[key].errorMessage ? (
-                <ButtonTooltipFlex>
-                  {showTooltip === key && <Tooltip tooltipOrientation="left" errorMessage={readyTemplates[key].errorMessage} />}
-                  <TemplateButton type="button" onMouseEnter={() => setShowTooltip(key)} onMouseLeave={() => setShowTooltip(false)}>
-                    {readyTemplates[key].id}
-                  </TemplateButton>
-                </ButtonTooltipFlex>
-              ) : (
-                <TemplateButton
-                  type="button"
-                  class="tmpl-butn"
-                  onClick={() => {
-                    setShowModal(true);
-                    setSelectedTemplate(key);
-                  }}
-                >
-                  {readyTemplates[key].id}
-                </TemplateButton>
-              ),
-            )}
+            {Object.keys(readyTemplates).map((key) => (
+              <TemplateButton
+                type="button"
+                key={key}
+                error={readyTemplates[key].errorMessage != undefined}
+                title={readyTemplates[key].errorMessage ?? ""}
+                onClick={() => {
+                  if (readyTemplates[key].errorMessage) return;
+                  setShowModal(true);
+                  setSelectedTemplate(key);
+                }}
+              >
+                {readyTemplates[key].id}
+              </TemplateButton>
+            ))}
           </TemplateDropdownContent>
         </TemplatesList>
       </Dropdown>

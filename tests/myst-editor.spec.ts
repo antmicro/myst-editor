@@ -520,7 +520,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
       const title = await page.locator("#document-title").innerHTML();
       expect(title).toContain("Playwright");
-      expect(page.locator("#topbar > span > button")).toHaveCount(2);
+      expect(page.locator("#topbar .side:last-child .btns button")).toHaveCount(2);
       const resolvedVisible = await page.isVisible("#resolved-wrapper");
       expect(resolvedVisible).toBeTruthy();
     });
