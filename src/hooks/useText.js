@@ -23,6 +23,7 @@ const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 function checkLinks(/** @type {markdownIt} */ md) {
   const defaultRule = md.renderer.rules.link_open;
   md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+    const render = defaultRule ?? self.renderToken.bind(self);
     const href = tokens[idx].attrs?.find((a) => a[0] == "href")?.[1];
     if (href?.startsWith("(")) {
       const linkLabel = tokens[idx + 1];
@@ -33,7 +34,7 @@ function checkLinks(/** @type {markdownIt} */ md) {
       return "";
     }
 
-    return defaultRule(tokens, idx, options, env, self);
+    return render(tokens, idx, options, env, self);
   };
 }
 

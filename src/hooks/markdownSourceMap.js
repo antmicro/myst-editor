@@ -39,6 +39,7 @@ function addLineNumberToTokens(defaultRule) {
    */
   return (tokens, idx, options, env, self) => {
     const rule = defaultRule ?? self.renderToken.bind(self);
+    if (!env.lineMap) return rule(tokens, idx, options, env, self);
 
     if (tokens[idx].type === "list_item_open" && tokens[idx + 1].type !== "list_item_close") {
       // skip non empty list items
@@ -131,6 +132,7 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
   const defaultFenceRule = md.renderer.rules.fence;
   md.renderer.rules.fence = (tokens, idx, options, env, self) => {
     const defaultOutput = defaultFenceRule(tokens, idx, options, env, self);
+    if (!env.lineMap) return defaultOutput;
     const token = tokens[idx];
     // Some markdown-it extensions use the `fence` rule for other things than code blocks (eg. mermaid graphs) so we don't want to modify those
     if (defaultOutput.includes("mermaid")) {

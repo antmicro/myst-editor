@@ -162,7 +162,7 @@ const toDocutilsDirective = ({ target, transform, required_arguments = 0, option
         block: true,
       });
       // We should support caching and async directives
-      token.content = transform(data.body + JSON.stringify(data.args) + JSON.stringify(data.options), data);
+      token.content = transform(data.body + JSON.stringify(data.args) + JSON.stringify(data.options), data, this);
       return [token];
     }
   };
