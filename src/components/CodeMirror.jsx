@@ -246,6 +246,7 @@ const CodeMirror = ({ text, collaboration, preview }) => {
         .useCompartment(suggestionCompartment, customHighlighter([]))
         .useSpellcheck(options.spellcheckOpts.value)
         .if(options.collaboration.value.enabled, (b) => b.useCollaboration({ ...collaboration, editorView }))
+        .if(!options.collaboration.value.enabled, (b) => b.useDefaultHistory())
         .if(options.collaboration.value.commentsEnabled, (b) =>
           b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({
             ycomments: collaboration.ycomments,

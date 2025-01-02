@@ -1,22 +1,42 @@
-import { highlightActiveLine, keymap } from "@codemirror/view";
+import {
+  highlightActiveLine,
+  lineNumbers,
+  highlightActiveLineGutter,
+  highlightSpecialChars,
+  drawSelection,
+  dropCursor,
+  rectangularSelection,
+  crosshairCursor,
+  keymap,
+} from "@codemirror/view";
 import { EditorSelection, EditorState, Prec } from "@codemirror/state";
-import { EditorView, basicSetup, minimalSetup } from "codemirror";
+import { EditorView } from "codemirror";
 import { yCollab } from "y-codemirror.next";
 import { markdown } from "@codemirror/lang-markdown";
-import { indentWithTab, redo, history } from "@codemirror/commands";
+import { indentWithTab, redo, history, defaultKeymap, historyKeymap } from "@codemirror/commands";
 import spellcheck from "./spellchecker";
 import { customHighlighter } from "./customHighlights";
 import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
 import { suggestionPopup } from "./suggestions";
-import { foldEffect, unfoldEffect, foldable } from "@codemirror/language";
+import {
+  foldEffect,
+  unfoldEffect,
+  foldable,
+  foldGutter,
+  indentOnInput,
+  syntaxHighlighting,
+  defaultHighlightStyle,
+  bracketMatching,
+  foldKeymap,
+} from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
 import { yaml } from "@codemirror/lang-yaml";
 import { ySync } from "./collab";
-
-const basicSetupWithoutHistory = basicSetup.filter((_, i) => i != 3);
-const minimalSetupWithoutHistory = minimalSetup.filter((_, i) => i != 1);
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
+import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
+import { lintKeymap } from "@codemirror/lint";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -43,11 +63,33 @@ export class ExtensionBuilder {
   }
 
   static minimalSetup() {
-    return new ExtensionBuilder(minimalSetupWithoutHistory);
+    return new ExtensionBuilder([
+      highlightSpecialChars(),
+      drawSelection(),
+      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+      keymap.of([...defaultKeymap]),
+    ]);
   }
 
   static basicSetup() {
-    return new ExtensionBuilder(basicSetupWithoutHistory);
+    return new ExtensionBuilder([
+      lineNumbers(),
+      highlightActiveLineGutter(),
+      highlightSpecialChars(),
+      foldGutter(),
+      drawSelection(),
+      dropCursor(),
+      EditorState.allowMultipleSelections.of(true),
+      indentOnInput(),
+      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+      bracketMatching(),
+      autocompletion(),
+      rectangularSelection(),
+      crosshairCursor(),
+      highlightActiveLine(),
+      highlightSelectionMatches(),
+      keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, ...foldKeymap, ...completionKeymap, ...lintKeymap]),
+    ]);
   }
 
   static codeLanguage(name) {
@@ -61,7 +103,7 @@ export class ExtensionBuilder {
   static defaultPlugins() {
     return [
       EditorView.lineWrapping,
-      markdown({ codeLanguages: this.codeLanguage }),
+      markdown({ codeLanguages: this.codeLanguage, addKeymap: false }),
       highlightActiveLine(),
       keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
     ];
