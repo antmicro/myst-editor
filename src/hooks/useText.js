@@ -38,6 +38,16 @@ function checkLinks(/** @type {markdownIt} */ md) {
   };
 }
 
+function openLinksNewTab(/** @type {markdownIt} */ md) {
+  const defaultRule = md.renderer.rules.link_open;
+  md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+    const render = defaultRule ?? self.renderToken.bind(self);
+    tokens[idx].attrSet("target", "_blank");
+    tokens[idx].attrSet("rel", "noreferrer");
+    return render(tokens, idx, options, env, self);
+  };
+}
+
 const exposeText = (text, editorId) => () => {
   window.myst_editor[editorId].text = text;
 };
@@ -117,7 +127,8 @@ export const useText = ({ preview }) => {
       .use(checkLinks)
       .use(colonFencedBlocks)
       .use(markdownItMapUrls)
-      .use(markdownCheckboxes);
+      .use(markdownCheckboxes)
+      .use(openLinksNewTab);
 
     if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
     return md;
@@ -196,7 +207,7 @@ export const useText = ({ preview }) => {
             purify.sanitize(markdown.value.render(md, { chunkId, startLine, lineMap, view: editorView.value, mapUrl: options.mapUrl.value }), {
               // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
               ADD_TAGS: ["foreignobject", "iframe"],
-              ADD_ATTR: ["dominant-baseline"],
+              ADD_ATTR: ["dominant-baseline", "target"],
             });
           return { md, hash, id: chunkId, html };
         }),
