@@ -17,7 +17,7 @@ const AvatarsWrapper = styled.div`
     transition: 0.5s;
 
     &:hover {
-      margin: 5px 0px 5px 0px;
+      margin-left: 0;
     }
 
     &.placeholder {
@@ -41,9 +41,9 @@ export const Avatar = ({ login, color, avatarUrl, userUrl }) => (
 );
 
 const AvatarPlaceholder = ({ n, usernames }) => (
-  <AvatarsWrapper title={usernames}>
-    <span class="avatar placeholder">+{n}</span>
-  </AvatarsWrapper>
+  <div class="avatar placeholder" title={usernames}>
+    +{n}
+  </div>
 );
 
 const Avatars = ({ users }) => {
@@ -51,19 +51,17 @@ const Avatars = ({ users }) => {
 
   return (
     <AvatarsWrapper n={Math.min(users.length, MAX_AVATARS)}>
-      {nUserAvatarsToShow < users.length ? (
+      {nUserAvatarsToShow < users.length && (
         <AvatarPlaceholder
           n={users.length - nUserAvatarsToShow}
           usernames={users
-            .filter((_, idx) => idx >= MAX_AVATARS)
+            .filter((_, idx) => idx >= MAX_AVATARS - 1)
             .map((u) => u.login)
             .join(", ")}
         />
-      ) : (
-        ""
       )}
       {users.slice(0, nUserAvatarsToShow).map((user) => (
-        <Avatar {...user} />
+        <Avatar key={user.login} {...user} />
       ))}
     </AvatarsWrapper>
   );
