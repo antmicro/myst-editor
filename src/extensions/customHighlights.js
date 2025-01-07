@@ -19,6 +19,8 @@ function buildDecorations(view, highlights, modifyHighlight, positions) {
   const builder = new RangeSetBuilder();
   const cmText = view.state.doc.sliceString(from, to);
 
+  let position = 0;
+
   highlights
     .flatMap((hl) => {
       const text = !hl.id ? cmText : view.state.doc.line(parseInt(positions.get(hl.id))).text;
@@ -26,6 +28,14 @@ function buildDecorations(view, highlights, modifyHighlight, positions) {
       return [...text.matchAll(hl.target)].map((match) => ({ match, hl: { ...hl, from: localFrom } }));
     })
     .sort((a, b) => a.hl.from + a.match.index - (b.hl.from + b.match.index))
+    .filter(({ hl, match }) => {
+      const overlap = hl.from + match.index < position;
+      position = hl.from + match.index + match[0].length;
+      if (overlap) {
+        console.warn(`Suggestion |${match[0]} -> ${hl.replacement}| will not be shown, as it overlaps a previous suggestion.`);
+      }
+      return !overlap;
+    })
     .forEach(({ hl, match }) => {
       let markParams = { class: defaultDecorationClass };
       if (hl.cssClass) {
