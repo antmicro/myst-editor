@@ -37,6 +37,7 @@ import { ySync } from "./collab";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { lintKeymap } from "@codemirror/lint";
+import { CollaborationClient } from "../collaboration";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -183,24 +184,27 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useCollaboration({ ytext, provider, undoManager, editorView }) {
-    const collab = yCollab(ytext, provider.awareness, { undoManager });
+  /**
+   * @param {{ collabClient: CollaborationClient, editorView: EditorView }}
+   */
+  useCollaboration({ collabClient, editorView }) {
+    const collab = yCollab(collabClient.ytext, collabClient.provider.awareness, { undoManager: collabClient.undoManager });
     collab[1] = ySync;
     this.extensions.push(collab);
 
-    if (undoManager) {
-      undoManager.on("stack-item-added", (event) => {
+    if (collabClient.undoManager) {
+      collabClient.undoManager.on("stack-item-added", (event) => {
         event.stackItem.meta.set("cursor-location", getRelativeCursorLocation(editorView.value));
       });
-      undoManager.on("stack-item-popped", (event) => {
+      collabClient.undoManager.on("stack-item-popped", (event) => {
         restoreCursorLocation(editorView.value, event.stackItem.meta.get("cursor-location"));
       });
 
       this.extensions.push(
         keymap.of([
-          { key: "Mod-z", run: () => undoManager.undo(), preventDefault: true },
-          { key: "Mod-y", run: () => undoManager.redo(), preventDefault: true },
-          { key: "Mod-Z", run: () => undoManager.redo(), preventDefault: true },
+          { key: "Mod-z", run: () => collabClient.undoManager.undo(), preventDefault: true },
+          { key: "Mod-y", run: () => collabClient.undoManager.redo(), preventDefault: true },
+          { key: "Mod-Z", run: () => collabClient.undoManager.redo(), preventDefault: true },
         ]),
       );
     }

@@ -1,12 +1,12 @@
 import { markdownKeymap } from "@codemirror/lang-markdown";
 import { Prec } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
-import { Signal, signal } from "@preact/signals";
+import { Signal, signal, effect } from "@preact/signals";
 import { EditorView } from "codemirror";
 import { createContext } from "preact";
-import { Doc } from "yjs";
 import { closeBrackets } from "@codemirror/autocomplete";
 import Settings from "./components/Settings";
+import { CollaborationClient } from "./collaboration";
 
 export const predefinedButtons = {
   printToPdf: {
@@ -96,6 +96,19 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
       return browserSetting ? { ...s, enabled: browserSetting.enabled } : s;
     });
   }
+  const collab = signal(null);
+  effect(() => {
+    if (!signalOptions.collaboration.value.enabled) return;
+    const client = new CollaborationClient(signalOptions.collaboration.value, {
+      id: signalOptions.id.value,
+      parent: opts.parent,
+      getAvatar: signalOptions.getAvatar.value,
+      getUserUrl: signalOptions.getUserUrl.value,
+    });
+    collab.value = client;
+
+    return () => client.destroy();
+  });
 
   return {
     options: signalOptions,
@@ -104,11 +117,8 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     cache: {
       transform: new Map(),
     },
-    collab: {
-      /** @type {Signal<Doc?>} */
-      ydoc: signal(null),
-    },
     userSettings: signal(userSettings),
+    collab,
   };
 }
 

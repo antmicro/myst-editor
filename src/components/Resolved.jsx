@@ -1,7 +1,8 @@
-import { useState, useMemo, useEffect } from "preact/hooks";
+import { useState, useMemo, useEffect, useContext } from "preact/hooks";
 import styled from "styled-components";
 import ResolvedComment from "./ResolvedComment";
 import CommentIcon from "../icons/comment.svg";
+import { MystState } from "../mystState";
 
 const ResolvedWrapper = styled.div`
   background-color: white;
@@ -63,7 +64,8 @@ function dateComparator(c1, c2) {
   return c1.resolvedDate - c2.resolvedDate;
 }
 
-const ResolvedComments = ({ ycomments }) => {
+const ResolvedComments = () => {
+  const { ycomments } = useContext(MystState).collab.value;
   let [resolvedComments, setResolvedComments] = useState(ycomments.resolver().resolved().sort(dateComparator));
   let commentContents = useMemo(
     () =>

@@ -310,7 +310,7 @@ const MystEditorGit = ({
   const fileToSelectOpt = (f) => ({ label: f, value: f });
 
   useSignalEffect(() => {
-    const doc = mystState.current.collab.ydoc.value;
+    const doc = mystState.current.collab.value.ydoc;
     if (!doc) return;
 
     const handleChange = (/** @type {Y.Transaction} */ tr) => {

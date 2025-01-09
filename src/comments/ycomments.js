@@ -334,7 +334,9 @@ export class YComments {
   }
 
   findCommentOn(lineNumber) {
-    return this.positions().positions.value.find((c) => c.lineNumber == lineNumber);
+    return this.positions()
+      .positions.peek()
+      .find((c) => c.lineNumber == lineNumber);
   }
 
   parentLineHeight(commentId) {

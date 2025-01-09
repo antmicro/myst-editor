@@ -11,6 +11,7 @@ import editIcon from "../icons/edit.svg";
 import { MystState } from "../mystState";
 import { userExtensionsCompartment } from "./Settings";
 import { useSignalEffect } from "@preact/signals";
+
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
   background: var(--gray-200);
@@ -196,29 +197,31 @@ const setEditorText = (editor, text) => {
   });
 };
 
-const CodeMirror = ({ text, collaboration, preview }) => {
-  const { editorView, options, userSettings } = useContext(MystState);
+const CodeMirror = ({ text, setUsers, preview }) => {
+  const { editorView, options, collab, userSettings } = useContext(MystState);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
 
-  useEffect(() => {
-    if (options.collaboration.value.enabled && collaboration.error) {
-      text.readyToRender();
-      editorView.value?.destroy();
+  useSignalEffect(() => {
+    if (!options.collaboration.value.enabled || collab.value.ready.value) return;
+    text.readyToRender();
+    editorView.value?.destroy();
 
-      const view = new EditorView({
-        root: options.parent,
-        state: EditorState.create({
-          doc: text.get(),
-          extensions: ExtensionBuilder.basicSetup().useHighlighter(options.transforms.value).readonly().create(),
-        }),
-        parent: editorMountpoint.current,
-      });
+    const view = new EditorView({
+      root: options.parent,
+      state: EditorState.create({
+        doc: text.get(),
+        extensions: ExtensionBuilder.basicSetup().useHighlighter(options.transforms.value).readonly().create(),
+      }),
+      parent: editorMountpoint.current,
+    });
+    view.dom.style.opacity = "0.5";
 
-      view.dom.style.opacity = "0.5";
-    }
-  }, [collaboration.error]);
+    return () => {
+      view.destroy();
+    };
+  });
 
   useSignalEffect(() => {
     const userExtensions = userSettings.value.filter((s) => s.enabled).map((s) => s.extension);
@@ -227,19 +230,18 @@ const CodeMirror = ({ text, collaboration, preview }) => {
     });
   });
 
-  useEffect(() => {
-    if (options.collaboration.value.enabled && !collaboration.ready) return;
-    if (collaboration.error) return;
-
-    if (collaboration.ytext?.toString().length === 0 && options.initialText.length > 0) {
-      console.warn("[Collaboration] Remote state is empty, overriding with local state");
-      text.set(options.initialText);
-      collaboration.ytext.insert(0, options.initialText);
-    }
-
+  useSignalEffect(() => {
     if (options.collaboration.value.enabled) {
-      text.set(collaboration.ytext.toString());
-      collaboration.ytext.observe((ev, tr) => {
+      if (!collab.value.ready.value) return;
+
+      if (collab.value.ytext.toString().length === 0 && options.initialText.length > 0) {
+        console.warn("[Collaboration] Remote state is empty, overriding with local state");
+        text.set(options.initialText);
+        collab.value.ytext.insert(0, options.initialText);
+      }
+
+      text.set(collab.value.ytext.toString());
+      collab.value.ytext.observe((ev, tr) => {
         if (!tr.local) return;
         lastTyped.current = performance.now();
       });
@@ -249,17 +251,19 @@ const CodeMirror = ({ text, collaboration, preview }) => {
 
     const startState = EditorState.create({
       root: options.parent,
-      doc: options.collaboration.value.enabled ? collaboration.ytext.toString() : text.get(),
+      doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.get(),
       extensions: ExtensionBuilder.basicSetup()
         .useHighlighter(options.transforms.value)
         .useCompartment(suggestionCompartment, customHighlighter([]))
         .useCompartment(userExtensionsCompartment, [])
         .useSpellcheck(options.spellcheckOpts.value)
-        .if(options.collaboration.value.enabled, (b) => b.useCollaboration({ ...collaboration, editorView }))
+        .if(options.collaboration.value.enabled, (b) => {
+          return b.useCollaboration({ collabClient: collab.value, editorView });
+        })
         .if(!options.collaboration.value.enabled, (b) => b.useDefaultHistory())
         .if(options.collaboration.value.commentsEnabled, (b) =>
-          b.useComments({ ycomments: collaboration.ycomments }).useSuggestionPopup({
-            ycomments: collaboration.ycomments,
+          b.useComments({ ycomments: collab.value.ycomments }).useSuggestionPopup({
+            ycomments: collab.value.ycomments,
             editorMountpoint,
           }),
         )
@@ -282,28 +286,18 @@ const CodeMirror = ({ text, collaboration, preview }) => {
       skipAndFoldAll(view, options.unfoldedHeadings.value);
     }
 
-    collaboration.ycomments?.registerCodeMirror(view);
-    collaboration.provider?.watchCollabolators(collaboration.setUsers);
+    collab.value?.ycomments?.registerCodeMirror(view);
+    collab.value?.provider?.watchCollabolators(setUsers);
     text.onSync((currentText) => setEditorText(view, currentText));
 
     return () => {
       view.destroy();
     };
-  }, [
-    ...Object.values(collaboration),
-    options.collaboration.value,
-    options.id.value,
-    options.spellcheckOpts.value,
-    options.syncScroll.value,
-    options.transforms.value,
-    options.unfoldedHeadings.value,
-  ]);
+  });
 
   return (
     <CodeEditor className="myst-main-editor" ref={editorMountpoint} $mode={options.mode.value} id={`${options.id.value}-editor`}>
-      {options.collaboration.value.commentsEnabled && !collaboration.error && collaboration.ycomments?.mainCodeMirror && (
-        <YCommentsParent ycomments={collaboration.ycomments} />
-      )}
+      {options.collaboration.value.commentsEnabled && collab.value.ready.value && collab.value.ycomments?.mainCodeMirror && <YCommentsParent />}
       {options.collaboration.value.commentsEnabled && (
         <AddSuggestionBtn style="display: none" className="myst-add-suggestion" title="Suggest Changes">
           <img src={editIcon} alt="edit" />

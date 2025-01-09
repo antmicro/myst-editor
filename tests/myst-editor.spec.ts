@@ -2,7 +2,6 @@ import { ChangeSpec } from "@codemirror/state";
 import { test, expect, Page, BrowserContext } from "@playwright/test";
 import { EditorView } from "codemirror";
 import fs from "fs/promises";
-import { YComments } from "../src/comments/ycomments";
 import { createMystState } from "../src/mystState";
 
 declare global {
@@ -12,7 +11,6 @@ declare global {
       {
         text: string;
         main_editor: EditorView;
-        ycomments: YComments;
         state: ReturnType<typeof createMystState>;
       }
     >;
@@ -610,7 +608,7 @@ const addComment = async (page: Page, lineNumber: number, text?: string) => {
     // for some reason yjs does not pick up the changes made above, so we need to add them below
     await page.evaluate(
       ({ lineNumber, text, id }) => {
-        const ycomments = window.myst_editor[id].ycomments;
+        const ycomments = window.myst_editor[id].state.collab.value.ycomments!;
         const commentId = ycomments.findCommentOn(lineNumber + 1)?.commentId;
         ycomments.getTextForComment(commentId).insert(0, text);
         ycomments.syncSuggestions(commentId);

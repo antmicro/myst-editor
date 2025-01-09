@@ -6,8 +6,6 @@ import Preview, { PreviewFocusHighlight } from "./components/Preview";
 import Diff from "./components/Diff";
 import { useText } from "./hooks/useText";
 import { EditorTopbar } from "./components/Topbar";
-import useCollaboration from "./hooks/useCollaboration";
-import useComments from "./hooks/useComments";
 import ResolvedComments from "./components/Resolved";
 import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
 import { createMystState, MystState, predefinedButtons, defaultButtons } from "./mystState";
@@ -60,8 +58,7 @@ const StatusBanner = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: ${(props) => (props.error ? "var(--red-500)" : "var(--blue-100)")};
-  color: ${(props) => (props.error ? "white" : "inherit")};
+  background-color: var(--blue-100);
   font-weight: 600;
 `;
 
@@ -97,7 +94,7 @@ const createExtraScopePlugin = (scope) => {
 const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val ? "hidden" : "visible");
 
 const MystEditor = () => {
-  const { editorView, cache, options } = useContext(MystState);
+  const { editorView, cache, options, collab } = useContext(MystState);
   const [fullscreen, setFullscreen] = useState(false);
 
   const preview = useRef(null);
@@ -108,9 +105,6 @@ const MystEditor = () => {
     (_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: options.getAvatar.value(u.login), userUrl: options.getUserUrl.value(u.login) })),
     [],
   );
-
-  const { provider, undoManager, ytext, ydoc, ready, error } = useCollaboration();
-  const ycomments = useComments(ydoc, provider);
 
   const alertFor = (alertText, secs) => {
     setAlert(alertText);
@@ -158,26 +152,12 @@ const MystEditor = () => {
               }}
             />
           )}
-          {error && <StatusBanner error> {typeof error == "string" ? error : "No connection to the collaboration server"} </StatusBanner>}
-          {options.collaboration.enabled && !ready && !error && <StatusBanner>Connecting to the collaboration server ...</StatusBanner>}
+          {options.collaboration.value.enabled && !collab.value.ready.value && (
+            <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
+          )}
           <MystWrapper fullscreen={fullscreen}>
             <FlexWrapper id="editor-wrapper">
-              <CodeMirror
-                {...{
-                  text,
-                  preview,
-                  collaboration: {
-                    setUsers,
-                    provider,
-                    undoManager,
-                    ytext,
-                    ydoc,
-                    ready,
-                    error,
-                    ycomments,
-                  },
-                }}
-              />
+              <CodeMirror text={text} preview={preview} setUsers={setUsers} />
             </FlexWrapper>
             <FlexWrapper id="preview-wrapper">
               <Preview
@@ -197,9 +177,9 @@ const MystEditor = () => {
                 <Diff text={text} />
               </FlexWrapper>
             )}
-            {options.collaboration.value.commentsEnabled && options.collaboration.value.resolvingCommentsEnabled && ycomments && !error && (
+            {options.collaboration.value.commentsEnabled && options.collaboration.value.resolvingCommentsEnabled && collab.value.ready.value && (
               <FlexWrapper id="resolved-wrapper">
-                <ResolvedComments ycomments={ycomments} />
+                <ResolvedComments />
               </FlexWrapper>
             )}
           </MystWrapper>
@@ -266,3 +246,4 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
 
 export { defaultButtons, predefinedButtons, batch, computed, signal, effect, MystEditor as MystEditorPreact };
 export { default as MystEditorGit } from "./myst-git/MystEditorGit";
+export { CollaborationClient } from "./collaboration";

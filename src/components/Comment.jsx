@@ -70,31 +70,32 @@ const YCommentWrapper = styled.div`
     transform: translateX(-30px);
   }
 `;
-/** @param {{ ycomments: YComments }} */
-const YComment = ({ ycomments, commentId }) => {
-  const { options } = useContext(MystState);
+
+const YComment = ({ commentId }) => {
+  const { options, collab } = useContext(MystState);
   let cmref = useRef(null);
 
-  const lineAuthors = useMemo(() => ycomments.lineAuthors(commentId), [commentId]);
+  const lineAuthors = useMemo(() => collab.value.ycomments.lineAuthors(commentId), [commentId]);
 
   const updateHeight = useCallback(
-    (update) => update.heightChanged && update.view.requestMeasure({ read: (view) => ycomments.updateHeight(commentId, view.dom.clientHeight) }),
+    (update) =>
+      update.heightChanged && update.view.requestMeasure({ read: (view) => collab.value.ycomments.updateHeight(commentId, view.dom.clientHeight) }),
     [commentId],
   );
 
-  const parentHeight = ycomments.parentLineHeight(commentId) - 1;
+  const parentHeight = collab.value.ycomments.parentLineHeight(commentId) - 1;
 
   useEffect(() => {
     if (!cmref.current) {
       return;
     }
-    const ytext = ycomments.getTextForComment(commentId);
+    const ytext = collab.value.ycomments.getTextForComment(commentId);
     const view = new EditorView({
       state: EditorState.create({
         doc: ytext.toString(),
         extensions: ExtensionBuilder.minimalSetup()
           .disable(["Mod-z", "Mod-y", "Mod-Z"])
-          .useCollaboration({ ytext, provider: ycomments.provider })
+          .useCollaboration({ collabClient: { ytext, provider: collab.value.provider } })
           .useDefaultHistory()
           .addUpdateListener(updateHeight)
           .showCommentLineAuthors(lineAuthors)
@@ -104,17 +105,17 @@ const YComment = ({ ycomments, commentId }) => {
       parent: cmref.current,
     });
 
-    ycomments.syncSuggestions(commentId);
-    ycomments.registerCommentEditor(commentId, view);
+    collab.value.ycomments.syncSuggestions(commentId);
+    collab.value.ycomments.registerCommentEditor(commentId, view);
     ytext.observe((_, tr) => {
       if (!tr.local) return;
-      ycomments.syncSuggestions(commentId);
-      ycomments.provider.awareness.setLocalStateField("lastChanged", Date.now());
+      collab.value.ycomments.syncSuggestions(commentId);
+      collab.value.ycomments.provider.awareness.setLocalStateField("lastChanged", Date.now());
     });
 
-    if (ycomments.newLocalComment) {
+    if (collab.value.ycomments.newLocalComment) {
       view.focus();
-      ycomments.newLocalComment = false;
+      collab.value.ycomments.newLocalComment = false;
     }
 
     return () => {
@@ -124,43 +125,48 @@ const YComment = ({ ycomments, commentId }) => {
 
   return (
     <YCommentWrapper
-      left={ycomments.marginLeft()}
-      top={ycomments.display().comments.value[commentId]?.top}
-      fade={ycomments.draggedComment.value == commentId}
+      left={collab.value.ycomments.marginLeft()}
+      top={collab.value.ycomments.display().comments.value[commentId]?.top}
+      fade={collab.value.ycomments.draggedComment.value == commentId}
     >
       <div class="comment-wrapper" style="position:relative">
-        {ycomments.commentWithPopup.value == commentId && (
+        {collab.value.ycomments.commentWithPopup.value == commentId && (
           <YCommentPopup
-            left={ycomments.marginLeft()}
+            left={collab.value.ycomments.marginLeft()}
             shift={parentHeight}
             onMouseLeave={() => {
-              ycomments.commentWithPopup.value = null;
-              ycomments.updateMainCodeMirror();
+              collab.value.ycomments.commentWithPopup.value = null;
+              collab.value.ycomments.updateMainCodeMirror();
             }}
           >
             <img
               class="comment-icon"
               src={commentIcon}
               onMouseUp={() => {
-                ycomments.display().switchVisibility(commentId);
-                ycomments.updateMainCodeMirror();
+                collab.value.ycomments.display().switchVisibility(commentId);
+                collab.value.ycomments.updateMainCodeMirror();
               }}
-              onDragStart={() => (ycomments.draggedComment.value = commentId)}
-              onDragEnd={() => (ycomments.draggedComment.value = null)}
+              onDragStart={() => (collab.value.ycomments.draggedComment.value = commentId)}
+              onDragEnd={() => (collab.value.ycomments.draggedComment.value = null)}
             />
 
             <svg width="3" height="22" viewBox="0 10 2 19" fill="none">
               <path d="M1 1V25" stroke="#DDDDDD" stroke-width="0.75" stroke-linecap="round" />
             </svg>
 
-            <PopupButton icon={trashcanIcon} bgOnHover={"#e7473c15"} text="DELETE" onClick={() => ycomments.deleteComment(commentId)} />
+            <PopupButton icon={trashcanIcon} bgOnHover={"#e7473c15"} text="DELETE" onClick={() => collab.value.ycomments.deleteComment(commentId)} />
             {options.collaboration.value.resolvingCommentsEnabled && (
-              <PopupButton icon={resolveIcon} bgOnHover={"#AAE17320"} text="RESOLVE" onClick={() => ycomments.resolveComment(commentId)} />
+              <PopupButton
+                icon={resolveIcon}
+                bgOnHover={"#AAE17320"}
+                text="RESOLVE"
+                onClick={() => collab.value.ycomments.resolveComment(commentId)}
+              />
             )}
           </YCommentPopup>
         )}
 
-        <div style={`display: ${ycomments.display().isShown(commentId) ? "block" : "none"}`} ref={cmref}></div>
+        <div style={`display: ${collab.value.ycomments.display().isShown(commentId) ? "block" : "none"}`} ref={cmref} />
       </div>
     </YCommentWrapper>
   );
@@ -238,7 +244,7 @@ const PopupButton = ({ icon, onClick, text, bgOnHover }) => {
   );
 };
 
-/** @param {{ ycomments: YComments }} */
-export const YCommentsParent = ({ ycomments }) => {
-  return ycomments.comments.value.map(({ commentId }) => <YComment key={commentId} {...{ commentId, ycomments }} />);
+export const YCommentsParent = () => {
+  const { ycomments } = useContext(MystState).collab.value;
+  return ycomments.comments.value.map(({ commentId }) => <YComment key={commentId} commentId={commentId} />);
 };
