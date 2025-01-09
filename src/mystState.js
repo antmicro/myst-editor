@@ -1,7 +1,12 @@
+import { markdownKeymap } from "@codemirror/lang-markdown";
+import { Prec } from "@codemirror/state";
+import { keymap } from "@codemirror/view";
 import { Signal, signal } from "@preact/signals";
 import { EditorView } from "codemirror";
 import { createContext } from "preact";
 import { Doc } from "yjs";
+import { closeBrackets } from "@codemirror/autocomplete";
+import Settings from "./components/Settings";
 
 export const predefinedButtons = {
   printToPdf: {
@@ -13,14 +18,31 @@ export const predefinedButtons = {
   copyHtml: { id: "copy-html", tooltip: "Copy document as HTML" },
   fullscreen: { id: "fullscreen", tooltip: "Fullscreen" },
   refresh: { id: "refresh", tooltip: "Refresh issue links" },
+  settings: { id: "settings", tooltip: "Editor settings", dropdown: Settings },
 };
 
 export const defaultButtons = [
   predefinedButtons.fullscreen,
+  predefinedButtons.settings,
   predefinedButtons.copyHtml,
   predefinedButtons.refresh,
   predefinedButtons.printToPdf,
   predefinedButtons.templateManager,
+];
+
+const defaultUserSettings = [
+  {
+    id: "auto-markdown",
+    title: "Autocomplete Markdown",
+    enabled: false,
+    extension: Prec.high(keymap.of(markdownKeymap)),
+  },
+  {
+    id: "autoclose-bracket",
+    title: "Autoclose brackets",
+    enabled: false,
+    extension: closeBrackets(),
+  },
 ];
 
 const defaults = {
@@ -66,6 +88,15 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     }
   }
 
+  let browserSettings = JSON.parse(localStorage.getItem("myst/settings"));
+  let userSettings = [...defaultUserSettings];
+  if (browserSettings) {
+    userSettings = userSettings.map((s) => {
+      const browserSetting = browserSettings.find((bSetting) => bSetting.id == s.id);
+      return browserSetting ? { ...s, enabled: browserSetting.enabled } : s;
+    });
+  }
+
   return {
     options: signalOptions,
     /** @type {Signal<EditorView?>} */
@@ -77,6 +108,7 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
       /** @type {Signal<Doc?>} */
       ydoc: signal(null),
     },
+    userSettings: signal(userSettings),
   };
 }
 

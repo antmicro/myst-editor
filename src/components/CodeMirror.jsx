@@ -9,6 +9,8 @@ import { customHighlighter } from "../extensions/customHighlights";
 import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
 import editIcon from "../icons/edit.svg";
 import { MystState } from "../mystState";
+import { userExtensionsCompartment } from "./Settings";
+import { useSignalEffect } from "@preact/signals";
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
   background: var(--gray-200);
@@ -195,7 +197,7 @@ const setEditorText = (editor, text) => {
 };
 
 const CodeMirror = ({ text, collaboration, preview }) => {
-  const { editorView, options } = useContext(MystState);
+  const { editorView, options, userSettings } = useContext(MystState);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
@@ -217,6 +219,13 @@ const CodeMirror = ({ text, collaboration, preview }) => {
       view.dom.style.opacity = "0.5";
     }
   }, [collaboration.error]);
+
+  useSignalEffect(() => {
+    const userExtensions = userSettings.value.filter((s) => s.enabled).map((s) => s.extension);
+    editorView.value?.dispatch?.({
+      effects: userExtensionsCompartment.reconfigure(userExtensions),
+    });
+  });
 
   useEffect(() => {
     if (options.collaboration.value.enabled && !collaboration.ready) return;
@@ -244,6 +253,7 @@ const CodeMirror = ({ text, collaboration, preview }) => {
       extensions: ExtensionBuilder.basicSetup()
         .useHighlighter(options.transforms.value)
         .useCompartment(suggestionCompartment, customHighlighter([]))
+        .useCompartment(userExtensionsCompartment, [])
         .useSpellcheck(options.spellcheckOpts.value)
         .if(options.collaboration.value.enabled, (b) => b.useCollaboration({ ...collaboration, editorView }))
         .if(!options.collaboration.value.enabled, (b) => b.useDefaultHistory())
