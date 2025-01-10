@@ -141,7 +141,7 @@ export class CommentPositionManager {
   }
 
   isOccupied(lineNumber) {
-    return this.positions.value.some((c) => c.lineNumber == lineNumber);
+    return this.positions.peek().some((c) => c.lineNumber == lineNumber);
   }
 
   get(commentId) {
@@ -172,20 +172,20 @@ export class DisplayManager {
   }
 
   updateComment(id, fields) {
-    this.comments.value = { ...this.comments.value, [id]: { ...this.comments.value[id], ...fields } };
+    this.comments.value = { ...this.comments.peek(), [id]: { ...this.comments.peek()[id], ...fields } };
   }
 
   isShown(commentId) {
-    return this.comments.value[commentId]?.isShown && this.comments.value[commentId]?.top;
+    return this.comments.peek()[commentId]?.isShown && this.comments.peek()[commentId]?.top;
   }
 
   del(commentId) {
-    const { [commentId]: _, ...comments } = this.comments.value;
+    const { [commentId]: _, ...comments } = this.comments.peek();
     this.comments.value = comments;
   }
 
   new(commentId) {
-    this.comments.value = { ...this.comments.value, [commentId]: { height: 18, isShown: false } };
+    this.comments.value = { ...this.comments.peek(), [commentId]: { height: 18, isShown: false } };
   }
 }
 
@@ -368,9 +368,8 @@ export class YComments {
   /** Fetch comments which are in Y.js state but not in Preact */
   syncRemoteComments() {
     this.positions()
-      .positions.value.filter(
-        (c) => !(c.commentId in this.display().comments.value) || this.display().comments.value[c.commentId].isShown == undefined,
-      )
+      .positions.peek()
+      .filter((c) => !(c.commentId in this.display().comments.peek()) || this.display().comments.peek()[c.commentId].isShown == undefined)
       .forEach((c) => {
         this.display().new(c.commentId);
         this.display().updateComment(c.commentId, { isShown: true });
@@ -380,9 +379,11 @@ export class YComments {
 
   /** Remove comments which are in Preact state but not in Y.js */
   removeLocalComments() {
-    let remoteComments = this.positions().positions.value.map((c) => c.commentId);
+    let remoteComments = this.positions()
+      .positions.peek()
+      .map((c) => c.commentId);
 
-    for (let commentId in this.display().comments.value) {
+    for (let commentId in this.display().comments.peek()) {
       if (!remoteComments.includes(commentId)) {
         this.display().del(commentId);
         this.suggestions.set(commentId, []);
@@ -407,7 +408,8 @@ export class YComments {
     }
 
     this.positions()
-      .positions.value.filter(
+      .positions.peek()
+      .filter(
         ({ lineNumber }) => lineNumber >= fromLine && lineNumber <= toLine && !ranges.some((r) => lineNumber >= r.fromLine && lineNumber <= r.toLine),
       )
       .forEach(({ commentId }) => {
