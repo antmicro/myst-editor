@@ -1,4 +1,4 @@
-import { computed, effect, signal } from "@preact/signals";
+import { batch, computed, effect, signal } from "@preact/signals";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 import * as awarenessProtocol from "y-protocols/awareness.js";
@@ -13,12 +13,20 @@ export class CollaborationClient {
     this.ready = computed(() => this.synced.value && this.connected.value);
     this.ydoc = new Y.Doc();
     this.provider = new WebsocketProvider(settings.wsUrl, settings.room, this.ydoc, {
-      connect: true,
+      connect: settings.mode === "websocket",
       params: {},
       WebSocketPolyfill: WebSocket,
       awareness: new awarenessProtocol.Awareness(this.ydoc),
       maxBackoffTime: 2500,
     });
+    if (settings.mode === "local") {
+      this.provider.shouldConnect = true;
+      this.provider.connectBc();
+      batch(() => {
+        this.synced.value = true;
+        this.connected.value = true;
+      });
+    }
 
     this.provider.awareness.setLocalStateField("user", {
       name: settings.username,

@@ -75,6 +75,7 @@ const defaults = {
     username: "",
     room: "0",
     color: "#ff0000",
+    mode: "websocket",
   },
   spellcheckOpts: { dict: "en_US", dictionaryPath: "/dictionaries" },
   customRoles: [],
