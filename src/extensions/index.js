@@ -46,6 +46,7 @@ const getRelativeCursorLocation = (view) => {
 };
 
 const restoreCursorLocation = (view, location) => {
+  if (location == undefined || location.line == undefined || location.ch == undefined) return;
   const lineNum = Math.min(view.state.doc.lines, location.line);
   const line = view.state.doc.line(lineNum);
   const pos = Math.min(view.state.doc.length, line.from + location.ch);
