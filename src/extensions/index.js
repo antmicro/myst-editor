@@ -41,13 +41,14 @@ import { CollaborationClient } from "../collaboration";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
-  const pos = view.state.doc.lineAt(from);
-  return { line: pos.number - 1, ch: from - pos.from };
+  const line = view.state.doc.lineAt(from);
+  return { line: line.number, ch: from - line.from };
 };
 
 const restoreCursorLocation = (view, location) => {
-  const { line, ch } = location;
-  const pos = view.state.doc.line(line + 1).from + ch;
+  const lineNum = Math.min(view.state.doc.lines, location.line);
+  const line = view.state.doc.line(lineNum);
+  const pos = Math.min(view.state.doc.length, line.from + location.ch);
   view.dispatch({
     selection: { anchor: pos, head: pos },
     scrollIntoView: true,
