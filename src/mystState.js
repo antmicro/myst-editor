@@ -43,6 +43,20 @@ const defaultUserSettings = [
     enabled: false,
     extension: closeBrackets(),
   },
+  {
+    id: "links-new-tab",
+    title: "Open links in new tabs",
+    enabled: false,
+    markdown(md) {
+      const defaultRule = md.renderer.rules.link_open;
+      md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+        const render = defaultRule ?? self.renderToken.bind(self);
+        tokens[idx].attrSet("target", "_blank");
+        tokens[idx].attrSet("rel", "noreferrer");
+        return render(tokens, idx, options, env, self);
+      };
+    },
+  },
 ];
 
 const defaults = {

@@ -38,16 +38,6 @@ function checkLinks(/** @type {markdownIt} */ md) {
   };
 }
 
-function openLinksNewTab(/** @type {markdownIt} */ md) {
-  const defaultRule = md.renderer.rules.link_open;
-  md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
-    const render = defaultRule ?? self.renderToken.bind(self);
-    tokens[idx].attrSet("target", "_blank");
-    tokens[idx].attrSet("rel", "noreferrer");
-    return render(tokens, idx, options, env, self);
-  };
-}
-
 const exposeText = (text, editorId) => () => {
   window.myst_editor[editorId].text = text;
 };
@@ -78,7 +68,7 @@ export const markdownUpdatedStateEffect = StateEffect.define();
 
 /** @param {{preview: { current: Element } }} */
 export const useText = ({ preview }) => {
-  const { editorView, cache, options } = useContext(MystState);
+  const { editorView, cache, options, userSettings } = useContext(MystState);
   const [text, setText] = useState(options.initialText);
   const [readyToRender, setReadyToRender] = useState(false);
   const [syncText, setSyncText] = useState(false);
@@ -127,10 +117,11 @@ export const useText = ({ preview }) => {
       .use(checkLinks)
       .use(colonFencedBlocks)
       .use(markdownItMapUrls)
-      .use(markdownCheckboxes)
-      .use(openLinksNewTab);
-
+      .use(markdownCheckboxes);
     if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
+
+    userSettings.value.filter((s) => s.enabled && s.markdown).forEach((s) => md.use(s.markdown));
+
     return md;
   });
 

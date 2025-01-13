@@ -224,7 +224,7 @@ const CodeMirror = ({ text, setUsers, preview }) => {
   });
 
   useSignalEffect(() => {
-    const userExtensions = userSettings.value.filter((s) => s.enabled).map((s) => s.extension);
+    const userExtensions = userSettings.value.filter((s) => s.enabled && s.extension).map((s) => s.extension);
     editorView.value?.dispatch?.({
       effects: userExtensionsCompartment.reconfigure(userExtensions),
     });
