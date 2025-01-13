@@ -22,6 +22,7 @@ function buildDecorations(view, highlights, modifyHighlight, positions) {
   let position = 0;
 
   highlights
+    .filter((hl) => !hl.id || parseInt(positions.get(hl.id)) <= view.state.doc.lines)
     .flatMap((hl) => {
       const text = !hl.id ? cmText : view.state.doc.line(parseInt(positions.get(hl.id))).text;
       const localFrom = !hl.id ? from : view.state.doc.line(parseInt(positions.get(hl.id))).from;
