@@ -11,7 +11,7 @@ import markdownMermaid from "./markdownMermaid";
 import { EditorView, ViewUpdate } from "@codemirror/view";
 import { ensureSyntaxTree } from "@codemirror/language";
 import { MystState } from "../mystState";
-import { useComputed } from "@preact/signals";
+import { useComputed, useSignalEffect } from "@preact/signals";
 import markdownCheckboxes from "markdown-it-checkbox";
 import { colonFencedBlocks } from "./markdownFence";
 import { markdownItMapUrls } from "./markdownUrlMapping";
@@ -123,6 +123,11 @@ export const useText = ({ preview }) => {
     userSettings.value.filter((s) => s.enabled && s.markdown).forEach((s) => md.use(s.markdown));
 
     return md;
+  });
+
+  useSignalEffect(() => {
+    markdown.value;
+    updateHtmlChunks({ newMarkdown: text, force: true });
   });
 
   const shiftLineMap = useCallback((/** @type {ViewUpdate} */ update) => {
