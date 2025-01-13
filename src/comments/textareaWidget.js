@@ -51,6 +51,8 @@ const shouldUpdateTextWidget = (transaction) => transaction.docChanged || transa
 /** @param {Transaction} transaction */
 const buildTextareaWidgets = (transaction) => [
   (builder, { commentId, lineNumber, height, isShown }) => {
+    if (lineNumber > transaction.state.doc.lines) return builder;
+
     try {
       const mountPoint = transaction.newDoc.line(lineNumber).to;
       builder.add(mountPoint, mountPoint, commentWidget(height, commentId, isShown));
