@@ -31,9 +31,10 @@ function buildDecorations(view, highlights, modifyHighlight, positions) {
     .sort((a, b) => a.hl.from + a.match.index - (b.hl.from + b.match.index))
     .filter(({ hl, match }) => {
       const overlap = hl.from + match.index < position;
-      position = hl.from + match.index + match[0].length;
       if (overlap) {
         console.warn(`Suggestion |${match[0]} -> ${hl.replacement}| will not be shown, as it overlaps a previous suggestion.`);
+      } else {
+        position = hl.from + match.index + match[0].length;
       }
       return !overlap;
     })
