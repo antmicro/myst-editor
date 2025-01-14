@@ -203,7 +203,8 @@ r({
     wsUrl: {}.VITE_WS_URL || o.get("collab_server"),
     username: i,
     room: d,
-    color: h
+    color: h,
+    mode: "websocket"
   },
   customRoles: l,
   customDirectives: c,
