@@ -8,6 +8,7 @@ import { YComments } from "./comments/ycomments";
 export class CollaborationClient {
   synced = signal(false);
   connected = signal(false);
+  lockMsg = signal(null);
 
   constructor(settings, editorOptions = { id: null, parent: null, hideUsernameDelay: null, getAvatar: () => {}, getUserUrl: () => {} }) {
     this.ready = computed(() => this.synced.value && this.connected.value);
@@ -54,6 +55,19 @@ export class CollaborationClient {
     if (settings.commentsEnabled && editorOptions.id) {
       this.ycomments = new YComments(this.ydoc, this.provider, editorOptions.getAvatar, editorOptions.getUserUrl);
     }
+
+    this.metaMap = this.ydoc.getMap("meta");
+    this.metaMap.observe(() => {
+      this.lockMsg.value = this.metaMap.get("lock");
+    });
+  }
+
+  lock(msg = "Document locked") {
+    this.metaMap.set("lock", msg);
+  }
+
+  unlock() {
+    this.metaMap.delete("lock");
   }
 
   destroy() {

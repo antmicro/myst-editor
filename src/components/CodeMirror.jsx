@@ -204,7 +204,7 @@ const CodeMirror = ({ text, setUsers, preview }) => {
   const lastTyped = useRef(null);
 
   useSignalEffect(() => {
-    if (!options.collaboration.value.enabled || collab.value.ready.value) return;
+    if (!options.collaboration.value.enabled || (collab.value.ready.value && !collab.value.lockMsg.value)) return;
     text.readyToRender();
     editorView.value?.destroy();
 
@@ -217,6 +217,8 @@ const CodeMirror = ({ text, setUsers, preview }) => {
       parent: editorMountpoint.current,
     });
     view.dom.style.opacity = "0.5";
+
+    collab.value?.ycomments?.registerCodeMirror(view);
 
     return () => {
       view.destroy();
@@ -232,7 +234,7 @@ const CodeMirror = ({ text, setUsers, preview }) => {
 
   useSignalEffect(() => {
     if (options.collaboration.value.enabled) {
-      if (!collab.value.ready.value) return;
+      if (!collab.value.ready.value || collab.value.lockMsg.value) return;
 
       if (collab.value.ytext.toString().length === 0 && options.initialText.length > 0) {
         console.warn("[Collaboration] Remote state is empty, overriding with local state");

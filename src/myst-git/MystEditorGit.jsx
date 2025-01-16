@@ -185,6 +185,7 @@ const MystEditorGit = ({
         return;
       }
       mystState.current.options.includeButtons.value = defaultButtons;
+      mystState.current.collab.value.lock("A commit is being prepared for this document");
       commitSummary.value = `MyST: update docs ${file.value}`;
     },
   };
@@ -192,18 +193,22 @@ const MystEditorGit = ({
     try {
       commitSummary.value = null;
       const { hash, webUrl } = await commitChanges(message);
-      commentStateToApply.current = window.myst_editor[props.id].ycomments.encodeState();
+      commentStateToApply.current = mystState.current.collab.value.ycomments.encodeState();
       toastNotify({ text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } });
+      mystState.current.collab.value.provider.awareness.setLocalStateField("newCommit", { hash, message: summary });
+      mystState.current.collab.value.unlock();
       switchCommit({ hash, message: summary }, true);
     } catch (error) {
       console.error(error);
       toastNotify({ text: `Error occured while commiting: ${error}` });
       mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
+      mystState.current.collab.value.unlock();
     }
   }
   function onCommitCancel() {
     commitSummary.value = null;
     mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
+    mystState.current.collab.value.unlock();
   }
   useSignalEffect(() => {
     if (commit.value?.hash == commits.value[0]?.hash) {
@@ -324,6 +329,7 @@ const MystEditorGit = ({
 
   useSignalEffect(() => {
     const doc = mystState.current.collab.value.ydoc;
+    const awareness = mystState.current.collab.value.provider.awareness;
     if (!doc) return;
 
     const handleChange = (/** @type {Y.Transaction} */ tr) => {
@@ -336,10 +342,23 @@ const MystEditorGit = ({
     };
     doc.on("afterTransaction", handleChange);
 
+    awareness.on("change", ({ added, updated }) => {
+      const ids = [...added, ...updated];
+      const states = awareness.getStates();
+      for (const id of ids) {
+        if (id === awareness.clientID) continue;
+        const state = states.get(id);
+        if (state.newCommit) {
+          switchCommit(state.newCommit, true);
+          return;
+        }
+      }
+    });
+
     // This is done to keep this signal effect from running in a cycle when some singals are updated in applyState.
     queueMicrotask(() => {
       if (commentStateToApply.current != null) {
-        window.myst_editor[props.id].ycomments.applyState(commentStateToApply.current);
+        mystState.current.collab.value.ycomments.applyState(commentStateToApply.current);
         commentStateToApply.current = null;
       }
     });
