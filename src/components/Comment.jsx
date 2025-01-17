@@ -142,7 +142,7 @@ const YComment = ({ commentId }) => {
             <img
               class="comment-icon"
               src={commentIcon}
-              onMouseUp={() => {
+              onClick={() => {
                 collab.value.ycomments.display().switchVisibility(commentId);
                 collab.value.ycomments.updateMainCodeMirror();
               }}

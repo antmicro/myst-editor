@@ -115,7 +115,7 @@ class Replacement extends WidgetType {
     replacementText.classList.add(this.remove ? "cm-suggestion-remove" : "cm-replacement");
     replacementText.title = this.remove ? "Remove section" : "Accept suggestion";
 
-    replacementText.addEventListener("mouseup", () => {
+    replacementText.addEventListener("click", () => {
       this.view.dispatch({
         changes: {
           from: this.from,
