@@ -237,6 +237,9 @@ These features include:
         },
       ];
 
+      const collabEnabled = !(import.meta.env.VITE_COLLAB == "OFF") && urlParams.get("collab") != "false";
+      const collabUrl = import.meta.env.VITE_WS_URL ?? urlParams.get("collab_server");
+
       MystEditor(
         {
           id: "demo",
@@ -245,14 +248,14 @@ These features include:
           title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
           transforms: exampleTransforms,
           collaboration: {
-            enabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
-            commentsEnabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
-            resolvingCommentsEnabled: import.meta.env.VITE_COLLAB == "ON" || urlParams.get("collab"),
-            wsUrl: import.meta.env.VITE_WS_URL || urlParams.get("collab_server"),
+            enabled: collabEnabled,
+            commentsEnabled: collabEnabled,
+            resolvingCommentsEnabled: collabEnabled,
+            wsUrl: collabUrl ?? "#",
             username,
             room,
             color,
-            mode: "websocket",
+            mode: collabUrl ? "websocket" : "local",
           },
           customRoles: exampleCustomRoles,
           customDirectives: exampleCustomDirectives,

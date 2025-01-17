@@ -21,8 +21,7 @@ const id = "demo";
 
 test.describe.parallel("With collaboration disabled", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await page.waitForSelector(".cm-content");
+    await applyPageOpts(page, { collab: "false" });
   });
 
   test("Loads initial document", async ({ page }) => {
@@ -147,8 +146,8 @@ graph TD
 
 test.describe.parallel("With collaboration enabled", () => {
   test("Keeps the initial document if collaborative state is empty", async ({ context }) => {
-    const collabOpts = { collab_server: "ws://localhost:4455", collab: "true", room: Date.now().toString() };
-    const page = await openPageWithOpts(context, collabOpts);
+    const collabOpts = { collab_server: "ws://localhost:4455", room: Date.now().toString() };
+    const page = await applyPageOpts(await context.newPage(), collabOpts);
 
     const editorContent = await page.evaluate((id) => window.myst_editor[id].text, id);
     expect(editorContent).toMatch(/^# This is MyST Editor/);
@@ -157,7 +156,7 @@ test.describe.parallel("With collaboration enabled", () => {
 
   test("Rejects the initial document if collaborative state is not empty", async ({ context }) => {
     const collabOpts = { collab_server: "ws://localhost:4455", collab: "true", room: Date.now().toString() };
-    const pageA = await openPageWithOpts(context, collabOpts);
+    const pageA = await applyPageOpts(await context.newPage(), collabOpts);
 
     // Initialize the document from pageA
     await clearEditor(pageA);
@@ -165,7 +164,7 @@ test.describe.parallel("With collaboration enabled", () => {
     await pageA.close();
 
     // Open the document as another user and verify that the initial content was ignored
-    const pageB = await openPageWithOpts(context, collabOpts);
+    const pageB = await applyPageOpts(await context.newPage(), collabOpts);
     const editorContent = await pageB.evaluate((id) => window.myst_editor[id].text, id);
 
     expect(editorContent).not.toContain("# This is MyST Editor");
@@ -175,14 +174,14 @@ test.describe.parallel("With collaboration enabled", () => {
 
   test("Synces document between peers", async ({ context }) => {
     const collabOpts = defaultCollabOpts();
-    const pageA = await openPageWithOpts(context, collabOpts);
+    const pageA = await applyPageOpts(await context.newPage(), collabOpts);
 
     // Initialize the document from pageA and add some content
     await clearEditor(pageA);
     await insertChangesAndCheckOutput(pageA, { from: 0, insert: "This is from pageA!" }, (html) => expect(html).toContain("This is from pageA!"));
 
     // Open the document as another user and add some content
-    const pageB = await openPageWithOpts(context, collabOpts);
+    const pageB = await applyPageOpts(await context.newPage(), collabOpts);
     const currentText = await pageB.evaluate((id) => window.myst_editor[id].text, id);
     expect(currentText).toBe("This is from pageA!");
 
@@ -203,8 +202,8 @@ test.describe.parallel("With collaboration enabled", () => {
   test.describe("Comments", () => {
     test("Positions are synced", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Initialize the document from pageA and add some content
       await clearEditor(pageA);
@@ -227,8 +226,8 @@ test.describe.parallel("With collaboration enabled", () => {
 
     test("Can be dragged", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Initialize the document from pageA and add some content
       await clearEditor(pageA);
@@ -262,8 +261,8 @@ test.describe.parallel("With collaboration enabled", () => {
 
     test("Can be resolved", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       await addComment(pageA, 1);
 
@@ -287,8 +286,8 @@ test.describe.parallel("With collaboration enabled", () => {
 
     test("Can be deleted", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       await addComment(pageA, 1);
 
@@ -303,8 +302,8 @@ test.describe.parallel("With collaboration enabled", () => {
 
     test("Can be merged", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Initialize the document from pageA and add some content
       await clearEditor(pageA);
@@ -336,8 +335,8 @@ test.describe.parallel("With collaboration enabled", () => {
   test.describe("Resolved Comments", () => {
     test("Can be restored", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Switch to resolved comments view
       await pageA.getByTitle("Resolved Comments").first().click();
@@ -364,8 +363,8 @@ test.describe.parallel("With collaboration enabled", () => {
 
     test("Can be occupied and restored", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Switch to resolved comments view
       await pageA.getByTitle("Resolved Comments").first().click();
@@ -396,8 +395,8 @@ test.describe.parallel("With collaboration enabled", () => {
 
     test("Can be orphaned and restored", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Switch to resolved comments view
       await pageA.getByTitle("Resolved Comments").first().click();
@@ -422,8 +421,8 @@ test.describe.parallel("With collaboration enabled", () => {
 
     test("Can be deleted", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Switch to resolved comments view
       await pageA.getByTitle("Resolved Comments").first().click();
@@ -448,8 +447,8 @@ test.describe.parallel("With collaboration enabled", () => {
   test.describe("Suggestions", () => {
     test("Can be added without replacement", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Initialize the document from pageA and add some content
       await clearEditor(pageA);
@@ -465,8 +464,8 @@ test.describe.parallel("With collaboration enabled", () => {
 
     test("Can be added with replacement", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Initialize the document from pageA and add some content
       await clearEditor(pageA);
@@ -484,8 +483,8 @@ test.describe.parallel("With collaboration enabled", () => {
 
     test("Can be applied", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Initialize the document from pageA and add some content
       await clearEditor(pageA);
@@ -508,7 +507,7 @@ test.describe.parallel("With collaboration enabled", () => {
   test.describe("Dynamic options", () => {
     test("Can modify UI", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
-      const page = await openPageWithOpts(context, collabOpts);
+      const page = await applyPageOpts(await context.newPage(), collabOpts);
       await page.evaluate(() => {
         window.myst_editor.demo.state.options.title.value = "Playwright";
         const btns = window.myst_editor.demo.state.options.includeButtons.value;
@@ -526,8 +525,8 @@ test.describe.parallel("With collaboration enabled", () => {
     test("Can change rooms", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
       // A, B - room 0
-      const pageA = await openPageWithOpts(context, collabOpts);
-      const pageB = await openPageWithOpts(context, collabOpts);
+      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       await clearEditor(pageA);
       const text0 = "this is room 0";
@@ -582,7 +581,7 @@ const clearEditor = async (page: Page) => {
   });
 };
 
-const defaultCollabOpts = () => ({ collab_server: "ws://localhost:4455", collab: "true", room: Date.now().toString() });
+const defaultCollabOpts = () => ({ collab_server: "ws://localhost:4455", room: Date.now().toString() });
 
 const insertChangesAndCheckOutput = async (page: Page, changes: ChangeSpec | null, check: (html: string) => void | Promise<void>) => {
   await insertToMainEditor(page, changes);
@@ -590,10 +589,9 @@ const insertChangesAndCheckOutput = async (page: Page, changes: ChangeSpec | nul
   await check(preview);
 };
 
-const openPageWithOpts = async (context: BrowserContext, opts: object) => {
+const applyPageOpts = async (page: Page, opts: object) => {
   let query = new URLSearchParams();
   Object.entries(opts).forEach(([k, v]) => query.set(k, v));
-  let page = await context.newPage();
   await page.goto("/?" + query.toString());
   await page.waitForSelector(".cm-content");
   return page;
