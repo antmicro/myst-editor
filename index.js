@@ -1,5 +1,5 @@
-import r, { defaultButtons as n } from "./MystEditor.js";
-let m = `# This is MyST Editor
+import d, { defaultButtons as h } from "./MystEditor.js";
+let l = `# This is MyST Editor
 
 A Markdown editor using the [markdown-it parser](https://github.com/markdown-it/markdown-it), based on the [CommonMark specification](https://spec.commonmark.org/0.31.2/).
 We added some extensions so that users can make use of various features of the [MyST Markdown flavor](https://mystmd.org/).
@@ -150,24 +150,24 @@ These features include:
   - resolved comments - a new view to see comments that were resolved
   - suggestions - non-destructively suggest changes to the document`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const s = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], o = new URLSearchParams(window.location.search), d = o.get("room") || "0", i = o.get("username") || Math.floor(Math.random() * 1e3).toString(), h = s[Math.floor(Math.random() * s.length)];
-let l = [{
+const n = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), c = a.get("room") || "0", m = a.get("username") || Math.floor(Math.random() * 1e3).toString(), u = n[Math.floor(Math.random() * n.length)];
+let p = [{
   target: "say",
-  transform: async (e) => i + " says: '" + e + "'"
-}], c = [{
+  transform: async (e) => m + " says: '" + e + "'"
+}], g = [{
   target: "bold",
   transform: (e, t) => `<b style="white-space: pre-wrap;">${t.body}</b>`
-}], u = [{
+}], f = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
-    const [t, a] = e.split("#");
-    return `<a href="https://github.com/${t}/issues/${a}">${e}</a>`;
+    const [t, s] = e.split("#");
+    return `<a href="https://github.com/${t}/issues/${s}">${e}</a>`;
   }
 }, {
   target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
   transform: (e) => {
-    const [t, a] = e.split("!");
-    return `<a href="https://github.com/${t}/pull/${a}">${e}</a>`;
+    const [t, s] = e.split("!");
+    return `<a href="https://github.com/${t}/pull/${s}">${e}</a>`;
   }
 }, {
   target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
@@ -190,25 +190,28 @@ let l = [{
     timeZone: "UTC"
   })))
 }];
-r({
+const i = {}.VITE_COLLAB != "OFF" && a.get("collab") != "false";
+var r;
+const o = (r = {}.VITE_WS_URL) != null ? r : a.get("collab_server");
+d({
   id: "demo",
   templatelist: "linkedtemplatelist.json",
-  initialText: m,
+  initialText: l,
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
-  transforms: u,
+  transforms: f,
   collaboration: {
-    enabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
-    commentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
-    resolvingCommentsEnabled: {}.VITE_COLLAB == "ON" || o.get("collab"),
-    wsUrl: {}.VITE_WS_URL || o.get("collab_server"),
-    username: i,
-    room: d,
-    color: h,
-    mode: "websocket"
+    enabled: i,
+    commentsEnabled: i,
+    resolvingCommentsEnabled: i,
+    wsUrl: o != null ? o : "#",
+    username: m,
+    room: c,
+    color: u,
+    mode: o ? "websocket" : "local"
   },
-  customRoles: l,
-  customDirectives: c,
-  includeButtons: n.concat([{
+  customRoles: p,
+  customDirectives: g,
+  includeButtons: h.concat([{
     text: "Custom button",
     action: () => alert("Custom button action")
   }]),
