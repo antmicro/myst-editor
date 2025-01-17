@@ -1,6 +1,6 @@
 import { markdownKeymap } from "@codemirror/lang-markdown";
 import { Prec } from "@codemirror/state";
-import { keymap } from "@codemirror/view";
+import { keymap, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { Signal, signal, effect } from "@preact/signals";
 import { EditorView } from "codemirror";
 import { createContext } from "preact";
@@ -56,6 +56,26 @@ const defaultUserSettings = [
         return render(tokens, idx, options, env, self);
       };
     },
+  },
+  {
+    id: "scroll-past-end",
+    title: "Scroll past last line",
+    enabled: false,
+    extension: ViewPlugin.fromClass(
+      class {
+        constructor(view) {
+          this.view = view;
+          this.observer = new ResizeObserver(() => {
+            view.dom.style.paddingBottom = `${view.dom.parentElement.clientHeight - 20 - view.defaultLineHeight}px`;
+          });
+          this.observer.observe(view.dom.parentElement);
+        }
+        destroy() {
+          this.view.dom.style.paddingBottom = "0px";
+          this.observer.disconnect();
+        }
+      },
+    ),
   },
 ];
 
