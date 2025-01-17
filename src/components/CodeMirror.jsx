@@ -93,7 +93,7 @@ const CodeEditor = styled.div`
   }
 
   .cm-yLineSelection {
-    margin: 0 2px 0 6px;
+    margin: 0 2px 0 0px;
   }
 
   .cm-editor {
