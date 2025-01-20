@@ -31,6 +31,7 @@ const Topbar = styled.div`
   .side {
     display: flex;
     align-items: center;
+    gap: 10px;
   }
 
   .btns {
@@ -74,7 +75,6 @@ const Topbar = styled.div`
 const Title = styled.div`
   font-size: large;
   white-space: nowrap;
-  margin-left: 10px;
   font-family: "Lato";
   overflow: hidden;
   text-overflow: ellipsis;
@@ -275,13 +275,15 @@ export const EditorTopbar = ({ alert, users, text, buttons }) => {
       </div>
       <div className="side">
         <Avatars users={users} />
-        <div className="btns">
-          {textButtons.map((b) => (
-            <DefaultButton type="button" onClick={b.action}>
-              {b.text}
-            </DefaultButton>
-          ))}
-        </div>
+        {textButtons.length > 0 && (
+          <div className="btns">
+            {textButtons.map((b) => (
+              <DefaultButton type="button" onClick={b.action}>
+                {b.text}
+              </DefaultButton>
+            ))}
+          </div>
+        )}
         <ButtonGroup buttons={editorModeButtons.value} clickedId={clickedId.value} />
       </div>
     </Topbar>

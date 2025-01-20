@@ -4,7 +4,6 @@ const MAX_AVATARS = 4;
 
 const AvatarsWrapper = styled.div`
   min-width: ${(props) => props.n * 35}px;
-  margin-right: 10px;
 
   .avatar {
     border-radius: 50%;
