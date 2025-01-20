@@ -19,7 +19,7 @@ const Topbar = styled.div`
   z-index: 10;
   position: sticky;
   top: 0;
-  padding: 0 15px;
+  padding: 0 20px;
   width: 100%;
   height: 60px;
   background-color: var(--navbar-bg);
