@@ -1,5 +1,5 @@
 import { markdownKeymap } from "@codemirror/lang-markdown";
-import { Prec } from "@codemirror/state";
+import { Annotation, Prec } from "@codemirror/state";
 import { keymap, ViewPlugin } from "@codemirror/view";
 import { Signal, signal, effect } from "@preact/signals";
 import { EditorView } from "codemirror";
@@ -11,6 +11,8 @@ import { CodeMirror as VimCM, vim } from "@replit/codemirror-vim";
 import { collabClientFacet } from "./extensions";
 import { TextManager } from "./text";
 import Templates from "./components/Templates";
+import { yRemoteAnnotation } from "./extensions/collab";
+import { syntaxTree } from "@codemirror/language";
 
 /** @type {{ id: string; tooltip?: string; text?: string; action?: Function; dropdown?: Function }} */
 export const predefinedButtons = {
@@ -40,6 +42,8 @@ const undoManagers = new WeakMap();
 const { undo: originalUndo, redo: originalRedo } = VimCM.commands;
 VimCM.commands.undo = (cm) => (undoManagers.get(cm)?.undo ?? originalUndo)(cm);
 VimCM.commands.redo = (cm) => (undoManagers.get(cm)?.redo ?? originalRedo)(cm);
+
+const reorderAnnotation = Annotation.define();
 
 const defaultUserSettings = [
   {
@@ -104,6 +108,48 @@ const defaultUserSettings = [
         },
       ),
     ],
+  },
+  {
+    id: "auto-ordered-lists",
+    title: "Automatically number ordered lists",
+    enabled: false,
+    extension: EditorView.updateListener.of((update) => {
+      if (!update.docChanged || update.transactions.some((tr) => tr.annotation(reorderAnnotation) || tr.annotation(yRemoteAnnotation))) return;
+
+      const tree = syntaxTree(update.state);
+      const changes = [];
+      const visisted = new Set();
+      update.changes.iterChangedRanges((_, __, from, to) => {
+        tree.iterate({
+          from,
+          to,
+          enter(cursor) {
+            if (cursor.name !== "OrderedList") return true;
+            if (visisted.has(cursor.node.from)) return false;
+            visisted.add(cursor.node.from);
+
+            let lastNum;
+            const items = cursor.node.getChildren("ListItem");
+            for (const item of items) {
+              const markLength = item.tree.children[0].length - 1;
+              const num = parseInt(update.state.sliceDoc(item.from, item.from + markLength));
+              if (lastNum && num != lastNum + 1) {
+                changes.push({ from: item.from, to: item.from + markLength, insert: String(lastNum + 1) });
+                lastNum = lastNum + 1;
+              } else {
+                lastNum = num;
+              }
+            }
+
+            return false;
+          },
+        });
+      });
+
+      if (changes.length > 0) {
+        update.view.dispatch({ changes, annotations: reorderAnnotation.of(true) });
+      }
+    }),
   },
 ];
 
