@@ -76,7 +76,7 @@ const moveComments = (transaction, ycomments) => {
   ) {
     const moved = [];
     ycomments.positions().positions.value.forEach((pos) => {
-      const { deleted, oldPos, newPos, newLine } = ycomments.mapThroughChanges(pos, transaction);
+      const { deleted, oldPos, newPos, newLine } = ycomments.mapThroughChanges(pos, transaction, true);
 
       if (deleted) {
         ycomments.deleteComment(pos.commentId);
