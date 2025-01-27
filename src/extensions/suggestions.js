@@ -143,7 +143,15 @@ export function suggestionPopup(/** @type {ViewUpdate} */ update, /** @type {YCo
   const startPos = update.view.coordsAtPos(mainSel.from);
   const endPos = update.view.coordsAtPos(mainSel.to);
   const middle = (startPos.left + endPos.left) / 2;
-  addSuggestionBtn.style.top = `${startPos.top - contentDOM.top - update.view.defaultLineHeight - 12}px`;
+  const arrowOffset = 12;
+  let top = startPos.top - contentDOM.top - update.view.defaultLineHeight - arrowOffset;
+  if (top - editorMountpoint.current.scrollTop < 0) {
+    top = startPos.bottom - contentDOM.top + update.view.defaultLineHeight + arrowOffset;
+    addSuggestionBtn.classList.add("dir-up");
+  } else {
+    addSuggestionBtn.classList.remove("dir-up");
+  }
+  addSuggestionBtn.style.top = `${top}px`;
   addSuggestionBtn.style.left = `${middle - contentDOM.left}px`;
   addSuggestionBtn.style.display = "block";
 
@@ -217,7 +225,17 @@ export const AddSuggestionBtn = styled(DefaultButton)`
     filter: invert(100%);
   }
 
-  &::after {
+  &.dir-up::before {
+    content: "";
+    position: absolute;
+    display: block;
+    transform: translate(10px, -18px);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid var(--icon-border);
+  }
+
+  &:not(.dir-up)::after {
     content: "";
     position: absolute;
     display: block;
