@@ -12,7 +12,7 @@ export default defineConfig({
     outDir: "../dist",
     emptyOutDir: true,
     lib: {
-      entry: [resolve(__dirname, "src/MystEditor.jsx"), resolve(__dirname, "src/index.html")],
+      entry: [resolve(__dirname, "src/MystEditor.jsx"), resolve(__dirname, "src/index.html"), resolve(__dirname, "src/myst-git/git.html")],
       formats: ["es"],
     },
     rollupOptions: {
@@ -21,6 +21,8 @@ export default defineConfig({
         manualChunks: (module) => {
           if (module.includes("index.html")) {
             return "index";
+          } else if (module.includes("git.html")) {
+            return "git";
           } else {
             return "MystEditor";
           }

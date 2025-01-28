@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>MyST editor Demo</title>
+    <link rel="stylesheet" href="../styles/MystEditor.css" />
+    <style>
+      body {
+        margin: 0;
+      }
+
+      #myst {
+        height: 100vh;
+      }
+    </style>
+    <script type="module">
+      import MystEditorGit from "./MystEditorGit.jsx";
+
+      const usercolors = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"];
+      const urlParams = new URLSearchParams(window.location.search);
+      const username = urlParams.get("username") || Math.floor(Math.random() * 1000).toString();
+      const color = usercolors[Math.floor(Math.random() * usercolors.length)];
+      let exampleCustomRoles = [
+        {
+          target: "say",
+          transform: async (content) => username + " says: '" + content + "'",
+        },
+      ];
+
+      let exampleCustomDirectives = [
+        {
+          target: "bold",
+          transform: (_, data) => `<b style="white-space: pre-wrap;">${data.body}</b>`,
+        },
+      ];
+
+      let exampleTransforms = [
+        {
+          // Other repo issue links
+          target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
+          transform: (match) => {
+            const [repo, issueId] = match.split("#");
+            return `<a href="https://github.com/${repo}/issues/${issueId}">${match}</a>`;
+          },
+        },
+        {
+          // Other repo PR links
+          target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
+          transform: (match) => {
+            const [repo, prid] = match.split("!");
+            return `<a href="https://github.com/${repo}/pull/${prid}">${match}</a>`;
+          },
+        },
+        {
+          // Same repo issue links
+          target: /(^|(?<=\s))#\d+/g,
+          transform: (match) => {
+            const issueId = match.slice(1);
+            return `<a href="https://github.com/antmicro/myst-editor/issues/${issueId}">${match}</a>`;
+          },
+        },
+        {
+          // Same repo PR links
+          target: /(^|(?<=\s))!\d+/g,
+          transform: (match) => {
+            const prid = match.slice(1);
+            return `<a href="https://github.com/antmicro/myst-editor/pull/${prid}">${match}</a>`;
+          },
+        },
+        {
+          // User links
+          target: /@[0-9a-z\-]+/g,
+          transform: (match) => {
+            const user = match.slice(1);
+            return `
+                <a href='https://github.com/${user}'>
+                  ${user}
+                </a>`;
+          },
+        },
+        {
+          target: /\|date\|/g,
+          transform: (match) => new Promise((r) => r(new Date().toLocaleString("en-GB", { timeZone: "UTC" }))),
+        },
+      ];
+
+      const collabEnabled = !(import.meta.env.VITE_COLLAB == "OFF") && urlParams.get("collab") != "false";
+      const collabUrl = import.meta.env.VITE_WS_URL ?? urlParams.get("collab_server");
+      const branches = ["main", "dev"];
+      const commits = [
+        { message: "commit 2", hash: "aaa" },
+        { message: "commit 1", hash: "bbb" },
+      ];
+      const files = ["docs/source/file1", "docs/source/file2"];
+
+      MystEditorGit(
+        {
+          repo: `repos/myst`,
+          initialBranches: branches,
+          getBranches: (page) => (page == 1 ? branches : []),
+          searchBranches: (input) => branches.filter((b) => b.includes(input)),
+          getCommits: (_, page) => (page == 1 ? commits : []),
+          searchCommits: (input) => commits.filter((c) => c.message.includes(input)),
+          getFiles: () => files,
+          getText: () => `line1\nline2\nline3`,
+          storeHistory: () => {},
+          commitChanges: (msg) => ({ hash: "ccc", webUrl: "#" }),
+          id: "demo",
+          templatelist: "linkedtemplatelist.json",
+          title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
+          transforms: exampleTransforms,
+          collaboration: {
+            enabled: collabEnabled,
+            commentsEnabled: collabEnabled,
+            resolvingCommentsEnabled: collabEnabled,
+            wsUrl: collabUrl ?? "#",
+            username,
+            color,
+            mode: collabUrl ? "websocket" : "local",
+          },
+          customRoles: exampleCustomRoles,
+          customDirectives: exampleCustomDirectives,
+          syncScroll: true,
+        },
+        document.getElementById("myst"),
+      );
+    </script>
+  </head>
+  <body>
+    <div id="myst"></div>
+  </body>
+</html>

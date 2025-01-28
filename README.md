@@ -179,6 +179,17 @@ Here are the options you can pass to the MystEditor function:
 
 Also see [the demo HTML](./src/index.html) for an example on how you can set these options.
 
+## Myst Editor for Git
+
+There is an additonal wrapper around the base editor that is meant to be easy to integrate with Git version control.
+The wrapper is provided as a component located in [src/myst-git/MystEditorGit.jsx](src/myst-git/MystEditorGit.jsx).
+You can import it from a build of Myst Editor with the following syntax:
+```js
+import { MystEditorGit } from "MystEditor.js";
+```
+There is an example page that makes use of this wrapper in [src/myst-git/git.html](src/myst-git/git.html).
+The example page can be accessed while the Editor is running in development mode via the following URL: `/myst-git/git.html`.
+
 ## License
 
 [Apache 2.0](./LICENSE)
