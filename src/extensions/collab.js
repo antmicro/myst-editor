@@ -2,7 +2,7 @@
 // I placed this here so that we can customize syncing yjs updates with CodeMirror and mark remote and local updates.
 
 import { Annotation } from "@codemirror/state";
-import { EditorView, ViewPlugin } from "@codemirror/view";
+import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { ySyncFacet } from "y-codemirror.next";
 import { Transaction } from "yjs";
 
@@ -11,7 +11,7 @@ export const yRemoteAnnotation = Annotation.define();
 export const yHistoryAnnotation = Annotation.define();
 
 /**
- * @extends {PluginValue}
+ * @extends {import("@codemirror/view").PluginValue}
  */
 class YSyncPluginValue {
   /**
@@ -53,7 +53,7 @@ class YSyncPluginValue {
   }
 
   /**
-   * @param {cmView.ViewUpdate} update
+   * @param {ViewUpdate} update
    */
   update(update) {
     if (!update.docChanged || (update.transactions.length > 0 && update.transactions[0].annotation(ySyncAnnotation) === this.conf)) {

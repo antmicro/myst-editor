@@ -1,4 +1,4 @@
-import { batch, computed, effect, signal } from "@preact/signals";
+import { batch, computed, signal } from "@preact/signals";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 import * as awarenessProtocol from "y-protocols/awareness.js";
@@ -80,7 +80,7 @@ WebsocketProvider.prototype.watchCollabolators = function (hook) {
   this.awareness.on("change", ({ added, removed }) => {
     if (added || removed) {
       let collabolators = Array.from(this.awareness.states)
-        .map(([key, { user }]) => ({ login: user.name, color: user.color }))
+        .map(([_, { user }]) => ({ login: user.name, color: user.color }))
         .reduce((curr, data) => {
           curr[data.login] = data;
           return curr;

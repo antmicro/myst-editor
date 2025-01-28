@@ -3,8 +3,8 @@ export function backslashLineBreakPlugin(md) {
   md.renderer.rules.text = (tokens, idx, options, env, self) => {
     if (tokens[idx].content === "\\") {
       return "<br>";
-    } else {
-      return defaultTextRule(tokens, idx, options, env, self);
     }
+
+    return defaultTextRule(tokens, idx, options, env, self);
   };
 }

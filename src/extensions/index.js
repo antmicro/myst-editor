@@ -99,8 +99,6 @@ export class ExtensionBuilder {
   static codeLanguage(name) {
     if (name == "yaml") {
       return yaml().language;
-    } else {
-      return null;
     }
   }
 
@@ -243,9 +241,8 @@ export class ExtensionBuilder {
   if(condition, extender) {
     if (condition) {
       return extender(this);
-    } else {
-      return this;
     }
+    return this;
   }
 
   useMoveCursorAfterFold() {

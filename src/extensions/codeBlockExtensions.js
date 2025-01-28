@@ -1,4 +1,4 @@
-import { Annotation, EditorState, Facet, MapMode, Prec, StateField } from "@codemirror/state";
+  import { Annotation, EditorState, Facet, MapMode, Prec, StateField } from "@codemirror/state";
 import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
 import { setDiagnostics, setDiagnosticsEffect } from "@codemirror/lint";

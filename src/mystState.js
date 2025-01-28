@@ -1,6 +1,6 @@
 import { markdownKeymap } from "@codemirror/lang-markdown";
 import { Prec } from "@codemirror/state";
-import { keymap, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import { keymap, ViewPlugin } from "@codemirror/view";
 import { Signal, signal, effect } from "@preact/signals";
 import { EditorView } from "codemirror";
 import { createContext } from "preact";
@@ -133,7 +133,7 @@ const defaults = {
   // this will create a bogus random avatar when no specific getAvatar function is provided
   getAvatar: (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
   avatarCrossorigin: null,
-  getUserUrl: (username) => "#",
+  getUserUrl: () => "#",
   backslashLineBreak: true,
   hideUsernameDelay: 5000,
   parent: null,

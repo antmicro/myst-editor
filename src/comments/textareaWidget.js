@@ -1,6 +1,5 @@
-import { EditorView } from "@codemirror/view";
-import { Decoration, WidgetType } from "@codemirror/view";
-import { RangeSetBuilder, RangeSet, StateField, Transaction, MapMode } from "@codemirror/state";
+import { EditorView, Decoration, WidgetType } from "@codemirror/view";
+import { RangeSetBuilder, RangeSet, StateField, Transaction } from "@codemirror/state";
 import { ycommentsFacet, updateShownComments } from "./state";
 import { YComments } from "./ycomments";
 import { yHistoryAnnotation } from "../extensions/collab";

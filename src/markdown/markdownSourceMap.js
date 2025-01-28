@@ -1,5 +1,4 @@
 import markdownIt from "markdown-it";
-import { escapeHtml } from "markdown-it/lib/common/utils";
 
 const SRC_LINE_ID = "data-line-id";
 const randomLineId = () => Math.random().toString().replace(".", "");

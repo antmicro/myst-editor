@@ -1,8 +1,6 @@
-import { Decoration, EditorView, ViewPlugin, ViewUpdate, gutter, GutterMarker, BlockInfo } from "@codemirror/view";
-import { RangeSetBuilder, Transaction } from "@codemirror/state";
+import { Decoration, EditorView, ViewPlugin, ViewUpdate, gutter, GutterMarker } from "@codemirror/view";
+import { RangeSetBuilder, Transaction, StateEffect, StateField, Facet } from "@codemirror/state";
 import { CommentLineAuthors } from "./ycomments";
-import { StateEffect, StateField } from "@codemirror/state";
-import { Facet } from "@codemirror/state";
 
 const isUserEvent = (transaction) => ["input", "delete", "undo", "redo"].some((ev) => transaction.isUserEvent(ev));
 
