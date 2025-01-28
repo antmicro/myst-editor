@@ -3,6 +3,7 @@
   <head>
     <title>MyST editor Demo</title>
     <link rel="stylesheet" href="../styles/MystEditor.css" />
+    <link rel="icon" href="data:," />
     <style>
       body {
         margin: 0;
@@ -105,7 +106,6 @@
           storeHistory: () => {},
           commitChanges: (msg) => ({ hash: "ccc", webUrl: "#" }),
           id: "demo",
-          templatelist: "linkedtemplatelist.json",
           title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
           transforms: exampleTransforms,
           collaboration: {

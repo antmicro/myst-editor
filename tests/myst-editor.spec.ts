@@ -558,6 +558,76 @@ test.describe.parallel("With collaboration enabled", () => {
   });
 });
 
+test.describe.parallel("MystEditorGit wrapper", () => {
+  test("Synces document between peers", async ({ context }) => {
+    const { collab_server } = defaultCollabOpts();
+    const pageA = await applyPageOpts(await context.newPage(), { collab_server }, true);
+
+    // Initialize the document from pageA and add some content
+    await clearEditor(pageA);
+    await insertChangesAndCheckOutput(pageA, { from: 0, insert: "This is from pageA!" }, (html) => expect(html).toContain("This is from pageA!"));
+
+    // Open the document as another user and add some content
+    const pageB = await applyPageOpts(await context.newPage(), { collab_server }, true);
+    const currentText = await pageB.evaluate((id) => window.myst_editor[id].text, id);
+    expect(currentText).toBe("This is from pageA!");
+
+    await insertChangesAndCheckOutput(
+      pageB,
+      {
+        from: currentText.length,
+        insert: "And this is from pageB!",
+      },
+      (html) => {
+        // Verify that both contents are present
+        expect(html).toContain("This is from pageA!");
+        expect(html).toContain("And this is from pageB!");
+      },
+    );
+  });
+
+  test("Switches rooms", async ({ context }) => {
+    const { collab_server } = defaultCollabOpts();
+    const page = await applyPageOpts(await context.newPage(), { collab_server }, true);
+
+    async function checkSelect(roomId: number, selectName: string) {
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: `room ${roomId}` });
+      await page.click(`#${selectName}`);
+      await page.click(`#${selectName}-list li:last-child`);
+      await page.waitForSelector(".cm-content");
+      const text = await page.evaluate((id) => window.myst_editor[id].text, id);
+      expect(text).not.toContain(`room ${roomId}`);
+    }
+
+    await checkSelect(1, "branches");
+    await checkSelect(2, "commits");
+    await checkSelect(3, "files");
+  });
+
+  test("Commits changes", async ({ context }) => {
+    const { collab_server } = defaultCollabOpts();
+    const pageA = await applyPageOpts(await context.newPage(), { collab_server }, true);
+    await clearEditor(pageA);
+    await insertToMainEditor(pageA, { from: 0, insert: `change` });
+
+    const pageB = await applyPageOpts(await context.newPage(), { collab_server }, true);
+
+    await pageA.getByTitle("Commit").click();
+    // Check if document is locked for the other user
+    expect(await pageB.getByText("A commit is being prepared").count()).not.toEqual(0);
+
+    // Commit
+    await pageA.click("button[type=submit]");
+    await pageA.waitForSelector(".cm-content");
+
+    const commitA = await pageA.locator("#commits span").innerHTML();
+    expect(commitA).toContain("update docs");
+    const commitB = await pageB.locator("#commits span").innerHTML();
+    expect(commitB).toContain("update docs");
+  });
+});
+
 test("dist/MystEditor.js exports src/MystEditor.js module", async () => {
   const module = await fs.readFile("dist/MystEditor.js");
   expect(module.length).toBeGreaterThan(3000);
@@ -589,7 +659,7 @@ const insertChangesAndCheckOutput = async (page: Page, changes: ChangeSpec | nul
   await check(preview);
 };
 
-const applyPageOpts = async (page: Page, opts: object) => {
+const applyPageOpts = async (page: Page, opts: object, git = false) => {
   let query = new URLSearchParams();
   Object.entries(opts).forEach(([k, v]) => query.set(k, v));
 
@@ -603,7 +673,7 @@ const applyPageOpts = async (page: Page, opts: object) => {
     }
   });
 
-  await page.goto("/?" + query.toString());
+  await page.goto(`${git ? "/myst-git/git.html" : "/"}?` + query.toString());
   await page.waitForSelector(".cm-content");
   return page;
 };

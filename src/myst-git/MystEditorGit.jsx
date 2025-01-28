@@ -388,6 +388,7 @@ const MystEditorGit = ({
             <div>
               <label>Branch:</label>
               <Select
+                name="branches"
                 options={branches.value.map(branchToSelectOpt)}
                 inputPlaceholder="Search branches"
                 onChange={(o, isNew) => switchBranch(o.value, isNew)}
@@ -399,6 +400,7 @@ const MystEditorGit = ({
             <div>
               <label>Commit:</label>
               <Select
+                name="commits"
                 options={commits.value.map(commitToSelectOpt)}
                 inputPlaceholder="Search commits"
                 onChange={(o, isNew) => switchCommit({ hash: o.value, message: o.label }, isNew)}
@@ -410,6 +412,7 @@ const MystEditorGit = ({
             <div>
               <label>File:</label>
               <Select
+                name="files"
                 options={files.value.map(fileToSelectOpt)}
                 inputPlaceholder="Search files"
                 onChange={(o) => switchFile(o.value)}

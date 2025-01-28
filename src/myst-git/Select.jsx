@@ -123,7 +123,7 @@ const OptionList = styled.ul`
  * Component providing UI to select one option from a list. Also has a searchbox.
  * Options can be lazily loaded.
  */
-const Select = ({ options, initialValue, onChange, inputPlaceholder, loadMore, searchOptions }) => {
+const Select = ({ options, initialValue, onChange, inputPlaceholder, loadMore, searchOptions, name }) => {
   const open = useSignal(false);
   const selectedValue = useSignal(initialValue);
   const selectedOption = useComputed(() => allOptions.value.find((o) => o.value == selectedValue.value));
@@ -188,7 +188,7 @@ const Select = ({ options, initialValue, onChange, inputPlaceholder, loadMore, s
 
   return (
     <Container>
-      <Toggle onClick={toggleDropdown}>
+      <Toggle id={name} onClick={toggleDropdown}>
         <span>{selectedOption.value?.label}</span>
         <ArrowIcon up={open.value} />
       </Toggle>
@@ -201,7 +201,7 @@ const Select = ({ options, initialValue, onChange, inputPlaceholder, loadMore, s
             value={search.value}
             onChange={(ev) => (search.value = ev.target.value)}
           />
-          <OptionList onScroll={listScroll} ref={optionList}>
+          <OptionList id={`${name}-list`} onScroll={listScroll} ref={optionList}>
             {shownOptions.value.map((o) => (
               <li key={o.value} onClick={() => selectOption(o)} className={`${o.value == selectedValue.value ? "active" : ""}`}>
                 <span className={`${o.marked ? "marked" : ""}`}>{o.label}</span>
