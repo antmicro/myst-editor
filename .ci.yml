@@ -10,7 +10,7 @@ build:
   before_script:
     - npm ci
   script:
-    - npm run lint
+    - npm run check-format
     - npm run build
   artifacts:
     paths:

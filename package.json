@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "host": "vite --host",
     "server": "cd bin && npm install && node server.js",
-    "lint": "prettier --check src tests bin package.json vite.config.js .eslintrc.cjs",
+    "check-format": "prettier --check src tests bin package.json vite.config.js .eslintrc.cjs",
+    "lint": "eslint .",
     "format": "prettier --write src tests bin package.json vite.config.js .eslintrc.cjs",
     "test": "PW_TEST_HTML_REPORT_OPEN=never playwright test -c tests/playwright.config.js --reporter html"
   },
@@ -55,6 +56,8 @@
     "babel-plugin-macros": "^3.1.0",
     "babel-plugin-styled-components": "^2.1.4",
     "eslint": "latest",
+    "eslint-config-preact": "^1.5.0",
+    "eslint-plugin-jsdoc": "^50.6.3",
     "playwright": "^1.45.1",
     "prettier": "^3.2.5",
     "vite": "^3.2.3",

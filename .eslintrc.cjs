@@ -4,7 +4,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: "eslint:recommended",
+  extends: ["eslint:recommended", "preact"],
   overrides: [
     {
       env: {
@@ -20,5 +20,19 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
   },
-  rules: {},
+  plugins: ["jsdoc"],
+  rules: {
+    "jsdoc/no-undefined-types": 1,
+    "no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+      },
+    ],
+    "prefer-template": 0,
+    radix: 0,
+    "react-hooks/rules-of-hooks": "warn",
+  },
 };
