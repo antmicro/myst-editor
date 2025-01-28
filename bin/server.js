@@ -6,7 +6,8 @@
 import WebSocket from "ws";
 import http from "http";
 const wss = new WebSocket.Server({ noServer: true });
-import { setupWSConnection, handleRequest } from "./utils.js";
+const statusWss = new WebSocket.Server({ noServer: true });
+import { setupWSConnection, handleRequest, setupStatusConnection } from "./utils.js";
 
 const port = process.env.PORT || 4444;
 
@@ -29,16 +30,19 @@ const server = http.createServer((request, response) => {
 
 wss.on("connection", setupWSConnection);
 
+statusWss.on("connection", setupStatusConnection);
+
 server.on("upgrade", (request, socket, head) => {
-  // You may check auth of request here..
-  // See https://github.com/websockets/ws#client-authentication
-  /**
-   * @param {any} ws
-   */
-  const handleAuth = (ws) => {
-    wss.emit("connection", ws, request);
-  };
-  wss.handleUpgrade(request, socket, head, handleAuth);
+  const params = new URL(`http://${process.env.HOST ?? "localhost"}${request.url}`).searchParams;
+  if (params.has("status")) {
+    statusWss.handleUpgrade(request, socket, head, (ws) => {
+      statusWss.emit("connection", ws, request);
+    });
+  } else {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit("connection", ws, request);
+    });
+  }
 });
 
 server.listen(port, () => {

@@ -11,6 +11,7 @@ import editIcon from "../icons/edit.svg";
 import { MystState } from "../mystState";
 import { userExtensionsCompartment } from "./Settings";
 import { useSignalEffect } from "@preact/signals";
+import * as Y from "yjs";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -239,7 +240,11 @@ const CodeMirror = ({ text, setUsers, preview }) => {
       if (collab.value.ytext.toString().length === 0 && options.initialText.length > 0) {
         console.warn("[Collaboration] Remote state is empty, overriding with local state");
         text.set(options.initialText);
-        collab.value.ytext.insert(0, options.initialText);
+        collab.value.ydoc.transact(() => {
+          collab.value.ytext.insert(0, options.initialText);
+          const metaMap = collab.value.ydoc.getMap("meta");
+          metaMap.set("initial", true);
+        });
       }
 
       text.set(collab.value.ytext.toString());

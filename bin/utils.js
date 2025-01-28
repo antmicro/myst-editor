@@ -26,7 +26,7 @@ const wsReadyStateClosed = 3; // eslint-disable-line
 const gcEnabled = process.env.GC !== "false" && process.env.GC !== "0";
 const persistenceDir = process.env.YPERSISTENCE;
 /**
- * @type {{bindState: function(string,WSSharedDoc):Promise<void>, writeState:function(string,WSSharedDoc):Promise<any>, provider: any}|null}
+ * @type {{bindState: function(string,WSSharedDoc):Promise<void>, writeState:function(string,WSSharedDoc):Promise<any>, provider: LeveldbPersistence | undefined}|null}
  */
 let persistence = null;
 if (typeof persistenceDir === "string") {
@@ -53,6 +53,25 @@ if (typeof persistenceDir === "string") {
     writeState: async (docName, ydoc) => {},
   };
 }
+
+const getPrefix = (docname) => {
+  if (!docname.includes("/")) return undefined;
+  return docname.split("/").slice(0, 2).join("/");
+};
+const DOCS_WITH_CHANGES = "docsWithChanges";
+const docsWithChanges = new Map();
+const statusConns = new Map();
+
+const sendStatusUpdates = (prefix, statuses) => {
+  const msg = JSON.stringify(statuses);
+  statusConns.get(prefix).forEach((_, conn) => {
+    try {
+      conn.send(msg);
+    } catch (error) {
+      conn.close();
+    }
+  });
+};
 
 /**
  * @param {{bindState: function(string,WSSharedDoc):void,
@@ -150,6 +169,95 @@ class WSSharedDoc extends Y.Doc {
   }
 }
 
+async function updateDocStatus(docname, fn) {
+  if (!persistence) return;
+  const docPrefix = getPrefix(docname);
+  try {
+    const currentMetadataCache = docsWithChanges.get(docPrefix) ?? {};
+    let currentMetadata = currentMetadataCache[docname];
+    if (!currentMetadata) {
+      const dbMetadata = (await persistence.provider.getMeta(docPrefix, DOCS_WITH_CHANGES)) || {};
+      currentMetadata = dbMetadata[docname] ?? {};
+      currentMetadataCache[docname] = currentMetadata;
+      docsWithChanges.set(docPrefix, currentMetadataCache);
+    }
+
+    const newMetadata = fn(currentMetadata);
+
+    if (Object.keys(newMetadata).length === Object.keys(currentMetadata).length && Object.keys(newMetadata).every((tag) => tag in currentMetadata))
+      return;
+
+    // Status changed
+    if (Object.keys(newMetadata).length === 0) {
+      delete currentMetadataCache[docname];
+    } else {
+      currentMetadataCache[docname] = newMetadata;
+    }
+
+    await persistence.provider.setMeta(docPrefix, DOCS_WITH_CHANGES, currentMetadataCache);
+    docsWithChanges.set(docPrefix, currentMetadataCache);
+
+    sendStatusUpdates(docPrefix, currentMetadataCache);
+  } catch (error) {
+    await logAsync(docname, { event: "error", msg: `Error while updating document change status: ${error}` });
+  }
+}
+
+async function markDocWithChanges(docname, tags = {}) {
+  await updateDocStatus(docname, (meta) => ({ ...meta, ...tags }));
+}
+
+async function unmarkDocWithChanges(docname, tags = {}) {
+  await updateDocStatus(docname, (meta) => Object.fromEntries(Object.entries(meta).filter(([tag]) => !(tag in tags))));
+}
+
+/**
+ * @param {str} docPrefix Part of the docname up to the second '/'
+ * @returns {string[]} Returns docnames starting with `docPrefix` that contain changes
+ * */
+async function getDocsWithChanges(docPrefix) {
+  if (!persistence) return {};
+  const cachedMetadata = docsWithChanges.get(docPrefix);
+  if (cachedMetadata != undefined) {
+    return cachedMetadata;
+  }
+
+  try {
+    let metadata = (await persistence.provider.getMeta(docPrefix, DOCS_WITH_CHANGES)) ?? {};
+    docsWithChanges.set(docPrefix, metadata);
+    return metadata;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+/**
+ *  @param {Y.Transaction} tr
+ *  @param {Y.Map} commentMap
+ */
+async function onCommentChange(docname, commentMap) {
+  if (commentMap.size != 0) {
+    markDocWithChanges(docname, { comments: true });
+  } else {
+    unmarkDocWithChanges(docname, { comments: true });
+  }
+}
+
+/**
+ * @param {Y.Doc} doc
+ * @param {string} docname
+ */
+async function onTextChange(doc, docname) {
+  const metaMap = doc.getMap("meta");
+  const initial = metaMap.get("initial");
+  // We want to ignore the initial text that is inserted into an empty document on edtior startup. Subsequent changes should however mark the document as changed.
+  if (initial === true) {
+    metaMap.set("initial", false);
+  } else if (initial == false) {
+    markDocWithChanges(docname, { text: true });
+  }
+}
+
 const getYDocLock = new Map();
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -183,6 +291,13 @@ export const getYDoc = async (docname, gc = true, attempt = 0) => {
     }
     logChanges(doc, docname);
     docs.set(docname, doc);
+
+    if (persistence !== null && docname.includes("/")) {
+      // watch doc for changes
+      const commentMap = doc.getMap();
+      commentMap.observe(() => onCommentChange(docname, commentMap));
+      doc.getText("codemirror").observe(() => onTextChange(doc, docname));
+    }
 
     return doc;
   } finally {
@@ -396,4 +511,52 @@ export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
   }
 
   return { error: "Unknown endpoint", code: 404 };
+};
+
+/**
+ * @param {WebSocket} conn
+ * @param {http.IncomingMessage} req
+ */
+export const setupStatusConnection = async (conn, req) => {
+  const prefix = req.url.slice(1).split("?")[0];
+  if (!statusConns.has(prefix)) {
+    statusConns.set(prefix, new Map());
+  }
+  const listenerMap = statusConns.get(prefix);
+  listenerMap.set(conn, "");
+
+  let pongReceived = true;
+  const pingInterval = setInterval(() => {
+    if (!pongReceived) {
+      conn.close();
+    } else {
+      pongReceived = false;
+      try {
+        conn.ping();
+      } catch (e) {
+        conn.close();
+      }
+    }
+  }, pingTimeout);
+
+  conn.on("pong", () => {
+    pongReceived = true;
+  });
+
+  conn.on("message", async (data) => {
+    if (!data) return;
+    await unmarkDocWithChanges(data, { comments: true, text: true });
+  });
+
+  conn.on("close", () => {
+    clearInterval(pingInterval);
+    listenerMap.delete(conn);
+  });
+
+  try {
+    // send initial statuses
+    conn.send(JSON.stringify(await getDocsWithChanges(prefix)));
+  } catch (error) {
+    conn.close();
+  }
 };

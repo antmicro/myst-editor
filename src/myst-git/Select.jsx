@@ -106,10 +106,16 @@ const OptionList = styled.ul`
       color: var(--blue-500);
       font-weight: bold;
     }
+  }
 
-    span {
-      color: var(--gray-800);
-    }
+  .marked::after {
+    content: "";
+    display: inline-block;
+    margin-left: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+    background-color: var(--gray-800);
   }
 `;
 
@@ -197,8 +203,8 @@ const Select = ({ options, initialValue, onChange, inputPlaceholder, loadMore, s
           />
           <OptionList onScroll={listScroll} ref={optionList}>
             {shownOptions.value.map((o) => (
-              <li key={o.value} onClick={() => selectOption(o)} className={o.value == selectedValue.value ? "active" : ""}>
-                {o.label}
+              <li key={o.value} onClick={() => selectOption(o)} className={`${o.value == selectedValue.value ? "active" : ""}`}>
+                <span className={`${o.marked ? "marked" : ""}`}>{o.label}</span>
               </li>
             ))}
           </OptionList>

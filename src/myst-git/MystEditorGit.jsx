@@ -7,6 +7,7 @@ import styled, { StyleSheetManager } from "styled-components";
 import Select from "./Select";
 import * as Y from "yjs";
 import CommitModal, { Popup } from "./CommitModal";
+import { useWatchChanges } from "./useWatchChanges";
 
 const MystContainer = styled.div`
   display: grid;
@@ -153,6 +154,7 @@ const MystEditorGit = ({
   const toast = useSignal({ content: null, timeout: null });
   const commitSummary = useSignal(null);
   const commentStateToApply = useRef(null);
+  const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
 
   useEffect(() => {
     window.myst_editor[props.id].state = mystState.current;
@@ -193,6 +195,8 @@ const MystEditorGit = ({
     try {
       commitSummary.value = null;
       const { hash, webUrl } = await commitChanges(message);
+      // Let the server know the changes have been commited
+      statusSocket.current.send(room.peek());
       commentStateToApply.current = mystState.current.collab.value.ycomments.encodeState();
       toastNotify({ text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } });
       mystState.current.collab.value.provider.awareness.setLocalStateField("newCommit", { hash, message: summary });
@@ -323,9 +327,19 @@ const MystEditorGit = ({
     });
   }
 
-  const branchToSelectOpt = (b) => ({ label: b, value: b });
-  const commitToSelectOpt = (c) => ({ label: c.message, value: c.hash });
-  const fileToSelectOpt = (f) => ({ label: f, value: f });
+  const branchToSelectOpt = (b) => ({ label: b, value: b, marked: docsWithChanges.value.some((desc) => desc.branch === b) });
+  const commitToSelectOpt = (c) => ({
+    label: c.message,
+    value: c.hash,
+    marked: docsWithChanges.value.some((desc) => desc.branch === branch.peek() && desc.commitHash === c.hash),
+  });
+  const fileToSelectOpt = (f) => ({
+    label: f,
+    value: f,
+    marked: docsWithChanges.value.some(
+      ({ branch: branchName, commitHash, file }) => branchName == branch.peek() && commit.peek().hash === commitHash && f == file,
+    ),
+  });
 
   useSignalEffect(() => {
     const doc = mystState.current.collab.value.ydoc;
