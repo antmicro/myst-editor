@@ -5,7 +5,6 @@ import purify from "dompurify";
 import DefaultButton from "./Buttons";
 import ButtonGroup from "./ButtonGroup";
 import Avatars from "./Avatars";
-import TemplateManager from "./TemplateManager";
 import { MystState } from "../mystState";
 import { useComputed, useSignal } from "@preact/signals";
 
@@ -59,9 +58,17 @@ const Topbar = styled.div`
     position: absolute;
     top: 50px;
     padding-top: 10px;
+    display: none;
 
-    &:hover > * {
+    &:hover {
       display: block;
+    }
+
+    .dropdown-content {
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: 4px 4px 10px var(--gray-600);
+      background: white;
     }
   }
 
@@ -98,7 +105,7 @@ export const TopbarButton = styled(DefaultButton)`
   background-color: ${(props) => (props.active ? "var(--icon-main-active)" : "var(--icon-bg)")};
   width: 40px;
 
-  &:hover ~ .btn-dropdown > * {
+  &:hover ~ .btn-dropdown {
     display: block;
   }
 `;
@@ -232,12 +239,22 @@ const TocIcon = () => (
   </svg>
 );
 
+const TemplatesIcon = () => (
+  <svg width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 16L11 16" stroke="#332D37" stroke-width="1.75" />
+    <path d="M1 21H10H19V12V6.5L13.5 1H1V6.5V12V21Z" stroke="#332D37" stroke-width="1.75" stroke-dasharray="6 3" />
+    <path d="M5 12L15 12" stroke="#332D37" stroke-width="1.75" />
+    <path d="M5 8L15 8" stroke="#332D37" stroke-width="1.75" />
+  </svg>
+);
+
 const icons = {
   fullscreen: FullscreenIcon,
   "copy-html": CopyIcon,
   refresh: RefreshIcon,
   "print-to-pdf": PrintPDFIcon,
   settings: SettingsIcon,
+  templates: TemplatesIcon,
 };
 
 export const EditorTopbar = ({ alert, users, buttons }) => {
@@ -267,7 +284,7 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
   });
   const clickedId = useComputed(() => editorModeButtons.value.findIndex((b) => b.id[0].toUpperCase() + b.id.slice(1) === options.mode.value));
   const buttonsLeft = useMemo(() => buttons.map((b) => ({ ...b, icon: b.icon || icons[b.id] })).filter((b) => b.icon), [buttons]);
-  const textButtons = useMemo(() => buttons.filter((b) => b.text && b.id !== "template-manager"), [buttons]);
+  const textButtons = useMemo(() => buttons.filter((b) => b.text), [buttons]);
 
   return (
     <Topbar id="topbar">
@@ -278,10 +295,13 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
               <TopbarButton className="icon" type="button" title={button.tooltip} name={button.id} onClick={button.action}>
                 {typeof button.icon == "function" ? <button.icon /> : <img src={button.icon} />}
               </TopbarButton>
-              <div className="btn-dropdown">{button.dropdown?.()}</div>
+              {button.dropdown && (
+                <div className="btn-dropdown">
+                  <div className="dropdown-content">{button.dropdown()}</div>
+                </div>
+              )}
             </div>
           ))}
-          {buttons.find((b) => b.id === "template-manager") && options.templatelist.value && <TemplateManager />}
         </div>
         {alert && <Alert className="topbar-alert"> {alert} </Alert>}
         <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />

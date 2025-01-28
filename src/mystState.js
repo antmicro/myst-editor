@@ -10,6 +10,7 @@ import { CollaborationClient } from "./collaboration";
 import { CodeMirror as VimCM, vim } from "@replit/codemirror-vim";
 import { collabClientFacet } from "./extensions";
 import { TextManager } from "./text";
+import Templates from "./components/Templates";
 
 export const predefinedButtons = {
   printToPdf: {
@@ -17,7 +18,7 @@ export const predefinedButtons = {
     tooltip: "Print document as pdf",
     action: () => window.print(),
   },
-  templateManager: { id: "template-manager" },
+  templateManager: { id: "templates", tooltip: "Templates", dropdown: Templates },
   copyHtml: { id: "copy-html", tooltip: "Copy document as HTML" },
   fullscreen: { id: "fullscreen", tooltip: "Fullscreen" },
   refresh: { id: "refresh", tooltip: "Refresh issue links" },

@@ -4,17 +4,8 @@ import { MystState } from "../mystState";
 import { Compartment } from "@codemirror/state";
 import { useSignalEffect } from "@preact/signals";
 
-const Dropdown = styled.div`
+const SettingsList = styled.div`
   width: 240px;
-  padding: 20px;
-  border-radius: var(--border-radius);
-  box-shadow: 4px 4px 10px var(--gray-600);
-  background: white;
-  display: none;
-
-  &:hover {
-    display: block;
-  }
 
   h1 {
     font-size: 20px;
@@ -106,7 +97,7 @@ const Settings = () => {
   });
 
   return (
-    <Dropdown>
+    <SettingsList>
       <h1>Settings</h1>
       <ul>
         {userSettings.value.map((s) => (
@@ -116,7 +107,7 @@ const Settings = () => {
           </li>
         ))}
       </ul>
-    </Dropdown>
+    </SettingsList>
   );
 };
 
