@@ -223,12 +223,12 @@ export const useText = ({ preview }) => {
     if (preview.current == null) return;
 
     const resizeObserver = new ResizeObserver(() => {
-      editorView.value.dispatch({
+      editorView.value?.dispatch?.({
         effects: markdownUpdatedStateEffect.of(null),
       });
     });
     const mutationObserver = new MutationObserver((mutationList) => {
-      editorView.value.dispatch({
+      editorView.value?.dispatch?.({
         effects: markdownUpdatedStateEffect.of(null),
       });
       for (const mutation of mutationList) {

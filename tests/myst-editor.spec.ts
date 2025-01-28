@@ -592,6 +592,17 @@ const insertChangesAndCheckOutput = async (page: Page, changes: ChangeSpec | nul
 const applyPageOpts = async (page: Page, opts: object) => {
   let query = new URLSearchParams();
   Object.entries(opts).forEach(([k, v]) => query.set(k, v));
+
+  // Fail on errors
+  page.on("pageerror", (err) => {
+    throw new Error(`Unhandled page exception: ${err.stack || err}`);
+  });
+  page.on("console", (msg) => {
+    if (msg.type() === "error") {
+      throw new Error(`Console error: ${msg.text()} ${JSON.stringify(msg.location())}`);
+    }
+  });
+
   await page.goto("/?" + query.toString());
   await page.waitForSelector(".cm-content");
   return page;

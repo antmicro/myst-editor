@@ -54,7 +54,7 @@ function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior 
 
   const elemScrollOffset = cursorBlock.top + previewTopPadding;
 
-  const top = matchingRect.top + preview.scrollTop - elemScrollOffset - previewRect.top + editor.scrollTop;
+  const top = matchingRect.top + preview.scrollTop - elemScrollOffset - previewRect.top + (editor?.scrollTop ?? 0);
   preview.scrollTo({ top, behavior });
 }
 
@@ -69,7 +69,7 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
   let elem = ev.target;
   if (!id) {
     // check parents and siblings
-    while (elem.tagName !== "HTML-CHUNK") {
+    while (elem && elem.tagName !== "HTML-CHUNK") {
       const parent = elem.parentElement;
       [id, elem] = findSoruceMappedPreviousElement(elem);
       if (id) break;

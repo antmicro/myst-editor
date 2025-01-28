@@ -3,6 +3,7 @@
   <head>
     <title>MyST editor Demo</title>
     <link rel="stylesheet" href="./styles/MystEditor.css" />
+    <link rel="icon" href="data:," />
     <style>
       body {
         margin: 0;
@@ -265,10 +266,7 @@ These features include:
               action: () => alert("Custom button action"),
             },
           ]),
-          spellcheckOpts: {
-            dict: "en_US",
-            dictionaryPath: "/myst-editor/dictionaries",
-          },
+          spellcheckOpts: { dict: "en_US", dictionaryPath: `${window.location.pathname}dictionaries` },
           syncScroll: true,
         },
         document.getElementById("myst"),

@@ -97,7 +97,7 @@ const defaults = {
     color: "#ff0000",
     mode: "websocket",
   },
-  spellcheckOpts: { dict: "en_US", dictionaryPath: "/dictionaries" },
+  spellcheckOpts: null,
   customRoles: [],
   transforms: [],
   customDirectives: [],
