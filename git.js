@@ -47,7 +47,7 @@ const s = (m = {}.VITE_WS_URL) != null ? m : n.get("collab_server"), a = ["main"
 }, {
   message: "commit 1",
   hash: "bbb"
-}], p = ["docs/source/file1", "docs/source/file2"];
+}], f = ["docs/source/file1", "docs/source/file2"];
 d({
   repo: "repos/myst",
   initialBranches: a,
@@ -55,7 +55,7 @@ d({
   searchBranches: (e) => a.filter((t) => t.includes(e)),
   getCommits: (e, t) => t == 1 ? i : [],
   searchCommits: (e) => i.filter((t) => t.message.includes(e)),
-  getFiles: () => p,
+  getFiles: () => f,
   getText: () => `line1
 line2
 line3`,
@@ -66,7 +66,6 @@ line3`,
     webUrl: "#"
   }),
   id: "demo",
-  templatelist: "linkedtemplatelist.json",
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
   transforms: b,
   collaboration: {
