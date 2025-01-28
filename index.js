@@ -157,7 +157,7 @@ let p = [{
 }], g = [{
   target: "bold",
   transform: (e, t) => `<b style="white-space: pre-wrap;">${t.body}</b>`
-}], f = [{
+}], w = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
     const [t, s] = e.split("#");
@@ -198,7 +198,7 @@ d({
   templatelist: "linkedtemplatelist.json",
   initialText: l,
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
-  transforms: f,
+  transforms: w,
   collaboration: {
     enabled: i,
     commentsEnabled: i,
@@ -217,7 +217,7 @@ d({
   }]),
   spellcheckOpts: {
     dict: "en_US",
-    dictionaryPath: "/myst-editor/dictionaries"
+    dictionaryPath: `${window.location.pathname}dictionaries`
   },
   syncScroll: !0
 }, document.getElementById("myst"));
