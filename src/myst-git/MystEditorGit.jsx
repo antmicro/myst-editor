@@ -196,7 +196,11 @@ const MystEditorGit = ({
       commitSummary.value = null;
       const { hash, webUrl } = await commitChanges(message);
       // Let the server know the changes have been commited
-      statusSocket.current.send(room.peek());
+      if (!statusSocket.current || statusSocket.current.readyState !== 1) {
+        console.warn("Document statuses not available");
+      } else {
+        statusSocket.current.send(room.peek());
+      }
       commentStateToApply.current = mystState.current.collab.value.ycomments.encodeState();
       toastNotify({ text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } });
       mystState.current.collab.value.provider.awareness.setLocalStateField("newCommit", { hash, message: summary });

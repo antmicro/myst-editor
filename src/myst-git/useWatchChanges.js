@@ -15,8 +15,12 @@ const connect = async (url, statusSocket, docsWithChanges) => {
   try {
     const socket = new WebSocket(url);
     socket.onmessage = (ev) => {
-      const statuses = JSON.parse(ev.data);
-      docsWithChanges.value = parseStatuses(statuses);
+      try {
+        const statuses = JSON.parse(ev.data);
+        docsWithChanges.value = parseStatuses(statuses);
+      } catch (err) {
+        socket.close();
+      }
     };
     socket.onclose = () => setTimeout(() => connect(url, statusSocket, docsWithChanges), SOCKET_RECONNECT_MS);
     statusSocket.current = socket;
