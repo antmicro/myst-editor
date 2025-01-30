@@ -149,7 +149,7 @@ const MystEditorGit = ({
   const file = useSignal();
   const initialText = useSignal("");
   const room = useComputed(() => (commit.value && file.value ? `${repo}/${branch.value}/${commit.value.hash}/${file.value}` : ""));
-  const mystState = useRef(createMystState({ ...props }));
+  const mystState = useRef(createMystState({ ...props, collaboration: { ...props.collaboration, mode: "manual" } }));
   const changeHistory = useSignal(initialHistory);
   const toast = useSignal({ content: null, timeout: null });
   const commitSummary = useSignal(null);
@@ -166,8 +166,9 @@ const MystEditorGit = ({
   });
 
   useSignalEffect(() => {
+    if (!room.value) return;
     const collaboration = mystState.current.options.collaboration.peek();
-    mystState.current.options.collaboration.value = { ...collaboration, room: room.value };
+    mystState.current.options.collaboration.value = { ...collaboration, room: room.value, mode: props.collaboration.mode };
   });
 
   function toastNotify(content) {
