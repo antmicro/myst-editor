@@ -480,12 +480,21 @@ export const setupWSConnection = async (conn, req, { docName = req.url.slice(1).
 const URL_PREFIX = process.env.URL_PREFIX || "";
 
 export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
+  console.log(`[handleRequest] Received ${request.method} request with url: ${request.url}`);
   const params = new URLSearchParams(request.url?.split("?")[1]);
+  console.log(`[handleRequest] parsed parameters: ${[...params.entries()]}`);
 
   if (request.url.startsWith(URL_PREFIX + "/connections/") && request.method == "PATCH") {
     const room = request.url?.split("?")[0].replace(URL_PREFIX + "/connections/", "");
+
+    console.log(`[handleRequest] room is ${room} (${new TextEncoder().encode(room)})`);
+    console.log(`[handleRequest] room is present: ${docs.has(room)}`);
+    console.log(`[handleRequest] Total rooms: ${docs.size}`);
+
     const doc = docs.get(room);
     if (!doc) return { code: 404, error: `Room ${room} does not exist` };
+
+    console.log(`Disconnecting ${params.get("users")}`);
 
     if (!params.get("users")) {
       return { code: 400, error: "No users were supplied" };
@@ -497,6 +506,8 @@ export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
     });
 
     const usersWithAccess = params.get("users").split(",");
+    console.log(`[handleRequest] Users with access ${usersWithAccess}`);
+
     for (const conn of doc.conns.keys()) {
       if (!usersWithAccess.includes(conn.__username)) {
         conn.close();
