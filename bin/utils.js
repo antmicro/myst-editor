@@ -409,7 +409,7 @@ const pingTimeout = 30000;
  * @param {any} req
  * @param {any} opts
  */
-export const setupWSConnection = async (conn, req, { docName = req.url.slice(1).split("?")[0], gc = true } = {}) => {
+export const setupWSConnection = async (conn, req, { docName = req.url.split("?")[0], gc = true } = {}) => {
   conn.__connectionId = Math.floor(Math.random() * 100000);
   conn.binaryType = "arraybuffer";
   logAsync(docName, { event: "connection-setup", msg: "New connection", connectionId: conn.__connectionId });
@@ -477,15 +477,13 @@ export const setupWSConnection = async (conn, req, { docName = req.url.slice(1).
   }
 };
 
-const URL_PREFIX = process.env.URL_PREFIX || "";
-
 export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
   console.log(`[handleRequest] Received ${request.method} request with url: ${request.url}`);
   const params = new URLSearchParams(request.url?.split("?")[1]);
   console.log(`[handleRequest] parsed parameters: ${[...params.entries()]}`);
 
-  if (request.url.startsWith(URL_PREFIX + "/connections/") && request.method == "PATCH") {
-    const room = request.url?.split("?")[0].replace(URL_PREFIX + "/connections", "");
+  if (request.url.startsWith("connections/") && request.method == "PATCH") {
+    const room = request.url?.split("?")[0].replace("connections/", "");
 
     console.log(`[handleRequest] room is ${room} (${new TextEncoder().encode(room)})`);
     console.log(`[handleRequest] room is present: ${docs.has(room)}`);
@@ -529,7 +527,7 @@ export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
  * @param {http.IncomingMessage} req
  */
 export const setupStatusConnection = async (conn, req) => {
-  const prefix = req.url.slice(1).split("?")[0];
+  const prefix = req.url.split("?")[0];
   if (!statusConns.has(prefix)) {
     statusConns.set(prefix, new Map());
   }
