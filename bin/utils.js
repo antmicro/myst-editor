@@ -485,7 +485,7 @@ export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
   console.log(`[handleRequest] parsed parameters: ${[...params.entries()]}`);
 
   if (request.url.startsWith(URL_PREFIX + "/connections/") && request.method == "PATCH") {
-    const room = request.url?.split("?")[0].replace(URL_PREFIX + "/connections/", "");
+    const room = request.url?.split("?")[0].replace(URL_PREFIX + "/connections", "");
 
     console.log(`[handleRequest] room is ${room} (${new TextEncoder().encode(room)})`);
     console.log(`[handleRequest] room is present: ${docs.has(room)}`);
