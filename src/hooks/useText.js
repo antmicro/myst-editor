@@ -16,6 +16,8 @@ import markdownCheckboxes from "markdown-it-checkbox";
 import { colonFencedBlocks } from "./markdownFence";
 import { markdownItMapUrls } from "./markdownUrlMapping";
 import newDirectives from "./markdownDirectives";
+import hljs from "highlight.js/lib/core";
+import yamlHighlight from "highlight.js/lib/languages/yaml";
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
 
@@ -66,6 +68,8 @@ const copyHtmlAsRichText = async (/** @type {string} */ txt) => {
 
 export const markdownUpdatedStateEffect = StateEffect.define();
 
+hljs.registerLanguage("yaml", yamlHighlight);
+
 /** @param {{preview: { current: Element } }} */
 export const useText = ({ preview }) => {
   const { editorView, cache, options, userSettings } = useContext(MystState);
@@ -107,7 +111,22 @@ export const useText = ({ preview }) => {
   }, []);
 
   const markdown = useComputed(() => {
-    const md = markdownIt({ breaks: true, linkify: true, html: true })
+    const md = markdownIt({
+      breaks: true,
+      linkify: true,
+      html: true,
+      highlight: (str, lang) => {
+        if (lang && hljs.getLanguage(lang)) {
+          try {
+            const v = hljs.highlight(str, { language: lang }).value;
+            return v;
+          } catch (err) {
+            console.error(`Error while highlighting ${lang}: ${err}`);
+          }
+          return md.utils.escapeHtml(str);
+        }
+      },
+    })
       .use(markdownitDocutils, { directives: { ...directivesDefault, ...newDirectives } })
       .use(markdownReplacer(options.transforms.value, options.parent, cache.transform))
       .use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))

@@ -143,9 +143,12 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
       return defaultOutput;
     }
 
-    const sanitizedContent = escapeHtml(token.content);
+    const parser = new DOMParser();
+    const defaultHTML = parser.parseFromString(defaultOutput, "text/html");
+    const codeElem = defaultHTML.querySelector("pre > code");
+    const defaultContent = codeElem.innerHTML;
     const startLine = token.map[0] + env.startLine - (env.chunkId !== 0);
-    let htmlContent = sanitizedContent
+    codeElem.innerHTML = defaultContent
       .split("\n")
       .filter((_, i, lines) => i !== lines.length - 1)
       .map((l, i) => {
@@ -155,7 +158,7 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
       })
       .join("\n");
 
-    return `<pre><code${self.renderAttrs(token)}>${htmlContent}</code></pre>\n`;
+    return defaultHTML.body.innerHTML;
   };
 }
 

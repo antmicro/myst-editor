@@ -365,6 +365,10 @@ const Preview = styled.div`
     text-align: center;
     margin-top: 12px;
   }
+
+  .hljs-attr {
+    color: rgb(0, 0, 204);
+  }
 `;
 Preview.defaultProps = { className: "myst-preview" };
 
