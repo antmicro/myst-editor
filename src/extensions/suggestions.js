@@ -134,7 +134,7 @@ export function suggestionPopup(/** @type {ViewUpdate} */ update, /** @type {YCo
   const mainSel = update.state.selection.main;
   const noSelection = mainSel.head === mainSel.anchor;
   const multilineSelection = update.state.doc.lineAt(mainSel.head).number !== update.state.doc.lineAt(mainSel.anchor).number;
-  if (!update.selectionSet || noSelection || multilineSelection) {
+  if (!update.view.hasFocus || noSelection || multilineSelection) {
     addSuggestionBtn.style.display = "none";
     return;
   }

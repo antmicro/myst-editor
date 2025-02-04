@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, useCallback, useMemo, useContext } from "preact/hooks";
 import { styled } from "styled-components";
 import { EditorView } from "codemirror";
-import { EditorState } from "@codemirror/state";
+import { Compartment, EditorState } from "@codemirror/state";
 import { ExtensionBuilder } from "../extensions";
 import { YComments } from "../comments/ycomments";
 import commentIcon from "../icons/comment.svg?url";
@@ -71,9 +71,12 @@ const YCommentWrapper = styled.div`
   }
 `;
 
+const commentUserSettingsCompartment = new Compartment();
+
 const YComment = ({ commentId }) => {
-  const { options, collab } = useContext(MystState);
+  const { options, collab, userSettings } = useContext(MystState);
   let cmref = useRef(null);
+  const cmView = useRef(null);
 
   const lineAuthors = useMemo(() => collab.value.ycomments.lineAuthors(commentId), [commentId]);
 
@@ -86,6 +89,14 @@ const YComment = ({ commentId }) => {
   const parentHeight = collab.value.ycomments.parentLineHeight(commentId) - 1;
 
   useEffect(() => {
+    if (!cmView.current) return;
+    const userExtensions = userSettings.value.filter((s) => s.enabled && s.extension && s.comments).map((s) => s.extension);
+    cmView.current.dispatch({
+      effects: commentUserSettingsCompartment.reconfigure(userExtensions),
+    });
+  }, [userSettings.value, cmView.current]);
+
+  useEffect(() => {
     if (!cmref.current) {
       return;
     }
@@ -96,14 +107,15 @@ const YComment = ({ commentId }) => {
         extensions: ExtensionBuilder.minimalSetup()
           .disable(["Mod-z", "Mod-y", "Mod-Z"])
           .useCollaboration({ collabClient: { ytext, provider: collab.value.provider } })
-          .useDefaultHistory()
           .addUpdateListener(updateHeight)
           .showCommentLineAuthors(lineAuthors)
           .useRemoveSelectionOnBlur()
+          .useCompartment(commentUserSettingsCompartment, [])
           .create(),
       }),
       parent: cmref.current,
     });
+    cmView.current = view;
 
     collab.value.ycomments.syncSuggestions(commentId);
     collab.value.ycomments.registerCommentEditor(commentId, view);

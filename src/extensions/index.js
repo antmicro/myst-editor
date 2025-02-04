@@ -9,7 +9,7 @@ import {
   crosshairCursor,
   keymap,
 } from "@codemirror/view";
-import { EditorSelection, EditorState, Prec } from "@codemirror/state";
+import { EditorSelection, EditorState, Facet, Prec } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { yCollab } from "y-codemirror.next";
 import { markdown } from "@codemirror/lang-markdown";
@@ -57,6 +57,7 @@ const restoreCursorLocation = (view, location) => {
 };
 
 export const folded = (update) => update.transactions.some((t) => t.effects.some((e) => e.is(foldEffect) || e.is(unfoldEffect)));
+export const collabClientFacet = Facet.define();
 
 export class ExtensionBuilder {
   constructor(base = []) {
@@ -193,6 +194,7 @@ export class ExtensionBuilder {
     const collab = yCollab(collabClient.ytext, collabClient.provider.awareness, { undoManager: collabClient.undoManager });
     collab[1] = ySync;
     this.extensions.push(collab);
+    this.extensions.push(collabClientFacet.of(collabClient));
 
     if (collabClient.undoManager) {
       collabClient.undoManager.on("stack-item-added", (event) => {

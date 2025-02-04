@@ -7,6 +7,8 @@ import { createContext } from "preact";
 import { closeBrackets } from "@codemirror/autocomplete";
 import Settings from "./components/Settings";
 import { CollaborationClient } from "./collaboration";
+import { CodeMirror as VimCM, vim } from "@replit/codemirror-vim";
+import { collabClientFacet } from "./extensions";
 
 export const predefinedButtons = {
   printToPdf: {
@@ -29,6 +31,12 @@ export const defaultButtons = [
   predefinedButtons.printToPdf,
   predefinedButtons.templateManager,
 ];
+
+// The vim plugin stores some functions as globals, but we need to differentiate between editors
+const undoManagers = new WeakMap();
+const { undo: originalUndo, redo: originalRedo } = VimCM.commands;
+VimCM.commands.undo = (cm) => (undoManagers.get(cm)?.undo ?? originalUndo)(cm);
+VimCM.commands.redo = (cm) => (undoManagers.get(cm)?.redo ?? originalRedo)(cm);
 
 const defaultUserSettings = [
   {
@@ -76,6 +84,23 @@ const defaultUserSettings = [
         }
       },
     ),
+  },
+  {
+    id: "vim",
+    title: "Vim mode",
+    enabled: false,
+    comments: true,
+    extension: [
+      Prec.high(vim()),
+      ViewPlugin.fromClass(
+        class {
+          constructor(view) {
+            const undoManager = view.state.facet(collabClientFacet)[0]?.undoManager;
+            if (undoManager) undoManagers.set(view.cm, { undo: () => undoManager.undo(), redo: () => undoManager.redo() });
+          }
+        },
+      ),
+    ],
   },
 ];
 
