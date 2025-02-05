@@ -128,6 +128,7 @@ const defaults = {
   customDirectives: [],
   // this will create a bogus random avatar when no specific getAvatar function is provided
   getAvatar: (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`,
+  avatarCrossorigin: null,
   getUserUrl: (username) => "#",
   backslashLineBreak: true,
   hideUsernameDelay: 5000,

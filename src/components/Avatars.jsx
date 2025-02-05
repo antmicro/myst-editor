@@ -1,4 +1,6 @@
+import { useContext } from "preact/hooks";
 import { styled } from "styled-components";
+import { MystState } from "../mystState";
 
 const MAX_AVATARS = 4;
 
@@ -33,11 +35,15 @@ const AvatarsWrapper = styled.div`
   }
 `;
 
-export const Avatar = ({ login, color, avatarUrl, userUrl }) => (
-  <a href={userUrl || "#"} target="_blank">
-    <img src={avatarUrl} key={login} title={login} class="avatar" style={`border-color: ${color}`} />
-  </a>
-);
+export const Avatar = ({ login, color, avatarUrl, userUrl }) => {
+  const { options } = useContext(MystState);
+
+  return (
+    <a href={userUrl || "#"} target="_blank">
+      <img src={avatarUrl} key={login} title={login} class="avatar" style={`border-color: ${color}`} crossOrigin={options.avatarCrossorigin.value} />
+    </a>
+  );
+};
 
 const AvatarPlaceholder = ({ n, usernames }) => (
   <div class="avatar placeholder" title={usernames}>
