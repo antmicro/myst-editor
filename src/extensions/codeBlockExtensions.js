@@ -3,10 +3,12 @@ import { syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
 import { linter, setDiagnosticsEffect } from "@codemirror/lint";
 import { hoverTooltip, showTooltip } from "@codemirror/view";
+import { yamlLanguage } from "@codemirror/lang-yaml";
+import { CompletionContext, currentCompletions, startCompletion } from "@codemirror/autocomplete";
 
 const subEditorUpdate = Annotation.define();
 
-const codeBlocksSubeditors = (extensions, editorView, tooltipSources) =>
+const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completionSources) =>
   StateField.define({
     create() {
       return { extensions, editors: [], diagnostics: {}, editorView };
@@ -109,8 +111,24 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources) =>
             return { ...tooltip, pos: tooltip.pos + contentFrom, end: tooltip.end + contentFrom };
           }
         }),
+        completionSources.map((src) =>
+          src.languageData.of({
+            autocomplete: (/** @type {CompletionContext} */ ctx) => {
+              const subeditors = ctx.view.state.field(field);
+              for (const subeditor of subeditors.editors) {
+                if (ctx.pos < subeditor.from || ctx.pos > subeditor.to) continue;
+                const contentFrom = ctx.view.state.doc.lineAt(subeditor.from).to + 1;
+                const innerCtx = new CompletionContext(subeditor.editor.state, ctx.pos - contentFrom, ctx.explicit, subeditor.editor);
+                const completion = src.source.doComplete(innerCtx);
+                return { ...completion, from: completion.from + contentFrom, to: completion.to + contentFrom };
+              }
+            },
+          }),
+        ),
       ];
     },
   });
 
-export const codeBlockExtensions = ({ extensions, editorView, tooltipSources }) => [codeBlocksSubeditors(extensions, editorView, tooltipSources)];
+export const codeBlockExtensions = ({ extensions, editorView, tooltipSources, completionSources }) => [
+  codeBlocksSubeditors(extensions, editorView, tooltipSources, completionSources),
+];

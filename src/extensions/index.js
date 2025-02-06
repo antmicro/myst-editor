@@ -40,7 +40,7 @@ import { linter, lintKeymap } from "@codemirror/lint";
 import { CollaborationClient } from "../collaboration";
 import { codeBlockExtensions } from "./codeBlockExtensions";
 import { yamlCompletion, yamlSchemaLinter } from "codemirror-json-schema/yaml";
-import { handleRefresh, JSONHover, stateExtensions } from "codemirror-json-schema";
+import { handleRefresh, JSONCompletion, JSONHover, stateExtensions } from "codemirror-json-schema";
 import YAML from "yaml";
 
 const getRelativeCursorLocation = (view) => {
@@ -277,15 +277,11 @@ export class ExtensionBuilder {
     this.extensions.push(
       codeBlockExtensions({
         extensions: {
-          yaml: [
-            yaml(),
-            linter(yamlSchemaLinter(), { needsRefresh: handleRefresh }),
-            yamlLanguage.data.of({ autocomplete: yamlCompletion() }),
-            stateExtensions(schema),
-          ],
+          yaml: [yaml(), linter(yamlSchemaLinter(), { needsRefresh: handleRefresh }), stateExtensions(schema)],
         },
         editorView,
         tooltipSources: { yaml: new JSONHover({ parser: YAML.parse, mode: "yaml" }) },
+        completionSources: [{ languageData: yamlLanguage.data, source: new JSONCompletion({ mode: "yaml" }) }],
       }),
     );
     return this;
