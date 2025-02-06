@@ -17,7 +17,7 @@ Click on the icon to create a comment.
 ## Toggling Comments
 
 Clicking on the comment icon can be used to hide/show a comment.
-By default when you load a document, all preexisting comments will be expanded.
+By default, when you load a document, all preexisting comments will be expanded.
 All new comments will be expanded as well.
 
 ## Collaborating on a Comment
@@ -28,11 +28,11 @@ All new comments will be expanded as well.
 Multiple comment authors
 :::
 
-Comments can span multiple lines and multiple users can participate in writing a single comment.
+Comments can span multiple lines, and multiple users can participate in writing a single comment.
 MyST Editor enables comment discussions through a concept of line authorship.
 Every line of a comment is highlighted in the color of the line's author.
 When you hover over a line, you can also see its author's avatar to the left of the comment.
-If you want to participate in a discussion, it is recommended to add a new line (for example at the end of a comment you want to reply to).
+If you want to participate in a discussion, it is recommended to add a new line (for example, at the end of a comment you want to reply to).
 
 ## Moving Comments
 
@@ -55,7 +55,7 @@ Moving a comment onto another comment will append its contents.
 Deleting a comment will delete input from all users, not just your text.
 ```
 
-In order to delete a comment you can:
+In order to delete a comment, you can:
 
 - Press backspace at the beginning of a commented line
 - Delete/cut a selection containing the commented line
@@ -125,7 +125,7 @@ Change suggestion
 :::
 
 You can suggest changes to a line in a comment.
-To do so you can use the following syntax within the comment:
+To do so, you can use the following syntax within the comment:
 
 ```md
 |<text to replace> -> <replacement>|
@@ -135,12 +135,20 @@ eg. |is -> was|
 This will cross out all the occurrences of such text within the line and place a suggested replacement next to them in the document.
 The suggestion will be colored after the color of the comment line it is in.
 Clicking the colored suggestion will apply it, which can be undone/redone.
-This will only apply one occurrence of the suggestion.
+This will only apply to one occurrence of the suggestion.
 
 ```{note}
 Suggestions only match against whole words/symbols. 
 If you want to match a certain occurrence of a word, try adding more context (more words/symbols around it).
 ```
+
+You can also suggest deleting a portion of text. To do this, simply leave the replacement after `->` blank:
+
+:::{figure-md} suggest-deletion
+![Suggest Deletion](./assets/suggest-del.png)
+
+Removal suggestion
+:::
 
 ````{tip}
 If you don't specify a replacement, the text between `||` will be highlighted. 
@@ -150,3 +158,11 @@ This can be useful to bring attention to a section of a line.
 eg. |something| - this will highlight the word something
 ```
 ````
+
+To easily add suggestions, you can select some text from one line and click the button that appears near your selection:
+
+:::{figure-md} suggest-button
+![Suggest Button](./assets/suggest-btn.png)
+
+Add suggestion button
+:::

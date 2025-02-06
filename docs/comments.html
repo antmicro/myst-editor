@@ -254,6 +254,22 @@
   
   
     <li class="md-nav__item">
+      <a href="settings.html" class="md-nav__link">
+        <span class="md-ellipsis">Settings</span>
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="collaboration.html" class="md-nav__link">
         <span class="md-ellipsis">Collaboration</span>
       </a>
@@ -440,7 +456,7 @@
 <figure class="align-default" id="add-comment">
 <img alt="Add Comment" src="_images/comment-add.png" />
 <figcaption>
-<p><span class="caption-number">Figure 5 </span><span class="caption-text"><span class="caption-text">
+<p><span class="caption-number">Figure 6 </span><span class="caption-text"><span class="caption-text">
 Add comment</span><a class="headerlink" href="#add-comment" title="Permalink to this image">¶</a></figcaption>
 </figure>
 <p>To add a comment, hover your cursor over the editor gutter (to the left of line numbers) on the line you want to comment on.
@@ -448,20 +464,20 @@ This should make the comment icon appear.
 Click on the icon to create a comment.</p>
 <h2 id="toggling-comments">Toggling Comments<a class="headerlink" href="#toggling-comments" title="Link to this heading">¶</a></h2>
 <p>Clicking on the comment icon can be used to hide/show a comment.
-By default when you load a document, all preexisting comments will be expanded.
+By default, when you load a document, all preexisting comments will be expanded.
 All new comments will be expanded as well.</p>
 <h2 id="collaborating-on-a-comment">Collaborating on a Comment<a class="headerlink" href="#collaborating-on-a-comment" title="Link to this heading">¶</a></h2>
 <figure class="align-default" id="multiple-authors">
 <img alt="Multiple comment authors" src="_images/comment.png" />
 <figcaption>
-<p><span class="caption-number">Figure 6 </span><span class="caption-text"><span class="caption-text">
+<p><span class="caption-number">Figure 7 </span><span class="caption-text"><span class="caption-text">
 Multiple comment authors</span><a class="headerlink" href="#multiple-authors" title="Permalink to this image">¶</a></figcaption>
 </figure>
-<p>Comments can span multiple lines and multiple users can participate in writing a single comment.
+<p>Comments can span multiple lines, and multiple users can participate in writing a single comment.
 MyST Editor enables comment discussions through a concept of line authorship.
 Every line of a comment is highlighted in the color of the line’s author.
 When you hover over a line, you can also see its author’s avatar to the left of the comment.
-If you want to participate in a discussion, it is recommended to add a new line (for example at the end of a comment you want to reply to).</p>
+If you want to participate in a discussion, it is recommended to add a new line (for example, at the end of a comment you want to reply to).</p>
 <h2 id="moving-comments">Moving Comments<a class="headerlink" href="#moving-comments" title="Link to this heading">¶</a></h2>
 <p>As new lines are added above a line with a comment, the comment will move with its original line.
 Pressing <code class="docutils literal notranslate"><span class="pre">enter</span></code> at the beginning of a commented line will also move it downwards.</p>
@@ -479,7 +495,7 @@ Pressing <code class="docutils literal notranslate"><span class="pre">enter</spa
 <p class="admonition-title">Warning</p>
 <p>Deleting a comment will delete input from all users, not just your text.</p>
 </div>
-<p>In order to delete a comment you can:</p>
+<p>In order to delete a comment, you can:</p>
 <ul class="simple">
 <li><p>Press backspace at the beginning of a commented line</p></li>
 <li><p>Delete/cut a selection containing the commented line</p></li>
@@ -502,7 +518,7 @@ Such comments are annotated with the following information:</p>
 <figure class="align-default" id="resolved-comment">
 <img alt="Resolved Comment" src="_images/resolved-comment.png" />
 <figcaption>
-<p><span class="caption-number">Figure 7 </span><span class="caption-text"><span class="caption-text">
+<p><span class="caption-number">Figure 8 </span><span class="caption-text"><span class="caption-text">
 Resolved comment</span><a class="headerlink" href="#resolved-comment" title="Permalink to this image">¶</a></figcaption>
 </figure>
 <h3 id="restoring-comments">Restoring Comments<a class="headerlink" href="#restoring-comments" title="Link to this heading">¶</a></h3>
@@ -514,14 +530,14 @@ When you press this button, the resolved comment will be added to the bottom of 
 <figure class="align-default" id="merge-comments">
 <img alt="Merge Comments" src="_images/comment-occupied.png" />
 <figcaption>
-<p><span class="caption-number">Figure 8 </span><span class="caption-text"><span class="caption-text">
+<p><span class="caption-number">Figure 9 </span><span class="caption-text"><span class="caption-text">
 Merging comments</span><a class="headerlink" href="#merge-comments" title="Permalink to this image">¶</a></figcaption>
 </figure>
 <h4 id="orphaned-comments">Orphaned Comments<a class="headerlink" href="#orphaned-comments" title="Link to this heading">¶</a></h4>
 <figure class="align-default" id="id1">
 <img alt="Orphaned Comment" src="_images/comment-orphaned.png" />
 <figcaption>
-<p><span class="caption-number">Figure 9 </span><span class="caption-text"><span class="caption-text">
+<p><span class="caption-number">Figure 10 </span><span class="caption-text"><span class="caption-text">
 Orphaned comment</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></figcaption>
 </figure>
 <p>If a resolved comment does not have a line number next to it or the text of the commented line is crossed out, the line the comment was assigned to has been deleted.
@@ -536,11 +552,11 @@ From there you can move it wherever you want.</p>
 <figure class="align-default" id="suggest-change">
 <img alt="Suggest Change" src="_images/suggestion.png" />
 <figcaption>
-<p><span class="caption-number">Figure 10 </span><span class="caption-text"><span class="caption-text">
+<p><span class="caption-number">Figure 11 </span><span class="caption-text"><span class="caption-text">
 Change suggestion</span><a class="headerlink" href="#suggest-change" title="Permalink to this image">¶</a></figcaption>
 </figure>
 <p>You can suggest changes to a line in a comment.
-To do so you can use the following syntax within the comment:</p>
+To do so, you can use the following syntax within the comment:</p>
 <div class="highlight-md notranslate"><div class="highlight"><pre><span></span><code>|&lt;text to replace&gt; -&gt; &lt;replacement&gt;|
 eg. |is -&gt; was|
 </code></pre></div>
@@ -548,12 +564,19 @@ eg. |is -&gt; was|
 <p>This will cross out all the occurrences of such text within the line and place a suggested replacement next to them in the document.
 The suggestion will be colored after the color of the comment line it is in.
 Clicking the colored suggestion will apply it, which can be undone/redone.
-This will only apply one occurrence of the suggestion.</p>
+This will only apply to one occurrence of the suggestion.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suggestions only match against whole words/symbols.
 If you want to match a certain occurrence of a word, try adding more context (more words/symbols around it).</p>
 </div>
+<p>You can also suggest deleting a portion of text. To do this, simply leave the replacement after <code class="docutils literal notranslate"><span class="pre">-&gt;</span></code> blank:</p>
+<figure class="align-default" id="suggest-deletion">
+<img alt="Suggest Deletion" src="_images/suggest-del.png" />
+<figcaption>
+<p><span class="caption-number">Figure 12 </span><span class="caption-text"><span class="caption-text">
+Removal suggestion</span><a class="headerlink" href="#suggest-deletion" title="Permalink to this image">¶</a></figcaption>
+</figure>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>If you don’t specify a replacement, the text between <code class="docutils literal notranslate"><span class="pre">||</span></code> will be highlighted.
@@ -562,6 +585,13 @@ This can be useful to bring attention to a section of a line.</p>
 </code></pre></div>
 </div>
 </div>
+<p>To easily add suggestions, you can select some text from one line and click the button that appears near your selection:</p>
+<figure class="align-default" id="suggest-button">
+<img alt="Suggest Button" src="_images/suggest-btn.png" />
+<figcaption>
+<p><span class="caption-number">Figure 13 </span><span class="caption-text"><span class="caption-text">
+Add suggestion button</span><a class="headerlink" href="#suggest-button" title="Permalink to this image">¶</a></figcaption>
+</figure>
 
 
   <hr>
@@ -622,7 +652,7 @@ This can be useful to bring attention to a section of a line.</p>
         
     </div>
   
-      <a href="https://github.com/antmicro/myst-editor/tree/81684a814a9397ca574c744b1fac399f2b87118b">81684a81</a>
+      <a href="https://github.com/antmicro/myst-editor/tree/17587855da731f30c39742a273df38260b8db8c5">17587855</a>
         @ <a href="https://github.com/antmicro/myst-editor/tree/main">main</a>
   
 </div>
