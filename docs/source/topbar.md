@@ -13,6 +13,7 @@ Left-side topbar buttons
 Starting from the left, the left side topbar visible in {numref}`left-side-buttons` includes the following buttons:
 
 - `Fullscreen` - toggles fullscreen editor mode
+- `Settings` - opens the [Settings](settings.md) dropdown
 - `Copy document as HTML` - copies the rendered document exported as HTML
 - `Refresh issue links` - re-renders all [rich links](rich-links.md) in the document
 - `Print to PDF` - save the rendered document as a PDF file or print it

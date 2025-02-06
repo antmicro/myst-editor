@@ -5,6 +5,7 @@
 
 introduction
 topbar
+settings
 collaboration
 mermaid
 rich-links

@@ -13,7 +13,7 @@ For an overview of the editor usage, see the [User Manual](https://antmicro.gith
 
 ## Demo
 
-A demo without the collaborative features is available [here](https://antmicro.github.io/myst-editor/).
+A demo of the editor is available [here](https://antmicro.github.io/myst-editor/).
 
 ## Main features
 
@@ -54,6 +54,13 @@ You can use the diff view to see exactly what changes have been made to the docu
 Using the buttons in the top-left, you can copy the rendered HTML or export the document to a PDF file.
 
 ![Copy Demo](./assets/export.png)
+
+### User settings
+
+Users can customize the editor with the settings dropdown.
+In the example below, we can see settings that allow for scrolling past the last line of the editor and autocompleting Markdown lists.
+
+![Settings Demo](./assets/settings.gif)
 
 ### Custom transforms
 
@@ -149,35 +156,41 @@ Here are the options you can pass to the MystEditor function:
 
 - `id` *(default: `crypto.randomUUID()`)* - this changes where the global state of an editor is stored, it is used when accessing `window.myst_editor` and is part of the CodeMirror parent DOM id
 - `name` *(default: "myst_editor_textarea")* - this will change the name of the textarea element which contains your markdown. Useful if you want the editor to be part of an HTML `form`.
-- `initialMode` *(default: "Both", possibleValues: "Source" | "Preview" | "Both")* - changes what is visible when you open the editor. By default, you will see a split view with the text editor and preview.
+- `additionalStyles` *(`CSSStylesheet` | `CSSStylesheet[]`)* - extra CSS stylesheets to customize the component
+- `title` - the document title displayed in the topbar. You can include Markdown links in here.
+- `mode` *(default: "Both", possibleValues: "Source" | "Preview" | "Both" | "Diff" | "Resolved")* - changes what is visible when you open the editor. By default, you will see a split view with the text editor and preview.
 - `initialText` *(default: "")* - initial Markdown text
 - `includeButtons` *(default: defaultButtons)* - An array of button definitions. A button definition is an object which has an `action: () => void` and either `icon` or `text`. As an example, a button could be defined as `{ text: "Button title", action: () => alert('clicked!') }`
 - `topbar` *(default: true)* - whether to show the topbar
 - `templateList` - path/url to a JSON file containing your document templates. For an example, see `public/linkedtemplatelist.json`.
-- `transforms` - [custom transforms](#custom-transforms)
-- `getAvatar` *(default: (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`)* - a function that returns the avatar for a given username
-- `getUserUrl` *(default: (login) => `#`)* - a function that returns the URL to the web page with the user's profile
-  It is used when an avatar is clicked.
 - `collaboration` - options related to live collaboration:
   - `enabled` *(default: false)*
+  - `commentsEnabled` *(default: false)* - enable basic comment functionality,
+  - `resolvingCommentsEnabled` *(default: false)* - enable resolving comments,
   - `wsUrl` *(example: ws://example:4444)* - URL of the websocket server
-  - `commentsEnabled` - enable basic comment functionality,
-  - `resolvingCommentsEnabled` - enable resolving comments,
   - `username`
-  - `room` - name of the room to join, users will see others in the same room
-  - `color` - color of the cursor seen by other users
-  - `hideUsernameDelay` *(default: 5000)* - milliseconds of inactivity after which the username attached to a remote cursor will be hidden
+  - `room` *(default: "0")* - name of the room to join, users will see others in the same room
+  - `color` *(default: "#ff0000")* - color of the cursor seen by other users
+  - `mode` *(default: "websocket")* - determines how the document will be synced. You can set it to `"local"` for testing without a server (using BroadcastChannel API)
 - `spellcheckOpts` - Configuration for the spellchecker. If the value is *null* or *false* then the spellchecker will be disabled.
   - `dict` *(default: "en_US")* - Name of the desired dictionary. For an example, see `public/dictionaries/en_US`.
   - `dictionaryPath` *(default: "/dictionaries")*  - Path to a folder with dictionaries. For an example, see `public/dictionaries/`.
+- `customRoles` - custom MyST roles. See [the demo HTML](./src/index.html) for examples.
+- `transforms` - [custom transforms](#custom-transforms)
+- `customDirectives` - custom MyST directives. See [the demo HTML](./src/index.html) for examples.
+- `getAvatar` *(default: (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`)* - a function that returns the avatar for a given username
+- `getUserUrl` *(default: (login) => `#`)* - a function that returns the URL to the web page with the user's profile
+  It is used when an avatar is clicked.
 - `backslashLineBreak` *(default: true)* - treat `\` as a line break even when it is at the end of a paragraph/block
-- `additionalStyles` *(`CSSStylesheet` | `CSSStylesheet[]`)* - extra CSS stylesheets to customize the component
+- `hideUsernameDelay` *(default: 5000)* - milliseconds of inactivity after which the username attached to a remote cursor will be hidden
 - `syncScroll` *(default: false)* - synchronize scrolling of the editor and preview in `Dual Pane` view mode.
   - > NOTE: This only works if you set a height limit on the editor parent element.
 - `unfoldedHeadings` *(`number?`)* - fold all but the given number of top level syntax nodes on startup.
   If the option is not set, nothing will be folded by default.
+- `mapUrl` *(default: (tag, url) => url)* - function used to map `href` and `src` attributes. Tag is the name of the HTML element and url is the source url you can transform.
 
 Also see [the demo HTML](./src/index.html) for an example on how you can set these options.
+Using `window.myst_editor` or the return value of the `MystEditor` function, you can modify these options at runtime.
 
 ## Myst Editor for Git
 
