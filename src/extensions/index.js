@@ -32,14 +32,16 @@ import {
 } from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
-import { yaml } from "@codemirror/lang-yaml";
+import { yaml, yamlLanguage } from "@codemirror/lang-yaml";
 import { ySync } from "./collab";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
-import { lintKeymap } from "@codemirror/lint";
+import { linter, lintKeymap } from "@codemirror/lint";
 import { CollaborationClient } from "../collaboration";
 import { codeBlockExtensions } from "./codeBlockExtensions";
-import { yamlSchema } from "codemirror-json-schema/yaml";
+import { yamlCompletion, yamlSchemaLinter } from "codemirror-json-schema/yaml";
+import { handleRefresh, JSONHover, stateExtensions } from "codemirror-json-schema";
+import YAML from "yaml";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -272,7 +274,20 @@ export class ExtensionBuilder {
   }
 
   useYamlSchema(schema, editorView) {
-    this.extensions.push(codeBlockExtensions({ yaml: [yaml(), yamlSchema(schema)] }, editorView));
+    this.extensions.push(
+      codeBlockExtensions({
+        extensions: {
+          yaml: [
+            yaml(),
+            linter(yamlSchemaLinter(), { needsRefresh: handleRefresh }),
+            yamlLanguage.data.of({ autocomplete: yamlCompletion() }),
+            stateExtensions(schema),
+          ],
+        },
+        editorView,
+        tooltipSources: { yaml: new JSONHover({ parser: YAML.parse, mode: "yaml" }) },
+      }),
+    );
     return this;
   }
 

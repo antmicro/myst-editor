@@ -42,6 +42,7 @@
     "y-codemirror.next": "^0.3.2",
     "y-protocols": "^1.0.5",
     "y-websocket": "^1.5.0",
+    "yaml": "^2.7.0",
     "yjs": "^13.5.44"
   },
   "devDependencies": {

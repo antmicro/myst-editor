@@ -2,10 +2,11 @@ import { Annotation, EditorState, MapMode, StateField } from "@codemirror/state"
 import { syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
 import { linter, setDiagnosticsEffect } from "@codemirror/lint";
+import { hoverTooltip, showTooltip } from "@codemirror/view";
 
 const subEditorUpdate = Annotation.define();
 
-const codeBlocksSubeditors = (extensions, editorView) =>
+const codeBlocksSubeditors = (extensions, editorView, tooltipSources) =>
   StateField.define({
     create() {
       return { extensions, editors: [], diagnostics: {}, editorView };
@@ -55,6 +56,7 @@ const codeBlocksSubeditors = (extensions, editorView) =>
             from: ref.from,
             to: ref.to,
             id,
+            lang: lang,
             editor: new EditorView({
               state: EditorState.create({
                 doc: contents,
@@ -96,8 +98,19 @@ const codeBlocksSubeditors = (extensions, editorView) =>
             },
           },
         ),
+        hoverTooltip(async (view, pos, side) => {
+          const subeditors = view.state.field(field);
+          for (const subeditor of subeditors.editors) {
+            if (pos < subeditor.from || pos > subeditor.to) continue;
+            const contentFrom = view.state.doc.lineAt(subeditor.from).to + 1;
+            const mappedPos = pos - contentFrom;
+            const tooltip = await tooltipSources[subeditor.lang]?.doHover?.(subeditor.editor, mappedPos, side);
+            if (!tooltip) return;
+            return { ...tooltip, pos: tooltip.pos + contentFrom, end: tooltip.end + contentFrom };
+          }
+        }),
       ];
     },
   });
 
-export const codeBlockExtensions = (extensions, editorView) => [codeBlocksSubeditors(extensions, editorView)];
+export const codeBlockExtensions = ({ extensions, editorView, tooltipSources }) => [codeBlocksSubeditors(extensions, editorView, tooltipSources)];
