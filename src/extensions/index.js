@@ -38,6 +38,8 @@ import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { lintKeymap } from "@codemirror/lint";
 import { CollaborationClient } from "../collaboration";
+import { codeBlockExtensions } from "./codeBlockExtensions";
+import { yamlSchema } from "codemirror-json-schema/yaml";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -266,6 +268,11 @@ export class ExtensionBuilder {
         update.view.focus();
       }),
     );
+    return this;
+  }
+
+  useYamlSchema(schema, editorView) {
+    this.extensions.push(codeBlockExtensions({ yaml: [yaml(), yamlSchema(schema)] }, editorView));
     return this;
   }
 

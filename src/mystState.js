@@ -136,6 +136,7 @@ const defaults = {
   syncScroll: false,
   unfoldedHeadings: null,
   mapUrl: (tag, url) => url,
+  yamlSchema: null,
 };
 
 export function createMystState(/** @type {typeof defaults} */ opts) {

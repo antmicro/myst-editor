@@ -280,6 +280,7 @@ const CodeMirror = ({ text, setUsers, preview }) => {
         .useMoveCursorAfterFold()
         .useCursorIndicator({ lineMap: text.lineMap, preview })
         .if(options.syncScroll.value, (b) => b.useSyncPreviewWithCursor({ lineMap: text.lineMap, preview, lastTyped }))
+        .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView))
         .create(),
     });
 
