@@ -86,15 +86,23 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
     provide(field) {
       return [
         EditorView.updateListener.of((u) => {
-          if (!u.transactions.some((t) => t.annotation(subEditorUpdate))) return;
+          if (!u.docChanged && !u.transactions.some((t) => t.annotation(subEditorUpdate))) return;
           const subeditors = u.view.state.field(field);
-          const diagnostics = {};
 
           if (subeditors.editors.length == 0 && linter.peek().status != "disabled") {
             linter.value = { stauts: "disabled", diagnostics: [] };
             u.view.dispatch(setDiagnostics(u.state, []));
             return;
           }
+
+          let changeInSubEditor = false;
+          u.changes.iterChangedRanges((_, __, from, to) => {
+            if (subeditors.editors.some((e) => from > e.from && to < e.to)) {
+              changeInSubEditor = true;
+            }
+          });
+          if (changeInSubEditor) return;
+          const diagnostics = {};
 
           for (const id in subeditors.diagnostics) {
             const editor = subeditors.editors.find((e) => e.id == id);
