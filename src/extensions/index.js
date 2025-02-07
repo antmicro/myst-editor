@@ -277,7 +277,7 @@ export class ExtensionBuilder {
     this.extensions.push(
       codeBlockExtensions({
         extensions: {
-          yaml: [yaml(), linter(yamlSchemaLinter(), { needsRefresh: handleRefresh }), stateExtensions(schema)],
+          yaml: [yaml(), linter(yamlSchemaLinter(), { needsRefresh: handleRefresh, delay: 100 }), stateExtensions(schema)],
         },
         editorView,
         tooltipSources: { yaml: new JSONHover({ parser: YAML.parse, mode: "yaml" }) },

@@ -4,7 +4,7 @@ import { EditorView } from "codemirror";
 import { linter, setDiagnosticsEffect } from "@codemirror/lint";
 import { hoverTooltip, keymap, showTooltip } from "@codemirror/view";
 import { yamlLanguage } from "@codemirror/lang-yaml";
-import { CompletionContext, currentCompletions, startCompletion } from "@codemirror/autocomplete";
+import { acceptCompletion, CompletionContext, currentCompletions, startCompletion } from "@codemirror/autocomplete";
 
 const subEditorUpdate = Annotation.define();
 
@@ -98,6 +98,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
             needsRefresh: (u) => {
               return u.transactions.some((t) => t.annotation(subEditorUpdate));
             },
+            delay: 100,
           },
         ),
         hoverTooltip(async (view, pos, side) => {
