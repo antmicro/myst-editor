@@ -1,5 +1,5 @@
 import { Annotation, EditorState, MapMode, Prec, StateField } from "@codemirror/state";
-import { syntaxTree } from "@codemirror/language";
+import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
 import { setDiagnostics, setDiagnosticsEffect } from "@codemirror/lint";
 import { hoverTooltip, keymap } from "@codemirror/view";
@@ -41,7 +41,12 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
       });
 
       // detect new editors
-      const tree = syntaxTree(tr.state);
+      let tree;
+      if (tr.reconfigured) {
+        tree = ensureSyntaxTree(tr.state, tr.state.doc.length, 5000);
+      } else {
+        tree = syntaxTree(tr.state);
+      }
       tree.iterate({
         enter(ref) {
           if (ref.name !== "FencedCode") return true;
