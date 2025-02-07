@@ -200,7 +200,7 @@ const setEditorText = (editor, text) => {
 };
 
 const CodeMirror = ({ text, setUsers, preview }) => {
-  const { editorView, options, collab, userSettings } = useContext(MystState);
+  const { editorView, options, collab, userSettings, linter } = useContext(MystState);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
@@ -280,7 +280,7 @@ const CodeMirror = ({ text, setUsers, preview }) => {
         .useMoveCursorAfterFold()
         .useCursorIndicator({ lineMap: text.lineMap, preview })
         .if(options.syncScroll.value, (b) => b.useSyncPreviewWithCursor({ lineMap: text.lineMap, preview, lastTyped }))
-        .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView))
+        .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView, linter))
         .create(),
     });
 

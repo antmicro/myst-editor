@@ -182,6 +182,7 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     userSettings: signal(userSettings),
     collab,
     cleanups: [collabCleanup],
+    linter: signal({ status: "disabled", diagnostics: [] }),
   };
 }
 

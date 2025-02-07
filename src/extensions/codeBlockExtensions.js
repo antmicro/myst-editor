@@ -1,14 +1,13 @@
 import { Annotation, EditorState, MapMode, Prec, StateField } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
-import { linter, setDiagnosticsEffect } from "@codemirror/lint";
-import { hoverTooltip, keymap, showTooltip } from "@codemirror/view";
-import { yamlLanguage } from "@codemirror/lang-yaml";
-import { acceptCompletion, CompletionContext, currentCompletions, startCompletion } from "@codemirror/autocomplete";
+import { linter as linterExtension, setDiagnosticsEffect } from "@codemirror/lint";
+import { hoverTooltip, keymap } from "@codemirror/view";
+import { acceptCompletion, CompletionContext } from "@codemirror/autocomplete";
 
 const subEditorUpdate = Annotation.define();
 
-const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completionSources) =>
+const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completionSources, linter) =>
   StateField.define({
     create() {
       return { extensions, editors: [], diagnostics: {}, editorView };
@@ -26,6 +25,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
         .filter((e) => {
           if (e.from == null || e.to == null) {
             e.editor.destroy();
+            delete value.diagnostics[e.id];
             return false;
           }
           return true;
@@ -35,6 +35,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
         const endLine = tr.state.doc.lineAt(e.to);
         const contents = tr.state.doc.slice(startLine.to + 1, endLine.from - 1).toString();
         if (contents != e.editor.state.doc.toString()) {
+          linter.value = { ...linter.peek(), status: "pending" };
           e.editor.dispatch({ changes: { from: 0, to: e.editor.state.doc.length, insert: contents } });
         }
       });
@@ -74,6 +75,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
               }),
             }),
           });
+          linter.value = { ...linter.peek(), status: "pending" };
 
           return false;
         },
@@ -83,10 +85,16 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
     },
     provide(field) {
       return [
-        linter(
+        linterExtension(
           (view) => {
             const subeditors = view.state.field(field);
             const diagnostics = {};
+
+            if (subeditors.editors.length == 0 && linter.peek().status != "disabled") {
+              linter.value = { stauts: "disabled", diagnostics: [] };
+              return [];
+            }
+
             for (const id in subeditors.diagnostics) {
               const editor = subeditors.editors.find((e) => e.id == id);
               const contentFrom = view.state.doc.lineAt(editor.from).to + 1;
@@ -101,6 +109,10 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
             delay: 100,
           },
         ),
+        EditorView.updateListener.of((u) => {
+          let diagnostics = u.transactions[0]?.effects?.find?.((e) => e.is(setDiagnosticsEffect))?.value;
+          if (diagnostics) linter.value = { status: "finished", diagnostics };
+        }),
         hoverTooltip(async (view, pos, side) => {
           const subeditors = view.state.field(field);
           for (const subeditor of subeditors.editors) {
@@ -130,7 +142,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
     },
   });
 
-export const codeBlockExtensions = ({ extensions, editorView, tooltipSources, completionSources }) => [
-  codeBlocksSubeditors(extensions, editorView, tooltipSources, completionSources),
+export const codeBlockExtensions = ({ extensions, editorView, tooltipSources, completionSources, linter }) => [
+  codeBlocksSubeditors(extensions, editorView, tooltipSources, completionSources, linter),
   Prec.high(keymap.of([{ key: "Tab", run: (v) => acceptCompletion(v), preventDefault: true }])),
 ];

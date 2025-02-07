@@ -36,7 +36,7 @@ import { yaml, yamlLanguage } from "@codemirror/lang-yaml";
 import { ySync } from "./collab";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
-import { linter, lintKeymap } from "@codemirror/lint";
+import { linter as linterExtension, lintKeymap } from "@codemirror/lint";
 import { CollaborationClient } from "../collaboration";
 import { codeBlockExtensions } from "./codeBlockExtensions";
 import { yamlCompletion, yamlSchemaLinter } from "codemirror-json-schema/yaml";
@@ -273,15 +273,16 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useYamlSchema(schema, editorView) {
+  useYamlSchema(schema, editorView, linter) {
     this.extensions.push(
       codeBlockExtensions({
         extensions: {
-          yaml: [yaml(), linter(yamlSchemaLinter(), { needsRefresh: handleRefresh, delay: 100 }), stateExtensions(schema)],
+          yaml: [yaml(), linterExtension(yamlSchemaLinter(), { needsRefresh: handleRefresh, delay: 100 }), stateExtensions(schema)],
         },
         editorView,
         tooltipSources: { yaml: new JSONHover({ parser: YAML.parse, mode: "yaml" }) },
         completionSources: [{ languageData: yamlLanguage.data, source: new JSONCompletion({ mode: "yaml" }) }],
+        linter,
       }),
     );
     return this;
