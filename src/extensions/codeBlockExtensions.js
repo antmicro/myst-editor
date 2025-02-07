@@ -1,7 +1,7 @@
 import { Annotation, EditorState, MapMode, Prec, StateField } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
-import { linter as linterExtension, setDiagnosticsEffect } from "@codemirror/lint";
+import { setDiagnostics, setDiagnosticsEffect } from "@codemirror/lint";
 import { hoverTooltip, keymap } from "@codemirror/view";
 import { acceptCompletion, CompletionContext } from "@codemirror/autocomplete";
 
@@ -85,33 +85,27 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
     },
     provide(field) {
       return [
-        linterExtension(
-          (view) => {
-            const subeditors = view.state.field(field);
-            const diagnostics = {};
+        EditorView.updateListener.of((u) => {
+          if (!u.transactions.some((t) => t.annotation(subEditorUpdate))) return;
+          const subeditors = u.view.state.field(field);
+          const diagnostics = {};
 
-            if (subeditors.editors.length == 0 && linter.peek().status != "disabled") {
-              linter.value = { stauts: "disabled", diagnostics: [] };
-              return [];
-            }
+          if (subeditors.editors.length == 0 && linter.peek().status != "disabled") {
+            linter.value = { stauts: "disabled", diagnostics: [] };
+            u.view.dispatch(setDiagnostics(u.state, []));
+            return;
+          }
 
-            for (const id in subeditors.diagnostics) {
-              const editor = subeditors.editors.find((e) => e.id == id);
-              const contentFrom = view.state.doc.lineAt(editor.from).to + 1;
-              diagnostics[id] = subeditors.diagnostics[id].map((d) => ({ ...d, from: d.from + contentFrom, to: d.to + contentFrom }));
-            }
-            return Object.values(diagnostics).flat();
-          },
-          {
-            needsRefresh: (u) => {
-              return u.transactions.some((t) => t.annotation(subEditorUpdate));
-            },
-            delay: 100,
-          },
-        ),
+          for (const id in subeditors.diagnostics) {
+            const editor = subeditors.editors.find((e) => e.id == id);
+            const contentFrom = u.view.state.doc.lineAt(editor.from).to + 1;
+            diagnostics[id] = subeditors.diagnostics[id].map((d) => ({ ...d, from: d.from + contentFrom, to: d.to + contentFrom }));
+          }
+          u.view.dispatch(setDiagnostics(u.state, Object.values(diagnostics).flat()));
+        }),
         EditorView.updateListener.of((u) => {
           let diagnostics = u.transactions[0]?.effects?.find?.((e) => e.is(setDiagnosticsEffect))?.value;
-          if (diagnostics) linter.value = { status: "finished", diagnostics };
+          if (diagnostics && u.view.state.field(field).editors.length != 0) linter.value = { status: "finished", diagnostics };
         }),
         hoverTooltip(async (view, pos, side) => {
           const subeditors = view.state.field(field);
