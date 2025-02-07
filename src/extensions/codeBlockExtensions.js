@@ -1,8 +1,8 @@
-import { Annotation, EditorState, MapMode, StateField } from "@codemirror/state";
+import { Annotation, EditorState, MapMode, Prec, StateField } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
 import { linter, setDiagnosticsEffect } from "@codemirror/lint";
-import { hoverTooltip, showTooltip } from "@codemirror/view";
+import { hoverTooltip, keymap, showTooltip } from "@codemirror/view";
 import { yamlLanguage } from "@codemirror/lang-yaml";
 import { CompletionContext, currentCompletions, startCompletion } from "@codemirror/autocomplete";
 
@@ -131,4 +131,5 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
 
 export const codeBlockExtensions = ({ extensions, editorView, tooltipSources, completionSources }) => [
   codeBlocksSubeditors(extensions, editorView, tooltipSources, completionSources),
+  Prec.high(keymap.of([{ key: "Tab", run: (v) => acceptCompletion(v), preventDefault: true }])),
 ];
