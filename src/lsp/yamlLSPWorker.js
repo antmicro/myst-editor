@@ -7,6 +7,7 @@ import {
   DidOpenTextDocumentNotification,
   HoverRequest,
   InitializeRequest,
+  PublishDiagnosticsNotification,
   TextDocumentSyncKind,
 } from "vscode-languageserver-protocol/browser";
 import { getLanguageService } from "yaml-language-server/lib/esm/languageservice/yamlLanguageService";
@@ -24,6 +25,12 @@ const docs = {};
 
 const worker = self;
 const conn = createProtocolConnection(new BrowserMessageReader(worker), new BrowserMessageWriter(worker));
+
+async function handleDiagnostics(uri) {
+  const diagnostics = await yamlService.doValidation(docs[uri]);
+  await conn.sendNotification(PublishDiagnosticsNotification.type, { uri, diagnostics });
+}
+
 conn.onRequest(InitializeRequest.type, () => {
   return {
     capabilities: {
@@ -33,13 +40,15 @@ conn.onRequest(InitializeRequest.type, () => {
     },
   };
 });
-conn.onNotification(DidOpenTextDocumentNotification.type, ({ textDocument: { uri, languageId, version, text } }) => {
+conn.onNotification(DidOpenTextDocumentNotification.type, async ({ textDocument: { uri, languageId, version, text } }) => {
   docs[uri] = TextDocument.create(uri, languageId, version, text);
+  await handleDiagnostics(uri);
 });
-conn.onNotification(DidChangeTextDocumentNotification.type, ({ textDocument, contentChanges }) => {
+conn.onNotification(DidChangeTextDocumentNotification.type, async ({ textDocument, contentChanges }) => {
   const doc = docs[textDocument.uri];
   if (doc) {
     docs[textDocument.uri] = TextDocument.update(doc, contentChanges, textDocument.version || 0);
+    await handleDiagnostics(textDocument.uri);
   }
 });
 conn.onRequest(CompletionRequest.type, async ({ textDocument, position }) => {

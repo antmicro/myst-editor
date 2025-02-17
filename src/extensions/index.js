@@ -37,7 +37,7 @@ import { yaml, yamlLanguage } from "@codemirror/lang-yaml";
 import { ySync } from "./collab";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
-import { linter as linterExtension, lintKeymap } from "@codemirror/lint";
+import { linter as linterExtension, lintKeymap, setDiagnostics } from "@codemirror/lint";
 import { CollaborationClient } from "../collaboration";
 import { codeBlockExtensions, subEditorId } from "./codeBlockExtensions";
 import { LanguageServerClient, languageServerWithTransport } from "codemirror-languageserver";
@@ -296,7 +296,9 @@ export class ExtensionBuilder {
               class {
                 constructor(/** @type {EditorView} */ view) {
                   this.id = view.state.field(subEditorId)[0];
+                  this.view = view;
                   this.version = 0;
+                  lspClient.attachPlugin(this);
                   lspClient.initializePromise.then(() => {
                     lspClient.textDocumentDidOpen({
                       textDocument: {
@@ -319,6 +321,18 @@ export class ExtensionBuilder {
                       contentChanges: [{ text: stateToYamlDoc(schema, update.state) }],
                     });
                   }, 200);
+                }
+
+                processNotification(notification) {
+                  if (notification.method !== "textDocument/publishDiagnostics" || notification.params.uri !== `file:///${this.id}.yaml`) return;
+                  const diag = notification.params.diagnostics.map((d) => ({
+                    message: d.message,
+                    source: d.source,
+                    from: lspPosToCmPos(this.view.state, d.range.start),
+                    to: lspPosToCmPos(this.view.state, d.range.end),
+                    severity: lspSeverityToCm(d.severity),
+                  }));
+                  this.view.dispatch(setDiagnostics(this.view.state, diag));
                 }
               },
             ),
@@ -389,4 +403,11 @@ const cmPosToLspPos = (state, pos) => {
 const lspPosToCmPos = (state, pos) => {
   const line = state.doc.line(pos.line);
   return line.from + pos.character;
+};
+
+const lspSeverityToCm = (severityLevel) => {
+  if (severityLevel === 2) return "error";
+  if (severityLevel === 1) return "warning";
+  if (severityLevel === 0) return "info";
+  return "hint";
 };
