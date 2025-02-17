@@ -2,12 +2,19 @@ import { defineConfig } from "vite";
 import preact from "@preact/preset-vite";
 import { resolve } from "path";
 import macrosPlugin from "vite-plugin-babel-macros";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "",
   root: "src",
-  plugins: [macrosPlugin(), preact()],
+  plugins: [
+    macrosPlugin(),
+    preact(),
+    nodePolyfills({
+      include: ["path"],
+    }),
+  ],
   build: {
     outDir: "../dist",
     emptyOutDir: true,
@@ -32,5 +39,14 @@ export default defineConfig({
   },
   define: {
     "process.env": {},
+  },
+  // https://github.com/redhat-developer/yaml-language-server/issues/1014
+  resolve: {
+    alias: [
+      {
+        find: "vscode-json-languageservice/lib/umd",
+        replacement: "vscode-json-languageservice/lib/esm",
+      },
+    ],
   },
 });

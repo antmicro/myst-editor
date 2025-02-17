@@ -1,4 +1,4 @@
-import { Annotation, EditorState, MapMode, Prec, StateField } from "@codemirror/state";
+import { Annotation, EditorState, Facet, MapMode, Prec, StateField } from "@codemirror/state";
 import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
 import { setDiagnostics, setDiagnosticsEffect } from "@codemirror/lint";
@@ -7,7 +7,9 @@ import { acceptCompletion, CompletionContext } from "@codemirror/autocomplete";
 
 const subEditorUpdate = Annotation.define();
 
-const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completionSources, linter) =>
+export const subEditorId = Facet.define();
+
+const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, completionSources = [], linter) =>
   StateField.define({
     create() {
       return { extensions, editors: [], diagnostics: {}, editorView };
@@ -76,6 +78,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources, completion
                     value.diagnostics[id] = diagnostics;
                     editorView.peek().dispatch({ annotations: subEditorUpdate.of(true) });
                   }),
+                  subEditorId.of(id),
                 ],
               }),
             }),

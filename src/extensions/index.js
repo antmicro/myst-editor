@@ -8,6 +8,7 @@ import {
   rectangularSelection,
   crosshairCursor,
   keymap,
+  ViewPlugin,
 } from "@codemirror/view";
 import { EditorSelection, EditorState, Facet, Prec } from "@codemirror/state";
 import { EditorView } from "codemirror";
@@ -38,10 +39,11 @@ import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { linter as linterExtension, lintKeymap } from "@codemirror/lint";
 import { CollaborationClient } from "../collaboration";
-import { codeBlockExtensions } from "./codeBlockExtensions";
-import { yamlCompletion, yamlSchemaLinter } from "codemirror-json-schema/yaml";
-import { handleRefresh, JSONCompletion, JSONHover, stateExtensions } from "codemirror-json-schema";
-import YAML from "yaml";
+import { codeBlockExtensions, subEditorId } from "./codeBlockExtensions";
+import { LanguageServerClient, languageServerWithTransport } from "codemirror-languageserver";
+import YamlLSPWorker from "../lsp/yamlLSPWorker.js?worker";
+import PostMessageWorkerTransport from "../lsp/messageTransport";
+import markdownIt from "markdown-it";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -62,6 +64,8 @@ const restoreCursorLocation = (view, location) => {
 
 export const folded = (update) => update.transactions.some((t) => t.effects.some((e) => e.is(foldEffect) || e.is(unfoldEffect)));
 export const collabClientFacet = Facet.define();
+
+const tooltipRenderer = markdownIt();
 
 export class ExtensionBuilder {
   constructor(base = []) {
@@ -274,14 +278,91 @@ export class ExtensionBuilder {
   }
 
   useYamlSchema(schema, editorView, linter) {
+    const yamlTransport = new PostMessageWorkerTransport(new YamlLSPWorker());
+    const lspClient = new LanguageServerClient({
+      transport: yamlTransport,
+      rootUri: "file:///",
+      workspaceFolders: null,
+      languageId: "yaml",
+      documentUri: "file:///project.yaml",
+      autoClose: true,
+    });
+
     this.extensions.push(
       codeBlockExtensions({
         extensions: {
-          yaml: [yaml(), linterExtension(yamlSchemaLinter(), { needsRefresh: handleRefresh, delay: 100 }), stateExtensions(schema)],
+          yaml: [
+            yaml(),
+            // languageServerWithTransport({
+            //   transport: yamlTransport,
+            //   rootUri: "file:///",
+            //   documentUri: "file:///project.yaml",
+            //   workspaceFolders: null,
+            //   languageId: "yaml",
+            // }),
+            ViewPlugin.fromClass(
+              class {
+                constructor(/** @type {EditorView} */ view) {
+                  const id = view.state.field(subEditorId)[0];
+                  this.version = 0;
+                  lspClient.initializePromise.then(() => {
+                    lspClient.textDocumentDidOpen({
+                      textDocument: {
+                        uri: "file:///project.yaml",
+                        languageId: "yaml",
+                        text: view.state.doc.toString(),
+                        version: this.version,
+                      },
+                    });
+                  });
+                }
+
+                update(update) {
+                  if (!update.docChanged) return;
+                  clearTimeout(this.changesTimeout);
+                  this.changesTimeout = setTimeout(() => {
+                    if (!lspClient.ready) return;
+                    lspClient.textDocumentDidChange({
+                      textDocument: { uri: "file:///project.yaml", version: this.version++ },
+                      contentChanges: [{ text: update.state.doc.toString() }],
+                    });
+                  }, 100);
+                }
+              },
+            ),
+          ],
         },
         editorView,
-        tooltipSources: { yaml: new JSONHover({ parser: YAML.parse, mode: "yaml" }) },
-        completionSources: [{ languageData: yamlLanguage.data, source: new JSONCompletion({ mode: "yaml" }) }],
+        tooltipSources: {
+          yaml: {
+            async doHover(view, pos) {
+              if (!lspClient.ready || !lspClient.capabilities?.hoverProvider || pos < 0) return null;
+
+              const line = view.state.doc.lineAt(pos);
+              const result = await lspClient.textDocumentHover({
+                textDocument: { uri: "file:///project.yaml" },
+                position: { line: line.number - 1, character: pos - line.from },
+              });
+              if (!result) return null;
+
+              const dom = document.createElement("div");
+              dom.innerHTML = tooltipRenderer.render(result.contents.value);
+              const startLine = view.state.doc.line(result.range.start.line + 1);
+              const start = startLine.from + result.range.start.character;
+              const endLine = view.state.doc.line(result.range.end.line + 1);
+              const end = endLine.from + result.range.end.character;
+              console.log(dom);
+
+              return {
+                pos: start,
+                end,
+                create: () => ({ dom }),
+                above: true,
+              };
+            },
+          },
+        },
+        // completionSources: [{ languageData: yamlLanguage.data, source: new JSONCompletion({ mode: "yaml" }) }],
         linter,
       }),
     );
