@@ -284,7 +284,6 @@ export class ExtensionBuilder {
       rootUri: "file:///",
       workspaceFolders: null,
       languageId: "yaml",
-      documentUri: "file:///project.yaml",
       autoClose: true,
     });
 
@@ -293,24 +292,17 @@ export class ExtensionBuilder {
         extensions: {
           yaml: [
             yaml(),
-            // languageServerWithTransport({
-            //   transport: yamlTransport,
-            //   rootUri: "file:///",
-            //   documentUri: "file:///project.yaml",
-            //   workspaceFolders: null,
-            //   languageId: "yaml",
-            // }),
             ViewPlugin.fromClass(
               class {
                 constructor(/** @type {EditorView} */ view) {
-                  const id = view.state.field(subEditorId)[0];
+                  this.id = view.state.field(subEditorId)[0];
                   this.version = 0;
                   lspClient.initializePromise.then(() => {
                     lspClient.textDocumentDidOpen({
                       textDocument: {
-                        uri: "file:///project.yaml",
+                        uri: `file:///${this.id}.yaml`,
                         languageId: "yaml",
-                        text: view.state.doc.toString(),
+                        text: stateToYamlDoc(schema, view.state),
                         version: this.version,
                       },
                     });
@@ -323,10 +315,10 @@ export class ExtensionBuilder {
                   this.changesTimeout = setTimeout(() => {
                     if (!lspClient.ready) return;
                     lspClient.textDocumentDidChange({
-                      textDocument: { uri: "file:///project.yaml", version: this.version++ },
-                      contentChanges: [{ text: update.state.doc.toString() }],
+                      textDocument: { uri: `file:///${this.id}.yaml`, version: this.version++ },
+                      contentChanges: [{ text: stateToYamlDoc(schema, update.state) }],
                     });
-                  }, 100);
+                  }, 200);
                 }
               },
             ),
@@ -338,24 +330,19 @@ export class ExtensionBuilder {
             async doHover(view, pos) {
               if (!lspClient.ready || !lspClient.capabilities?.hoverProvider || pos < 0) return null;
 
-              const line = view.state.doc.lineAt(pos);
+              const id = view.state.field(subEditorId)[0];
               const result = await lspClient.textDocumentHover({
-                textDocument: { uri: "file:///project.yaml" },
-                position: { line: line.number - 1, character: pos - line.from },
+                textDocument: { uri: `file:///${id}.yaml` },
+                position: cmPosToLspPos(view.state, pos),
               });
               if (!result) return null;
 
               const dom = document.createElement("div");
               dom.innerHTML = tooltipRenderer.render(result.contents.value);
-              const startLine = view.state.doc.line(result.range.start.line + 1);
-              const start = startLine.from + result.range.start.character;
-              const endLine = view.state.doc.line(result.range.end.line + 1);
-              const end = endLine.from + result.range.end.character;
-              console.log(dom);
 
               return {
-                pos: start,
-                end,
+                pos: lspPosToCmPos(view.state, result.range.start),
+                end: lspPosToCmPos(view.state, result.range.end),
                 create: () => ({ dom }),
                 above: true,
               };
@@ -390,3 +377,16 @@ export function skipAndFoldAll(/** @type {EditorView} */ view, skip = 0) {
   }
   if (effects.length) view.dispatch({ effects });
 }
+
+/** This is a workaround to pass the schema to the language server. The server schema file association options do not seem to work. */
+const stateToYamlDoc = (schema, state) => `# yaml-language-server: $schema=${schema}\n${state.doc.toString()}`;
+
+const cmPosToLspPos = (state, pos) => {
+  const line = state.doc.lineAt(pos);
+  return { line: line.number, character: pos - line.from };
+};
+
+const lspPosToCmPos = (state, pos) => {
+  const line = state.doc.line(pos.line);
+  return line.from + pos.character;
+};

@@ -18,11 +18,6 @@ const yamlService = getLanguageService({
     const res = await fetch(uri);
     return res.text();
   },
-  yamlSettings: {
-    schemaAssociations: {
-      "http://localhost:5174/project.json": "/project.yaml",
-    },
-  },
 });
 
 const docs = {};
@@ -33,9 +28,7 @@ conn.onRequest(InitializeRequest.type, () => {
   return {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Incremental,
-      completionProvider: {
-        triggerCharacters: ['"', ":"],
-      },
+      completionProvider: true,
       hoverProvider: true,
     },
   };
