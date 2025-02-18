@@ -15,7 +15,6 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 
 const yamlService = getLanguageService({
   async schemaRequestService(uri) {
-    console.log(uri);
     const res = await fetch(uri);
     return res.text();
   },

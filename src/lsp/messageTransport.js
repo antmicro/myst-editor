@@ -9,7 +9,6 @@ export default class PostMessageWorkerTransport extends Transport {
   }
 
   messageHandler = (ev) => {
-    console.log("LSP <<-", ev.data);
     this.transportRequestManager.resolveResponse(JSON.stringify(ev.data));
   };
 
@@ -21,7 +20,6 @@ export default class PostMessageWorkerTransport extends Transport {
   }
 
   async sendData(data) {
-    console.log("LSP ->>", data);
     const prom = this.transportRequestManager.addRequest(data, null);
     const notifications = getNotifications(data);
     if (this.worker) {
