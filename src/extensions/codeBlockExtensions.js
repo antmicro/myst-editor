@@ -3,7 +3,7 @@ import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
 import { setDiagnostics, setDiagnosticsEffect } from "@codemirror/lint";
 import { hoverTooltip, keymap } from "@codemirror/view";
-import { acceptCompletion, CompletionContext } from "@codemirror/autocomplete";
+import { acceptCompletion, autocompletion, CompletionContext } from "@codemirror/autocomplete";
 
 const subEditorUpdate = Annotation.define();
 
@@ -133,6 +133,9 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, compl
             if (!tooltip) return;
             return { ...tooltip, pos: tooltip.pos + contentFrom, end: tooltip.end + contentFrom };
           }
+        }),
+        autocompletion({
+          icons: false,
         }),
         completionSources.map((src) =>
           src.languageData.of({
