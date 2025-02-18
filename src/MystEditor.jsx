@@ -209,31 +209,31 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   }
   window.myst_editor[editorId] = {};
 
-  // cleanup function
-  window.myst_editor[editorId].remove = () => {
-    delete window.myst_editor[editorId];
-    render(null, target.shadowRoot);
-  };
-
   const form = target.closest("form");
   if (form) {
     form.addEventListener("formdata", (e) => e.formData.append(params.name, window.myst_editor[editorId].text));
   }
 
+  const state = createMystState({ id: editorId, ...params });
+  window.myst_editor[editorId].state = state;
+
+  // cleanup function
+  function remove() {
+    state.cleanups.forEach((c) => c());
+    delete window.myst_editor[editorId];
+    render(null, target.shadowRoot);
+  }
+  window.myst_editor[editorId].remove = remove;
   // runs Preact cleanup logic when target is removed
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (Array.prototype.some.call(mutation.removedNodes, (n) => n == target)) {
-        delete window.myst_editor[editorId];
-        render(null, target.shadowRoot);
+        remove();
         observer.disconnect();
       }
     }
   });
   observer.observe(target.parentElement, { childList: true });
-
-  const state = createMystState({ id: editorId, ...params });
-  window.myst_editor[editorId].state = state;
 
   render(
     <MystState.Provider value={state}>

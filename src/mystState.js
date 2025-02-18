@@ -158,7 +158,7 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     });
   }
   const collab = signal(null);
-  effect(() => {
+  const collabCleanup = effect(() => {
     if (!signalOptions.collaboration.value.enabled) return;
     const client = new CollaborationClient(signalOptions.collaboration.value, {
       id: signalOptions.id.value,
@@ -180,6 +180,7 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     },
     userSettings: signal(userSettings),
     collab,
+    cleanups: [collabCleanup],
   };
 }
 
