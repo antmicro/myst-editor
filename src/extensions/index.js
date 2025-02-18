@@ -37,13 +37,14 @@ import { yaml, yamlLanguage } from "@codemirror/lang-yaml";
 import { ySync } from "./collab";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
-import { linter as linterExtension, lintKeymap, setDiagnostics } from "@codemirror/lint";
+import { lintKeymap, setDiagnostics } from "@codemirror/lint";
 import { CollaborationClient } from "../collaboration";
 import { codeBlockExtensions, subEditorId } from "./codeBlockExtensions";
-import { LanguageServerClient, languageServerWithTransport } from "codemirror-languageserver";
+import { LanguageServerClient } from "codemirror-languageserver";
 import YamlLSPWorker from "../lsp/yamlLSPWorker.js?worker";
 import PostMessageWorkerTransport from "../lsp/messageTransport";
 import markdownIt from "markdown-it";
+import { CompletionItemKind, CompletionTriggerKind, FileChangeType } from "vscode-languageserver-protocol";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -66,6 +67,7 @@ export const folded = (update) => update.transactions.some((t) => t.effects.some
 export const collabClientFacet = Facet.define();
 
 const tooltipRenderer = markdownIt();
+const CompletionItemKindMap = Object.fromEntries(Object.entries(CompletionItemKind).map(([key, value]) => [value, key]));
 
 export class ExtensionBuilder {
   constructor(base = []) {
@@ -363,7 +365,47 @@ export class ExtensionBuilder {
             },
           },
         },
-        // completionSources: [{ languageData: yamlLanguage.data, source: new JSONCompletion({ mode: "yaml" }) }],
+        completionSources: [
+          {
+            languageData: yamlLanguage.data,
+            source: {
+              async doComplete(ctx) {
+                if (!lspClient.ready) return;
+                const id = ctx.state.field(subEditorId)[0];
+                const completions = await lspClient.textDocumentCompletion({
+                  textDocument: { uri: `file:///${id}.yaml` },
+                  position: cmPosToLspPos(ctx.state, ctx.pos),
+                });
+                if (!completions || completions?.length === 0 || completions.items.length === 0) return;
+
+                // Only show completions when at the end of a line
+                const line = ctx.state.doc.lineAt(ctx.pos);
+                if (ctx.pos !== line.to) return;
+
+                const items = completions.items ?? completions;
+                const token = ctx.matchBefore(/\w+/);
+                const options = items
+                  .map(({ detail, label, kind, textEdit, documentation }) => ({
+                    label,
+                    detail,
+                    type: kind && CompletionItemKindMap[kind].toLowerCase(),
+                    info: documentation?.toString(),
+                    apply(view, _, from, to) {
+                      const start = lspPosToCmPos(ctx.state, textEdit.range.start) + from - ctx.pos;
+                      const startLine = view.state.doc.lineAt(start);
+                      const text = textEdit.newText.replace("\n", "\n" + " ".repeat(start - startLine.from)).replace(/\${[0-9]+}/g, "");
+                      view.dispatch({
+                        changes: { from: start, to, insert: text },
+                        selection: { anchor: start + text.length, head: start + text.length },
+                      });
+                    },
+                  }))
+                  .filter(({ type, label }) => type !== "class" && (!token || label.startsWith(token.text)));
+                return { from: ctx.pos, to: ctx.pos, options, filter: false };
+              },
+            },
+          },
+        ],
         linter,
       }),
     );

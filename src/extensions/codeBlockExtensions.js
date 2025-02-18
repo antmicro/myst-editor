@@ -136,13 +136,14 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, compl
         }),
         completionSources.map((src) =>
           src.languageData.of({
-            autocomplete: (/** @type {CompletionContext} */ ctx) => {
+            autocomplete: async (/** @type {CompletionContext} */ ctx) => {
               const subeditors = ctx.view.state.field(field);
               for (const subeditor of subeditors.editors) {
                 if (ctx.pos < subeditor.from || ctx.pos > subeditor.to) continue;
                 const contentFrom = ctx.view.state.doc.lineAt(subeditor.from).to + 1;
                 const innerCtx = new CompletionContext(subeditor.editor.state, ctx.pos - contentFrom, ctx.explicit, subeditor.editor);
-                const completion = src.source.doComplete(innerCtx);
+                const completion = await src.source.doComplete(innerCtx);
+                if (!completion) return null;
                 return { ...completion, from: completion.from + contentFrom, to: completion.to + contentFrom };
               }
             },
