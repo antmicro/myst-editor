@@ -182,6 +182,7 @@ const CodeEditor = styled.div`
       width: 5px;
       height: 100%;
       position: absolute;
+      z-index: -1;
       background-color: var(--blue-200);
       transform: translateX(-11px);
     }
