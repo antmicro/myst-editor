@@ -266,9 +266,8 @@ These features include:
               action: () => alert("Custom button action"),
             },
           ]),
-          // spellcheckOpts: { dict: "en_US", dictionaryPath: `${window.location.pathname}dictionaries` },
+          spellcheckOpts: { dict: "en_US", dictionaryPath: `${window.location.pathname}dictionaries` },
           syncScroll: true,
-          yamlSchema: `${window.location.origin}${window.location.pathname.split("/").slice(0, -1).join("/")}/project.json`,
         },
         document.getElementById("myst"),
       );
