@@ -187,6 +187,18 @@ const CodeEditor = styled.div`
       transform: translateX(-11px);
     }
   }
+
+  .cm-tooltip-hover {
+    padding: 10px;
+
+    & *:first-child {
+      margin-top: 0;
+    }
+
+    & *:last-child {
+      margin-bottom: 0;
+    }
+  }
 `;
 
 const setEditorText = (editor, text) => {
