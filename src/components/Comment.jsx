@@ -38,7 +38,7 @@ const YCommentWrapper = styled.div`
   }
 
   .cm-content {
-    padding: 0px;
+    padding: 0px !important;
   }
   .cm-line {
     line-height: 1.5em;

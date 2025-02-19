@@ -164,6 +164,10 @@ const CodeEditor = styled.div`
     background: transparent;
   }
 
+  .cm-focused {
+    outline: none !important;
+  }
+
   .cm-gutterElement span[title="Fold line"],
   .cm-gutterElement span[title="Unfold line"] {
     user-select: none;

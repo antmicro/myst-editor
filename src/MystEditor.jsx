@@ -11,6 +11,7 @@ import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
 import { createMystState, MystState, predefinedButtons, defaultButtons } from "./mystState";
 import { batch, computed, signal, effect } from "@preact/signals";
 import { syncCheckboxes } from "./hooks/markdownCheckboxes";
+import { MystContainer } from "./styles/MystStyles";
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -139,8 +140,8 @@ const MystEditor = () => {
   useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
 
   return (
-    <div style="all: initial" id="myst-css-namespace">
-      <StyleSheetManager target={options.parent} stylisPlugins={[createExtraScopePlugin("#myst-css-namespace")]}>
+    <StyleSheetManager target={options.parent}>
+      <MystContainer id="myst-css-namespace">
         <EditorParent mode={options.mode.value} fullscreen={fullscreen}>
           {options.topbar.value && (
             <EditorTopbar
@@ -185,8 +186,8 @@ const MystEditor = () => {
             )}
           </MystWrapper>
         </EditorParent>
-      </StyleSheetManager>
-    </div>
+      </MystContainer>
+    </StyleSheetManager>
   );
 };
 
