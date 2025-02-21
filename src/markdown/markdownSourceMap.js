@@ -68,8 +68,8 @@ function addLineNumberToTokens(defaultRule) {
     } else if (tokens[idx].map) {
       const line = tokens[idx].map[0] + env.startLine - (env.chunkId !== 0);
       const id = randomLineId();
-      if (!env.lineMap.current.has(line)) {
-        env.lineMap.current.set(line, id);
+      if (!env.lineMap.has(line)) {
+        env.lineMap.set(line, id);
         tokens[idx].attrSet(SRC_LINE_ID, id);
       }
     }
@@ -153,7 +153,7 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
       .filter((_, i, lines) => i !== lines.length - 1)
       .map((l, i) => {
         const id = randomLineId();
-        env.lineMap.current.set(startLine + i + 1, id);
+        env.lineMap.set(startLine + i + 1, id);
         return `<span ${SRC_LINE_ID}="${id}">${l}</span>`;
       })
       .join("\n");
@@ -167,7 +167,7 @@ export function findNearestElementForLine(lineNumber, lineMap, preview) {
   let match = null;
   let num = lineNumber;
   for (; num >= 1; num--) {
-    id = lineMap.current.get(num);
+    id = lineMap.get(num);
     if (id) {
       match = preview.querySelector(`[data-line-id="${id}"]`);
       if (match) break;

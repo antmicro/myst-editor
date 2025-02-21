@@ -1,6 +1,6 @@
 import { EditorView } from "codemirror";
-import { markdownUpdatedStateEffect } from "../hooks/useText";
-import { findNearestElementForLine, getLineById } from "../hooks/markdownSourceMap";
+import { markdownUpdatedEffect } from "../text";
+import { findNearestElementForLine, getLineById } from "../markdown/markdownSourceMap";
 import { EditorSelection } from "@codemirror/state";
 
 const previewTopPadding = 20;
@@ -10,7 +10,7 @@ const debounceTimeout = 100;
  */
 const typedToUpdateThreshold = 500;
 
-export const syncPreviewWithCursor = (lineMap, preview, lastTyped) => {
+export const syncPreviewWithCursor = (text, preview, lastTyped) => {
   let timeout;
 
   return EditorView.updateListener.of((update) => {
@@ -19,21 +19,21 @@ export const syncPreviewWithCursor = (lineMap, preview, lastTyped) => {
     const selectionChanged = update.selectionSet && (cursorLineBefore !== cursorLineAfter || cursorLineBefore === 1);
     const timeSinceLastTyped = lastTyped.current === null ? typedToUpdateThreshold : performance.now() - lastTyped.current;
     const markdownUpdated =
-      update.transactions.some((t) => t.effects.some((e) => e.is(markdownUpdatedStateEffect))) && timeSinceLastTyped < typedToUpdateThreshold;
+      update.transactions.some((t) => t.effects.some((e) => e.is(markdownUpdatedEffect))) && timeSinceLastTyped < typedToUpdateThreshold;
     const resized = update.geometryChanged && !update.viewportChanged;
     if (update.docChanged || (!selectionChanged && !markdownUpdated && !resized)) {
       return;
     }
 
     function sync() {
-      const [matchingElem, matchingLine] = findNearestElementForLine(cursorLineAfter, lineMap, preview.current);
+      const [matchingElem, matchingLine] = findNearestElementForLine(cursorLineAfter, text.lineMap, preview);
       if (matchingElem) {
         scrollPreviewElemIntoView({
           view: update.view,
           matchingLine,
           matchingElem,
           behavior: "smooth",
-          preview: preview.current,
+          preview,
         });
       }
     }
@@ -60,8 +60,8 @@ function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior 
 
 /**
  * @param {{ target: HTMLElement }} ev
- * @param {{ current: Map<number, string> }} lineMap
- * @param {{ current: HTMLElement }} preview
+ * @param {Map<number, string>} lineMap
+ * @param {HTMLElement} preview
  * @param { EditorView } editor
  */
 export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
@@ -78,7 +78,7 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
   }
   if (!id) return;
 
-  const lineNumber = getLineById(lineMap.current, id);
+  const lineNumber = getLineById(lineMap, id);
   const line = editor.state.doc.line(lineNumber);
   const visible = editor.visibleRanges[0];
   function setCursor() {

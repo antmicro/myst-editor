@@ -205,31 +205,21 @@ const CodeEditor = styled.div`
   }
 `;
 
-const setEditorText = (editor, text) => {
-  editor.dispatch({
-    changes: {
-      from: 0,
-      to: editor.state.doc.length,
-      insert: text,
-    },
-  });
-};
-
-const CodeMirror = ({ text, setUsers, preview }) => {
-  const { editorView, options, collab, userSettings, linter } = useContext(MystState);
+const CodeMirror = ({ setUsers }) => {
+  const { editorView, options, collab, userSettings, linter, text } = useContext(MystState);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
+  const renderTimer = useRef(null);
 
   useSignalEffect(() => {
     if (!options.collaboration.value.enabled || (collab.value.ready.value && !collab.value.lockMsg.value)) return;
-    text.readyToRender();
     editorView.value?.destroy();
 
     const view = new EditorView({
       root: options.parent,
       state: EditorState.create({
-        doc: text.get(),
+        doc: text.text.peek(),
         extensions: ExtensionBuilder.basicSetup().useHighlighter(options.transforms.value).readonly().create(),
       }),
       parent: editorMountpoint.current,
@@ -256,7 +246,7 @@ const CodeMirror = ({ text, setUsers, preview }) => {
 
       if (collab.value.ytext.toString().length === 0 && options.initialText.length > 0) {
         console.warn("[Collaboration] Remote state is empty, overriding with local state");
-        text.set(options.initialText);
+        text.text.value = options.initialText;
         collab.value.ydoc.transact(() => {
           collab.value.ytext.insert(0, options.initialText);
           const metaMap = collab.value.ydoc.getMap("meta");
@@ -264,18 +254,16 @@ const CodeMirror = ({ text, setUsers, preview }) => {
         });
       }
 
-      text.set(collab.value.ytext.toString());
+      text.text.value = collab.value.ytext.toString();
       collab.value.ytext.observe((ev, tr) => {
         if (!tr.local) return;
         lastTyped.current = performance.now();
       });
     }
 
-    text.readyToRender();
-
     const startState = EditorState.create({
       root: options.parent,
-      doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.get(),
+      doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.text.peek(),
       extensions: ExtensionBuilder.basicSetup()
         .useHighlighter(options.transforms.value)
         .useCompartment(suggestionCompartment, customHighlighter([]))
@@ -291,11 +279,18 @@ const CodeMirror = ({ text, setUsers, preview }) => {
             editorMountpoint,
           }),
         )
-        .addUpdateListener((update) => update.docChanged && text.set(view.state.doc.toString(), update))
+        .addUpdateListener((update) => {
+          if (!update.docChanged) return;
+          clearTimeout(renderTimer.current);
+          renderTimer.current = setTimeout(() => {
+            text.shiftLineMap(update);
+            text.text.value = view.state.doc.toString();
+          });
+        })
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
-        .useCursorIndicator({ lineMap: text.lineMap, preview })
-        .if(options.syncScroll.value, (b) => b.useSyncPreviewWithCursor({ lineMap: text.lineMap, preview, lastTyped }))
+        .useCursorIndicator({ text, preview: text.preview.value })
+        .if(options.syncScroll.value, (b) => b.useSyncPreviewWithCursor({ text, preview: text.preview.value, lastTyped }))
         .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView, linter))
         .create(),
     });
@@ -313,7 +308,6 @@ const CodeMirror = ({ text, setUsers, preview }) => {
 
     collab.value?.ycomments?.registerCodeMirror(view);
     collab.value?.provider?.watchCollabolators(setUsers);
-    text.onSync((currentText) => setEditorText(view, currentText));
 
     return () => {
       view.destroy();

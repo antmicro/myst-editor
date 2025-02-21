@@ -9,13 +9,11 @@ const mapToken = (token, mapFunc) => {
   }
 };
 
-export function markdownItMapUrls(/** @type {markdownIt} */ md) {
+export function markdownItMapUrls(/** @type {markdownIt} */ md, mapUrl) {
   md.core.ruler.after("inline", "map_urls", (state) => {
-    if (state.env.mapUrl == undefined) return;
-
     for (const token of state.tokens) {
-      mapToken(token, state.env.mapUrl);
-      token.children?.forEach?.((c) => mapToken(c, state.env.mapUrl));
+      mapToken(token, mapUrl);
+      token.children?.forEach?.((c) => mapToken(c, mapUrl));
     }
   });
 }

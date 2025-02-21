@@ -9,6 +9,7 @@ import Settings from "./components/Settings";
 import { CollaborationClient } from "./collaboration";
 import { CodeMirror as VimCM, vim } from "@replit/codemirror-vim";
 import { collabClientFacet } from "./extensions";
+import { TextManager } from "./text";
 
 export const predefinedButtons = {
   printToPdf: {
@@ -172,7 +173,7 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     return () => client.destroy();
   });
 
-  return {
+  const state = {
     options: signalOptions,
     /** @type {Signal<EditorView?>} */
     editorView: signal(null),
@@ -183,7 +184,11 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     collab,
     cleanups: [collabCleanup],
     linter: signal({ status: "disabled", diagnostics: [] }),
+    /** @type {TextManager} */
+    text: null,
   };
+  state.text = new TextManager({ ...signalOptions, ...state });
+  return state;
 }
 
 /** @type {import("preact").Context<ReturnType<createMystState>>} */

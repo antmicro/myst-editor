@@ -31,7 +31,7 @@ const markdownItMermaid = (md, { lineMap, parent }) => {
     }
 
     const code = token.content.trim();
-    const lineNumber = getLineById(lineMap.current, token.attrGet("data-line-id"));
+    const lineNumber = getLineById(lineMap, token.attrGet("data-line-id"));
     let cached = lineCache.get(lineNumber);
     const hash = new IMurMurHash(code, hashSeed).result();
     if (!cached || cached.hash !== hash) {

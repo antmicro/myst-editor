@@ -4,14 +4,13 @@ import { StyleSheetManager, styled } from "styled-components";
 import CodeMirror from "./components/CodeMirror";
 import Preview, { PreviewFocusHighlight } from "./components/Preview";
 import Diff from "./components/Diff";
-import { useText } from "./hooks/useText";
 import { EditorTopbar } from "./components/Topbar";
 import ResolvedComments from "./components/Resolved";
 import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
 import { createMystState, MystState, predefinedButtons, defaultButtons } from "./mystState";
 import { batch, computed, signal, effect } from "@preact/signals";
-import { syncCheckboxes } from "./hooks/markdownCheckboxes";
 import { MystContainer } from "./styles/MystStyles";
+import { syncCheckboxes } from "./markdown/markdownCheckboxes";
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -95,11 +94,13 @@ const createExtraScopePlugin = (scope) => {
 const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val ? "hidden" : "visible");
 
 const MystEditor = () => {
-  const { editorView, cache, options, collab } = useContext(MystState);
+  const { editorView, cache, options, collab, text } = useContext(MystState);
   const [fullscreen, setFullscreen] = useState(false);
 
   const preview = useRef(null);
-  const text = useText({ preview });
+  useEffect(() => {
+    text.preview.value = preview.current;
+  }, [preview.current]);
 
   const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer(
@@ -121,11 +122,11 @@ const MystEditor = () => {
       fullscreen: () => setFullscreen((f) => !f),
       refresh: () => {
         cache.transform.clear();
+        text.renderText(false);
         alertFor("Rich links refreshed!", 1);
-        text.refresh();
       },
     }),
-    [text],
+    [],
   );
 
   const buttons = useMemo(
@@ -143,23 +144,14 @@ const MystEditor = () => {
     <StyleSheetManager target={options.parent}>
       <MystContainer id="myst-css-namespace">
         <EditorParent mode={options.mode.value} fullscreen={fullscreen}>
-          {options.topbar.value && (
-            <EditorTopbar
-              {...{
-                alert,
-                users,
-                text,
-                buttons,
-              }}
-            />
-          )}
+          {options.topbar.value && <EditorTopbar alert={alert} users={users} buttons={buttons} />}
           {options.collaboration.value.enabled && !collab.value.ready.value && (
             <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
           )}
           {options.collaboration.value.enabled && collab.value.lockMsg.value && <StatusBanner>{collab.value.lockMsg}</StatusBanner>}
           <MystWrapper fullscreen={fullscreen}>
             <FlexWrapper id="editor-wrapper">
-              <CodeMirror text={text} preview={preview} setUsers={setUsers} />
+              <CodeMirror setUsers={setUsers} />
             </FlexWrapper>
             <FlexWrapper id="preview-wrapper">
               <Preview
@@ -176,7 +168,7 @@ const MystEditor = () => {
             </FlexWrapper>
             {options.mode.value === "Diff" && (
               <FlexWrapper>
-                <Diff text={text} />
+                <Diff />
               </FlexWrapper>
             )}
             {options.collaboration.value.commentsEnabled && options.collaboration.value.resolvingCommentsEnabled && collab.value.ready.value && (

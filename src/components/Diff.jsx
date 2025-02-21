@@ -32,8 +32,8 @@ const initMergeView = ({ old, current, root }) => {
   });
 };
 
-const Diff = ({ text }) => {
-  const { options } = useContext(MystState);
+const Diff = () => {
+  const { options, text } = useContext(MystState);
   let leftRef = useRef(null);
   let rightRef = useRef(null);
   let mergeView = useRef(null);
@@ -44,7 +44,7 @@ const Diff = ({ text }) => {
     }
     mergeView.current = initMergeView({
       old: options.initialText,
-      current: text.get(),
+      current: text.text.peek(),
       root: options.parent,
     });
 

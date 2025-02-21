@@ -80,8 +80,8 @@ const validateTemplConfig = (templConfig) => {
   return templConfig;
 };
 
-const TemplateManager = ({ text }) => {
-  const { options } = useContext(MystState);
+const TemplateManager = () => {
+  const { options, editorView } = useContext(MystState);
   const [template, setTemplate] = useState("");
   const [readyTemplates, setReadyTemplates] = useState({});
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -97,8 +97,7 @@ const TemplateManager = ({ text }) => {
 
   const changeDocumentTemplate = (template) => {
     setTemplate(readyTemplates[template].templatetext);
-    text.set(readyTemplates[template].templatetext);
-    text.sync();
+    editorView.value.dispatch({ changes: { from: 0, to: editorView.value.state.doc.length, insert: readyTemplates[template].templatetext } });
     setShowModal(false);
   };
 

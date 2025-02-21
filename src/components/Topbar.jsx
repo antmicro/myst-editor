@@ -228,7 +228,7 @@ const icons = {
   settings: SettingsIcon,
 };
 
-export const EditorTopbar = ({ alert, users, text, buttons }) => {
+export const EditorTopbar = ({ alert, users, buttons }) => {
   const { options, editorView } = useContext(MystState);
   const titleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.title.value)));
   const emptyDiff = useSignal(false);
@@ -268,7 +268,7 @@ export const EditorTopbar = ({ alert, users, text, buttons }) => {
               <div className="btn-dropdown">{button.dropdown?.()}</div>
             </div>
           ))}
-          {buttons.find((b) => b.id === "template-manager") && options.templatelist.value && <TemplateManager text={text} />}
+          {buttons.find((b) => b.id === "template-manager") && options.templatelist.value && <TemplateManager />}
         </div>
         {alert && <Alert className="topbar-alert"> {alert} </Alert>}
         <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
