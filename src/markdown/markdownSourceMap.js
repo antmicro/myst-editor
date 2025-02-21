@@ -23,6 +23,7 @@ export default function markdownSourceMap(md) {
     "checkbox_input",
     "html_block",
     "html_inline",
+    "checkbox",
   ];
 
   for (const rule of overrideRules) {

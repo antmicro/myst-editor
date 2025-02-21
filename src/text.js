@@ -8,13 +8,13 @@ import markdownSourceMap from "./markdown/markdownSourceMap";
 import { checkLinks } from "./markdown/markdownLinks";
 import { colonFencedBlocks } from "./markdown/markdownFence";
 import { markdownItMapUrls } from "./markdown/markdownUrlMapping";
-import markdownCheckboxes from "markdown-it-checkbox";
 import { backslashLineBreakPlugin } from "./markdown/markdownLineBreak";
 import IMurMurHash from "imurmurhash";
 import purify from "dompurify";
 import { StateEffect } from "@codemirror/state";
 import hljs from "highlight.js/lib/core";
 import yamlHighlight from "highlight.js/lib/languages/yaml";
+import { markdownCheckboxes } from "./markdown/markdownCheckboxes";
 
 export const markdownUpdatedEffect = StateEffect.define();
 
