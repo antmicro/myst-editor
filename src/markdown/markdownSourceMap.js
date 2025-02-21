@@ -3,6 +3,8 @@ import { escapeHtml } from "markdown-it/lib/common/utils";
 
 const SRC_LINE_ID = "data-line-id";
 const randomLineId = () => Math.random().toString().replace(".", "");
+const inlineContainers = ["paragraph_open", "heading_open"];
+const ignoreTypes = ["inline", "bullet_list_open", "ordered_list_open", "table_open", "td_open", "thead_open", "tbody_open"];
 
 /** @param {markdownIt} md  */
 export default function markdownSourceMap(md) {
@@ -12,71 +14,42 @@ export default function markdownSourceMap(md) {
   md.use(wrapTextInSpan);
   md.use(wrapFencedLinesInSpan);
 
-  const excludeRules = ["softbreak"];
-  const overrideRules = [
-    ...Object.keys(md.renderer.rules).filter((r) => !excludeRules.includes(r)),
-    "paragraph_open",
-    "heading_open",
-    "admonition_open",
-    "link_open",
-    "list_item_open",
-    "checkbox_input",
-    "html_block",
-    "html_inline",
-    "checkbox",
-  ];
+  md.core.ruler.after("linkify", "source_map", (state) => {
+    if (state.env.lineMap == undefined || state.env.startLine == undefined || state.env.chunkId == undefined) return;
 
-  for (const rule of overrideRules) {
-    const temp = md.renderer.rules[rule];
-    md.renderer.rules[rule] = addLineNumberToTokens(temp);
-  }
-}
-
-function addLineNumberToTokens(defaultRule) {
-  /**
-   * @param {import("markdown-it/index.js").Token[]} tokens
-   * @param {number} idx
-   * @param {import("markdown-it/index.js").Renderer} self
-   */
-  return (tokens, idx, options, env, self) => {
-    const rule = defaultRule ?? self.renderToken.bind(self);
-    if (env.lineMap == undefined || env.startLine == undefined || env.chunkId == undefined) {
-      return rule(tokens, idx, options, env, self);
+    function addLineAttr(token) {
+      const line = token.map[0] + state.env.startLine - (state.env.chunkId !== 0);
+      if (!state.env.lineMap.has(line)) {
+        const id = randomLineId();
+        state.env.lineMap.set(line, id);
+        token.attrSet(SRC_LINE_ID, id);
+      }
     }
 
-    if (tokens[idx].type === "list_item_open" && tokens[idx + 1].type !== "list_item_close") {
+    for (let idx = 0; idx < state.tokens.length; idx++) {
       // skip non empty list items
-      return rule(tokens, idx, options, env, self);
-    }
+      if (state.tokens[idx].type === "list_item_open" && state.tokens[idx + 1].type !== "list_item_close") continue;
 
-    const inlineContainers = ["paragraph_open", "heading_open"];
-    if (inlineContainers.includes(tokens[idx].type)) {
-      const inlineToken = tokens[idx + 1];
-      let lineInParagraph = 0;
-      let lineUsed = false;
-      for (const childToken of inlineToken.children) {
-        if (childToken.type === "softbreak") {
-          lineInParagraph++;
-          lineUsed = false;
-          continue;
+      if (inlineContainers.includes(state.tokens[idx].type)) {
+        const inlineToken = state.tokens[idx + 1];
+        let lineInParagraph = 0;
+        for (const childToken of inlineToken.children) {
+          if (childToken.type === "softbreak") {
+            lineInParagraph++;
+            continue;
+          }
+
+          if (!childToken.type.includes("_open")) {
+            childToken.map = [state.tokens[idx].map[0] + lineInParagraph, state.tokens[idx].map[0] + lineInParagraph + 1];
+          }
         }
+      } else if (state.tokens[idx].map && !ignoreTypes.includes(state.tokens[idx].type)) {
+        addLineAttr(state.tokens[idx]);
+      }
 
-        if (!lineUsed && !childToken.type.includes("_open")) {
-          childToken.map = [tokens[idx].map[0] + lineInParagraph, tokens[idx].map[0] + lineInParagraph + 1];
-          lineUsed = true;
-        }
-      }
-    } else if (tokens[idx].map) {
-      const line = tokens[idx].map[0] + env.startLine - (env.chunkId !== 0);
-      const id = randomLineId();
-      if (!env.lineMap.has(line)) {
-        env.lineMap.set(line, id);
-        tokens[idx].attrSet(SRC_LINE_ID, id);
-      }
+      state.tokens[idx].children?.filter?.((c) => c.map && !ignoreTypes.includes(c))?.forEach?.((c) => addLineAttr(c));
     }
-
-    return rule(tokens, idx, options, env, self);
-  };
+  });
 }
 
 /** The fallback renderer rule for unhandled and error directives does not output the token attributes into the html **/

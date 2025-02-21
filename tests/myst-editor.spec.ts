@@ -531,7 +531,7 @@ test.describe.parallel("With collaboration enabled", () => {
       await clearEditor(pageA);
       const text0 = "this is room 0";
       await insertToMainEditor(pageA, { from: 0, insert: text0 });
-      let currentText = await pageB.waitForFunction((id) => window.myst_editor[id].text, id);
+      let currentText = await pageB.waitForFunction((id) => window.myst_editor[id].state.collab.value.ytext.toString(), id);
       expect(await currentText.evaluate((str) => str)).toBe(text0);
 
       const text1 = "this is room 1";
@@ -543,7 +543,7 @@ test.describe.parallel("With collaboration enabled", () => {
       await pageA.waitForSelector(".cm-content");
       await clearEditor(pageA);
       await insertToMainEditor(pageA, { from: 0, insert: text1 });
-      currentText = await pageB.waitForFunction((id) => window.myst_editor[id].text, id);
+      currentText = await pageB.waitForFunction((id) => window.myst_editor[id].state.collab.value.ytext.toString(), id);
       expect(await currentText.evaluate((str) => str)).toBe(text0);
 
       // B - join room 1
@@ -552,7 +552,7 @@ test.describe.parallel("With collaboration enabled", () => {
         window.myst_editor[id].state.options.collaboration.value = { ...collab, room: "1" };
       }, id);
       await pageB.waitForSelector(".cm-content");
-      currentText = await pageB.waitForFunction((id) => window.myst_editor[id].text, id);
+      currentText = await pageB.waitForFunction((id) => window.myst_editor[id].state.collab.value.ytext.toString(), id);
       expect(await currentText.evaluate((str) => str)).toBe(text1);
     });
   });
@@ -653,6 +653,8 @@ const clearEditor = async (page: Page) => {
 
 const defaultCollabOpts = () => ({ collab_server: "ws://localhost:4455", room: Date.now().toString() });
 
+const collaborationReady = (page: Page) => page.waitForFunction((id) => window?.myst_editor[id]?.state?.collab?.value?.ready?.value, id);
+
 const insertChangesAndCheckOutput = async (page: Page, changes: ChangeSpec | null, check: (html: string) => void | Promise<void>) => {
   await insertToMainEditor(page, changes);
   const preview = await page.locator(".myst-preview").first().innerHTML();
@@ -675,6 +677,9 @@ const applyPageOpts = async (page: Page, opts: object, git = false) => {
 
   await page.goto(`${git ? "/myst-git/git.html" : "/"}?` + query.toString());
   await page.waitForSelector(".cm-content");
+  if ("collab_server" in opts) {
+    await collaborationReady(page);
+  }
   return page;
 };
 

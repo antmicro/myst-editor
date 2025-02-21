@@ -159,6 +159,7 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
       return browserSetting ? { ...s, enabled: browserSetting.enabled } : s;
     });
   }
+  /** @type {Signal<CollaborationClient>} */
   const collab = signal(null);
   const collabCleanup = effect(() => {
     if (!signalOptions.collaboration.value.enabled) return;
