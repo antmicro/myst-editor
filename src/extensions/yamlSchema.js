@@ -111,7 +111,10 @@ export const yamlSchema = (schema, editorView, linter) => {
             if (ctx.pos !== line.to) return;
 
             const items = completions.items ?? completions;
-            const token = ctx.matchBefore(/\w+/);
+            const token = ctx.matchBefore(/^.*/m);
+            const tokenSplit = token ? token.text.trimStart().split(": ") : null;
+            const completionStart = token ? tokenSplit[tokenSplit.length - 1] : null;
+            const property = !token || tokenSplit.length === 1;
             const options = items
               .map(({ detail, label, kind, textEdit, documentation }) => ({
                 label,
@@ -128,7 +131,7 @@ export const yamlSchema = (schema, editorView, linter) => {
                   });
                 },
               }))
-              .filter(({ type, label }) => type !== "class" && (!token || label.startsWith(token.text)));
+              .filter(({ type, label }) => type !== "class" && (type !== "property" || property) && (!token || label.startsWith(completionStart)));
             return { from: ctx.pos, to: ctx.pos, options, filter: false };
           },
         },
