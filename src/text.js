@@ -15,6 +15,7 @@ import { StateEffect } from "@codemirror/state";
 import hljs from "highlight.js/lib/core";
 import yamlHighlight from "highlight.js/lib/languages/yaml";
 import { markdownCheckboxes } from "./markdown/markdownCheckboxes";
+import markdownTableOfContents from "./markdown/markdownTableOfContents";
 
 export const markdownUpdatedEffect = StateEffect.define();
 
@@ -28,6 +29,8 @@ export class TextManager {
     this.chunks = [];
     this.editorView = editorView;
     this.preview = signal(null);
+    this.headingsPerChunk = { current: {} };
+    this.headings = signal([]);
     this.md = computed(() => {
       const md = markdownIt({
         breaks: true,
@@ -54,7 +57,8 @@ export class TextManager {
         .use(checkLinks)
         .use(colonFencedBlocks)
         .use(markdownItMapUrls, options.mapUrl.value)
-        .use(markdownCheckboxes);
+        .use(markdownCheckboxes)
+        .use(markdownTableOfContents, this.headingsPerChunk);
       if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
       userSettings.value.filter((s) => s.enabled && s.markdown).forEach((s) => md.use(s.markdown));
 
@@ -67,8 +71,17 @@ export class TextManager {
 
   renderText(useCache = true) {
     if (!this.preview.value || !this.editorView.value) return;
+    const oldHeadingsPerChunk = { ...this.headingsPerChunk.current };
+    this.headingsPerChunk.current = {};
     const cache = !this.lastMd || this.lastMd == this.md.value ? useCache : false;
-    const newChunks = this.splitTextIntoChunks(cache);
+    const chunkLookup = cache ? this.chunks.reduce((lookup, chunk) => ({ ...lookup, [chunk.hash]: { html: chunk.html, oldId: chunk.id } }), {}) : {};
+    const newChunks = this.splitTextIntoChunks(chunkLookup);
+    // Reuse old heading data for chunks we didn't rerender
+    for (let i = 0; i < newChunks.length; i++) {
+      if (i in this.headingsPerChunk.current) continue;
+      this.headingsPerChunk.current[i] = oldHeadingsPerChunk[newChunks[i].oldId];
+    }
+    this.headings.value = nestHeadings(this.headingsPerChunk.current);
 
     if (this.chunks.length != newChunks.length || !cache) {
       // Render all chunks
@@ -100,9 +113,7 @@ export class TextManager {
     };
   }
 
-  splitTextIntoChunks(cache = true) {
-    const chunkLookup = cache ? this.chunks.reduce((lookup, chunk) => ({ ...lookup, [chunk.hash]: chunk.html }), {}) : {};
-
+  splitTextIntoChunks(chunkLookup = {}) {
     return this.text.value
       .split(/(?=\n#{1,3} )/g)
       .reduce((chunks, textChunk) => {
@@ -125,7 +136,8 @@ export class TextManager {
         return chunks;
       }, [])
       .map(({ text, startLine, endLine }, chunkId) => {
-        const hash = new IMurMurHash(text, 42).result();
+        // We need to take into account both the chunk content and position
+        const hash = new IMurMurHash(text + chunkId.toString(), 42).result();
 
         // Clear source mappings for chunk we are rerendering
         if (!(hash in chunkLookup)) {
@@ -135,13 +147,13 @@ export class TextManager {
         }
 
         const html =
-          chunkLookup[hash] ||
+          chunkLookup[hash]?.html ||
           purify.sanitize(this.md.value.render(text, { chunkId, startLine, lineMap: this.lineMap, view: this.editorView.value }), {
             // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
             ADD_TAGS: ["foreignobject", "iframe"],
             ADD_ATTR: ["dominant-baseline", "target"],
           });
-        return { text, hash, id: chunkId, html };
+        return { text, hash, id: chunkId, html, oldId: chunkLookup[hash]?.oldId };
       });
   }
 
@@ -199,3 +211,23 @@ export class TextManager {
 }
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
+
+function nestHeadings(headingsPerChunk) {
+  let headingsFlat = Object.values(headingsPerChunk).flat();
+
+  const headingsNested = [];
+  const levelMap = {};
+  headingsFlat.forEach((h) => {
+    const newItem = { ...h, children: [] };
+    const parent = levelMap[h.level - 1];
+    if (h.level === 1) {
+      headingsNested.push(newItem);
+    } else if (parent) {
+      parent.children.push(newItem);
+    } else {
+      headingsNested.push(newItem);
+    }
+    levelMap[h.level] = newItem;
+  });
+  return headingsNested;
+}

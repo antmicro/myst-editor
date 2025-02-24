@@ -11,6 +11,7 @@ import { createMystState, MystState, predefinedButtons, defaultButtons } from ".
 import { batch, computed, signal, effect } from "@preact/signals";
 import { MystContainer } from "./styles/MystStyles";
 import { syncCheckboxes } from "./markdown/markdownCheckboxes";
+import { TableOfContents } from "./components/TableOfContents";
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -22,14 +23,16 @@ const EditorParent = styled.div`
   ${(props) => {
     switch (props.mode) {
       case "Preview":
-        return "#editor-wrapper { display: none } #resolved-wrapper { display: none }";
+        return "#editor-wrapper { display: none }";
       case "Source":
-        return "#preview-wrapper { display: none } #resolved-wrapper { display: none }";
+        return "#preview-wrapper { display: none }";
       case "Diff":
-        return "#editor-wrapper { display: none }; #preview-wrapper { display: none } #resolved-wrapper { display: none }";
+        return "#editor-wrapper { display: none }; #preview-wrapper { display: none }";
       case "Both":
         return "#resolved-wrapper { display: none }";
       case "Resolved":
+        return "#preview-wrapper { display: none };";
+      case "Outline":
         return "#preview-wrapper { display: none };";
       default:
         return ``;
@@ -171,9 +174,17 @@ const MystEditor = () => {
                 <Diff />
               </FlexWrapper>
             )}
-            {options.collaboration.value.commentsEnabled && options.collaboration.value.resolvingCommentsEnabled && collab.value.ready.value && (
-              <FlexWrapper id="resolved-wrapper">
-                <ResolvedComments />
+            {options.mode.value == "Resolved" &&
+              options.collaboration.value.commentsEnabled &&
+              options.collaboration.value.resolvingCommentsEnabled &&
+              collab.value.ready.value && (
+                <FlexWrapper id="resolved-wrapper">
+                  <ResolvedComments />
+                </FlexWrapper>
+              )}
+            {options.mode.value === "Outline" && (
+              <FlexWrapper>
+                <TableOfContents />
               </FlexWrapper>
             )}
           </MystWrapper>

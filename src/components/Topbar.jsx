@@ -220,6 +220,18 @@ const SettingsIcon = () => (
   </svg>
 );
 
+const TocIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M16 12H3M16 18H3M16 6H3M21 12H21.01M21 18H21.01M21 6H21.01"
+      stroke="black"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
+
 const icons = {
   fullscreen: FullscreenIcon,
   "copy-html": CopyIcon,
@@ -245,6 +257,7 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
         hover: () => (emptyDiff.value = options.initialText == editorView.value?.state?.doc?.toString?.()),
         icon: DiffIcon,
       },
+      { id: "outline", tooltip: "Table of Contents", action: () => (options.mode.value = "Outline"), icon: TocIcon },
     ];
     if (options.collaboration.value.resolvingCommentsEnabled) {
       modeButtons.push({ id: "resolved", tooltip: "Resolved Comments", action: () => (options.mode.value = "Resolved"), icon: ResolvedIcon });
