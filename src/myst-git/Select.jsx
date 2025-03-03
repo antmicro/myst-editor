@@ -65,6 +65,7 @@ const Dropdown = styled.div`
   align-items: center;
   padding: 10px;
   border-radius: var(--border-radius);
+  border: 1px solid var(--icon-border);
 
   input {
     width: 100%;

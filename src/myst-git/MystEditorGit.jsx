@@ -8,8 +8,11 @@ import Select from "./Select";
 import * as Y from "yjs";
 import CommitModal, { Popup } from "./CommitModal";
 import { useWatchChanges } from "./useWatchChanges";
+import { MystCSSVars } from "../styles/MystStyles";
 
-const MystContainer = styled.div`
+const MystContainer = styled(MystCSSVars)`
+  --text: black;
+  color: var(--text);
   display: grid;
   grid-template-columns: 300px 1fr;
   grid-template-rows: 100%;
@@ -30,7 +33,6 @@ const GitSidebar = styled.div`
 
   label {
     display: block;
-    color: white;
     margin-top: 24px;
     margin-bottom: 12px;
     font-weight: 600;
@@ -39,7 +41,6 @@ const GitSidebar = styled.div`
 `;
 
 const ChangeHistory = styled.div`
-  color: white;
   font-size: 12px;
   width: 100%;
 
@@ -61,7 +62,7 @@ const ChangeHistory = styled.div`
   button {
     cursor: pointer;
     background: white;
-    border: none;
+    border: 1px solid var(--icon-border);
     font-family: "Lato";
     font-weight: 600;
     display: flex;
@@ -388,7 +389,7 @@ const MystEditorGit = ({
   return (
     <div style="all: initial;">
       <StyleSheetManager target={props.parent}>
-        <MystContainer>
+        <MystContainer id="myst-git-container">
           <GitSidebar>
             <div>
               <label>Branch:</label>

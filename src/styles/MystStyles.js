@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const MystContainer = styled.div`
+export const MystCSSVars = styled.div`
   --border-radius: 5px;
   --black: #000;
   --gray-900: #333;
@@ -32,6 +32,9 @@ export const MystContainer = styled.div`
   --icon-color: var(--dark-violet);
   --separator: var(--gray-500);
   --alert: var(--blue-100);
+`;
+
+export const MystContainer = styled(MystCSSVars)`
   all: initial;
   font-family: "Lato", sans-serif;
   height: 100%;
