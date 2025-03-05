@@ -1,6 +1,6 @@
 # MyST Editor
 
-Copyright (c) 2022-2024 [Antmicro](https://antmicro.com)
+Copyright (c) 2022-2025 [Antmicro](https://antmicro.com)
 
 ![MyST Editor logo](./assets/MyST-Editor--GH-readme.png)
 
