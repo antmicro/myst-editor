@@ -2,6 +2,8 @@
 
 Copyright (c) 2022-2024 [Antmicro](https://antmicro.com)
 
+![MyST Editor logo](./assets/MyST-Editor--GH-readme.png)
+
 This is a Markdown web editor that uses the [MyST Markdown](https://myst-parser.readthedocs.io/en/v0.16.0/) flavor.
 It is implemented as a [Preact](https://preactjs.com/) component.
 The intended way to use it is by embedding the editor in various websites/webapps.
