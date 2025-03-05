@@ -4,7 +4,7 @@ import { yaml, yamlLanguage } from "@codemirror/lang-yaml";
 import PostMessageWorkerTransport from "../lsp/messageTransport";
 import { LanguageServerClient } from "codemirror-languageserver";
 import { codeBlockExtensions, subEditorId } from "./codeBlockExtensions";
-import { ViewPlugin } from "@codemirror/view";
+import { EditorView, ViewPlugin } from "@codemirror/view";
 import { setDiagnostics } from "@codemirror/lint";
 import { CompletionItemKind } from "vscode-languageserver-protocol";
 

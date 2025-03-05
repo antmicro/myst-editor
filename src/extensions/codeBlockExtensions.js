@@ -1,4 +1,4 @@
-  import { Annotation, EditorState, Facet, MapMode, Prec, StateField } from "@codemirror/state";
+import { Annotation, EditorState, Facet, MapMode, Prec, StateField } from "@codemirror/state";
 import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { EditorView } from "codemirror";
 import { setDiagnostics, setDiagnosticsEffect } from "@codemirror/lint";
@@ -66,7 +66,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, compl
             from: ref.from,
             to: ref.to,
             id,
-            lang: lang,
+            lang,
             editor: new EditorView({
               state: EditorState.create({
                 doc: contents,

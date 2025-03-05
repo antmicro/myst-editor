@@ -78,22 +78,6 @@ const FlexWrapper = styled.div`
   }
 `;
 
-const createExtraScopePlugin = (scope) => {
-  const plugin = (element, index, children) => {
-    if (element.type == "rule") {
-      element.props[0] = element.props[0]
-        .split(",")
-        .map((x) => `${scope} ${x}`)
-        .join(",");
-    }
-  };
-
-  // Styled-components require the function to have a name
-  Object.defineProperty(plugin, "name", { value: `scope-${scope}` });
-
-  return plugin;
-};
-
 const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val ? "hidden" : "visible");
 
 const MystEditor = () => {

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "preact/hooks";
+import { useContext, useRef } from "preact/hooks";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import styled from "styled-components";
@@ -11,7 +11,6 @@ import editIcon from "../icons/edit.svg";
 import { MystState } from "../mystState";
 import { userExtensionsCompartment } from "./Settings";
 import { useSignalEffect } from "@preact/signals";
-import * as Y from "yjs";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -44,7 +43,7 @@ const CodeEditor = styled.div`
     position: absolute;
     display: inline;
     background-color: var(--gray-200);
-    background-image: url("data:image/svg+xml;charset=UTF-8,${(props) => encodeURIComponent(commentIcon)}");
+    background-image: url("data:image/svg+xml;charset=UTF-8,${() => encodeURIComponent(commentIcon)}");
     background-repeat: no-repeat;
   }
 

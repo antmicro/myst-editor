@@ -39,7 +39,7 @@ export const Avatar = ({ login, color, avatarUrl, userUrl }) => {
   const { options } = useContext(MystState);
 
   return (
-    <a href={userUrl || "#"} target="_blank">
+    <a href={userUrl || "#"} target="_blank" rel="noreferrer">
       <img src={avatarUrl} key={login} title={login} class="avatar" style={`border-color: ${color}`} crossOrigin={options.avatarCrossorigin.value} />
     </a>
   );

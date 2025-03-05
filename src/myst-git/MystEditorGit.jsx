@@ -470,7 +470,7 @@ const MystEditorGit = ({
               <span>
                 {toast.value.content.text}
                 {toast.value.content.link && (
-                  <a href={toast.value.content.link.href} target="_blank">
+                  <a href={toast.value.content.link.href} target="_blank" rel="noreferrer">
                     {toast.value.content.link.text}
                   </a>
                 )}

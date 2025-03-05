@@ -240,9 +240,8 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
       return "RESTORE ORPHANED";
     } else if (c.occupied) {
       return "RESTORE AND MERGE";
-    } else {
-      return "RESTORE";
     }
+    return "RESTORE";
   }, [c]);
 
   return (
@@ -278,8 +277,10 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
         </CommentTopbar>
         <CommentContent>
           {" "}
-          {groupedLines.map((lineData) => (
-            <CommentLine color={lineData.author.color}>{lineData.text}</CommentLine>
+          {groupedLines.map((lineData, i) => (
+            <CommentLine key={i} color={lineData.author.color}>
+              {lineData.text}
+            </CommentLine>
           ))}{" "}
         </CommentContent>
       </CommentContainer>

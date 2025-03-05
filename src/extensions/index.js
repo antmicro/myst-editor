@@ -38,6 +38,7 @@ import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { lintKeymap } from "@codemirror/lint";
 import { yamlSchema } from "./yamlSchema";
+import { CollaborationClient } from "../collaboration";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;

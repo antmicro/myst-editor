@@ -1,9 +1,8 @@
-import { useRef, useEffect, useState, useCallback, useMemo, useContext } from "preact/hooks";
+import { useRef, useEffect, useCallback, useMemo, useContext } from "preact/hooks";
 import { styled } from "styled-components";
 import { EditorView } from "codemirror";
 import { Compartment, EditorState } from "@codemirror/state";
 import { ExtensionBuilder } from "../extensions";
-import { YComments } from "../comments/ycomments";
 import commentIcon from "../icons/comment.svg?url";
 import trashcanIcon from "../icons/trashcan.svg?url";
 import resolveIcon from "../icons/resolve.svg?url";

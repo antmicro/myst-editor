@@ -312,7 +312,7 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
         {textButtons.length > 0 && (
           <div className="btns">
             {textButtons.map((b) => (
-              <DefaultButton type="button" onClick={b.action}>
+              <DefaultButton key={b.id} type="button" onClick={b.action}>
                 {b.text}
               </DefaultButton>
             ))}

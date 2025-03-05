@@ -78,7 +78,7 @@ const Toggle = ({ ...props }) => {
   return (
     <ToggleContainer>
       <input type="checkbox" {...props} />
-      <label htmlFor={props.id} title="Toggle setting"></label>
+      <label htmlFor={props.id} title="Toggle setting" />
     </ToggleContainer>
   );
 };

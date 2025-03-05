@@ -10,7 +10,7 @@
     "host": "vite --host",
     "server": "cd bin && npm install && node server.js",
     "check-format": "prettier --check src tests bin package.json vite.config.js .eslintrc.cjs",
-    "lint": "eslint .",
+    "lint": "eslint --ext js,jsx .",
     "format": "prettier --write src tests bin package.json vite.config.js .eslintrc.cjs",
     "test": "PW_TEST_HTML_REPORT_OPEN=never playwright test -c tests/playwright.config.js --reporter html"
   },

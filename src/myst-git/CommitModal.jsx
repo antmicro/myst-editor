@@ -91,7 +91,7 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose }) => {
           onChange={(ev) => (description.value = ev.target.value)}
           cols={80}
           rows={5}
-        ></textarea>
+        />
         <div id="buttons">
           <button type="submit">Commit</button>
           <button type="button" onClick={onClose}>
