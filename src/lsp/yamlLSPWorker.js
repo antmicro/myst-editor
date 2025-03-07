@@ -46,7 +46,7 @@ conn.onNotification(DidOpenTextDocumentNotification.type, async ({ textDocument:
 conn.onNotification(DidChangeTextDocumentNotification.type, async ({ textDocument, contentChanges }) => {
   const doc = docs[textDocument.uri];
   if (doc) {
-    docs[textDocument.uri] = TextDocument.update(doc, contentChanges, textDocument.version || 0);
+    docs[textDocument.uri] = TextDocument.update(doc, contentChanges, textDocument.version + 1);
     await handleDiagnostics(textDocument.uri);
   }
 });
