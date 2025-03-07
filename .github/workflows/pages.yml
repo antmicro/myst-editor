@@ -5,16 +5,16 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
       - uses: actions/download-artifact@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.11
 
       - name: Build
         run: |
@@ -24,7 +24,6 @@ jobs:
 
       - name: Install dependencies for docs
         run: |
-          sudo apt-get update
           python -m pip install -r docs/requirements.txt
 
       - name: Generate documentation
