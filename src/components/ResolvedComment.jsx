@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useMemo } from "preact/hooks";
+import { useEffect, useRef, useMemo } from "preact/hooks";
 import styled from "styled-components";
 import { Avatar } from "./Avatars";
+import { useSignal } from "@preact/signals";
 
 const ResolvedLine = styled.p`
   font-size: 16px;
@@ -185,7 +186,7 @@ const RestoreIcon = () => (
 const formatter = new Intl.RelativeTimeFormat("en", { style: "long" });
 
 const ResolvedComment = ({ c, authors, ycomments, content }) => {
-  const [difference, setDifference] = useState({ amount: 0, unit: "second" });
+  const difference = useSignal({ amount: 0, unit: "second" });
   const timer = useRef(null);
 
   const groupedLines = useMemo(() => {
@@ -214,17 +215,17 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
     }
 
     if (secondDifference < 60) {
-      setDifference({ amount: secondDifference, unit: "second" });
+      difference.value = { amount: secondDifference, unit: "second" };
     } else if (minuteDifference < 60) {
-      setDifference({ amount: minuteDifference, unit: "minute" });
+      difference.value = { amount: minuteDifference, unit: "minute" };
     } else if (hourDifference < 24) {
-      setDifference({ amount: hourDifference, unit: "hour" });
+      difference.value = { amount: hourDifference, unit: "hour" };
     } else if (dayDifference < 30) {
-      setDifference({ amount: dayDifference, unit: "day" });
+      difference.value = { amount: dayDifference, unit: "day" };
     } else if (monthDifference < 12) {
-      setDifference({ amount: monthDifference, unit: "month" });
+      difference.value = { amount: monthDifference, unit: "month" };
     } else {
-      setDifference({ amount: yearDifference, unit: "year" });
+      difference.value = { amount: yearDifference, unit: "year" };
     }
   }
 
@@ -258,7 +259,7 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
           </FlexRow>
           <FlexRow>
             <ResolvedBy>
-              Comment resolved by @{c.resolvedBy.name} {formatter.format(-difference.amount, difference.unit)}
+              Comment resolved by @{c.resolvedBy.name} {formatter.format(-difference.value.amount, difference.value.unit)}
             </ResolvedBy>
             <OptionsContainer className="myst-dropdown-toggle">
               <OptionsIcon />

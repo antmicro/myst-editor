@@ -1,5 +1,5 @@
 import { render } from "preact";
-import { useState, useEffect, useReducer, useRef, useMemo, useContext } from "preact/hooks";
+import { useEffect, useReducer, useRef, useMemo, useContext } from "preact/hooks";
 import { StyleSheetManager, styled } from "styled-components";
 import CodeMirror from "./components/CodeMirror";
 import Preview, { PreviewFocusHighlight } from "./components/Preview";
@@ -8,7 +8,7 @@ import { EditorTopbar } from "./components/Topbar";
 import ResolvedComments from "./components/Resolved";
 import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
 import { createMystState, MystState, predefinedButtons, defaultButtons } from "./mystState";
-import { batch, computed, signal, effect } from "@preact/signals";
+import { batch, computed, signal, effect, useSignal } from "@preact/signals";
 import { MystContainer } from "./styles/MystStyles";
 import { syncCheckboxes } from "./markdown/markdownCheckboxes";
 import { TableOfContents } from "./components/TableOfContents";
@@ -84,22 +84,24 @@ const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val
 
 const MystEditor = () => {
   const { editorView, cache, options, collab, text } = useContext(MystState);
-  const [fullscreen, setFullscreen] = useState(false);
+
+  const fullscreen = useSignal(false);
+  useSignalEffect(() => hideBodyScrollIf(fullscreen.value));
 
   const preview = useRef(null);
   useEffect(() => {
     text.preview.value = preview.current;
   }, [preview.current]);
 
-  const [alert, setAlert] = useState(null);
   const [users, setUsers] = useReducer(
     (_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: options.getAvatar.value(u.login), userUrl: options.getUserUrl.value(u.login) })),
     [],
   );
 
+  const alert = useSignal(null);
   const alertFor = (alertText, secs) => {
-    setAlert(alertText);
-    setTimeout(() => setAlert(null), secs * 1000);
+    alert = alertText;
+    setTimeout(() => (alert = null), secs * 1000);
   };
 
   const buttonActions = useMemo(
@@ -108,7 +110,7 @@ const MystEditor = () => {
         await text.copy();
         alertFor("copied!", 2);
       },
-      fullscreen: () => setFullscreen((f) => !f),
+      fullscreen: () => (fullscreen.value = !fullscreen.peek()),
       refresh: () => {
         cache.transform.clear();
         text.renderText(false);
@@ -127,18 +129,16 @@ const MystEditor = () => {
     [options.includeButtons.value, buttonActions],
   );
 
-  useEffect(() => hideBodyScrollIf(fullscreen), [fullscreen]);
-
   return (
     <StyleSheetManager target={options.parent}>
       <MystContainer id="myst-css-namespace">
-        <EditorParent mode={options.mode.value} fullscreen={fullscreen}>
+        <EditorParent mode={options.mode.value} fullscreen={fullscreen.value}>
           {options.topbar.value && <EditorTopbar alert={alert} users={users} buttons={buttons} />}
           {options.collaboration.value.enabled && !collab.value.ready.value && (
             <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
           )}
           {options.collaboration.value.enabled && collab.value.lockMsg.value && <StatusBanner>{collab.value.lockMsg}</StatusBanner>}
-          <MystWrapper fullscreen={fullscreen}>
+          <MystWrapper fullscreen={fullscreen.value}>
             <FlexWrapper id="editor-wrapper">
               <CodeMirror setUsers={setUsers} />
             </FlexWrapper>

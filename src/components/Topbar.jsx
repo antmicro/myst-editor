@@ -318,7 +318,7 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
             </div>
           ))}
         </div>
-        {alert && <Alert className="topbar-alert"> {alert} </Alert>}
+        {alert.value && <Alert className="topbar-alert"> {alert.value} </Alert>}
         <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
       </div>
       <div className="side">
