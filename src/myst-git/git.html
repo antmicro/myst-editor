@@ -91,7 +91,14 @@
         { message: "commit 2", hash: "aaa" },
         { message: "commit 1", hash: "bbb" },
       ];
-      const files = ["docs/source/file1", "docs/source/file2"];
+      const files = ["docs/source/file1", "docs/source/file2", "docs/source/index.md"];
+      const index = `# {{project}}
+
+\`\`\`{toctree}
+file2
+file1
+\`\`\`
+`;
 
       MystEditorGit(
         {
@@ -102,7 +109,7 @@
           getCommits: (_, page) => (page == 1 ? commits : []),
           searchCommits: (input) => commits.filter((c) => c.message.includes(input)),
           getFiles: () => files,
-          getText: () => `line1\nline2\nline3`,
+          getText: async (_, __, f) => (f.includes("index") ? index : `# Heading 1\nline1\nline2\n## Heading2_1\nline3\n## Heading2_2\nline4`),
           storeHistory: () => {},
           commitChanges: (msg) => ({ hash: "ccc", webUrl: "#" }),
           id: "demo",
@@ -120,6 +127,8 @@
           customRoles: exampleCustomRoles,
           customDirectives: exampleCustomDirectives,
           syncScroll: true,
+          index: "docs/source/index.md",
+          docsRoot: "docs/source",
         },
         document.getElementById("myst"),
       );

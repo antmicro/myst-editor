@@ -59,7 +59,7 @@ const HeadingList = styled.div`
 
 function Heading({ heading }) {
   let children;
-  if (heading.children) {
+  if (heading.children.length > 0) {
     children = (
       <ul>
         {heading.children.map((c) => (
@@ -67,16 +67,16 @@ function Heading({ heading }) {
         ))}
       </ul>
     );
-
-    return (
-      <li>
-        <span title="Go to heading" data-heading-id={heading.lineId}>
-          {heading.text}
-        </span>
-        {children}
-      </li>
-    );
   }
+
+  return (
+    <li>
+      <span title="Go to heading" data-heading-id={heading.lineId}>
+        {heading.text}
+      </span>
+      {children}
+    </li>
+  );
 }
 
 export const TableOfContents = () => {

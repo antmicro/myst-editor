@@ -9,6 +9,7 @@ import * as Y from "yjs";
 import CommitModal, { Popup } from "./CommitModal";
 import { useWatchChanges } from "./useWatchChanges";
 import { MystCSSVars } from "../styles/MystStyles";
+import { TableOfContents } from "./TableOfContents";
 
 const MystContainer = styled(MystCSSVars)`
   --text: black;
@@ -140,6 +141,8 @@ const MystEditorGit = ({
   storeHistory = () => {},
   initialState = null,
   commitChanges = async () => {},
+  index = null,
+  docsRoot = "",
   ...props
 }) => {
   const branches = useSignal(initialBranches);
@@ -156,6 +159,7 @@ const MystEditorGit = ({
   const commitSummary = useSignal(null);
   const commentStateToApply = useRef(null);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
+  const indexFile = useSignal();
 
   useEffect(() => {
     window.myst_editor[props.id].state = mystState.current;
@@ -352,6 +356,8 @@ const MystEditorGit = ({
     const awareness = mystState.current.collab.value.provider.awareness;
     if (!doc) return;
 
+    getText(branch.peek(), commit.peek(), index).then((txt) => (indexFile.value = txt));
+
     const handleChange = (/** @type {Y.Transaction} */ tr) => {
       if (tr.local && tr.origin) {
         const old = changeHistory.peek().filter((ch) => ch.room != room.peek());
@@ -426,6 +432,16 @@ const MystEditorGit = ({
                 searchOptions={async (input) => files.value.filter((f) => f.toLowerCase().includes(input.toLowerCase())).map(fileToSelectOpt)}
               />
             </div>
+            {indexFile.value && file.value && (
+              <TableOfContents
+                index={indexFile.value}
+                docsRoot={docsRoot}
+                currentFile={file.value}
+                mystState={mystState.current}
+                onFileClick={(f) => switchFile(f.file)}
+                files={files.value}
+              />
+            )}
             <ChangeHistory>
               <p>History:</p>
               {changeHistory.value.length == 0 ? (
