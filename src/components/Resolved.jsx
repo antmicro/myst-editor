@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect, useContext } from "preact/hooks";
+import { useContext } from "preact/hooks";
 import styled from "styled-components";
 import ResolvedComment from "./ResolvedComment";
 import CommentIcon from "../icons/comment.svg";
 import { MystState } from "../mystState";
+import { useComputed } from "@preact/signals";
 
 const ResolvedWrapper = styled.div`
   background-color: white;
@@ -66,34 +67,33 @@ function dateComparator(c1, c2) {
 
 const ResolvedComments = () => {
   const { ycomments } = useContext(MystState).collab.value;
-  let [resolvedComments, setResolvedComments] = useState(ycomments.resolver().resolved().sort(dateComparator));
-  let commentContents = useMemo(
-    () =>
-      resolvedComments.reduce((contents, { commentId }) => {
-        contents[commentId] = ycomments.getTextForComment(commentId).toString();
-        return contents;
-      }, {}),
-    [resolvedComments],
+  const resolvedComments = useComputed(() => ycomments.resolver().resolvedCommentsList.value.sort(dateComparator));
+  const commentContents = useComputed(() =>
+    resolvedComments.value.reduce((contents, { commentId }) => {
+      contents[commentId] = ycomments.getTextForComment(commentId).toString();
+      return contents;
+    }, {}),
   );
-  let authors = useMemo(() => resolvedComments.map((c) => ycomments.lineAuthors(c.commentId)), [resolvedComments]);
-
-  useEffect(() => {
-    setResolvedComments(ycomments.resolver().resolved().sort(dateComparator));
-    ycomments.resolver().onUpdate((comments) => setResolvedComments(comments.sort(dateComparator)));
-  }, [ycomments]);
+  const authors = useComputed(() => resolvedComments.value.map((c) => ycomments.lineAuthors(c.commentId)));
 
   return (
     <ResolvedWrapper>
       <h1>Resolved comments</h1>
       <VerticalSparator />
       <CommentsContainer>
-        {resolvedComments.length === 0 ? (
+        {resolvedComments.value.length === 0 ? (
           <NoCommentsText>
             No resolved comments yet, to resolve a comment hover over it's icon <img src={CommentIcon} /> and click <span>RESOLVE</span>
           </NoCommentsText>
         ) : (
-          resolvedComments.map((c, idx) => (
-            <ResolvedComment key={c.commentId} c={c} authors={authors[idx]} ycomments={ycomments} content={commentContents[c.commentId]} />
+          resolvedComments.value.map((c, idx) => (
+            <ResolvedComment
+              key={c.commentId}
+              c={c}
+              authors={authors.value[idx]}
+              ycomments={ycomments}
+              content={commentContents.value[c.commentId]}
+            />
           ))
         )}
       </CommentsContainer>

@@ -192,7 +192,11 @@ export class DisplayManager {
 export class ResolvedComments {
   constructor(provider, /** @type {Y.Doc} */ ydoc) {
     this.user = provider.awareness.getLocalState().user;
+    this.resolvedCommentsList = signal([]);
     this.resolvedComments = ydoc.getMap("resolved-comments");
+    this.resolvedComments.observe(() => {
+      this.resolvedCommentsList.value = [...this.resolvedComments.entries()].map(([commentId, data]) => ({ commentId, ...JSON.parse(data) }));
+    });
     this.ydoc = ydoc;
   }
 
@@ -204,16 +208,8 @@ export class ResolvedComments {
     this.ydoc.transact(() => this.resolvedComments.delete(commentId), "comments");
   }
 
-  resolved() {
-    return [...this.resolvedComments.entries()].map(([commentId, data]) => ({ commentId, ...JSON.parse(data) }));
-  }
-
   updateComment(commentId, attributes) {
     this.resolvedComments.set(commentId, JSON.stringify({ ...JSON.parse(this.resolvedComments.get(commentId)), ...attributes }));
-  }
-
-  onUpdate(f) {
-    this.resolvedComments.observe(() => f(this.resolved()));
   }
 }
 
@@ -468,7 +464,7 @@ export class YComments {
     const commentUpdate = update.transactions.some((t) => t.effects.some((e) => e.is(updateShownComments)));
     if (noLocalChange && !commentUpdate) return;
 
-    const resolvedComments = this.resolver().resolved();
+    const resolvedComments = this.resolver().resolvedCommentsList.peek();
     for (const comment of resolvedComments) {
       let doNotUpdate = true;
       update.changes.iterChanges((from) => {
@@ -583,7 +579,7 @@ export class YComments {
     const resolved = this.resolver().resolvedComments.toJSON();
     const lineAuthors = {};
     const text = {};
-    const allComments = [...this.comments.peek(), ...this.resolver().resolved()];
+    const allComments = [...this.comments.peek(), ...this.resolver().resolvedCommentsList.peek()];
     for (const { commentId } of allComments) {
       const lineData = this.lineAuthors(commentId);
       lineAuthors[commentId] = lineData.lineAuthors.toJSON();
