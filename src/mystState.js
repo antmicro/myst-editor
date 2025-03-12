@@ -222,8 +222,13 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
       getUserUrl: signalOptions.getUserUrl.value,
     });
     collab.value = client;
+    const destroy = () => client.destroy();
+    window.addEventListener("beforeunload", destroy);
 
-    return () => client.destroy();
+    return () => {
+      client.destroy();
+      window.removeEventListener("beforeunload", destroy);
+    };
   });
 
   const state = {
