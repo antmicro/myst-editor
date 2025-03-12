@@ -237,7 +237,7 @@ const CodeEditor = styled.div`
   }
 `;
 
-const CodeMirror = ({ setUsers }) => {
+const CodeMirror = () => {
   const { editorView, options, collab, userSettings, linter, text, headings } = useContext(MystState);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
@@ -344,7 +344,6 @@ const CodeMirror = ({ setUsers }) => {
     }
 
     collab.value?.ycomments?.registerCodeMirror(view);
-    collab.value?.provider?.watchCollabolators(setUsers);
 
     return () => {
       view.destroy();

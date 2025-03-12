@@ -1,5 +1,5 @@
 import { render } from "preact";
-import { useEffect, useReducer, useRef, useMemo, useContext } from "preact/hooks";
+import { useEffect, useRef, useMemo, useContext } from "preact/hooks";
 import { StyleSheetManager, styled } from "styled-components";
 import CodeMirror from "./components/CodeMirror";
 import Preview, { PreviewFocusHighlight } from "./components/Preview";
@@ -8,7 +8,7 @@ import { EditorTopbar } from "./components/Topbar";
 import ResolvedComments from "./components/Resolved";
 import { handlePreviewClickToScroll } from "./extensions/syncDualPane";
 import { createMystState, MystState, predefinedButtons, defaultButtons } from "./mystState";
-import { batch, computed, signal, effect, useSignal } from "@preact/signals";
+import { batch, computed, signal, effect, useSignal, useSignalEffect } from "@preact/signals";
 import { MystContainer } from "./styles/MystStyles";
 import { syncCheckboxes } from "./markdown/markdownCheckboxes";
 import { TableOfContents } from "./components/TableOfContents";
@@ -93,15 +93,10 @@ const MystEditor = () => {
     text.preview.value = preview.current;
   }, [preview.current]);
 
-  const [users, setUsers] = useReducer(
-    (_, currentUsers) => currentUsers.map((u) => ({ ...u, avatarUrl: options.getAvatar.value(u.login), userUrl: options.getUserUrl.value(u.login) })),
-    [],
-  );
-
   const alert = useSignal(null);
   const alertFor = (alertText, secs) => {
-    alert = alertText;
-    setTimeout(() => (alert = null), secs * 1000);
+    alert.value = alertText;
+    setTimeout(() => (alert.value = null), secs * 1000);
   };
 
   const buttonActions = useMemo(
@@ -133,14 +128,14 @@ const MystEditor = () => {
     <StyleSheetManager target={options.parent}>
       <MystContainer id="myst-css-namespace">
         <EditorParent mode={options.mode.value} fullscreen={fullscreen.value}>
-          {options.topbar.value && <EditorTopbar alert={alert} users={users} buttons={buttons} />}
+          {options.topbar.value && <EditorTopbar alert={alert} buttons={buttons} />}
           {options.collaboration.value.enabled && !collab.value.ready.value && (
             <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
           )}
           {options.collaboration.value.enabled && collab.value.lockMsg.value && <StatusBanner>{collab.value.lockMsg}</StatusBanner>}
           <MystWrapper fullscreen={fullscreen.value}>
             <FlexWrapper id="editor-wrapper">
-              <CodeMirror setUsers={setUsers} />
+              <CodeMirror />
             </FlexWrapper>
             <FlexWrapper id="preview-wrapper">
               <Preview

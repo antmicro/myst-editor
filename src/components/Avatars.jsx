@@ -35,12 +35,12 @@ const AvatarsWrapper = styled.div`
   }
 `;
 
-export const Avatar = ({ login, color, avatarUrl, userUrl }) => {
+export const Avatar = ({ name, color, avatarUrl, userUrl }) => {
   const { options } = useContext(MystState);
 
   return (
     <a href={userUrl || "#"} target="_blank" rel="noreferrer">
-      <img src={avatarUrl} key={login} title={login} class="avatar" style={`border-color: ${color}`} crossOrigin={options.avatarCrossorigin.value} />
+      <img src={avatarUrl} key={name} title={name} class="avatar" style={`border-color: ${color}`} crossOrigin={options.avatarCrossorigin.value} />
     </a>
   );
 };
@@ -51,22 +51,23 @@ const AvatarPlaceholder = ({ n, usernames }) => (
   </div>
 );
 
-const Avatars = ({ users }) => {
-  const nUserAvatarsToShow = users.length <= MAX_AVATARS ? users.length : 3;
+const Avatars = () => {
+  const { collab } = useContext(MystState);
+  const nUserAvatarsToShow = collab.value.users.value.length <= MAX_AVATARS ? collab.value.users.value.length : 3;
 
   return (
-    <AvatarsWrapper n={Math.min(users.length, MAX_AVATARS)}>
-      {nUserAvatarsToShow < users.length && (
+    <AvatarsWrapper n={Math.min(collab.value.users.value.length, MAX_AVATARS)}>
+      {nUserAvatarsToShow < collab.value.users.value.length && (
         <AvatarPlaceholder
-          n={users.length - nUserAvatarsToShow}
-          usernames={users
+          n={collab.value.users.value.length - nUserAvatarsToShow}
+          usernames={collab.value.users.value
             .filter((_, idx) => idx >= MAX_AVATARS - 1)
-            .map((u) => u.login)
+            .map((u) => u.name)
             .join(", ")}
         />
       )}
-      {users.slice(0, nUserAvatarsToShow).map((user) => (
-        <Avatar key={user.login} {...user} />
+      {collab.value.users.value.slice(0, nUserAvatarsToShow).map((user) => (
+        <Avatar key={user.name} {...user} />
       ))}
     </AvatarsWrapper>
   );

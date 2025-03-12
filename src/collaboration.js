@@ -6,12 +6,16 @@ import { hideUsernames } from "./extensions/hideUsernames";
 import { YComments } from "./comments/ycomments";
 
 export class CollaborationClient {
-  synced = signal(false);
-  connected = signal(false);
-  lockMsg = signal(null);
+  #synced = signal(false);
+  #connected = signal(false);
+  #lockMsg = signal(null);
+  #users = signal([]);
+  #localUser = {};
+  lockMsg = computed(() => this.#lockMsg.value);
+  users = computed(() => this.#users.value);
 
   constructor(settings, editorOptions = { id: null, parent: null, hideUsernameDelay: null, getAvatar: () => {}, getUserUrl: () => {} }) {
-    this.ready = computed(() => this.synced.value && this.connected.value);
+    this.ready = computed(() => this.#synced.value && this.#connected.value);
     this.ydoc = new Y.Doc();
     this.provider = new WebsocketProvider(settings.wsUrl, settings.room, this.ydoc, {
       connect: settings.mode === "websocket",
@@ -24,18 +28,48 @@ export class CollaborationClient {
       this.provider.shouldConnect = true;
       this.provider.connectBc();
       batch(() => {
-        this.synced.value = true;
-        this.connected.value = true;
+        this.#synced.value = true;
+        this.#connected.value = true;
       });
     }
+
+    // We cannot detect the local user being added in the awareness change callback
+    this.#localUser = {
+      name: settings.username,
+      color: settings.color,
+      avatarUrl: editorOptions.getAvatar(settings.username),
+      userUrl: editorOptions.getUserUrl(settings.username),
+    };
+    this.#users.value = [this.#localUser];
+
+    this.provider.awareness.on("change", ({ added, removed }) => {
+      if (added.length === 0 && removed.length === 0) return;
+      // Get unique users by name
+      const states = [...this.provider.awareness.getStates().values()]
+        .map((state) => state.user)
+        .concat(this.#localUser)
+        .filter((u) => u?.name)
+        .reduce((curr, user) => {
+          curr[user.name] = user;
+          return curr;
+        }, {});
+      this.#users.value = Object.values(states)
+        .sort((u1, u2) => {
+          // Ensure alphabetical order of usernames
+          if (u1.name < u2.name) return -1;
+          if (u1.name > u2.name) return 1;
+          return 0;
+        })
+        .map((u) => ({ ...u, avatarUrl: editorOptions.getAvatar(u.name), userUrl: editorOptions.getUserUrl(u.name) }));
+    });
 
     this.provider.awareness.setLocalStateField("user", {
       name: settings.username,
       color: settings.color,
     });
 
-    this.provider.on("sync", (sync) => (this.synced.value = sync));
-    this.provider.on("status", ({ status }) => (this.connected.value = status == "connected"));
+    this.provider.on("sync", (sync) => (this.#synced.value = sync));
+    this.provider.on("status", ({ status }) => (this.#connected.value = status == "connected"));
 
     if (editorOptions.parent) {
       hideUsernames({
@@ -58,7 +92,7 @@ export class CollaborationClient {
 
     this.metaMap = this.ydoc.getMap("meta");
     this.metaMap.observe(() => {
-      this.lockMsg.value = this.metaMap.get("lock");
+      this.#lockMsg.value = this.metaMap.get("lock");
     });
   }
 
@@ -75,17 +109,3 @@ export class CollaborationClient {
     this.ydoc.destroy();
   }
 }
-
-WebsocketProvider.prototype.watchCollabolators = function (hook) {
-  this.awareness.on("change", ({ added, removed }) => {
-    if (added || removed) {
-      let collabolators = Array.from(this.awareness.states)
-        .map(([_, { user }]) => ({ login: user.name, color: user.color }))
-        .reduce((curr, data) => {
-          curr[data.login] = data;
-          return curr;
-        }, {});
-      hook(Object.values(collabolators));
-    }
-  });
-};

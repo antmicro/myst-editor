@@ -270,7 +270,7 @@ const icons = {
   templates: TemplatesIcon,
 };
 
-export const EditorTopbar = ({ alert, users, buttons }) => {
+export const EditorTopbar = ({ alert, buttons }) => {
   const { options, editorView } = useContext(MystState);
   const titleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.title.value)));
   const emptyDiff = useSignal(false);
@@ -318,11 +318,11 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
             </div>
           ))}
         </div>
-        {alert.value && <Alert className="topbar-alert"> {alert.value} </Alert>}
+        {alert.value && <Alert className="topbar-alert"> {alert} </Alert>}
         <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
       </div>
       <div className="side">
-        <Avatars users={users} />
+        <Avatars />
         {textButtons.length > 0 && (
           <div className="btns">
             {textButtons.map((b) => (
