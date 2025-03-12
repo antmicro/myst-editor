@@ -271,7 +271,7 @@ const icons = {
 };
 
 export const EditorTopbar = ({ alert, buttons }) => {
-  const { options, editorView } = useContext(MystState);
+  const { options, editorView, collab } = useContext(MystState);
   const titleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.title.value)));
   const emptyDiff = useSignal(false);
   const editorModeButtons = useComputed(() => {
@@ -322,7 +322,7 @@ export const EditorTopbar = ({ alert, buttons }) => {
         <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
       </div>
       <div className="side">
-        <Avatars />
+        {collab.value && <Avatars />}
         {textButtons.length > 0 && (
           <div className="btns">
             {textButtons.map((b) => (
