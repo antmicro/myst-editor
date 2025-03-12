@@ -11,19 +11,18 @@ import { setupWSConnection, handleRequest, setupStatusConnection } from "./utils
 
 const port = process.env.PORT || 4444;
 
-/** https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#escaping */
-function escapeRegExp(string) {
-  if (!string) return;
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-const HTTP_PREFIX = escapeRegExp(process.env.HTTP_PREFIX || "/");
-const httpPrefixRegExp = new RegExp(`^${HTTP_PREFIX}`);
-const WS_PREFIX = escapeRegExp(process.env.WS_PREFIX || "/");
-const wsPrefixRegExp = new RegExp(`^${WS_PREFIX}`);
+const HTTP_PREFIX = process.env.HTTP_PREFIX || "/";
+console.log(`Using HTTP_PREFIX=${HTTP_PREFIX}`);
+const WS_PREFIX = process.env.WS_PREFIX || "/";
+console.log(`Using WS_PREFIX=${WS_PREFIX}`);
 
 const server = http.createServer((request, response) => {
   try {
-    request.url = request.url.replace(httpPrefixRegExp, "");
+    if (request.url.startsWith(HTTP_PREFIX)) {
+      request.url = request.url.slice(HTTP_PREFIX.length);
+    } else {
+      console.warn(`Received HTTP request URL: ${request.url} does not match configured HTTP_PREFIX=${HTTP_PREFIX}`);
+    }
     const result = handleRequest(request);
     if (result.error) {
       response.writeHead(result.code);
@@ -44,7 +43,11 @@ wss.on("connection", setupWSConnection);
 statusWss.on("connection", setupStatusConnection);
 
 server.on("upgrade", (request, socket, head) => {
-  request.url = request.url.replace(wsPrefixRegExp, "");
+  if (request.url.startsWith(WS_PREFIX)) {
+    request.url = request.url.slice(WS_PREFIX.length);
+  } else {
+    console.warn(`Received WebSocket request URL: ${request.url} does not match configured WS_PREFIX=${WS_PREFIX}`);
+  }
   const params = new URL(`http://${process.env.HOST ?? "localhost"}${request.url}`).searchParams;
   if (params.has("status")) {
     statusWss.handleUpgrade(request, socket, head, (ws) => {
