@@ -39,6 +39,7 @@ import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { lintKeymap } from "@codemirror/lint";
 import { yamlSchema } from "./yamlSchema";
 import { CollaborationClient } from "../collaboration";
+import { inlinePreview } from "./inlinePreview";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -73,6 +74,25 @@ export class ExtensionBuilder {
       drawSelection(),
       syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
       keymap.of([...defaultKeymap]),
+    ]);
+  }
+
+  static inlinePreviewSetup() {
+    return new ExtensionBuilder([
+      highlightSpecialChars(),
+      foldGutter(),
+      drawSelection(),
+      dropCursor(),
+      EditorState.allowMultipleSelections.of(true),
+      indentOnInput(),
+      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+      bracketMatching(),
+      autocompletion(),
+      rectangularSelection(),
+      crosshairCursor(),
+      highlightActiveLine(),
+      highlightSelectionMatches(),
+      keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, ...foldKeymap, ...completionKeymap, ...lintKeymap]),
     ]);
   }
 
@@ -269,6 +289,11 @@ export class ExtensionBuilder {
 
   useYamlSchema(schema, editorView, linter) {
     this.extensions.push(yamlSchema(schema, editorView, linter));
+    return this;
+  }
+
+  useInlinePreview(text) {
+    this.extensions.push(inlinePreview(text));
     return this;
   }
 

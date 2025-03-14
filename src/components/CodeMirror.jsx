@@ -264,7 +264,7 @@ const CodeMirror = ({ setUsers }) => {
       });
     }
 
-    const setup = options.mode.value === "Inline" ? ExtensionBuilder.minimalSetup() : ExtensionBuilder.basicSetup();
+    const setup = options.mode.value === "Inline" ? ExtensionBuilder.inlinePreviewSetup() : ExtensionBuilder.basicSetup();
     const startState = EditorState.create({
       root: options.parent,
       doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.text.peek(),
@@ -296,6 +296,7 @@ const CodeMirror = ({ setUsers }) => {
         .useCursorIndicator({ text, preview: text.preview.value })
         .if(options.syncScroll.value, (b) => b.useSyncPreviewWithCursor({ text, preview: text.preview.value, lastTyped }))
         .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView, linter))
+        .if(options.mode.value === "Inline", (b) => b.useInlinePreview(text))
         .create(),
     });
 
