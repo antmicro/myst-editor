@@ -255,6 +255,12 @@ const TemplatesIcon = () => (
   </svg>
 );
 
+const InlinePreviewIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000">
+    <path d="M120-240v-80h520v80H120Zm664-40L584-480l200-200 56 56-144 144 144 144-56 56ZM120-440v-80h400v80H120Zm0-200v-80h520v80H120Z" />
+  </svg>
+);
+
 const icons = {
   fullscreen: FullscreenIcon,
   "copy-html": CopyIcon,
@@ -273,6 +279,7 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
       { id: "source", tooltip: "Source", action: () => (options.mode.value = "Source"), icon: SourceIcon },
       { id: "preview", tooltip: "Preview", action: () => (options.mode.value = "Preview"), icon: PreviewIcon },
       { id: "both", tooltip: "Dual Pane", action: () => (options.mode.value = "Both"), icon: BothIcon },
+      { id: "inline", tooltip: "Inline Preview", action: () => (options.mode.value = "Inline"), icon: InlinePreviewIcon },
       {
         id: "diff",
         tooltip: emptyDiff.value ? "No changes to show" : null,
@@ -325,7 +332,7 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
             ))}
           </div>
         )}
-        <ButtonGroup buttons={editorModeButtons} clickedId={clickedId.value} mainButtonsNum={3} />
+        <ButtonGroup buttons={editorModeButtons} clickedId={clickedId.value} mainButtonsNum={4} />
       </div>
     </Topbar>
   );

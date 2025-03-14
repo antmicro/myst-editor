@@ -34,6 +34,8 @@ const EditorParent = styled.div`
         return "#preview-wrapper { display: none };";
       case "Outline":
         return "#preview-wrapper { display: none };";
+      case "Inline":
+        return "#preview-wrapper { display: none }";
       default:
         return ``;
     }

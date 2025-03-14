@@ -160,7 +160,7 @@ Here are the options you can pass to the MystEditor function:
 - `name` *(default: "myst_editor_textarea")* - this will change the name of the textarea element which contains your markdown. Useful if you want the editor to be part of an HTML `form`.
 - `additionalStyles` *(`CSSStylesheet` | `CSSStylesheet[]`)* - extra CSS stylesheets to customize the component
 - `title` - the document title displayed in the topbar. You can include Markdown links in here.
-- `mode` *(default: "Both", possibleValues: "Source" | "Preview" | "Both" | "Diff" | "Resolved")* - changes what is visible when you open the editor. By default, you will see a split view with the text editor and preview.
+- `mode` *(default: "Both", possibleValues: "Source" | "Preview" | "Both" | "Diff" | "Resolved" | "Outline" | "Inline")* - changes what is visible when you open the editor. By default, you will see a split view with the text editor and preview.
 - `initialText` *(default: "")* - initial Markdown text
 - `includeButtons` *(default: defaultButtons)* - An array of button definitions. A button definition is an object which has an `action: () => void` and either `icon` or `text`. As an example, a button could be defined as `{ text: "Button title", action: () => alert('clicked!') }`
 - `topbar` *(default: true)* - whether to show the topbar

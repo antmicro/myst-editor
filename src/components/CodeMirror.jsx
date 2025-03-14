@@ -264,10 +264,11 @@ const CodeMirror = ({ setUsers }) => {
       });
     }
 
+    const setup = options.mode.value === "Inline" ? ExtensionBuilder.minimalSetup() : ExtensionBuilder.basicSetup();
     const startState = EditorState.create({
       root: options.parent,
       doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.text.peek(),
-      extensions: ExtensionBuilder.basicSetup()
+      extensions: setup
         .useHighlighter(options.transforms.value)
         .useCompartment(suggestionCompartment, customHighlighter([]))
         .useCompartment(userExtensionsCompartment, [])
