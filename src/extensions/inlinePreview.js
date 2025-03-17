@@ -1,86 +1,19 @@
-import { EditorState, RangeSet, RangeSetBuilder, StateField } from "@codemirror/state";
+import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { TextManager } from "../text";
-import { Decoration, EditorView, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
+import { tags } from "@lezer/highlight";
 
-export const inlinePreview = (/** @type {TextManager} */ text) =>
-  StateField.define({
-    create(state) {
-      return RangeSet.of(buildDecorations(state, text));
-    },
-    update(decorations, tr) {
-      if (tr.newSelection || tr.docChanged) {
-        return RangeSet.of(buildDecorations(tr.state, text));
-      } else {
-        return decorations;
-      }
-    },
-    provide(field) {
-      return EditorView.decorations.from(field);
-    },
-  });
+export const inlinePreview = (/** @type {TextManager} */ text) => [syntaxHighlighting(markdownHighlightStyle)];
 
-const buildDecorations = (/** @type {EditorState} */ state, text) => {
-  let visibleLines = [{ fromLine: 1, toLine: state.doc.lines }];
-  const selectionLines = state.selection.ranges.map((r) => rangeToLines(state, r));
-  visibleLines = splitVisibleLines(visibleLines, selectionLines);
-
-  return visibleLines.map((visibleSection) => {
-    const from = state.doc.line(visibleSection.fromLine).from;
-    const to = state.doc.line(visibleSection.toLine).to;
-    const sectionText = state.doc.sliceString(from, to);
-    const decoration = Decoration.replace({
-      widget: new RenderedSection({ text: sectionText, md: text.md.value }),
-    });
-    return decoration.range(from, to);
-  });
-};
-
-const rangeToLines = (state, range) => {
-  return {
-    fromLine: state.doc.lineAt(range.from).number,
-    toLine: state.doc.lineAt(range.to).number,
-  };
-};
-
-const splitVisibleLines = (visibleLines, selectionLines) => {
-  let result = [];
-
-  visibleLines.forEach((visible) => {
-    let start = visible.fromLine;
-    let end = visible.toLine;
-
-    selectionLines.forEach((selection) => {
-      if (selection.toLine < start || selection.fromLine > end) {
-        return;
-      }
-
-      if (selection.fromLine <= end && selection.toLine >= start) {
-        if (selection.fromLine <= start) {
-          start = selection.toLine + 1;
-        } else if (selection.toLine >= end) {
-          end = selection.fromLine - 1;
-        }
-      }
-    });
-
-    if (start <= end) {
-      result.push({ fromLine: start, toLine: end });
-    }
-  });
-
-  return result;
-};
-
-class RenderedSection extends WidgetType {
-  constructor({ text, md }) {
-    super();
-    this.text = text;
-    this.md = md;
-  }
-
-  toDOM() {
-    const container = document.createElement("div");
-    container.innerHTML = this.md.render(this.text);
-    return container;
-  }
-}
+const previewFont = "Lato";
+const markdownHighlightStyle = HighlightStyle.define([
+  { tag: tags.heading1, fontWeight: "bold", fontFamily: previewFont, fontSize: "32px", textDecoration: "none" },
+  { tag: tags.heading2, fontWeight: "bold", fontFamily: previewFont, fontSize: "28px", textDecoration: "none" },
+  { tag: tags.heading3, fontWeight: "bold", fontFamily: previewFont, fontSize: "24px", textDecoration: "none" },
+  { tag: tags.heading4, fontWeight: "bold", fontFamily: previewFont, fontSize: "22px", textDecoration: "none" },
+  { tag: tags.link, fontFamily: previewFont, textDecoration: "underline", color: "blue" },
+  { tag: tags.emphasis, fontFamily: previewFont, fontStyle: "italic" },
+  { tag: tags.strong, fontFamily: previewFont, fontWeight: "bold" },
+  { tag: tags.monospace, fontFamily: "monospace" },
+  { tag: tags.content, fontFamily: previewFont, fontSize: "16px" },
+  { tag: tags.meta, color: "darkgrey" },
+]);
