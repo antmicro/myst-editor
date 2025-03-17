@@ -135,7 +135,7 @@ const CodeEditor = styled.div`
   .cm-suggestion {
     font-weight: 700;
 
-    &.replaced {
+    &.replaced * {
       font-weight: initial;
       color: initial !important;
       text-decoration: line-through;

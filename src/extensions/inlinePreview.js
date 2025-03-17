@@ -6,10 +6,10 @@ export const inlinePreview = (/** @type {TextManager} */ text) => [syntaxHighlig
 
 const previewFont = "Lato";
 const markdownHighlightStyle = HighlightStyle.define([
-  { tag: tags.heading1, fontWeight: "bold", fontFamily: previewFont, fontSize: "32px", textDecoration: "none" },
-  { tag: tags.heading2, fontWeight: "bold", fontFamily: previewFont, fontSize: "28px", textDecoration: "none" },
-  { tag: tags.heading3, fontWeight: "bold", fontFamily: previewFont, fontSize: "24px", textDecoration: "none" },
-  { tag: tags.heading4, fontWeight: "bold", fontFamily: previewFont, fontSize: "22px", textDecoration: "none" },
+  { tag: tags.heading1, fontWeight: "bold", fontFamily: previewFont, fontSize: "32px" },
+  { tag: tags.heading2, fontWeight: "bold", fontFamily: previewFont, fontSize: "28px" },
+  { tag: tags.heading3, fontWeight: "bold", fontFamily: previewFont, fontSize: "24px" },
+  { tag: tags.heading4, fontWeight: "bold", fontFamily: previewFont, fontSize: "22px" },
   { tag: tags.link, fontFamily: previewFont, textDecoration: "underline", color: "blue" },
   { tag: tags.emphasis, fontFamily: previewFont, fontStyle: "italic" },
   { tag: tags.strong, fontFamily: previewFont, fontWeight: "bold" },
