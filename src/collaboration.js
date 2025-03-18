@@ -54,12 +54,7 @@ export class CollaborationClient {
           return curr;
         }, {});
       this.#users.value = Object.values(states)
-        .sort((u1, u2) => {
-          // Ensure alphabetical order of usernames
-          if (u1.name < u2.name) return -1;
-          if (u1.name > u2.name) return 1;
-          return 0;
-        })
+        .sort((u1, u2) => u1.name.localeCompare(u2.name))
         .map((u) => ({ ...u, avatarUrl: editorOptions.getAvatar(u.name), userUrl: editorOptions.getUserUrl(u.name) }));
     });
 
