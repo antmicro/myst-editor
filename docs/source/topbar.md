@@ -55,5 +55,14 @@ Starting from the left, the buttons serve the following functions:
 - `Source` - only show the Markdown source code
 - `Preview` - only show a rendered document preview
 - `Dual Pane` - **(default)** - show Markdown on the left and a rendered preview on the right
+
+:::{figure-md} view-mode-buttons-expanded
+![Additional View Modes](./assets/view-btns-expanded.png)
+
+Additional View Modes
+:::
+
+There are also some additional views provided, accessible by hovering over the last icon, as illustrated in {numref}`view-mode-buttons-expanded`:
 - `Diff View` - show changes made to the document
+- `Table of Contents` - a multi-level list of all headings in the document. Clicking on headings navigates to them.
 - `Resolved Comments` - show resolved comments, for more information see [Resolving Comments](comments.md#resolving-comments).

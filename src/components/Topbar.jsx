@@ -268,16 +268,17 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
       { id: "both", tooltip: "Dual Pane", action: () => (options.mode.value = "Both"), icon: BothIcon },
       {
         id: "diff",
-        tooltip: emptyDiff.value ? "No changes to show" : "Diff View",
+        tooltip: emptyDiff.value ? "No changes to show" : null,
+        text: "Diff View",
         disabled: emptyDiff.value,
         action: () => (options.mode.value = "Diff"),
         hover: () => (emptyDiff.value = options.initialText == editorView.value?.state?.doc?.toString?.()),
         icon: DiffIcon,
       },
-      { id: "outline", tooltip: "Table of Contents", action: () => (options.mode.value = "Outline"), icon: TocIcon },
+      { id: "outline", text: "Table of Contents", action: () => (options.mode.value = "Outline"), icon: TocIcon },
     ];
     if (options.collaboration.value.resolvingCommentsEnabled) {
-      modeButtons.push({ id: "resolved", tooltip: "Resolved Comments", action: () => (options.mode.value = "Resolved"), icon: ResolvedIcon });
+      modeButtons.push({ id: "resolved", text: "Resolved Comments", action: () => (options.mode.value = "Resolved"), icon: ResolvedIcon });
     }
 
     return modeButtons;
@@ -317,7 +318,7 @@ export const EditorTopbar = ({ alert, users, buttons }) => {
             ))}
           </div>
         )}
-        <ButtonGroup buttons={editorModeButtons.value} clickedId={clickedId.value} />
+        <ButtonGroup buttons={editorModeButtons} clickedId={clickedId.value} mainButtonsNum={3} />
       </div>
     </Topbar>
   );

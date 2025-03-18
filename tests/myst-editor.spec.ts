@@ -274,12 +274,12 @@ test.describe.parallel("With collaboration enabled", () => {
       expect(await pageA.locator(".comment-wrapper").count()).toBe(0);
 
       // Verify that it appeared in the resolved comments
-      await pageA.getByTitle("Resolved Comments").click();
+      await openResolvedComments(pageA);
       await pageA.waitForSelector(".resolved-comment");
       expect(await pageA.locator(".resolved-comment").count()).toBe(1);
 
       // Verify that the resolved comments are synced among peers
-      await pageB.getByTitle("Resolved Comments").click();
+      await openResolvedComments(pageB);
       await pageB.waitForSelector(".resolved-comment");
       expect(await pageB.locator(".resolved-comment").count()).toBe(1);
     });
@@ -339,8 +339,8 @@ test.describe.parallel("With collaboration enabled", () => {
       const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Switch to resolved comments view
-      await pageA.getByTitle("Resolved Comments").first().click();
-      await pageB.getByTitle("Resolved Comments").first().click();
+      await openResolvedComments(pageA);
+      await openResolvedComments(pageB);
 
       await addComment(pageA, 1);
 
@@ -367,8 +367,8 @@ test.describe.parallel("With collaboration enabled", () => {
       const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Switch to resolved comments view
-      await pageA.getByTitle("Resolved Comments").first().click();
-      await pageB.getByTitle("Resolved Comments").first().click();
+      await openResolvedComments(pageA);
+      await openResolvedComments(pageB);
 
       await addComment(pageA, 1, "1");
 
@@ -399,8 +399,8 @@ test.describe.parallel("With collaboration enabled", () => {
       const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Switch to resolved comments view
-      await pageA.getByTitle("Resolved Comments").first().click();
-      await pageB.getByTitle("Resolved Comments").first().click();
+      await openResolvedComments(pageA);
+      await openResolvedComments(pageB);
 
       await addComment(pageA, 1);
 
@@ -425,8 +425,8 @@ test.describe.parallel("With collaboration enabled", () => {
       const pageB = await applyPageOpts(await context.newPage(), collabOpts);
 
       // Switch to resolved comments view
-      await pageA.getByTitle("Resolved Comments").first().click();
-      await pageB.getByTitle("Resolved Comments").first().click();
+      await openResolvedComments(pageA);
+      await openResolvedComments(pageB);
 
       await addComment(pageA, 1);
 
@@ -700,4 +700,9 @@ const addComment = async (page: Page, lineNumber: number, text?: string) => {
       { lineNumber, text, id },
     );
   }
+};
+
+const openResolvedComments = async (page: Page) => {
+  await page.hover(".more");
+  await page.click('[name="resolved"]');
 };

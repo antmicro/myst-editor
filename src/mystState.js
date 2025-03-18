@@ -12,6 +12,7 @@ import { collabClientFacet } from "./extensions";
 import { TextManager } from "./text";
 import Templates from "./components/Templates";
 
+/** @type {{ id: string; tooltip?: string; text?: string; action?: Function; dropdown?: Function }} */
 export const predefinedButtons = {
   printToPdf: {
     id: "print-to-pdf",
