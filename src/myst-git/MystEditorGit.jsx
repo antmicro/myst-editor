@@ -356,8 +356,6 @@ const MystEditorGit = ({
     const awareness = mystState.current.collab.value.provider.awareness;
     if (!doc) return;
 
-    getText(branch.peek(), commit.peek(), index).then((txt) => (indexFile.value = txt));
-
     const handleChange = (/** @type {Y.Transaction} */ tr) => {
       if (tr.local && tr.origin) {
         const old = changeHistory.peek().filter((ch) => ch.room != room.peek());
@@ -390,6 +388,11 @@ const MystEditorGit = ({
     });
 
     return () => doc.off("afterTransaction", handleChange);
+  });
+
+  useSignalEffect(() => {
+    if (!branch.value || !commit.value?.hash) return;
+    getText(branch.value, commit.value, index).then((txt) => (indexFile.value = txt));
   });
 
   return (
@@ -438,7 +441,7 @@ const MystEditorGit = ({
                 docsRoot={docsRoot}
                 currentFile={file.value}
                 mystState={mystState.current}
-                onFileClick={(f) => switchFile(f.file)}
+                onFileClick={(f) => switchFile(f.file + ".md")}
                 files={files.value}
               />
             )}

@@ -7,6 +7,7 @@ const Container = styled.div`
   width: 250px;
   position: relative;
   font-family: "Lato";
+  color: black;
 
   * {
     box-sizing: border-box;
