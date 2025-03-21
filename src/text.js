@@ -29,6 +29,7 @@ export class TextManager {
     this.chunks = [];
     this.editorView = editorView;
     this.preview = signal(null);
+    this.options = options;
     this.headingsPerChunk = { current: {} };
     this.headings = signal([]);
     this.md = computed(() => {
@@ -69,8 +70,9 @@ export class TextManager {
     effect(() => this.observePreview());
   }
 
-  renderText(useCache = true) {
-    if (!this.preview.value || !this.editorView.value) return;
+  renderText(useCache = true, force = false) {
+    const previewVisible = ["Both", "Preview"].includes(this.options.mode.value) || force;
+    if (!this.preview.value || !this.editorView.value || !previewVisible) return;
     const oldHeadingsPerChunk = { ...this.headingsPerChunk.current };
     this.headingsPerChunk.current = {};
     const cache = !this.lastMd || this.lastMd == this.md.value ? useCache : false;
@@ -187,6 +189,7 @@ export class TextManager {
   }
 
   async copy() {
+    this.renderText(true, true);
     const html = this.chunks.map((c) => c.html).join("\n");
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
