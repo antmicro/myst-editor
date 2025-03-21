@@ -47,7 +47,7 @@ const o = (m = {}.VITE_WS_URL) != null ? m : n.get("collab_server"), a = ["main"
 }, {
   message: "commit 1",
   hash: "bbb"
-}], f = ["docs/source/file1", "docs/source/file2", "docs/source/index.md"], p = "# {{project}}\n\n```{toctree}\nfile2\nfile1\n```\n";
+}], f = ["docs/source/file1.md", "docs/source/file2.md", "docs/source/index.md"], p = "# {{project}}\n\n```{toctree}\nfile2\nfile1\n```\n";
 d({
   repo: "repos/myst",
   initialBranches: a,
