@@ -33,10 +33,31 @@ const CodeEditor = styled.div`
     background-color: var(--gray-200) !important;
   }
 
+  .comment-gutter {
+    width: 17px;
+    height: 100%;
+    display: grid;
+    place-items: center;
+  }
+
   .comment-gutter-icon {
     height: 17px;
     width: 17px;
     cursor: pointer;
+  }
+
+  .cm-foldGutter .cm-gutterElement {
+    display: grid;
+    place-items: center;
+
+    span {
+      line-height: normal;
+      display: inline-block;
+
+      &[title="Fold line"] {
+        transform: translateY(-5px);
+      }
+    }
   }
 
   .comment-image {
@@ -300,7 +321,9 @@ const CodeMirror = ({ setUsers }) => {
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
         .useCursorIndicator({ text, preview: text.preview.value })
-        .if(options.syncScroll.value, (b) => b.useSyncPreviewWithCursor({ text, preview: text.preview.value, lastTyped }))
+        .if(options.syncScroll.value && options.mode.value === "Both", (b) =>
+          b.useSyncPreviewWithCursor({ text, preview: text.preview.value, lastTyped }),
+        )
         .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView, linter))
         .if(options.mode.value === "Inline", (b) => b.useInlinePreview(text))
         .create(),
