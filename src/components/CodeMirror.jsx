@@ -206,6 +206,12 @@ const CodeEditor = styled.div`
       margin-bottom: 0;
     }
   }
+
+  .cm-inline-bullet::after {
+    display: inline;
+    color: #000;
+    content: "•";
+  }
 `;
 
 const CodeMirror = ({ setUsers }) => {

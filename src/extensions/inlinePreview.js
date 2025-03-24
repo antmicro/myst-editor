@@ -19,9 +19,12 @@ const markdownHighlightStyle = HighlightStyle.define([
   { tag: tags.content, ...baseFont },
   { tag: tags.meta, color: "darkgrey" },
 ]);
-const markdownTheme = EditorView.theme({ "&": { fontSize: "16px" } });
+const markdownTheme = EditorView.theme({
+  "&": { fontSize: "16px" },
+  ".cm-inline-bullet *": { display: "none" },
+});
 
-const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Link"];
+const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Link", "ListItem"];
 const tokenHidden = ["HardBreak", "LinkMark", "EmphasisMark", "URL"];
 const decorationHidden = Decoration.replace({});
 const decorationBullet = Decoration.mark({ class: "cm-inline-bullet" });
