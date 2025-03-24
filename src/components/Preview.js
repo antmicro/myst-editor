@@ -1,32 +1,6 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
-const Preview = styled.div`
-  background-color: white;
-  padding: 20px;
-  box-sizing: border-box;
-  height: 100%;
-  border: 1px solid var(--gray-400);
-  border-left: 1px solid var(--gray-600);
-  box-shadow: inset 0px 0px 4px var(--gray-600);
-  border-radius: var(--border-radius);
-  vertical-align: top;
-  color: var(--gray-900);
-  word-wrap: break-word;
-  position: relative;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-
-  @media print {
-    & {
-      display: block !important;
-      border: 0px !important;
-      box-shadow: none !important;
-      border-radius: 0px !important;
-      word-break: unset !important;
-    }
-  }
-
+export const MdStyles = css`
   p {
     margin-top: 0px;
     line-height: 1.3em;
@@ -364,6 +338,36 @@ const Preview = styled.div`
   .hljs-attr {
     color: rgb(0, 0, 204);
   }
+`;
+
+const Preview = styled.div`
+  background-color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100%;
+  border: 1px solid var(--gray-400);
+  border-left: 1px solid var(--gray-600);
+  box-shadow: inset 0px 0px 4px var(--gray-600);
+  border-radius: var(--border-radius);
+  vertical-align: top;
+  color: var(--gray-900);
+  word-wrap: break-word;
+  position: relative;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+
+  @media print {
+    & {
+      display: block !important;
+      border: 0px !important;
+      box-shadow: none !important;
+      border-radius: 0px !important;
+      word-break: unset !important;
+    }
+  }
+
+  ${MdStyles}
 `;
 Preview.defaultProps = { className: "myst-preview" };
 

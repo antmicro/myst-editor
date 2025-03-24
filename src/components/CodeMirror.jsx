@@ -11,6 +11,7 @@ import editIcon from "../icons/edit.svg";
 import { MystState } from "../mystState";
 import { userExtensionsCompartment } from "./Settings";
 import { useSignalEffect } from "@preact/signals";
+import { MdStyles } from "./Preview";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -233,6 +234,10 @@ const CodeEditor = styled.div`
     color: #000;
     content: "•";
   }
+
+  .cm-inline-rendered-md {
+    ${MdStyles}
+  }
 `;
 
 const CodeMirror = ({ setUsers }) => {
@@ -320,7 +325,7 @@ const CodeMirror = ({ setUsers }) => {
         })
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
-        .useCursorIndicator({ text, preview: text.preview.value })
+        .if(options.mode.value === "Both", (b) => b.useCursorIndicator({ text, preview: text.preview.value }))
         .if(options.syncScroll.value && options.mode.value === "Both", (b) =>
           b.useSyncPreviewWithCursor({ text, preview: text.preview.value, lastTyped }),
         )
