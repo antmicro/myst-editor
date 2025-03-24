@@ -25,6 +25,10 @@ const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", 
 const tokenHidden = ["HardBreak", "LinkMark", "EmphasisMark", "URL"];
 const decorationHidden = Decoration.replace({});
 const decorationBullet = Decoration.mark({ class: "cm-inline-bullet" });
+const nodeInSelection = (state, node) =>
+  state.selection.ranges.some(
+    (r) => (r.from >= node.from && r.from <= node.to) || (r.to >= node.from && r.to <= node.to) || (node.from >= r.from && node.to <= r.to),
+  );
 
 export const inlinePreview = (/** @type {TextManager} */ text) =>
   ViewPlugin.fromClass(
@@ -37,29 +41,29 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
         if (update.docChanged || update.viewportChanged || update.selectionSet) this.decorations = this.process(update.view);
       }
 
-      process(view) {
-        let widgets = [];
-        let [cursor] = view.state.selection.ranges;
+      process(/** @type {EditorView} */ view) {
+        const widgets = [];
 
-        for (let { from, to } of view.visibleRanges) {
+        for (const { from, to } of view.visibleRanges) {
           syntaxTree(view.state).iterate({
             from,
             to,
             enter(node) {
-              if ((node.name.startsWith("ATXHeading") || tokenElement.includes(node.name)) && cursor.from >= node.from && cursor.to <= node.to)
+              if ((node.name.startsWith("ATXHeading") || tokenElement.includes(node.name)) && nodeInSelection(view.state, node)) {
                 return false;
+              }
 
-              if (
-                node.name === "ListMark" &&
-                node.matchContext(["BulletList", "ListItem"]) &&
-                cursor.from != node.from &&
-                cursor.from != node.from + 1
-              )
+              if (node.name === "ListMark" && node.matchContext(["BulletList", "ListItem"]) && !nodeInSelection(view.state, node)) {
                 widgets.push(decorationBullet.range(node.from, node.to));
+              }
 
-              if (node.name === "HeaderMark") widgets.push(decorationHidden.range(node.from, node.to + 1));
+              if (node.name === "HeaderMark") {
+                widgets.push(decorationHidden.range(node.from, node.to + 1));
+              }
 
-              if (tokenHidden.includes(node.name)) widgets.push(decorationHidden.range(node.from, node.to));
+              if (tokenHidden.includes(node.name)) {
+                widgets.push(decorationHidden.range(node.from, node.to));
+              }
             },
           });
         }
