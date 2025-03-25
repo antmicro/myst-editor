@@ -9,23 +9,11 @@ export const MdStyles = css`
     a {
       display: inline;
     }
-
-    @media print {
-      break-inside: avoid !important;
-      text-align: justify !important;
-      text-justify: inter-word !important;
-    }
   }
 
   a {
     color: var(--blue-500);
     word-break: break-word;
-
-    @media print {
-      &::after {
-        content: "(" attr(href) ")" !important;
-      }
-    }
   }
 
   h1,
@@ -357,6 +345,8 @@ const Preview = styled.div`
   overscroll-behavior: contain;
   scrollbar-width: thin;
 
+  ${MdStyles}
+
   @media print {
     & {
       display: block !important;
@@ -365,9 +355,17 @@ const Preview = styled.div`
       border-radius: 0px !important;
       word-break: unset !important;
     }
-  }
 
-  ${MdStyles}
+    p {
+      break-inside: avoid !important;
+      text-align: justify !important;
+      text-justify: inter-word !important;
+    }
+
+    a::after {
+      content: "(" attr(href) ")" !important;
+    }
+  }
 `;
 Preview.defaultProps = { className: "myst-preview" };
 

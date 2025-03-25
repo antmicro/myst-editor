@@ -236,7 +236,15 @@ const CodeEditor = styled.div`
   }
 
   .cm-inline-rendered-md {
+    all: initial;
+    font-family: "Lato";
+    font-size: 16px;
+
     ${MdStyles}
+
+    aside.admonition {
+      margin-bottom: 0;
+    }
   }
 `;
 
