@@ -35,7 +35,7 @@ const nodeInSelection = (state, node) =>
   );
 
 const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image"];
-const renderedInlineNodes = ["Link"];
+const renderedInlineNodes = ["Link", "InlineCode"];
 class RenderedMarkdownWidget extends WidgetType {
   constructor(src, textManager, isBlock) {
     super();
