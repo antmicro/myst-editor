@@ -40,8 +40,8 @@ class RenderedMarkdownWidget extends WidgetType {
   constructor(src, textManager, isBlock) {
     super();
     this.src = src;
+    this.textManager = textManager;
     this.isBlock = isBlock;
-    this.rendered = isBlock ? textManager.md.peek().render(src) : textManager.md.peek().renderInline(src);
   }
 
   eq(widget) {
@@ -52,7 +52,7 @@ class RenderedMarkdownWidget extends WidgetType {
     const content = document.createElement(this.isBlock ? "div" : "span");
     content.setAttribute("contenteditable", "false");
     content.className = "cm-inline-rendered-md";
-    content.innerHTML = this.rendered;
+    content.innerHTML = this.isBlock ? this.textManager.md.peek().render(this.src) : this.textManager.md.peek().renderInline(this.src);
     return content;
   }
 
