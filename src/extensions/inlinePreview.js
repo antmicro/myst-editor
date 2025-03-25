@@ -26,7 +26,7 @@ const markdownTheme = EditorView.theme({
   ":is(.cm-widgetBuffer:has(+ .cm-inline-rendered-md), .cm-inline-rendered-md + .cm-widgetBuffer)": { display: "none" },
 });
 
-const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Link", "ListItem"];
+const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Link", "ListItem", "Image"];
 const tokenHidden = ["HardBreak", "LinkMark", "EmphasisMark", "URL"];
 const decorationHidden = Decoration.replace({});
 const decorationBullet = Decoration.mark({ class: "cm-inline-bullet" });
