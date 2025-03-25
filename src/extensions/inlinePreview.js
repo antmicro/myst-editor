@@ -23,6 +23,7 @@ const markdownHighlightStyle = HighlightStyle.define([
 const markdownTheme = EditorView.theme({
   "&": { fontSize: "16px" },
   ".cm-inline-bullet *": { display: "none" },
+  ":is(.cm-widgetBuffer:has(+ .cm-inline-rendered-md), .cm-inline-rendered-md + .cm-widgetBuffer)": { display: "none" },
 });
 
 const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Link", "ListItem"];
@@ -74,8 +75,6 @@ function replaceMd(state, textManager) {
       const src = state.doc.sliceString(node.from, node.to);
       const decoration = Decoration.replace({
         widget: new RenderedMarkdownWidget(src, textManager, isBlock),
-        block: isBlock,
-        inclusive: false,
       });
 
       decorations.push(decoration.range(node.from, node.to));
