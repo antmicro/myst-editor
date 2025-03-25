@@ -167,9 +167,13 @@ const CodeEditor = styled.div`
     outline: none !important;
   }
 
-  .cm-gutterElement span[title="Fold line"],
-  .cm-gutterElement span[title="Unfold line"] {
-    user-select: none;
+  .cm-foldGutter {
+    margin-right: 5px;
+
+    .cm-gutterElement span[title="Fold line"],
+    .cm-gutterElement span[title="Unfold line"] {
+      user-select: none;
+    }
   }
 
   .cm-line {
@@ -185,7 +189,7 @@ const CodeEditor = styled.div`
       width: 5px;
       height: 100%;
       position: absolute;
-      z-index: -1;
+      z-index: 200;
       background-color: var(--blue-200);
       transform: translateX(-11px);
     }
