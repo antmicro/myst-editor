@@ -75,6 +75,7 @@ function replaceMd(state, textManager) {
       const decoration = Decoration.replace({
         widget: new RenderedMarkdownWidget(src, textManager, isBlock),
         block: isBlock,
+        inclusive: false,
       });
 
       decorations.push(decoration.range(node.from, node.to));
