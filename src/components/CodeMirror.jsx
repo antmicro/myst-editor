@@ -15,7 +15,7 @@ import { MdStyles } from "./Preview";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
-  background: var(--gray-200);
+  background: ${(props) => (props.$mode != "Inline" ? "var(--gray-200)" : "transparent")};
   font-family: monospace;
   font-size: 14px;
   resize: none;
@@ -31,7 +31,7 @@ const CodeEditor = styled.div`
   box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
 
   .cm-gutters {
-    background-color: var(--gray-200) !important;
+    background-color: ${(props) => (props.$mode != "Inline" ? "var(--gray-200)" : "transparent")} !important;
   }
 
   .comment-gutter {
@@ -47,16 +47,20 @@ const CodeEditor = styled.div`
     cursor: pointer;
   }
 
-  .cm-foldGutter .cm-gutterElement {
-    display: grid;
-    place-items: center;
+  .cm-foldGutter {
+    margin-right: 5px;
 
-    span {
-      line-height: normal;
-      display: inline-block;
+    .cm-gutterElement {
+      display: grid;
+      place-items: center;
 
-      &[title="Fold line"] {
-        transform: translateY(-5px);
+      span {
+        line-height: normal;
+        display: inline-block;
+
+        &[title="Fold line"] {
+          transform: translateY(-5px);
+        }
       }
     }
   }
