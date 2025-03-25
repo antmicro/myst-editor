@@ -40,7 +40,7 @@
     "preact": "^10.11.3",
     "styled-components": "^6.1.2",
     "stylis": "^4.3.0",
-    "typo-js": "^1.2.3",
+    "typo-js": "1.2.4",
     "vite-plugin-node-polyfills": "^0.23.0",
     "vscode-languageserver-protocol": "^3.17.5",
     "vscode-languageserver-textdocument": "^1.0.12",
