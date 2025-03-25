@@ -34,12 +34,14 @@ const nodeInSelection = (state, node) =>
     (r) => (r.from >= node.from && r.from <= node.to) || (r.to >= node.from && r.to <= node.to) || (node.from >= r.from && node.to <= r.to),
   );
 
-const renderedNodes = ["Table", "Blockquote", "FencedCode", "Image"];
+const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image"];
+const renderedInlineNodes = ["Link"];
 class RenderedMarkdownWidget extends WidgetType {
-  constructor(src, textManager) {
+  constructor(src, textManager, isBlock) {
     super();
     this.src = src;
-    this.rendered = textManager.md.peek().render(src);
+    this.isBlock = isBlock;
+    this.rendered = isBlock ? textManager.md.peek().render(src) : textManager.md.peek().renderInline(src);
   }
 
   eq(widget) {
@@ -47,15 +49,15 @@ class RenderedMarkdownWidget extends WidgetType {
   }
 
   toDOM() {
-    const content = document.createElement("div");
+    const content = document.createElement(this.isBlock ? "div" : "span");
     content.setAttribute("contenteditable", "false");
     content.className = "cm-inline-rendered-md";
     content.innerHTML = this.rendered;
     return content;
   }
 
-  ignoreEvent() {
-    return false;
+  ignoreEvent(ev) {
+    return ev.type === "mousedown" && ev.ctrlKey;
   }
 }
 
@@ -65,13 +67,14 @@ function replaceMd(state, textManager) {
   // If possible we should only render blocks in view
   syntaxTree(state).iterate({
     enter(node) {
-      if (!renderedNodes.includes(node.name)) return;
+      const isBlock = renderedBlockNodes.includes(node.name);
+      if (!isBlock && !renderedInlineNodes.includes(node.name)) return;
       if (nodeInSelection(state, node)) return false;
 
       const src = state.doc.sliceString(node.from, node.to);
       const decoration = Decoration.replace({
-        widget: new RenderedMarkdownWidget(src, textManager),
-        block: true,
+        widget: new RenderedMarkdownWidget(src, textManager, isBlock),
+        block: isBlock,
       });
 
       decorations.push(decoration.range(node.from, node.to));
@@ -141,9 +144,10 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
       provide: () => [syntaxHighlighting(markdownHighlightStyle), markdownTheme, renderMdInline(text)],
       decorations: (v) => v.decorations,
       eventHandlers: {
-        mousedown({ target }, view) {
-          if (target instanceof Element && target.matches(".cm-inline-rendered-md *")) {
-            view.dispatch({ selection: { anchor: view.posAtDOM(target) } });
+        mousedown(ev, view) {
+          if (ev.target instanceof Element && ev.target.matches(".cm-inline-rendered-md *")) {
+            ev.preventDefault();
+            view.dispatch({ selection: { anchor: view.posAtDOM(ev.target) } });
           }
         },
       },
