@@ -234,7 +234,7 @@ const CodeEditor = styled.div`
   }
 
   .cm-inline-bullet::after {
-    display: inline;
+    display: inline-block;
     color: #000;
     content: "•";
   }

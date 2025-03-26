@@ -30,7 +30,6 @@ const markdownTheme = EditorView.theme({
 const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Link", "Image"];
 const tokenHidden = ["HardBreak", "LinkMark", "EmphasisMark", "URL"];
 const decorationHidden = Decoration.replace({});
-const decorationBullet = Decoration.mark({ class: "cm-inline-bullet" });
 const decorationOrderedListNum = Decoration.mark({ class: "cm-inline-ordered-list-marker" });
 const nodeInSelection = (state, node) =>
   state.selection.ranges.some(
@@ -127,7 +126,16 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
               }
 
               if (node.name === "ListMark" && node.matchContext(["BulletList", "ListItem"]) && !nodeInSelection(view.state, node)) {
-                widgets.push(decorationBullet.range(node.from, node.to));
+                const parents = [];
+                let curr = node.node.parent;
+                while (curr.name != "Document") {
+                  parents.push(curr.name);
+                  curr = curr.parent;
+                }
+                const level = parents.filter((p) => p == "BulletList").length - 1;
+                widgets.push(
+                  Decoration.mark({ class: "cm-inline-bullet", attributes: { style: `margin-left: ${level * 20}px;` } }).range(node.from, node.to),
+                );
               }
 
               if (node.name === "ListMark" && node.matchContext(["OrderedList", "ListItem"])) {
