@@ -14,6 +14,7 @@ const markdownHighlightStyle = HighlightStyle.define([
   { tag: tags.heading3, ...baseHeading, fontSize: "1.25em" },
   { tag: tags.heading4, ...baseHeading, fontSize: "1.15em" },
   { tag: tags.link, ...baseFont, textDecoration: "underline", color: "var(--blue-500)" },
+  { tag: tags.url, ...baseFont, textDecoration: "underline", color: "var(--blue-500)" },
   { tag: tags.emphasis, ...baseFont, fontStyle: "italic" },
   { tag: tags.strong, ...baseFont, fontWeight: "bold" },
   { tag: tags.monospace, ...baseFont, fontFamily: "monospace" },
@@ -27,8 +28,8 @@ const markdownTheme = EditorView.theme({
   ".cm-inline-ordered-list-marker *": { color: "black !important" },
 });
 
-const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Link", "Image"];
-const tokenHidden = ["HardBreak", "LinkMark", "EmphasisMark", "URL"];
+const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Image"];
+const tokenHidden = ["HardBreak", "EmphasisMark"];
 const decorationHidden = Decoration.replace({});
 const decorationOrderedListNum = Decoration.mark({ class: "cm-inline-ordered-list-marker" });
 const nodeInSelection = (state, node) =>
@@ -37,7 +38,7 @@ const nodeInSelection = (state, node) =>
   );
 
 const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image"];
-const renderedInlineNodes = ["Link", "InlineCode"];
+const renderedInlineNodes = ["Link", "URL", "InlineCode"];
 class RenderedMarkdownWidget extends WidgetType {
   constructor(src, textManager, isBlock) {
     super();
