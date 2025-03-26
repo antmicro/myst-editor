@@ -18,3 +18,16 @@ export function checkLinks(/** @type {markdownIt} */ md) {
     return render(tokens, idx, options, env, self);
   };
 }
+
+export function linkTitle(/** @type {markdownIt} */ md, title) {
+  const handleTokens = (tokens) => {
+    for (const token of tokens) {
+      if (token.type === "link_open") token.attrSet("title", title);
+      if (token.children) handleTokens(token.children);
+    }
+  };
+
+  md.core.ruler.after("linkify", "link_title", (state) => {
+    handleTokens(state.tokens);
+  });
+}
