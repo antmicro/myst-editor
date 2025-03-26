@@ -72,7 +72,9 @@ function replaceMd(state, textManager) {
       if (!isBlock && !renderedInlineNodes.includes(node.name)) return;
       if (nodeInSelection(state, node)) return false;
 
-      const src = state.doc.sliceString(node.from, node.to);
+      const line = state.doc.lineAt(node.from);
+      const from = isBlock ? line.from : node.from;
+      const src = state.doc.sliceString(from, node.to);
       const decoration = Decoration.replace({
         widget: new RenderedMarkdownWidget(src, textManager, isBlock),
       });
