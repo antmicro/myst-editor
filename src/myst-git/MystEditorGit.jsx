@@ -1,6 +1,6 @@
 import { MystEditorPreact, defaultButtons } from "../MystEditor";
 import { render } from "preact";
-import { useEffect, useRef } from "preact/hooks";
+import { useContext, useEffect, useRef } from "preact/hooks";
 import { batch, useComputed, useSignal, useSignalEffect } from "@preact/signals";
 import { createMystState, MystState } from "../mystState";
 import styled, { StyleSheetManager } from "styled-components";
@@ -153,27 +153,26 @@ const MystEditorGit = ({
   const file = useSignal();
   const initialText = useSignal("");
   const room = useComputed(() => (commit.value && file.value ? `${repo}/${branch.value}/${commit.value.hash}/${file.value}` : ""));
-  const mystState = useRef(createMystState({ ...props, collaboration: { ...props.collaboration, mode: "manual" } }));
   const changeHistory = useSignal(initialHistory);
   const toast = useSignal({ content: null, timeout: null });
   const commitSummary = useSignal(null);
   const commentStateToApply = useRef(null);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
   const indexFile = useSignal();
+  const { collab, options, editorView } = useContext(MystState);
 
   useEffect(() => {
-    window.myst_editor[props.id].state = mystState.current;
     window.myst_editor[props.id].git = { branch, commits, commit, files, file, initialText, room };
-  }, [mystState.current, props.id]);
+  }, [props.id]);
 
   useSignalEffect(() => {
-    mystState.current.options.initialText = initialText.value;
+    options.initialText = initialText.value;
   });
 
   useSignalEffect(() => {
     if (!room.value) return;
-    const collaboration = mystState.current.options.collaboration.peek();
-    mystState.current.options.collaboration.value = { ...collaboration, room: room.value, mode: props.collaboration.mode };
+    const collaboration = options.collaboration.peek();
+    options.collaboration.value = { ...collaboration, room: room.value, mode: props.collaboration.mode };
   });
 
   function toastNotify(content) {
@@ -187,13 +186,13 @@ const MystEditorGit = ({
     tooltip: "Commit",
     icon: CommitIcon,
     action: () => {
-      const textChanged = mystState.current.editorView.value.state.doc.toString() != initialText.value;
+      const textChanged = editorView.value.state.doc.toString() != initialText.value;
       if (!textChanged) {
         toastNotify({ text: "No changes to commit" });
         return;
       }
-      mystState.current.options.includeButtons.value = defaultButtons;
-      mystState.current.collab.value.lock("A commit is being prepared for this document");
+      options.includeButtons.value = defaultButtons;
+      collab.value.lock("A commit is being prepared for this document");
       commitSummary.value = `MyST: update docs ${file.value}`;
     },
   };
@@ -207,28 +206,28 @@ const MystEditorGit = ({
       } else {
         statusSocket.current.send(room.peek());
       }
-      commentStateToApply.current = mystState.current.collab.value.ycomments.encodeState();
+      commentStateToApply.current = collab.value.ycomments.encodeState();
       toastNotify({ text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } });
-      mystState.current.collab.value.provider.awareness.setLocalStateField("newCommit", { hash, message: summary });
-      mystState.current.collab.value.unlock();
+      collab.value.provider.awareness.setLocalStateField("newCommit", { hash, message: summary });
+      collab.value.unlock();
       switchCommit({ hash, message: summary }, true);
     } catch (error) {
       console.error(error);
       toastNotify({ text: `Error occured while commiting: ${error}` });
-      mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
-      mystState.current.collab.value.unlock();
+      options.includeButtons.value = [...defaultButtons, commitButton];
+      collab.value.unlock();
     }
   }
   function onCommitCancel() {
     commitSummary.value = null;
-    mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
-    mystState.current.collab.value.unlock();
+    options.includeButtons.value = [...defaultButtons, commitButton];
+    collab.value.unlock();
   }
   useSignalEffect(() => {
     if (commit.value?.hash == commits.value[0]?.hash) {
-      mystState.current.options.includeButtons.value = [...defaultButtons, commitButton];
+      options.includeButtons.value = [...defaultButtons, commitButton];
     } else {
-      mystState.current.options.includeButtons.value = defaultButtons;
+      options.includeButtons.value = defaultButtons;
     }
   });
 
@@ -352,8 +351,8 @@ const MystEditorGit = ({
   });
 
   useSignalEffect(() => {
-    const doc = mystState.current.collab.value.ydoc;
-    const awareness = mystState.current.collab.value.provider.awareness;
+    const doc = collab.value.ydoc;
+    const awareness = collab.value.provider.awareness;
     if (!doc) return;
 
     const handleChange = (/** @type {Y.Transaction} */ tr) => {
@@ -382,7 +381,7 @@ const MystEditorGit = ({
     // This is done to keep this signal effect from running in a cycle when some singals are updated in applyState.
     queueMicrotask(() => {
       if (commentStateToApply.current != null) {
-        mystState.current.collab.value.ycomments.applyState(commentStateToApply.current);
+        collab.value.ycomments.applyState(commentStateToApply.current);
         commentStateToApply.current = null;
       }
     });
@@ -440,7 +439,6 @@ const MystEditorGit = ({
                 index={indexFile.value}
                 docsRoot={docsRoot}
                 currentFile={file.value}
-                mystState={mystState.current}
                 onFileClick={(f) => switchFile(f.file + ".md")}
                 files={files.value}
               />
@@ -487,14 +485,14 @@ const MystEditorGit = ({
             </Toast>
           )}
           {commitSummary.value && <CommitModal initialSummary={commitSummary.value} onSubmit={onCommit} onClose={onCommitCancel} />}
-          <MystState.Provider value={mystState.current}>{room.value && <MystEditorPreact />}</MystState.Provider>
+          {room.value && <MystEditorPreact />}
         </MystContainer>
       </StyleSheetManager>
     </div>
   );
 };
 
-export default ({ additionalStyles, id, ...params }, target) => {
+export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ target) => {
   if (!target.shadowRoot) {
     target.attachShadow({
       mode: "open",
@@ -527,5 +525,13 @@ export default ({ additionalStyles, id, ...params }, target) => {
   });
   observer.observe(target.parentElement, { childList: true });
 
-  render(<MystEditorGit {...{ ...params, id: editorId }} />, target.shadowRoot);
+  const state = createMystState({ id: editorId, ...params, collaboration: { ...params.collaboration, mode: "manual" } });
+  window.myst_editor[editorId].state = state;
+
+  render(
+    <MystState.Provider value={state}>
+      <MystEditorGit {...{ ...params, id: editorId }} />
+    </MystState.Provider>,
+    target.shadowRoot,
+  );
 };

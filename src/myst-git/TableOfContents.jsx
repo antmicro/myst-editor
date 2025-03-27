@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import { getLineById } from "../markdown/markdownSourceMap";
 import { EditorView } from "codemirror";
-import { useMemo } from "preact/hooks";
+import { useContext, useMemo } from "preact/hooks";
+import { MystState } from "../mystState";
 
 const List = styled.div`
   font-size: 12px;
@@ -100,16 +101,17 @@ function Heading({ heading }) {
   );
 }
 
-export const TableOfContents = ({ index, docsRoot, currentFile, mystState, onFileClick, files }) => {
+export const TableOfContents = ({ index, docsRoot, currentFile, onFileClick, files }) => {
+  const { text, editorView } = useContext(MystState);
   const parsedFiles = useMemo(() => indexToFiles({ docsRoot, index, files }), [docsRoot, index, files]);
 
   function handleHeadingClick(ev) {
     const lineId = ev.target?.getAttribute("data-heading-id");
     if (!lineId) return;
-    const lineNum = getLineById(mystState.text.lineMap, lineId);
+    const lineNum = getLineById(text.lineMap, lineId);
     if (!lineNum) return;
-    const line = mystState.editorView.value.state.doc.line(lineNum);
-    mystState.editorView.value.dispatch({
+    const line = editorView.value.state.doc.line(lineNum);
+    editorView.value.dispatch({
       selection: { anchor: line.to, head: line.to },
       effects: EditorView.scrollIntoView(line.to, { y: "start" }),
     });
@@ -127,7 +129,7 @@ export const TableOfContents = ({ index, docsRoot, currentFile, mystState, onFil
               </span>
               {currentFile.startsWith(f.file) && (
                 <ul id="headings" onClick={handleHeadingClick}>
-                  {mystState.text.headings.value.map((h) => (
+                  {text.headings.value.map((h) => (
                     <Heading heading={h} key={h.lineId} />
                   ))}
                 </ul>
