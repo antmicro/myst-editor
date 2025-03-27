@@ -41,6 +41,7 @@ import { yamlSchema } from "./yamlSchema";
 import { CollaborationClient } from "../collaboration";
 import { inlinePreview } from "./inlinePreview";
 import { Autolink } from "@lezer/markdown";
+import { colonFencedCodeParser } from "./lezerMarkdownExtensions";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -127,7 +128,7 @@ export class ExtensionBuilder {
   static defaultPlugins() {
     return [
       EditorView.lineWrapping,
-      markdown({ codeLanguages: this.codeLanguage, addKeymap: false, extensions: [Autolink] }),
+      markdown({ codeLanguages: this.codeLanguage, addKeymap: false, extensions: [Autolink, colonFencedCodeParser] }),
       highlightActiveLine(),
       keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
     ];
