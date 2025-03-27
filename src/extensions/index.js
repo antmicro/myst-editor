@@ -40,7 +40,7 @@ import { lintKeymap } from "@codemirror/lint";
 import { yamlSchema } from "./yamlSchema";
 import { CollaborationClient } from "../collaboration";
 import { inlinePreview } from "./inlinePreview";
-import { Autolink } from "@lezer/markdown";
+import { Autolink, TaskList } from "@lezer/markdown";
 import { colonFencedCodeParser } from "./lezerMarkdownExtensions";
 
 const getRelativeCursorLocation = (view) => {
@@ -128,7 +128,7 @@ export class ExtensionBuilder {
   static defaultPlugins() {
     return [
       EditorView.lineWrapping,
-      markdown({ codeLanguages: this.codeLanguage, addKeymap: false, extensions: [Autolink, colonFencedCodeParser] }),
+      markdown({ codeLanguages: this.codeLanguage, addKeymap: false, extensions: [Autolink, colonFencedCodeParser, TaskList] }),
       highlightActiveLine(),
       keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
     ];

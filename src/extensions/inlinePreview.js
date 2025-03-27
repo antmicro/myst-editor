@@ -18,6 +18,7 @@ const markdownHighlightStyle = HighlightStyle.define([
   { tag: tags.emphasis, ...baseFont, fontStyle: "italic" },
   { tag: tags.strong, ...baseFont, fontWeight: "bold" },
   { tag: tags.monospace, ...baseFont, fontFamily: "monospace" },
+  { tag: tags.atom, ...baseFont, fontFamily: "monospace" },
   { tag: tags.content, ...baseFont },
   { tag: tags.meta, color: "darkgrey" },
 ]);
@@ -37,7 +38,7 @@ const nodeInSelection = (state, node) =>
     (r) => (r.from >= node.from && r.from <= node.to) || (r.to >= node.from && r.to <= node.to) || (node.from >= r.from && node.to <= r.to),
   );
 
-const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image"];
+const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task"];
 const renderedInlineNodes = ["Link", "URL", "InlineCode"];
 class RenderedMarkdownWidget extends WidgetType {
   constructor(src, textManager, isBlock) {
@@ -60,7 +61,7 @@ class RenderedMarkdownWidget extends WidgetType {
   }
 
   ignoreEvent(ev) {
-    return ev.type === "mousedown" && ev.ctrlKey;
+    return ev.type === "mousedown" && ev.ctrlKey && ev.target.tagName != "INPUT";
   }
 }
 
@@ -74,9 +75,18 @@ function replaceMd(state, textManager) {
       if (!isBlock && !renderedInlineNodes.includes(node.name)) return;
       if (nodeInSelection(state, node)) return false;
 
-      const line = state.doc.lineAt(node.from);
-      const from = isBlock ? line.from : node.from;
-      const src = state.doc.sliceString(from, node.to);
+      const lineFrom = state.doc.lineAt(node.from);
+      const lineTo = state.doc.lineAt(node.to);
+      const isMultiline = isBlock && lineTo.number > lineFrom.number;
+      const fromOffset = node.from - lineFrom.from;
+      let src = state.doc.sliceString(node.from, node.to);
+      if (isMultiline && fromOffset > 0) {
+        src = src
+          .split("\n")
+          .map((line, i) => (i == 0 ? line : line.slice(fromOffset)))
+          .join("\n");
+      }
+
       const decoration = Decoration.replace({
         widget: new RenderedMarkdownWidget(src, textManager, isBlock),
       });
@@ -162,8 +172,19 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
       decorations: (v) => v.decorations,
       eventHandlers: {
         mousedown(ev, view) {
-          if (ev.target instanceof Element && ev.target.matches(".cm-inline-rendered-md *")) {
-            ev.preventDefault();
+          if (!(ev.target instanceof Element) || !ev.target.matches(".cm-inline-rendered-md *")) return;
+
+          ev.preventDefault();
+          if (ev.target.tagName == "INPUT" && ev.ctrlKey) {
+            // Toggle checkbox
+            const line = view.state.doc.lineAt(view.posAtDOM(ev.target));
+            const statusIdx = line.text.indexOf("[") + 1;
+            const from = line.from + statusIdx;
+            const to = from + 1;
+            const current = line.text.slice(statusIdx, statusIdx + 1);
+            const newStatus = current == " " ? "x" : " ";
+            view.dispatch({ changes: { from, to, insert: newStatus } });
+          } else {
             view.dispatch({ selection: { anchor: view.posAtDOM(ev.target) } });
           }
         },
