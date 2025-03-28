@@ -40,9 +40,8 @@ import { lintKeymap } from "@codemirror/lint";
 import { yamlSchema } from "./yamlSchema";
 import { CollaborationClient } from "../collaboration";
 import { inlinePreview } from "./inlinePreview";
-import { Autolink, Table, TaskList } from "@lezer/markdown";
-import { colonFencedCodeParser } from "./lezerMarkdownExtensions";
-import { tags } from "@lezer/highlight";
+import { Autolink, TaskList } from "@lezer/markdown";
+import { colonFencedCodeParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -132,21 +131,7 @@ export class ExtensionBuilder {
       markdown({
         codeLanguages: this.codeLanguage,
         addKeymap: false,
-        extensions: [
-          Autolink,
-          colonFencedCodeParser,
-          TaskList,
-          {
-            defineNodes: [
-              { name: "Table", block: true },
-              { name: "TableHeader", style: { "TableHeader/...": tags.monospace } },
-              "TableRow",
-              { name: "TableCell", style: tags.monospace },
-              { name: "TableDelimiter", style: tags.monospace },
-            ],
-            parseBlock: Table.parseBlock,
-          },
-        ],
+        extensions: [Autolink, colonFencedCodeParser, TaskList, tableParser, roleParser],
       }),
       highlightActiveLine(),
       keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),

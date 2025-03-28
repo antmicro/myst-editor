@@ -1,5 +1,6 @@
 // https://github.com/lezer-parser/markdown/blob/main/src/markdown.ts
-import { Element } from "@lezer/markdown";
+import { tags } from "@lezer/highlight";
+import { Element, Table } from "@lezer/markdown";
 
 const Type = {
   FencedCode: 3,
@@ -74,3 +75,36 @@ function addCodeText(marks, from, to) {
   if (last >= 0 && marks[last].to == from && marks[last].type == Type.CodeText) marks[last].to = to;
   else marks.push(elt(Type.CodeText, from, to));
 }
+
+export const tableParser = {
+  defineNodes: [
+    { name: "Table", block: true },
+    { name: "TableHeader", style: { "TableHeader/...": tags.monospace } },
+    "TableRow",
+    { name: "TableCell", style: tags.monospace },
+    { name: "TableDelimiter", style: tags.monospace },
+  ],
+  parseBlock: Table.parseBlock,
+};
+
+export const roleParser = {
+  /** @type {import("@lezer/markdown").NodeSpec[]} */
+  defineNodes: [{ name: "Role", style: tags.monospace }],
+  /** @type {import("@lezer/markdown").InlineParser[]} */
+  parseInline: [
+    {
+      parse(cx, next, start) {
+        if (next != 123 /* '{' */ || (start && cx.char(start - 1) == 123)) return -1;
+        let pos = start + 1;
+        while (pos < cx.end && cx.char(pos) != 125 /* '}' */) pos++;
+        if (pos == cx.end || cx.char(pos + 1) != 96 /* '`' */) return -1;
+        pos += 2;
+        while (pos < cx.end && cx.char(pos) != 96 /* '`' */) pos++;
+        if (cx.char(pos) != 96) return -1;
+
+        return cx.addElement(cx.elt("Role", start, pos + 1));
+      },
+      before: "InlineCode",
+    },
+  ],
+};
