@@ -26,11 +26,18 @@ const Topbar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box;
 
   .side {
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
+
+    &:last-child {
+      flex-shrink: 0;
+    }
   }
 
   .btns {

@@ -313,11 +313,12 @@ test.describe.parallel("With collaboration enabled", () => {
       await addComment(pageA, 3, "2");
 
       // Drag the comment
-      const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+      let placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
       const from = (await placesForCommentA[1].boundingBox()) as { x: number; y: number; width: number; height: number };
-      const to = (await placesForCommentA[3].boundingBox()) as { x: number; y: number; width: number; height: number };
       await pageA.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
       await pageA.mouse.down();
+      placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+      const to = (await placesForCommentA[3].boundingBox()) as { x: number; y: number; width: number; height: number };
       await pageA.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 100 });
       await pageA.mouse.up();
 
