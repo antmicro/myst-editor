@@ -34,10 +34,15 @@ const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", 
 const tokenHidden = ["HardBreak", "EmphasisMark"];
 const decorationHidden = Decoration.replace({});
 const decorationOrderedListNum = Decoration.mark({ class: "cm-inline-ordered-list-marker" });
+const decorationMonospace = Decoration.mark({ class: "cm-inline-mono" });
 const nodeInSelection = (state, node) =>
-  state.selection.ranges.some(
-    (r) => (r.from >= node.from && r.from <= node.to) || (r.to >= node.from && r.to <= node.to) || (node.from >= r.from && node.to <= r.to),
-  );
+  state.selection.ranges.some((r) => {
+    const rFrom = state.doc.lineAt(r.from).number;
+    const rTo = state.doc.lineAt(r.to).number;
+    const nodeFrom = state.doc.lineAt(node.from).number;
+    const nodeTo = state.doc.lineAt(node.to).number;
+    return (rFrom >= nodeFrom && rFrom <= nodeTo) || (rTo >= nodeFrom && rTo <= nodeTo) || (nodeFrom >= rFrom && nodeTo <= rTo);
+  });
 
 const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task"];
 const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
@@ -133,7 +138,11 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
             from,
             to,
             enter(node) {
-              if ((node.name.startsWith("ATXHeading") || tokenElement.includes(node.name)) && nodeInSelection(view.state, node)) {
+              if (node.name.startsWith("ATXHeading") && nodeInSelection(view.state, node)) return false;
+              if (tokenElement.includes(node.name) && nodeInSelection(view.state, node)) {
+                const startLine = view.state.doc.lineAt(node.from);
+                const endLine = view.state.doc.lineAt(node.to);
+                widgets.push(decorationMonospace.range(startLine.from, endLine.to));
                 return false;
               }
 
@@ -164,6 +173,15 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
             },
           });
         }
+
+        view.state.selection.ranges.forEach((r) => {
+          const startLine = view.state.doc.lineAt(r.from);
+          const endLine = view.state.doc.lineAt(r.to);
+          if (startLine.from != endLine.to) {
+            widgets.push(decorationMonospace.range(startLine.from, endLine.to));
+          }
+        });
+        widgets.sort((w1, w2) => w1.from - w2.from);
 
         return Decoration.set(widgets);
       }

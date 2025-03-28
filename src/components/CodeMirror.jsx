@@ -250,6 +250,13 @@ const CodeEditor = styled.div`
       margin-bottom: 0;
     }
   }
+
+  .cm-inline-mono * {
+    font-family: monospace !important;
+    line-height: 1.3em !important;
+    font-weight: normal !important;
+    font-size: 16px !important;
+  }
 `;
 
 const CodeMirror = ({ setUsers }) => {
