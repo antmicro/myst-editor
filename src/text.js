@@ -5,7 +5,7 @@ import newDirectives from "./markdown/markdownDirectives";
 import { markdownReplacer, useCustomDirectives, useCustomRoles } from "./markdown/markdownReplacer";
 import markdownMermaid from "./markdown/markdownMermaid";
 import markdownSourceMap from "./markdown/markdownSourceMap";
-import { checkLinks, linkTitle } from "./markdown/markdownLinks";
+import { checkLinks } from "./markdown/markdownLinks";
 import { colonFencedBlocks } from "./markdown/markdownFence";
 import { markdownItMapUrls } from "./markdown/markdownUrlMapping";
 import { backslashLineBreakPlugin } from "./markdown/markdownLineBreak";
@@ -61,7 +61,6 @@ export class TextManager {
         .use(markdownCheckboxes)
         .use(markdownTableOfContents, this.headingsPerChunk);
       if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
-      if (options.mode.value === "Inline") md.use(linkTitle, "Follow link (Ctrl + click)");
       userSettings.value.filter((s) => s.enabled && s.markdown).forEach((s) => md.use(s.markdown));
 
       return md;

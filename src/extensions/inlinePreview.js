@@ -67,7 +67,7 @@ class RenderedMarkdownWidget extends WidgetType {
   }
 
   ignoreEvent(ev) {
-    return ev.type === "mousedown" && ev.ctrlKey && ev.target.tagName != "INPUT";
+    return ev.type == "mousedown" && (ev.target.tagName == "A" || ev.target.parentNode?.tagName == "A");
   }
 }
 
@@ -194,7 +194,7 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
           if (!(ev.target instanceof Element) || !ev.target.matches(".cm-inline-rendered-md *")) return;
 
           ev.preventDefault();
-          if (ev.target.tagName == "INPUT" && ev.ctrlKey) {
+          if (ev.target.tagName == "INPUT") {
             // Toggle checkbox
             const line = view.state.doc.lineAt(view.posAtDOM(ev.target));
             const statusIdx = line.text.indexOf("[") + 1;
