@@ -133,7 +133,7 @@ function scrollEditorToLine(elem, preview, line, editor) {
   return { canScroll, editorParent };
 }
 
-function findSoruceMappedPreviousElement(startingElem) {
+export function findSoruceMappedPreviousElement(startingElem) {
   let elem = startingElem;
   while (elem != null) {
     const id = elem.getAttribute("data-line-id");

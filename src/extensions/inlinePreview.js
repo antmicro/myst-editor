@@ -4,6 +4,8 @@ import { tags } from "@lezer/highlight";
 import { EditorView } from "codemirror";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
 import { RangeSet, StateField } from "@codemirror/state";
+import { findSoruceMappedPreviousElement } from "./syncDualPane";
+import { getLineById } from "../markdown/markdownSourceMap";
 
 const previewFont = "Lato";
 const baseFont = { fontFamily: previewFont, lineHeight: "1.3em" };
@@ -47,11 +49,13 @@ const nodeInSelection = (state, node) =>
 const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task"];
 const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
 class RenderedMarkdownWidget extends WidgetType {
-  constructor(src, textManager, isBlock) {
+  constructor(src, textManager, isBlock, start, end) {
     super();
     this.src = src;
     this.textManager = textManager;
     this.isBlock = isBlock;
+    this.start = start;
+    this.end = end;
   }
 
   eq(widget) {
@@ -62,7 +66,15 @@ class RenderedMarkdownWidget extends WidgetType {
     const content = document.createElement(this.isBlock ? "div" : "span");
     content.setAttribute("contenteditable", "false");
     content.className = "cm-inline-rendered-md";
-    content.innerHTML = this.isBlock ? this.textManager.md.peek().render(this.src) : this.textManager.md.peek().renderInline(this.src);
+    const md = this.textManager.md.peek();
+
+    for (let l = this.start; l <= this.end; l++) {
+      this.textManager.lineMap.delete(l);
+    }
+
+    const render = (src) =>
+      this.isBlock ? md.render(src, { lineMap: this.textManager.lineMap, startLine: this.start, chunkId: 0 }) : md.renderInline(src);
+    content.innerHTML = render(this.src);
     return content;
   }
 
@@ -94,7 +106,7 @@ function replaceMd(state, textManager) {
       }
 
       const decoration = Decoration.replace({
-        widget: new RenderedMarkdownWidget(src, textManager, isBlock),
+        widget: new RenderedMarkdownWidget(src, textManager, isBlock, lineFrom.number, lineTo.number),
       });
 
       decorations.push(decoration.range(node.from, node.to));
@@ -204,7 +216,24 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
             const newStatus = current == " " ? "x" : " ";
             view.dispatch({ changes: { from, to, insert: newStatus } });
           } else {
-            view.dispatch({ selection: { anchor: view.posAtDOM(ev.target) } });
+            let id = ev.target.getAttribute("data-line-id");
+            let elem = ev.target;
+            if (!id) {
+              // check parents and siblings
+              while (elem && elem.tagName !== "HTML-CHUNK") {
+                const parent = elem.parentElement;
+                [id, elem] = findSoruceMappedPreviousElement(elem);
+                if (id) break;
+                elem = parent;
+              }
+            }
+            if (id) {
+              const lineNumber = getLineById(text.lineMap, id);
+              const line = view.state.doc.line(lineNumber);
+              view.dispatch({ selection: { anchor: line.from } });
+            } else {
+              view.dispatch({ selection: { anchor: view.posAtDOM(ev.target) } });
+            }
           }
         },
       },
