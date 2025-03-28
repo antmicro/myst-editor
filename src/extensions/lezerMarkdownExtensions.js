@@ -108,3 +108,26 @@ export const roleParser = {
     },
   ],
 };
+
+export const customTransformsParser = (transforms) => {
+  const beginTransforms = transforms.map(({ target }) => new RegExp("^" + target.source, target.flags));
+  return {
+    /** @type {import("@lezer/markdown").NodeSpec[]} */
+    defineNodes: [{ name: "Transform", style: tags.macroName }],
+    /** @type {import("@lezer/markdown").InlineParser[]} */
+    parseInline: [
+      {
+        parse(cx, _, start) {
+          const line = cx.slice(start, cx.end);
+          for (const beginTarget of beginTransforms) {
+            const match = line.match(beginTarget);
+            if (match) {
+              return cx.addElement(cx.elt("Transform", start, start + match[0].length));
+            }
+          }
+          return -1;
+        },
+      },
+    ],
+  };
+};

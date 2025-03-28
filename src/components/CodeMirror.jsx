@@ -267,7 +267,7 @@ const CodeMirror = ({ setUsers }) => {
       root: options.parent,
       state: EditorState.create({
         doc: text.text.peek(),
-        extensions: ExtensionBuilder.basicSetup().useHighlighter(options.transforms.value).readonly().create(),
+        extensions: ExtensionBuilder.basicSetup().useMarkdown(options.transforms.value).readonly().create(),
       }),
       parent: editorMountpoint.current,
     });
@@ -313,7 +313,7 @@ const CodeMirror = ({ setUsers }) => {
       root: options.parent,
       doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.text.peek(),
       extensions: setup
-        .useHighlighter(options.transforms.value)
+        .useMarkdown(options.transforms.value)
         .useCompartment(suggestionCompartment, customHighlighter([]))
         .useCompartment(userExtensionsCompartment, [])
         .useSpellcheck(options.spellcheckOpts.value)

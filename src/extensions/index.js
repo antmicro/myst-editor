@@ -41,7 +41,7 @@ import { yamlSchema } from "./yamlSchema";
 import { CollaborationClient } from "../collaboration";
 import { inlinePreview } from "./inlinePreview";
 import { Autolink, TaskList } from "@lezer/markdown";
-import { colonFencedCodeParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
+import { colonFencedCodeParser, customTransformsParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -126,16 +126,18 @@ export class ExtensionBuilder {
   }
 
   static defaultPlugins() {
-    return [
-      EditorView.lineWrapping,
+    return [EditorView.lineWrapping, highlightActiveLine(), keymap.of([indentWithTab, { key: "Mod-Z", run: redo }])];
+  }
+
+  useMarkdown(transforms) {
+    this.extensions.push(
       markdown({
         codeLanguages: this.codeLanguage,
         addKeymap: false,
-        extensions: [Autolink, colonFencedCodeParser, TaskList, tableParser, roleParser],
+        extensions: [Autolink, colonFencedCodeParser, TaskList, tableParser, roleParser, customTransformsParser(transforms)],
       }),
-      highlightActiveLine(),
-      keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
-    ];
+    );
+    return this;
   }
 
   disable(keys) {

@@ -15,6 +15,7 @@ const markdownHighlightStyle = HighlightStyle.define([
   { tag: tags.heading4, ...baseHeading, fontSize: "1.15em" },
   { tag: tags.link, ...baseFont, textDecoration: "underline", color: "var(--blue-500)" },
   { tag: tags.url, ...baseFont, textDecoration: "underline", color: "var(--blue-500)" },
+  { tag: tags.macroName, ...baseFont, color: "var(--blue-500)" },
   { tag: tags.emphasis, ...baseFont, fontStyle: "italic" },
   { tag: tags.strong, ...baseFont, fontWeight: "bold" },
   { tag: tags.monospace, ...baseFont, fontFamily: "monospace" },
@@ -39,7 +40,7 @@ const nodeInSelection = (state, node) =>
   );
 
 const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task"];
-const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role"];
+const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
 class RenderedMarkdownWidget extends WidgetType {
   constructor(src, textManager, isBlock) {
     super();
