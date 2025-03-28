@@ -30,7 +30,7 @@ const markdownTheme = EditorView.theme({
   ".cm-inline-ordered-list-marker *": { color: "black !important" },
 });
 
-const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Image"];
+const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Image", "Blockquote"];
 const tokenHidden = ["HardBreak", "EmphasisMark"];
 const decorationHidden = Decoration.replace({});
 const decorationOrderedListNum = Decoration.mark({ class: "cm-inline-ordered-list-marker" });
