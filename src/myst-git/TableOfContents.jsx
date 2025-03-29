@@ -71,12 +71,15 @@ const indexToFiles = ({ docsRoot, index, files }) => {
   let file = index.slice(index.indexOf(start) + start.length);
   if (!file.includes("```")) return;
   file = file.slice(0, file.indexOf("```"));
+  let prefix = docsRoot;
+  if (prefix === "." || prefix === "./") prefix = ""; // these 3 should be equivalent meaning "top-level dir"
+  if (prefix !== "") prefix += "/"; // unless in top-level dir, add slash to at end
   return file
     .split("\n")
     .map((l) => l.trim())
     .filter((l) => l && !l.startsWith(":"))
-    .map((f) => ({ file: `${docsRoot}/${f}`, title: fileToTitle(f) }))
-    .filter((f) => files.some((file) => file.startsWith(f.file)));
+    .map((f) => ({ file: prefix + f, title: fileToTitle(f) }))
+    .filter((f) => files.some((file) => file.split(".md")[0] === f.file));
 };
 
 function Heading({ heading }) {
