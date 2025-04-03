@@ -273,24 +273,28 @@ const MystEditorGit = ({
     });
   };
 
-  const gotoRoomFromUrl = async () => {
-    if (!branches.value.includes(initialState.branch)) {
-      branches.value = [initialState.branch, ...branches.value];
+  const gotoInitialRoom = async () => {
+    const currBranch = initialState.branch ?? branches.peek()[0];
+    if (!branches.value.includes(currBranch)) {
+      branches.value = [currBranch, ...branches.value];
     }
 
-    let resolvedCommits = await getCommits(initialState.branch, 1);
-    if (!resolvedCommits.some((c) => c.hash == initialState.commit.hash)) {
-      resolvedCommits.push(initialState.commit);
+    const resolvedCommits = await getCommits(currBranch, 1);
+    const currCommit = initialState.commit ?? resolvedCommits[0];
+    if (!resolvedCommits.some((c) => c.hash == currCommit.hash)) {
+      resolvedCommits.push(currCommit);
     }
-    const resolvedFiles = await getFiles(initialState.branch, initialState.commit);
-    const text = await getText(initialState.branch, initialState.commit, initialState.file);
+
+    const resolvedFiles = await getFiles(currBranch, currCommit);
+    const currFile = initialState.file && resolvedFiles.includes(initialState.file) ? initialState.file : resolvedFiles[0];
+    const text = await getText(currBranch, currCommit, currFile);
 
     batch(() => {
-      branch.value = initialState.branch;
+      branch.value = currBranch;
       commits.value = resolvedCommits;
-      commit.value = initialState.commit;
+      commit.value = currCommit;
       files.value = resolvedFiles;
-      file.value = initialState.file;
+      file.value = currFile;
       initialText.value = text;
     });
   };
@@ -298,7 +302,7 @@ const MystEditorGit = ({
   // Since we need to make some async calls, we cannot just pass initial values to signals
   useEffect(() => {
     if (initialState) {
-      gotoRoomFromUrl(initialState);
+      gotoInitialRoom(initialState);
     } else {
       switchBranch(initialBranches[0]);
     }
