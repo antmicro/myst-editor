@@ -28,7 +28,6 @@ const markdownHighlightStyle = HighlightStyle.define([
 const markdownTheme = EditorView.theme({
   "&": { fontSize: "16px" },
   ".cm-inline-bullet *": { display: "none" },
-  ":is(.cm-widgetBuffer:has(+ .cm-inline-rendered-md), .cm-inline-rendered-md + .cm-widgetBuffer)": { display: "none" },
   ".cm-inline-ordered-list-marker *": { color: "black !important" },
 });
 
