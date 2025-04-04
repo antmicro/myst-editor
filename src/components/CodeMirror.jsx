@@ -290,12 +290,12 @@ const CodeMirror = ({ setUsers }) => {
       });
     }
 
-    const setup = options.mode.value === "Inline" ? ExtensionBuilder.inlinePreviewSetup() : ExtensionBuilder.basicSetup();
     const startState = EditorState.create({
       root: options.parent,
       doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.text.peek(),
-      extensions: setup
+      extensions: ExtensionBuilder.basicSetup()
         .useMarkdown(options.transforms.value)
+        .if(options.mode.value !== "Inline", (b) => b.useLineNumbers().useGutterActiveHighlight())
         .useCompartment(suggestionCompartment, customHighlighter([]))
         .useCompartment(userExtensionsCompartment, [])
         .useSpellcheck(options.spellcheckOpts.value)

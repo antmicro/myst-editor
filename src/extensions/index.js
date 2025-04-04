@@ -79,29 +79,8 @@ export class ExtensionBuilder {
     ]);
   }
 
-  static inlinePreviewSetup() {
-    return new ExtensionBuilder([
-      highlightSpecialChars(),
-      foldGutter(),
-      drawSelection(),
-      dropCursor(),
-      EditorState.allowMultipleSelections.of(true),
-      indentOnInput(),
-      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-      bracketMatching(),
-      autocompletion(),
-      rectangularSelection(),
-      crosshairCursor(),
-      highlightActiveLine(),
-      highlightSelectionMatches(),
-      keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, ...foldKeymap, ...completionKeymap, ...lintKeymap]),
-    ]);
-  }
-
   static basicSetup() {
     return new ExtensionBuilder([
-      lineNumbers(),
-      highlightActiveLineGutter(),
       highlightSpecialChars(),
       foldGutter(),
       drawSelection(),
@@ -137,6 +116,16 @@ export class ExtensionBuilder {
         extensions: [Autolink, colonFencedCodeParser, TaskList, tableParser, roleParser, customTransformsParser(transforms)],
       }),
     );
+    return this;
+  }
+
+  useLineNumbers() {
+    this.base.unshift(lineNumbers());
+    return this;
+  }
+
+  useGutterActiveHighlight() {
+    this.extensions.push(highlightActiveLineGutter());
     return this;
   }
 
