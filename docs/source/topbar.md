@@ -55,6 +55,7 @@ Starting from the left, the buttons serve the following functions:
 - `Source` - only show the Markdown source code
 - `Preview` - only show a rendered document preview
 - `Dual Pane` - **(default)** - show Markdown on the left and a rendered preview on the right
+- `Inline Preview` - a hybrid mode combining both the Markdown source and rendered content
 
 :::{figure-md} view-mode-buttons-expanded
 ![Additional View Modes](./assets/view-btns-expanded.png)
