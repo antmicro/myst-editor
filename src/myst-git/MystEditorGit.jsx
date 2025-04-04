@@ -532,13 +532,14 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   const fileLinkTransform = {
     target: /\[\[(.+)\]\]/g,
     transform: async (input, file) => {
+      const fileFull = file + ".md";
       const files = window.myst_editor[editorId].git.files.peek();
-      if (!files.includes(file)) return `<span title="Invalid file path">${input}</span>`;
-      const text = await params.getText(window.myst_editor[editorId].git.branch.peek(), window.myst_editor[editorId].git.commit.peek(), file);
+      if (!files.includes(fileFull)) return `<span title="Invalid file path">${input}</span>`;
+      const text = await params.getText(window.myst_editor[editorId].git.branch.peek(), window.myst_editor[editorId].git.commit.peek(), fileFull);
       const heading = text.match(/^# .+$/gm);
       const fileName = heading ? heading[0].slice(2) : file;
 
-      return `<a href="#" title="Switch to file" data-file-link="${file}">${fileName}</a>`;
+      return `<a href="#" title="Switch to file" data-file-link="${fileFull}">${fileName}</a>`;
     },
   };
 
