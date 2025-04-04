@@ -191,6 +191,7 @@ Here are the options you can pass to the MystEditor function:
   If the option is not set, nothing will be folded by default.
 - `mapUrl` *(default: (tag, url) => url)* - function used to map `href` and `src` attributes. Tag is the name of the HTML element and url is the source url you can transform.
 - `yamlSchema` - must be an absoulte URL. If provided, a language server will launch in the background to provide tooltips, diagnostics and autocompletions based on the schema in YAML code blocks.
+- `onPreviewClick` *(`(ev: MouseEvent) => boolean`)* - callback for when the preview is clicked, if the builtin click actions should be skipped, it should return `true`
 
 Also see [the demo HTML](./src/index.html) for an example on how you can set these options.
 Using `window.myst_editor` or the return value of the `MystEditor` function, you can modify these options at runtime.

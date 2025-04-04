@@ -145,6 +145,7 @@ const MystEditor = () => {
                 ref={preview}
                 mode={options.mode.value}
                 onClick={(ev) => {
+                  if (options.onPreviewClick.value?.(ev)) return;
                   syncCheckboxes(ev, text.lineMap, editorView.value);
                   if (options.syncScroll.value && options.mode.value == "Both")
                     handlePreviewClickToScroll(ev, text.lineMap, preview, editorView.value);

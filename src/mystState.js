@@ -187,6 +187,7 @@ const defaults = {
   unfoldedHeadings: null,
   mapUrl: (tag, url) => url,
   yamlSchema: null,
+  onPreviewClick: () => {},
 };
 
 export function createMystState(/** @type {typeof defaults} */ opts) {
