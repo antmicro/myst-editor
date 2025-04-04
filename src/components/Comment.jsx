@@ -192,6 +192,7 @@ const YCommentPopup = styled.div`
   z-index: 30000000;
   left: ${(props) => -props.left - 13}px;
   top: ${(props) => -props.shift}px;
+  transform: translateY(-50%);
   box-shadow: 0 0 3px #ccc;
   box-sizing: content-box;
 

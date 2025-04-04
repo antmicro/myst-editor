@@ -343,10 +343,10 @@ export class YComments {
     let elem;
     if (this.display().isShown(commentId)) {
       elem = this.mainCodeMirror.dom.querySelector("#" + commentId)?.previousSibling;
-      if (elem) return elem.clientHeight + 5;
+      if (elem) return elem.clientHeight / 2;
     } else {
       elem = this.mainCodeMirror.dom.querySelector("#" + commentId)?.parentElement;
-      if (elem) return elem.clientHeight;
+      if (elem) return (elem.clientHeight - 8) / 2;
     }
 
     let parentLineNumber = this.positionManager.get(commentId);
