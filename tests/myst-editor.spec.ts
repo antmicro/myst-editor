@@ -616,7 +616,7 @@ test.describe.parallel("MystEditorGit wrapper", () => {
 
     await pageA.getByTitle("Commit").click();
     // Check if document is locked for the other user
-    expect(await pageB.getByText("A commit is being prepared").count()).not.toEqual(0);
+    await pageB.getByText("A commit is being prepared").waitFor();
 
     // Check if text used for commit contains the changes
     const textA = await pageA.evaluate((id) => window.myst_editor[id].text, id);

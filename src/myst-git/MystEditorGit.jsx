@@ -1,12 +1,12 @@
-import { MystEditorPreact, defaultButtons } from "../MystEditor";
+import { MystEditorPreact, CollaborationClient } from "../MystEditor";
 import { render } from "preact";
 import { useContext, useEffect, useRef } from "preact/hooks";
-import { batch, useComputed, useSignal, useSignalEffect } from "@preact/signals";
+import { batch, effect, useComputed, useSignal, useSignalEffect } from "@preact/signals";
 import { createMystState, MystState } from "../mystState";
 import styled, { StyleSheetManager } from "styled-components";
 import Select from "./Select";
 import * as Y from "yjs";
-import CommitModal, { Popup } from "./CommitModal";
+import CommitModal from "./CommitModal";
 import { useWatchChanges } from "./useWatchChanges";
 import { MystCSSVars } from "../styles/MystStyles";
 import { TableOfContents } from "./TableOfContents";
@@ -88,7 +88,7 @@ const ChangeHistory = styled.div`
   }
 `;
 
-const Toast = styled(Popup)`
+const Toast = styled.div`
   background-color: white;
   position: absolute;
   top: 10px;
@@ -159,7 +159,8 @@ const MystEditorGit = ({
   const commentStateToApply = useRef(null);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
   const indexFile = useSignal();
-  const { collab, options, editorView } = useContext(MystState);
+  const { collab, options } = useContext(MystState);
+  const commitDocuments = useRef(null);
 
   useEffect(() => {
     window.myst_editor[props.id].git = { branch, commits, commit, files, file, initialText, room };
@@ -185,49 +186,92 @@ const MystEditorGit = ({
   const commitButton = {
     tooltip: "Commit",
     icon: CommitIcon,
-    action: () => {
-      const textChanged = editorView.value.state.doc.toString() != initialText.value;
-      if (!textChanged) {
+    action: async () => {
+      options.includeButtons.value = options.includeButtons.peek().filter((b) => b.tooltip != "Commit");
+      const changedFiles = docsWithChanges
+        .peek()
+        .filter((d) => d.branch === branch.peek() && d.commitHash === commit.peek().hash)
+        .map(({ file }) => file);
+      const otherFiles = changedFiles.filter((f) => f !== file.peek());
+      let documents = await setupFileConnections(repo, props, branch.peek(), commit.peek().hash, otherFiles, getText);
+      if (otherFiles.length < changedFiles.length) {
+        documents.unshift({
+          client: collab.peek(),
+          file: file.peek(),
+          initialText: initialText.peek(),
+          text: collab.peek().ytext.toString(),
+        });
+      }
+      documents = documents.map((d) => ({ ...d, textChanged: d.text != d.initialText, commentCount: d.client.ycomments.comments.peek().length }));
+      const unchangedDocs = documents.filter((d) => !d.textChanged && d.commentCount == 0);
+      cleanupConnections(unchangedDocs, collab);
+      documents = documents.filter((d) => d.textChanged || d.commentCount > 0);
+      if (!documents.some((d) => d.textChanged)) {
         toastNotify({ text: "No changes to commit" });
+        options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
         return;
       }
-      options.includeButtons.value = defaultButtons;
-      collab.value.lock("A commit is being prepared for this document");
-      commitSummary.value = `MyST: update docs ${file.value}`;
+      documents.forEach(({ client }) => client.lock("A commit is being prepared for this document"));
+      commitDocuments.current = documents;
+      commitSummary.value = `MyST: update docs ${documents.map(({ file }) => file).join(", ")}`;
     },
   };
-  async function onCommit({ summary, message }) {
+  async function onCommit({ summary, message, stagedDocs }) {
+    let newConnections = [];
     try {
       commitSummary.value = null;
-      const { hash, webUrl } = await commitChanges(message);
+      const { hash, webUrl } = await commitChanges(
+        message,
+        commitDocuments.current.filter((d) => d.textChanged && stagedDocs.includes(d.file)),
+      );
       // Let the server know the changes have been commited
       if (!statusSocket.current || statusSocket.current.readyState !== 1) {
         console.warn("Document statuses not available");
       } else {
-        statusSocket.current.send(room.peek());
+        // Let the server know the changes have been commited (also includes comments)
+        commitDocuments.current
+          .filter((d) => (d.textChanged && stagedDocs.includes(d.file)) || (!d.textChanged && d.commentCount > 0))
+          .forEach(({ client }) => statusSocket.current.send(client.provider.roomname));
       }
+      // Store comment information for the other files, do not include comments from files where text changed but were not committed
+      const commentStates = commitDocuments.current
+        .filter((d) => d.client != collab.peek() && d.commentCount > 0 && (!d.textChanged || stagedDocs.includes(d.file)))
+        .reduce((states, { client, file }) => ({ ...states, [file]: client.ycomments.encodeState() }), {});
+      // Store comments for this file
       commentStateToApply.current = collab.value.ycomments.encodeState();
       toastNotify({ text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } });
-      collab.value.provider.awareness.setLocalStateField("newCommit", { hash, message: summary });
-      collab.value.unlock();
+      commitDocuments.current.forEach(({ client }) => client.provider.awareness.setLocalStateField("newCommit", { hash, message: summary }));
+      cleanupConnections(commitDocuments.current, collab);
+      commitDocuments.current = null;
+
       switchCommit({ hash, message: summary }, true);
+
+      // Move comments over in other files
+      newConnections = await setupFileConnections(repo, props, branch.peek(), hash, Object.keys(commentStates));
+      newConnections.forEach(({ client, file }) => client.ycomments.applyState(commentStates[file]));
     } catch (error) {
       console.error(error);
       toastNotify({ text: `Error occured while commiting: ${error}` });
-      options.includeButtons.value = [...defaultButtons, commitButton];
-      collab.value.unlock();
+      options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
+      cleanupConnections(commitDocuments.current, collab);
+      commitDocuments.current = null;
+    } finally {
+      cleanupConnections(newConnections, collab);
     }
   }
   function onCommitCancel() {
     commitSummary.value = null;
-    options.includeButtons.value = [...defaultButtons, commitButton];
-    collab.value.unlock();
+    options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
+    cleanupConnections(commitDocuments.current, collab);
+    commitDocuments.current = null;
   }
   useSignalEffect(() => {
     if (commit.value?.hash == commits.value[0]?.hash) {
-      options.includeButtons.value = [...defaultButtons, commitButton];
+      if (!options.includeButtons.peek().some((b) => b.tooltip == "Commit")) {
+        options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
+      }
     } else {
-      options.includeButtons.value = defaultButtons;
+      options.includeButtons.value = options.includeButtons.peek().filter((b) => b.tooltip != "Commit");
     }
   });
 
@@ -488,7 +532,13 @@ const MystEditorGit = ({
               </button>
             </Toast>
           )}
-          {commitSummary.value && <CommitModal initialSummary={commitSummary.value} onSubmit={onCommit} onClose={onCommitCancel} />}
+          <CommitModal
+            initialSummary={commitSummary.value}
+            onSubmit={onCommit}
+            onClose={onCommitCancel}
+            documents={commitDocuments.current?.filter?.((d) => d.textChanged) ?? []}
+            parent={props.parent}
+          />
           {room.value && <MystEditorPreact />}
         </MystContainer>
       </StyleSheetManager>
@@ -574,3 +624,34 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
     target.shadowRoot,
   );
 };
+
+async function setupFileConnections(repo, props, branch, commitHash, files, getText) {
+  return await Promise.all(
+    files.map(
+      (file) =>
+        new Promise(async (res) => {
+          const initialText = getText ? await getText(branch, { hash: commitHash }, file) : null;
+          const client = new CollaborationClient(
+            {
+              wsUrl: props.collaboration.wsUrl,
+              room: `${repo}/${branch}/${commitHash}/${file}`,
+              mode: "websocket",
+              commentsEnabled: true,
+            },
+            { id: props.id },
+          );
+          effect(() => {
+            if (!client.ready.value) return;
+            res({ client, file, text: client.ytext.toString(), initialText });
+          });
+        }),
+    ),
+  );
+}
+
+function cleanupConnections(documents, currClient) {
+  documents.forEach(({ client }) => {
+    client.unlock();
+    if (client != currClient.peek()) client.destroy();
+  });
+}

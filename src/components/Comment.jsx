@@ -7,6 +7,7 @@ import commentIcon from "../icons/comment.svg?url";
 import trashcanIcon from "../icons/trashcan.svg?url";
 import resolveIcon from "../icons/resolve.svg?url";
 import { MystState } from "../mystState";
+import { useSignalEffect } from "@preact/signals";
 
 const YCommentWrapper = styled.div`
   position: absolute;
@@ -95,16 +96,14 @@ const YComment = ({ commentId }) => {
     });
   }, [userSettings.value, cmView.current]);
 
-  useEffect(() => {
-    if (!cmref.current) {
-      return;
-    }
+  useSignalEffect(() => {
     const ytext = collab.value.ycomments.getTextForComment(commentId);
     const view = new EditorView({
       state: EditorState.create({
         doc: ytext.toString(),
         extensions: ExtensionBuilder.minimalSetup()
           .disable(["Mod-z", "Mod-y", "Mod-Z"])
+          .if(collab.value.lockMsg.value, (b) => b.readonly())
           .useCollaboration({ collabClient: { ytext, provider: collab.value.provider } })
           .addUpdateListener(updateHeight)
           .showCommentLineAuthors(lineAuthors)
@@ -132,7 +131,7 @@ const YComment = ({ commentId }) => {
     return () => {
       view.destroy();
     };
-  }, [cmref]);
+  });
 
   return (
     <YCommentWrapper

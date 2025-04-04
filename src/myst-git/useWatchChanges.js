@@ -6,7 +6,7 @@ const parseStatuses = (statuses) => {
   return roomNames.map((name) => {
     const [_, __, branch, commitHash, ...rest] = name.split("/");
     const file = rest.join("/");
-    return { branch, commitHash, file };
+    return { branch, commitHash, file, tags: statuses[name] };
   });
 };
 

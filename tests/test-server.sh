@@ -37,4 +37,4 @@ service apache2 restart
 echo "Apache proxy server is running and serving the ./dist directory on port 4173"
 
 cd bin/
-PORT=4455 node server.js&
+YPERSISTENCE=docs PORT=4455 node server.js&
