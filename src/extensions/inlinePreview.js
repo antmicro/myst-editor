@@ -60,8 +60,7 @@ class RenderedMarkdownWidget extends WidgetType {
   }
 
   toDOM() {
-    const content = document.createElement(this.isBlock ? "div" : "span");
-    content.setAttribute("contenteditable", "false");
+    const content = document.createElement("div");
     content.className = "cm-inline-rendered-md";
     const md = this.textManager.md.peek();
 
@@ -83,7 +82,6 @@ class RenderedMarkdownWidget extends WidgetType {
 function replaceMd(state, textManager) {
   const decorations = [];
 
-  // If possible we should only render blocks in view
   syntaxTree(state).iterate({
     enter(node) {
       const isBlock = renderedBlockNodes.includes(node.name);
