@@ -34,35 +34,10 @@ const CodeEditor = styled.div`
     background-color: ${(props) => (props.$mode != "Inline" ? "var(--gray-200)" : "transparent")} !important;
   }
 
-  .comment-gutter {
-    width: 17px;
-    height: 100%;
-    display: grid;
-    place-items: center;
-  }
-
   .comment-gutter-icon {
     height: 17px;
     width: 17px;
     cursor: pointer;
-  }
-
-  .cm-foldGutter {
-    margin-right: 5px;
-
-    .cm-gutterElement {
-      display: grid;
-      place-items: center;
-
-      span {
-        line-height: normal;
-        display: inline-block;
-
-        &[title="Fold line"] {
-          transform: translateY(-5px);
-        }
-      }
-    }
   }
 
   .comment-image {
