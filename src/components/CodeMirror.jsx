@@ -235,7 +235,7 @@ const CodeEditor = styled.div`
 `;
 
 const CodeMirror = ({ setUsers }) => {
-  const { editorView, options, collab, userSettings, linter, text } = useContext(MystState);
+  const { editorView, options, collab, userSettings, linter, text, headings } = useContext(MystState);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
@@ -325,6 +325,7 @@ const CodeMirror = ({ setUsers }) => {
         )
         .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView, linter))
         .if(options.mode.value === "Inline", (b) => b.useInlinePreview(text))
+        .useTrackHeadings(headings)
         .create(),
     });
 

@@ -237,6 +237,8 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     linter: signal({ status: "disabled", diagnostics: [] }),
     /** @type {TextManager} */
     text: null,
+    /** @type {Signal<{level: number, text: string, pos: number}[]>} */
+    headings: signal([]),
   };
   state.text = new TextManager({ ...signalOptions, ...state });
   return state;

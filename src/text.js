@@ -15,7 +15,6 @@ import { StateEffect } from "@codemirror/state";
 import hljs from "highlight.js/lib/core";
 import yamlHighlight from "highlight.js/lib/languages/yaml";
 import { markdownCheckboxes } from "./markdown/markdownCheckboxes";
-import markdownTableOfContents from "./markdown/markdownTableOfContents";
 
 export const markdownUpdatedEffect = StateEffect.define();
 
@@ -30,8 +29,6 @@ export class TextManager {
     this.editorView = editorView;
     this.preview = signal(null);
     this.options = options;
-    this.headingsPerChunk = { current: {} };
-    this.headings = signal([]);
     this.md = computed(() => {
       const md = markdownIt({
         breaks: true,
@@ -58,8 +55,7 @@ export class TextManager {
         .use(checkLinks)
         .use(colonFencedBlocks)
         .use(markdownItMapUrls, options.mapUrl.value)
-        .use(markdownCheckboxes)
-        .use(markdownTableOfContents, this.headingsPerChunk);
+        .use(markdownCheckboxes);
       if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
       userSettings.value.filter((s) => s.enabled && s.markdown).forEach((s) => md.use(s.markdown));
 
@@ -73,17 +69,9 @@ export class TextManager {
   renderText(useCache = true, force = false) {
     const previewVisible = ["Both", "Preview"].includes(this.options.mode.value) || force;
     if (!this.preview.value || !this.editorView.value || !previewVisible) return;
-    const oldHeadingsPerChunk = { ...this.headingsPerChunk.current };
-    this.headingsPerChunk.current = {};
     const cache = !this.lastMd || this.lastMd == this.md.value ? useCache : false;
     const chunkLookup = cache ? this.chunks.reduce((lookup, chunk) => ({ ...lookup, [chunk.hash]: { html: chunk.html, oldId: chunk.id } }), {}) : {};
     const newChunks = this.splitTextIntoChunks(chunkLookup);
-    // Reuse old heading data for chunks we didn't rerender
-    for (let i = 0; i < newChunks.length; i++) {
-      if (i in this.headingsPerChunk.current) continue;
-      this.headingsPerChunk.current[i] = oldHeadingsPerChunk[newChunks[i].oldId];
-    }
-    this.headings.value = nestHeadings(this.headingsPerChunk.current);
 
     if (this.chunks.length != newChunks.length || !cache) {
       // Render all chunks
@@ -214,23 +202,3 @@ export class TextManager {
 }
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
-
-function nestHeadings(headingsPerChunk) {
-  let headingsFlat = Object.values(headingsPerChunk).flat();
-
-  const headingsNested = [];
-  const levelMap = {};
-  headingsFlat.forEach((h) => {
-    const newItem = { ...h, children: [] };
-    const parent = levelMap[h.level - 1];
-    if (h.level === 1) {
-      headingsNested.push(newItem);
-    } else if (parent) {
-      parent.children.push(newItem);
-    } else {
-      headingsNested.push(newItem);
-    }
-    levelMap[h.level] = newItem;
-  });
-  return headingsNested;
-}

@@ -42,6 +42,7 @@ import { CollaborationClient } from "../collaboration";
 import { inlinePreview } from "./inlinePreview";
 import { Autolink, TaskList } from "@lezer/markdown";
 import { colonFencedCodeParser, customTransformsParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
+import { trackHeadings } from "./trackHeadings";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -291,6 +292,11 @@ export class ExtensionBuilder {
 
   useInlinePreview(text) {
     this.extensions.push(inlinePreview(text));
+    return this;
+  }
+
+  useTrackHeadings(headings) {
+    this.extensions.push(trackHeadings(headings));
     return this;
   }
 

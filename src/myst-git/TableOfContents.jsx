@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { getLineById } from "../markdown/markdownSourceMap";
 import { EditorView } from "codemirror";
 import { useContext, useMemo } from "preact/hooks";
 import { MystState } from "../mystState";
@@ -88,7 +87,7 @@ function Heading({ heading }) {
     children = (
       <ul>
         {heading.children.map((c) => (
-          <Heading key={c.lineId} heading={c} />
+          <Heading key={c.pos} heading={c} />
         ))}
       </ul>
     );
@@ -96,7 +95,7 @@ function Heading({ heading }) {
 
   return (
     <li>
-      <span title="Go to heading" className="heading" data-heading-id={heading.lineId}>
+      <span title="Go to heading" className="heading" data-heading-pos={heading.pos}>
         {heading.text}
       </span>
       {children}
@@ -105,19 +104,14 @@ function Heading({ heading }) {
 }
 
 export const TableOfContents = ({ index, docsRoot, currentFile, onFileClick, files }) => {
-  const { text, editorView } = useContext(MystState);
+  const { headings, editorView } = useContext(MystState);
   const parsedFiles = useMemo(() => indexToFiles({ docsRoot, index, files }), [docsRoot, index, files]);
 
   function handleHeadingClick(ev) {
-    const lineId = ev.target?.getAttribute("data-heading-id");
-    if (!lineId) return;
-    const lineNum = getLineById(text.lineMap, lineId);
-    if (!lineNum) return;
-    const line = editorView.value.state.doc.line(lineNum);
-    editorView.value.dispatch({
-      selection: { anchor: line.to, head: line.to },
-      effects: EditorView.scrollIntoView(line.to, { y: "start" }),
-    });
+    const posAttr = ev.target?.dataset?.headingPos;
+    if (!posAttr) return;
+    const pos = parseInt(posAttr, 10);
+    editorView.value.dispatch({ selection: { anchor: pos, head: pos }, effects: EditorView.scrollIntoView(pos, { y: "start" }) });
   }
 
   return (
@@ -132,8 +126,8 @@ export const TableOfContents = ({ index, docsRoot, currentFile, onFileClick, fil
               </span>
               {currentFile.startsWith(f.file) && (
                 <ul id="headings" onClick={handleHeadingClick}>
-                  {text.headings.value.map((h) => (
-                    <Heading heading={h} key={h.lineId} />
+                  {headings.value.map((h) => (
+                    <Heading heading={h} key={h.pos} />
                   ))}
                 </ul>
               )}

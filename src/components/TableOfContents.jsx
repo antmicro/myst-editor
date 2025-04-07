@@ -1,8 +1,8 @@
 import { useContext } from "preact/hooks";
 import styled from "styled-components";
 import { MystState } from "../mystState";
-import { getLineById } from "../markdown/markdownSourceMap";
 import { EditorView } from "codemirror";
+import { useSignalEffect } from "@preact/signals";
 
 const Wrapper = styled.div`
   background-color: white;
@@ -63,7 +63,7 @@ function Heading({ heading }) {
     children = (
       <ul>
         {heading.children.map((c) => (
-          <Heading key={c.lineId} heading={c} />
+          <Heading key={c.pos} heading={c} />
         ))}
       </ul>
     );
@@ -71,7 +71,7 @@ function Heading({ heading }) {
 
   return (
     <li>
-      <span title="Go to heading" data-heading-id={heading.lineId}>
+      <span title="Go to heading" data-heading-pos={heading.pos}>
         {heading.text}
       </span>
       {children}
@@ -80,15 +80,15 @@ function Heading({ heading }) {
 }
 
 export const TableOfContents = () => {
-  const { text, editorView } = useContext(MystState);
+  const { headings, editorView } = useContext(MystState);
+
+  useSignalEffect(() => console.log(headings.value));
 
   function handleClick(ev) {
-    const lineId = ev.target?.getAttribute("data-heading-id");
-    if (!lineId) return;
-    const lineNum = getLineById(text.lineMap, lineId);
-    if (!lineNum) return;
-    const line = editorView.value.state.doc.line(lineNum);
-    editorView.value.dispatch({ selection: { anchor: line.to, head: line.to }, effects: EditorView.scrollIntoView(line.to, { y: "start" }) });
+    const posAttr = ev.target?.dataset?.headingPos;
+    if (!posAttr) return;
+    const pos = parseInt(posAttr, 10);
+    editorView.value.dispatch({ selection: { anchor: pos, head: pos }, effects: EditorView.scrollIntoView(pos, { y: "start" }) });
   }
 
   return (
@@ -97,8 +97,8 @@ export const TableOfContents = () => {
       <VerticalSparator />
       <HeadingList onClick={handleClick}>
         <ul>
-          {text.headings.value.map((h) => (
-            <Heading heading={h} key={h.lineId} />
+          {headings.value.map((h) => (
+            <Heading heading={h} key={h.pos} />
           ))}
         </ul>
       </HeadingList>
