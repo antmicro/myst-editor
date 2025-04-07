@@ -324,7 +324,7 @@ const CodeMirror = ({ setUsers }) => {
           b.useSyncPreviewWithCursor({ text, preview: text.preview.value, lastTyped }),
         )
         .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView, linter))
-        .if(options.mode.value === "Inline", (b) => b.useInlinePreview(text))
+        .if(options.mode.value === "Inline", (b) => b.useInlinePreview(text, options))
         .useTrackHeadings(headings)
         .create(),
     });

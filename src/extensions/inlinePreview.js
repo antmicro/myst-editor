@@ -7,127 +7,125 @@ import { RangeSet, StateField } from "@codemirror/state";
 import { findSoruceMappedPreviousElement } from "./syncDualPane";
 import { getLineById } from "../markdown/markdownSourceMap";
 
-const previewFont = "Lato";
-const baseFont = { fontFamily: previewFont, lineHeight: "1.3em" };
-const baseHeading = { fontWeight: "bold", lineHeight: 1.5, fontFamily: previewFont };
-const markdownHighlightStyle = HighlightStyle.define([
-  { tag: tags.heading1, ...baseHeading, fontSize: "1.8em" },
-  { tag: tags.heading2, ...baseHeading, fontSize: "1.5em" },
-  { tag: tags.heading3, ...baseHeading, fontSize: "1.25em" },
-  { tag: tags.heading4, ...baseHeading, fontSize: "1.15em" },
-  { tag: [tags.link, tags.url], ...baseFont, textDecoration: "underline", color: "var(--blue-500)" },
-  { tag: tags.macroName, ...baseFont, color: "var(--blue-500)" },
-  { tag: tags.emphasis, ...baseFont, fontStyle: "italic" },
-  { tag: tags.strong, ...baseFont, fontWeight: "bold" },
-  { tag: [tags.monospace, tags.atom], ...baseFont, fontFamily: "monospace" },
-  { tag: tags.content, ...baseFont },
-  { tag: tags.meta, color: "darkgrey" },
-]);
-const markdownTheme = EditorView.theme({
-  "&": { fontSize: "16px" },
-  ".cm-inline-bullet *": { display: "none" },
-  ".cm-inline-ordered-list-marker *": { color: "black !important" },
-});
-
-const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Image", "Blockquote"];
-const tokenHidden = ["HardBreak", "EmphasisMark"];
-const decorationHidden = Decoration.replace({});
-const decorationOrderedListNum = Decoration.mark({ class: "cm-inline-ordered-list-marker" });
-const decorationMonospace = Decoration.mark({ class: "cm-inline-mono" });
-const nodeInSelection = (state, node) =>
-  state.selection.ranges.some((r) => {
-    const rFrom = state.doc.lineAt(r.from).number;
-    const rTo = state.doc.lineAt(r.to).number;
-    const nodeFrom = state.doc.lineAt(node.from).number;
-    const nodeTo = state.doc.lineAt(node.to).number;
-    return (rFrom >= nodeFrom && rFrom <= nodeTo) || (rTo >= nodeFrom && rTo <= nodeTo) || (nodeFrom >= rFrom && nodeTo <= rTo);
+export const inlinePreview = (/** @type {TextManager} */ text, options) => {
+  const previewFont = "Lato";
+  const baseFont = { fontFamily: previewFont, lineHeight: "1.3em" };
+  const baseHeading = { fontWeight: "bold", lineHeight: 1.5, fontFamily: previewFont };
+  const markdownHighlightStyle = HighlightStyle.define([
+    { tag: tags.heading1, ...baseHeading, fontSize: "1.8em" },
+    { tag: tags.heading2, ...baseHeading, fontSize: "1.5em" },
+    { tag: tags.heading3, ...baseHeading, fontSize: "1.25em" },
+    { tag: tags.heading4, ...baseHeading, fontSize: "1.15em" },
+    { tag: [tags.link, tags.url], ...baseFont, textDecoration: "underline", color: "var(--blue-500)" },
+    { tag: tags.macroName, ...baseFont, color: "var(--blue-500)" },
+    { tag: tags.emphasis, ...baseFont, fontStyle: "italic" },
+    { tag: tags.strong, ...baseFont, fontWeight: "bold" },
+    { tag: [tags.monospace, tags.atom], ...baseFont, fontFamily: "monospace" },
+    { tag: tags.content, ...baseFont },
+    { tag: tags.meta, color: "darkgrey" },
+  ]);
+  const markdownTheme = EditorView.theme({
+    "&": { fontSize: "16px" },
+    ".cm-inline-bullet *": { display: "none" },
+    ".cm-inline-ordered-list-marker *": { color: "black !important" },
   });
 
-const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task"];
-const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
-class RenderedMarkdownWidget extends WidgetType {
-  constructor(src, textManager, isBlock, start, end) {
-    super();
-    this.src = src;
-    this.textManager = textManager;
-    this.isBlock = isBlock;
-    this.start = start;
-    this.end = end;
-  }
+  const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Image", "Blockquote"];
+  const tokenHidden = ["HardBreak", "EmphasisMark"];
+  const decorationHidden = Decoration.replace({});
+  const decorationOrderedListNum = Decoration.mark({ class: "cm-inline-ordered-list-marker" });
+  const decorationMonospace = Decoration.mark({ class: "cm-inline-mono" });
+  const nodeInSelection = (state, node) =>
+    state.selection.ranges.some((r) => {
+      const rFrom = state.doc.lineAt(r.from).number;
+      const rTo = state.doc.lineAt(r.to).number;
+      const nodeFrom = state.doc.lineAt(node.from).number;
+      const nodeTo = state.doc.lineAt(node.to).number;
+      return (rFrom >= nodeFrom && rFrom <= nodeTo) || (rTo >= nodeFrom && rTo <= nodeTo) || (nodeFrom >= rFrom && nodeTo <= rTo);
+    });
 
-  eq(widget) {
-    return this.src === widget.rsc;
-  }
-
-  toDOM() {
-    const content = document.createElement("div");
-    content.className = "cm-inline-rendered-md";
-    const md = this.textManager.md.peek();
-
-    for (let l = this.start; l <= this.end; l++) {
-      this.textManager.lineMap.delete(l);
+  const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task"];
+  const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
+  class RenderedMarkdownWidget extends WidgetType {
+    constructor(src, isBlock, start, end) {
+      super();
+      this.src = src;
+      this.isBlock = isBlock;
+      this.start = start;
+      this.end = end;
     }
 
-    const render = (src) =>
-      this.isBlock ? md.render(src, { lineMap: this.textManager.lineMap, startLine: this.start, chunkId: 0 }) : md.renderInline(src);
-    content.innerHTML = render(this.src);
-    return content;
-  }
+    eq(widget) {
+      return this.src === widget.src;
+    }
 
-  ignoreEvent(ev) {
-    return ev.type == "mousedown" && (ev.target.tagName == "A" || ev.target.parentNode?.tagName == "A");
-  }
-}
+    toDOM() {
+      const content = document.createElement("div");
+      content.className = "cm-inline-rendered-md";
+      const md = text.md.peek();
 
-function replaceMd(state, textManager) {
-  const decorations = [];
-
-  syntaxTree(state).iterate({
-    enter(node) {
-      const isBlock = renderedBlockNodes.includes(node.name);
-      if (!isBlock && !renderedInlineNodes.includes(node.name)) return;
-      if (nodeInSelection(state, node)) return false;
-
-      const lineFrom = state.doc.lineAt(node.from);
-      const lineTo = state.doc.lineAt(node.to);
-      const isMultiline = isBlock && lineTo.number > lineFrom.number;
-      const fromOffset = node.from - lineFrom.from;
-      let src = state.doc.sliceString(node.from, node.to);
-      if (isMultiline && fromOffset > 0) {
-        src = src
-          .split("\n")
-          .map((line, i) => (i == 0 ? line : line.slice(fromOffset)))
-          .join("\n");
+      for (let l = this.start; l <= this.end; l++) {
+        text.lineMap.delete(l);
       }
 
-      const decoration = Decoration.replace({
-        widget: new RenderedMarkdownWidget(src, textManager, isBlock, lineFrom.number, lineTo.number),
-      });
+      const render = (src) => (this.isBlock ? md.render(src, { lineMap: text.lineMap, startLine: this.start, chunkId: 0 }) : md.renderInline(src));
+      content.innerHTML = render(this.src);
+      return content;
+    }
 
-      decorations.push(decoration.range(node.from, node.to));
-    },
-  });
+    ignoreEvent(ev) {
+      return ev.type == "mousedown" && (options.onPreviewClick.peek()?.(ev) || ev.target.tagName == "A" || ev.target.parentNode?.tagName == "A");
+    }
+  }
 
-  return decorations;
-}
+  function replaceMd(state) {
+    const decorations = [];
 
-const renderMdInline = (textManager) =>
-  StateField.define({
-    create(state) {
-      return RangeSet.of(replaceMd(state, textManager), true);
-    },
+    syntaxTree(state).iterate({
+      enter(node) {
+        const isBlock = renderedBlockNodes.includes(node.name);
+        if (!isBlock && !renderedInlineNodes.includes(node.name)) return;
+        if (nodeInSelection(state, node)) return false;
 
-    update(_, transaction) {
-      return RangeSet.of(replaceMd(transaction.state, textManager), true);
-    },
+        const lineFrom = state.doc.lineAt(node.from);
+        const lineTo = state.doc.lineAt(node.to);
+        const isMultiline = isBlock && lineTo.number > lineFrom.number;
+        const fromOffset = node.from - lineFrom.from;
+        let src = state.doc.sliceString(node.from, node.to);
+        if (isMultiline && fromOffset > 0) {
+          src = src
+            .split("\n")
+            .map((line, i) => (i == 0 ? line : line.slice(fromOffset)))
+            .join("\n");
+        }
 
-    provide(field) {
-      return EditorView.decorations.from(field);
-    },
-  });
+        const decoration = Decoration.replace({
+          widget: new RenderedMarkdownWidget(src, isBlock, lineFrom.number, lineTo.number),
+        });
 
-export const inlinePreview = (/** @type {TextManager} */ text) =>
-  ViewPlugin.fromClass(
+        decorations.push(decoration.range(node.from, node.to));
+      },
+    });
+
+    return decorations;
+  }
+
+  const renderMdInline = () =>
+    StateField.define({
+      create(state) {
+        return RangeSet.of(replaceMd(state), true);
+      },
+
+      update(_, transaction) {
+        return RangeSet.of(replaceMd(transaction.state), true);
+      },
+
+      provide(field) {
+        return EditorView.decorations.from(field);
+      },
+    });
+
+  return ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.decorations = this.process(view);
@@ -194,7 +192,7 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
       }
     },
     {
-      provide: () => [syntaxHighlighting(markdownHighlightStyle), markdownTheme, renderMdInline(text)],
+      provide: () => [syntaxHighlighting(markdownHighlightStyle), markdownTheme, renderMdInline()],
       decorations: (v) => v.decorations,
       eventHandlers: {
         mousedown(ev, view) {
@@ -234,3 +232,4 @@ export const inlinePreview = (/** @type {TextManager} */ text) =>
       },
     },
   );
+};

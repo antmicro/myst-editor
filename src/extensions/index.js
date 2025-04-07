@@ -290,8 +290,8 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useInlinePreview(text) {
-    this.extensions.push(inlinePreview(text));
+  useInlinePreview(text, options) {
+    this.extensions.push(inlinePreview(text, options));
     return this;
   }
 
