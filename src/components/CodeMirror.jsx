@@ -226,11 +226,11 @@ const CodeEditor = styled.div`
     }
   }
 
+  .cm-inline-mono,
   .cm-inline-mono * {
     font-family: monospace !important;
     line-height: 1.3em !important;
-    font-weight: normal !important;
-    font-size: 16px !important;
+    font-size: 14px !important;
   }
 `;
 
