@@ -41,15 +41,16 @@ const GitSidebar = styled.div`
   }
 `;
 
-const ChangeHistory = styled.div`
+const ChangeHistory = styled.details`
   font-size: 12px;
   width: 100%;
 
-  p:first-child {
+  summary {
     margin-top: 24px;
     margin-bottom: 12px;
     font-weight: 600;
     font-size: 14px;
+    user-select: none;
   }
 
   .history-wrapper {
@@ -492,7 +493,7 @@ const MystEditorGit = ({
               />
             )}
             <ChangeHistory>
-              <p>History:</p>
+              <summary>History</summary>
               {changeHistory.value.length == 0 ? (
                 <p>When you make any changes, you will be able to go back to them later from this panel.</p>
               ) : (
