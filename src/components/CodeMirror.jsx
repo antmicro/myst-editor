@@ -136,7 +136,8 @@ const CodeEditor = styled.div`
   .cm-suggestion {
     font-weight: 700;
 
-    &.replaced * {
+    &.replaced *,
+    &.replaced {
       font-weight: initial;
       color: initial !important;
       text-decoration: line-through;
@@ -296,7 +297,7 @@ const CodeMirror = ({ setUsers }) => {
       extensions: ExtensionBuilder.basicSetup()
         .useMarkdown(options.transforms.value)
         .if(options.mode.value !== "Inline", (b) => b.useLineNumbers().useGutterActiveHighlight())
-        .useCompartment(suggestionCompartment, customHighlighter([]))
+        .useCompartment(suggestionCompartment, collab.value?.ycomments?.suggestionHighlighter ?? customHighlighter([]))
         .useCompartment(userExtensionsCompartment, [])
         .useSpellcheck(options.spellcheckOpts.value)
         .if(options.collaboration.value.enabled, (b) => {

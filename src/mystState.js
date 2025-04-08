@@ -190,6 +190,8 @@ const defaults = {
   onPreviewClick: () => {},
 };
 
+export const modeChangeAnnotation = Annotation.define();
+
 export function createMystState(/** @type {typeof defaults} */ opts) {
   const fullOptions = { ...defaults, ...opts };
   /** @typedef {Omit<typeof defaults, "parent" | "initialText">} SignalOpts */
@@ -241,6 +243,15 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     headings: signal([]),
   };
   state.text = new TextManager({ ...signalOptions, ...state });
+
+  // Update comment positions when chaning editor modes
+  const modeCleanup = effect(() => {
+    state.options.mode.value;
+    // Prevent tracking further nested signals with queueMicrotask
+    queueMicrotask(() => state.collab.peek()?.ycomments?.updateMainCodeMirror());
+  });
+  state.cleanups.push(modeCleanup);
+
   return state;
 }
 

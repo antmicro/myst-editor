@@ -254,11 +254,13 @@ export class YComments {
     this.commentEditors = new Map();
 
     this.suggestions = ydoc.getMap("suggestions");
+    this.suggestionHighlighter = customHighlighter([]);
     this.suggestions.observe(() => {
       if (!this.mainCodeMirror) return;
       const highlights = [...this.suggestions.values()].flat().map((h) => ({ ...h, target: new RegExp(h.targetRegexSrc, h.targetRegexFlags) }));
+      this.suggestionHighlighter = customHighlighter(highlights, modifyHighlight, this.positions());
       this.mainCodeMirror.dispatch({
-        effects: suggestionCompartment.reconfigure(customHighlighter(highlights, modifyHighlight, this.positions())),
+        effects: suggestionCompartment.reconfigure(this.suggestionHighlighter),
         annotations: Transaction.userEvent.of("suggestion"),
       });
     });
