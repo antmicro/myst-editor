@@ -87,12 +87,12 @@ export const tableParser = {
   parseBlock: Table.parseBlock,
 };
 
+/** @type {import("@lezer/markdown").MarkdownConfig} */
 export const roleParser = {
-  /** @type {import("@lezer/markdown").NodeSpec[]} */
   defineNodes: [{ name: "Role", style: tags.monospace }],
-  /** @type {import("@lezer/markdown").InlineParser[]} */
   parseInline: [
     {
+      name: "Roles",
       parse(cx, next, start) {
         if (next != 123 /* '{' */ || (start && cx.char(start - 1) == 123)) return -1;
         let pos = start + 1;
@@ -109,24 +109,29 @@ export const roleParser = {
   ],
 };
 
+/** @returns {import("@lezer/markdown").MarkdownConfig} */
 export const customTransformsParser = (transforms) => {
-  const beginTransforms = transforms.map(({ target }) => new RegExp("^" + target.source, target.flags));
+  const beginTransforms = transforms.map(({ target }) => (target instanceof RegExp ? new RegExp(`^(?:${target.source})`, target.flags) : target));
   return {
-    /** @type {import("@lezer/markdown").NodeSpec[]} */
     defineNodes: [{ name: "Transform", style: tags.macroName }],
-    /** @type {import("@lezer/markdown").InlineParser[]} */
     parseInline: [
       {
+        name: "Transforms",
         parse(cx, _, start) {
           const line = cx.slice(start, cx.end);
           for (const beginTarget of beginTransforms) {
-            const match = line.match(beginTarget);
-            if (match) {
-              return cx.addElement(cx.elt("Transform", start, start + match[0].length));
+            if (beginTarget instanceof RegExp) {
+              const match = line.match(beginTarget);
+              if (match) {
+                return cx.addElement(cx.elt("Transform", start, start + match[0].length));
+              }
+            } else if (line.startsWith(beginTarget)) {
+              return cx.addElement(cx.elt("Transform", start, start + beginTarget.length));
             }
           }
           return -1;
         },
+        before: "Link",
       },
     ],
   };
