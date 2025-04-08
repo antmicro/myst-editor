@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { EditorView } from "codemirror";
-import { useContext, useMemo } from "preact/hooks";
+import { useContext } from "preact/hooks";
 import { MystState } from "../mystState";
 
 const List = styled.div`
@@ -64,23 +64,6 @@ const fileToTitle = (f) =>
     .map((p) => p[0].toUpperCase() + p.slice(1))
     .join(" ");
 
-const indexToFiles = ({ docsRoot, index, files }) => {
-  const start = "```{toctree}";
-  if (!index.includes(start)) return;
-  let file = index.slice(index.indexOf(start) + start.length);
-  if (!file.includes("```")) return;
-  file = file.slice(0, file.indexOf("```"));
-  let prefix = docsRoot;
-  if (prefix === "." || prefix === "./") prefix = ""; // these 3 should be equivalent meaning "top-level dir"
-  if (prefix !== "") prefix += "/"; // unless in top-level dir, add slash to at end
-  return file
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l && !l.startsWith(":"))
-    .map((f) => ({ file: prefix + f, title: fileToTitle(f) }))
-    .filter((f) => files.some((file) => file.split(".md")[0] === f.file));
-};
-
 function Heading({ heading }) {
   let children;
   if (heading.children.length > 0) {
@@ -103,9 +86,9 @@ function Heading({ heading }) {
   );
 }
 
-export const TableOfContents = ({ index, docsRoot, currentFile, onFileClick, files }) => {
+export const TableOfContents = ({ indexedFiles, currentFile, onFileClick }) => {
   const { headings, editorView } = useContext(MystState);
-  const parsedFiles = useMemo(() => indexToFiles({ docsRoot, index, files }), [docsRoot, index, files]);
+  const fileList = indexedFiles.map((f) => ({ ...f, title: fileToTitle(f.fileName) }));
 
   function handleHeadingClick(ev) {
     const posAttr = ev.target?.dataset?.headingPos;
@@ -116,9 +99,9 @@ export const TableOfContents = ({ index, docsRoot, currentFile, onFileClick, fil
 
   return (
     <List>
-      <p>Table of Contents:</p>
-      <ul id="files">
-        {parsedFiles.map((f) => {
+      <p>Page index:</p>
+      <ul>
+        {fileList.map((f) => {
           return (
             <li key={f.file}>
               <span className={`file ${currentFile.startsWith(f.file) ? "active" : ""}`} title="Go to file" onClick={() => onFileClick(f)}>
