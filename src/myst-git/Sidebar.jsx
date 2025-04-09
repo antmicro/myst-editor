@@ -183,7 +183,14 @@ const Sidebar = ({
   return (
     <GitSidebar>
       {indexFile.value && file.value && (
-        <TableOfContents indexedFiles={indexedFiles.value} currentFile={file.value} onFileClick={(f) => switchFile(f.file)} />
+        <TableOfContents
+          indexedFiles={indexedFiles}
+          currentFile={file.value}
+          onFileClick={(f) => switchFile(f.file)}
+          getText={getText}
+          branch={branch}
+          commit={commit}
+        />
       )}
       <UnindexedFiles>
         <summary>Unindexed files:</summary>

@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { EditorView } from "codemirror";
 import { useContext } from "preact/hooks";
 import { MystState } from "../mystState";
+import { useComputed, useSignal, useSignalEffect } from "@preact/signals";
 
 const List = styled.div`
   font-size: 12px;
@@ -58,12 +59,6 @@ const List = styled.div`
   }
 `;
 
-const fileToTitle = (f) =>
-  f
-    .split("-")
-    .map((p) => p[0].toUpperCase() + p.slice(1))
-    .join(" ");
-
 function Heading({ heading }) {
   let children;
   if (heading.children.length > 0) {
@@ -86,9 +81,30 @@ function Heading({ heading }) {
   );
 }
 
-export const TableOfContents = ({ indexedFiles, currentFile, onFileClick }) => {
+export const TableOfContents = ({ indexedFiles, currentFile, onFileClick, getText, branch, commit }) => {
   const { headings, editorView } = useContext(MystState);
-  const fileList = indexedFiles.map((f) => ({ ...f, title: fileToTitle(f.fileName) }));
+
+  const fileList = useSignal([]);
+  useSignalEffect(() => {
+    branch.value;
+    commit.value;
+
+    const files = indexedFiles.value;
+    (async () => {
+      for (const f of files) {
+        const text = await getText(branch.value, commit.value, f.file);
+        const headingMatch = text.match(/^(#+) (.+)/m);
+        if (!headingMatch || headingMatch[1].length !== 1) {
+          f.title = f.file;
+        } else {
+          f.title = headingMatch[2];
+        }
+      }
+      fileList.value = files;
+    })();
+  });
+
+  const fileHeadings = useComputed(() => headings.value.flatMap((h, i) => (i == 0 && h.level == 1 ? h.children : h)));
 
   function handleHeadingClick(ev) {
     const posAttr = ev.target?.dataset?.headingPos;
@@ -101,15 +117,19 @@ export const TableOfContents = ({ indexedFiles, currentFile, onFileClick }) => {
     <List>
       <p>Page index:</p>
       <ul>
-        {fileList.map((f) => {
+        {fileList.value.map((f) => {
           return (
             <li key={f.file}>
-              <span className={`file ${currentFile.startsWith(f.file) ? "active" : ""}`} title="Go to file" onClick={() => onFileClick(f)}>
-                {f.title}
+              <span
+                className={`file ${currentFile.startsWith(f.file) ? "active" : ""}`}
+                title={`Go to file ${f.file}`}
+                onClick={() => onFileClick(f)}
+              >
+                {f.file === currentFile ? (headings.value[0]?.level === 1 ? headings.value[0].text : currentFile) : f.title}
               </span>
               {currentFile.startsWith(f.file) && (
                 <ul id="headings" onClick={handleHeadingClick}>
-                  {headings.value.map((h) => (
+                  {fileHeadings.value.map((h) => (
                     <Heading heading={h} key={h.pos} />
                   ))}
                 </ul>

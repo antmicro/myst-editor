@@ -92,13 +92,17 @@
         { message: "commit 1", hash: "bbb" },
       ];
       const files = ["docs/source/file1.md", "docs/source/file2.md", "docs/source/index.md"];
-      const index = `# {{project}}
+      const text = {
+        ["docs/source/index.md"]: `# {{project}}
 
 \`\`\`{toctree}
 file2
 file1
 \`\`\`
-`;
+`,
+        ["docs/source/file1.md"]: `# Document 1\nline1\nline2\n## Heading2_1\nline3\n## Heading2_2\nline4`,
+        ["docs/source/file2.md"]: `# Document 2\nline1\nline2\n## Heading2_1\nline3\n## Heading2_2\nline4`,
+      };
 
       MystEditorGit(
         {
@@ -109,7 +113,7 @@ file1
           getCommits: (_, page) => (page == 1 ? commits : []),
           searchCommits: (input) => commits.filter((c) => c.message.includes(input)),
           getFiles: () => files,
-          getText: async (_, __, f) => (f.includes("index") ? index : `# Heading 1\nline1\nline2\n## Heading2_1\nline3\n## Heading2_2\nline4`),
+          getText: async (_, __, f) => text[f] ?? "",
           storeHistory: () => {},
           commitChanges: (msg) => ({ hash: "ccc", webUrl: "#" }),
           id: "demo",
