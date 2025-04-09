@@ -427,7 +427,7 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
       const heading = text.match(/^# .+$/gm);
       const fileName = heading ? heading[0].slice(2) : file;
 
-      return `<a href="#" title="Switch to file" data-file-link="${fileFull}">${fileName}</a>`;
+      return `<span class="file-link" title="Switch to file" data-file-link="${fileFull}">${fileName}</span>`;
     },
   };
 

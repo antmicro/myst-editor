@@ -48,4 +48,13 @@ export const MystContainer = styled(MystCSSVars)`
   .todo {
     background-color: yellow;
   }
+
+  .file-link {
+    color: var(--blue-500);
+
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
 `;
