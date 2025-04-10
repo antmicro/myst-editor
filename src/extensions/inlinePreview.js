@@ -213,6 +213,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
             const newStatus = current == " " ? "x" : " ";
             view.dispatch({ changes: { from, to, insert: newStatus } });
           } else {
+            view.focus();
             let id = ev.target.getAttribute("data-line-id");
             let elem = ev.target;
             if (!id) {
