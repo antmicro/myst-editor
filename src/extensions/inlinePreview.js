@@ -7,7 +7,7 @@ import { RangeSet, StateField } from "@codemirror/state";
 import { findSoruceMappedPreviousElement } from "./syncDualPane";
 import { getLineById } from "../markdown/markdownSourceMap";
 
-export const inlinePreview = (/** @type {TextManager} */ text, options) => {
+export const inlinePreview = (/** @type {TextManager} */ text, options, editorView) => {
   const previewFont = "Lato";
   const baseFont = { fontFamily: previewFont, lineHeight: "1.3em" };
   const baseHeading = { fontWeight: "bold", lineHeight: 1.5, fontFamily: previewFont };
@@ -36,6 +36,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options) => {
   const decorationOrderedListNum = Decoration.mark({ class: "cm-inline-ordered-list-marker" });
   const decorationMonospace = Decoration.mark({ class: "cm-inline-mono" });
   const nodeInSelection = (state, node) =>
+    editorView.peek()?.hasFocus &&
     state.selection.ranges.some((r) => {
       const rFrom = state.doc.lineAt(r.from).number;
       const rTo = state.doc.lineAt(r.to).number;
@@ -179,13 +180,16 @@ export const inlinePreview = (/** @type {TextManager} */ text, options) => {
           });
         }
 
-        view.state.selection.ranges.forEach((r) => {
-          const startLine = view.state.doc.lineAt(r.from);
-          const endLine = view.state.doc.lineAt(r.to);
-          if (startLine.from != endLine.to) {
-            widgets.push(decorationMonospace.range(startLine.from, endLine.to));
-          }
-        });
+        if (editorView.peek()?.hasFocus) {
+          view.state.selection.ranges.forEach((r) => {
+            const startLine = view.state.doc.lineAt(r.from);
+            const endLine = view.state.doc.lineAt(r.to);
+            if (startLine.from != endLine.to) {
+              widgets.push(decorationMonospace.range(startLine.from, endLine.to));
+            }
+          });
+        }
+
         widgets.sort((w1, w2) => w1.from - w2.from);
 
         return Decoration.set(widgets);
