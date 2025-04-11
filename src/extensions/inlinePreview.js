@@ -28,6 +28,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     "&": { fontSize: "16px" },
     ".cm-inline-bullet *": { display: "none" },
     ".cm-inline-ordered-list-marker *": { color: "black !important" },
+    ":is(.cm-widgetBuffer:has(+ .inline-custom-styles), .inline-custom-styles + .cm-widgetBuffer)": { display: "none" },
   });
 
   const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Image", "Blockquote"];
@@ -62,7 +63,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     }
 
     toDOM() {
-      const content = document.createElement("div");
+      const content = document.createElement("span");
       content.className = "cm-inline-rendered-md";
       if (this.cssClasses.length > 0) {
         content.classList.add("inline-custom-styles");
