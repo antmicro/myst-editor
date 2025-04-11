@@ -165,8 +165,13 @@ export class ExtensionBuilder {
     return this;
   }
 
-  readonly() {
-    this.extensions.push(EditorView.editable.of(false), EditorState.readOnly.of(true));
+  useNoSelection() {
+    this.extensions.push(EditorView.editable.of(false));
+    return this;
+  }
+
+  useReadonly() {
+    this.extensions.push(EditorState.readOnly.of(true));
     return this;
   }
 

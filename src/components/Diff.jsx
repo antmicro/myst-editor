@@ -22,8 +22,8 @@ const MergeViewCodeEditor = styled(CodeEditor)`
   display: block;
 `;
 
-const initMergeView = ({ old, current, root }) => {
-  const extensions = ExtensionBuilder.basicSetup().readonly().create();
+const initMergeView = ({ old, current, root, transforms }) => {
+  const extensions = new ExtensionBuilder().useReadonly().useMarkdown(transforms).create();
   return new MergeView({
     a: { doc: old, extensions },
     b: { doc: current, extensions },
@@ -46,6 +46,7 @@ const Diff = () => {
       old: options.initialText,
       current: text.text.peek(),
       root: options.parent,
+      transforms: options.transforms.value,
     });
 
     leftRef.current.appendChild(mergeView.current.b.dom);

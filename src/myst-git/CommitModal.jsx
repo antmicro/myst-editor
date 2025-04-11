@@ -184,7 +184,7 @@ const Diff = ({ document, parent, onStage }) => {
       root: parent,
       doc: document.text,
       extensions: [
-        ...ExtensionBuilder.basicSetup().readonly().create(),
+        ...ExtensionBuilder.basicSetup().useReadonly().create(),
         unifiedMergeView({
           original: document.initialText,
           mergeControls: false,
