@@ -1,6 +1,6 @@
-import { HighlightStyle, syntaxHighlighting, syntaxTree } from "@codemirror/language";
+import { highlightingFor, HighlightStyle, syntaxHighlighting, syntaxTree } from "@codemirror/language";
 import { TextManager } from "../text";
-import { tags } from "@lezer/highlight";
+import { getStyleTags, tags } from "@lezer/highlight";
 import { EditorView } from "codemirror";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
 import { RangeSet, StateField } from "@codemirror/state";
@@ -48,12 +48,13 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
   const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task"];
   const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
   class RenderedMarkdownWidget extends WidgetType {
-    constructor(src, isBlock, start, end) {
+    constructor(src, isBlock, start, end, cssClasses = []) {
       super();
       this.src = src;
       this.isBlock = isBlock;
       this.start = start;
       this.end = end;
+      this.cssClasses = cssClasses;
     }
 
     eq(widget) {
@@ -63,6 +64,10 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     toDOM() {
       const content = document.createElement("div");
       content.className = "cm-inline-rendered-md";
+      if (this.cssClasses.length > 0) {
+        content.classList.add("inline-custom-styles");
+      }
+      this.cssClasses.forEach((c) => content.classList.add(c));
       const md = text.md.peek();
 
       for (let l = this.start; l <= this.end; l++) {
@@ -99,9 +104,12 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
             .map((line, i) => (i == 0 ? line : line.slice(fromOffset)))
             .join("\n");
         }
+        const parent = node.node.parent.toTree();
+        const tags = getStyleTags(parent)?.tags;
+        const parentClass = parent.type.name.startsWith("ATXHeading") && tags ? highlightingFor(state, tags) : null;
 
         const decoration = Decoration.replace({
-          widget: new RenderedMarkdownWidget(src, isBlock, lineFrom.number, lineTo.number),
+          widget: new RenderedMarkdownWidget(src, isBlock, lineFrom.number, lineTo.number, parentClass ? [parentClass] : []),
         });
 
         decorations.push(decoration.range(node.from, node.to));

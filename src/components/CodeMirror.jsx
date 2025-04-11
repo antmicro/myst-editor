@@ -216,9 +216,11 @@ const CodeEditor = styled.div`
   }
 
   .cm-inline-rendered-md {
-    all: initial;
-    font-family: "Lato";
-    font-size: 16px;
+    &:not(&.inline-custom-styles) {
+      all: initial;
+      font-family: "Lato";
+      font-size: 16px;
+    }
 
     ${MdStyles}
 
