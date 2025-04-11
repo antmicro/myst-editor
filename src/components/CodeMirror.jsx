@@ -298,7 +298,7 @@ const CodeMirror = () => {
       doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.text.peek(),
       extensions: ExtensionBuilder.basicSetup()
         .useMarkdown(options.transforms.value)
-        .if(options.mode.value !== "Inline", (b) => b.useLineNumbers().useGutterActiveHighlight())
+        .if(options.mode.value !== "Inline", (b) => b.useLineNumbers())
         .useCompartment(suggestionCompartment, collab.value?.ycomments?.suggestionHighlighter ?? customHighlighter([]))
         .useCompartment(userExtensionsCompartment, [])
         .useSpellcheck(options.spellcheckOpts.value)

@@ -101,7 +101,7 @@ const YComment = ({ commentId }) => {
     const view = new EditorView({
       state: EditorState.create({
         doc: ytext.toString(),
-        extensions: ExtensionBuilder.minimalSetup()
+        extensions: new ExtensionBuilder()
           .disable(["Mod-z", "Mod-y", "Mod-Z"])
           .if(collab.value.lockMsg.value, (b) => b.readonly())
           .useCollaboration({ collabClient: { ytext, provider: collab.value.provider } })

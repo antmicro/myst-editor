@@ -1,14 +1,4 @@
-import {
-  highlightActiveLine,
-  lineNumbers,
-  highlightActiveLineGutter,
-  highlightSpecialChars,
-  drawSelection,
-  dropCursor,
-  rectangularSelection,
-  crosshairCursor,
-  keymap,
-} from "@codemirror/view";
+import { lineNumbers, highlightSpecialChars, drawSelection, dropCursor, rectangularSelection, crosshairCursor, keymap } from "@codemirror/view";
 import { EditorSelection, EditorState, Facet, Prec } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { yCollab } from "y-codemirror.next";
@@ -43,6 +33,7 @@ import { inlinePreview } from "./inlinePreview";
 import { Autolink, TaskList } from "@lezer/markdown";
 import { colonFencedCodeParser, customTransformsParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
 import { trackHeadings } from "./trackHeadings";
+import { highlightFocusedActiveLine } from "./activeLineHighlight";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -71,31 +62,18 @@ export class ExtensionBuilder {
     this.extensions = ExtensionBuilder.defaultPlugins();
   }
 
-  static minimalSetup() {
-    return new ExtensionBuilder([
-      highlightSpecialChars(),
-      drawSelection(),
-      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-      keymap.of([...defaultKeymap]),
-    ]);
-  }
-
   static basicSetup() {
     return new ExtensionBuilder([
-      highlightSpecialChars(),
       foldGutter(),
-      drawSelection(),
       dropCursor(),
       EditorState.allowMultipleSelections.of(true),
       indentOnInput(),
-      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
       bracketMatching(),
       autocompletion(),
       rectangularSelection(),
       crosshairCursor(),
-      highlightActiveLine(),
       highlightSelectionMatches(),
-      keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, ...foldKeymap, ...completionKeymap, ...lintKeymap]),
+      keymap.of([...historyKeymap, ...searchKeymap, ...foldKeymap, ...completionKeymap, ...lintKeymap]),
     ]);
   }
 
@@ -106,7 +84,15 @@ export class ExtensionBuilder {
   }
 
   static defaultPlugins() {
-    return [EditorView.lineWrapping, highlightActiveLine(), keymap.of([indentWithTab, { key: "Mod-Z", run: redo }])];
+    return [
+      EditorView.lineWrapping,
+      highlightSpecialChars(),
+      drawSelection(),
+      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+      highlightFocusedActiveLine,
+      keymap.of(defaultKeymap),
+      keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
+    ];
   }
 
   useMarkdown(transforms) {
@@ -122,11 +108,6 @@ export class ExtensionBuilder {
 
   useLineNumbers() {
     this.base.unshift(lineNumbers());
-    return this;
-  }
-
-  useGutterActiveHighlight() {
-    this.extensions.push(highlightActiveLineGutter());
     return this;
   }
 

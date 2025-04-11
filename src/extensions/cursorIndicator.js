@@ -9,13 +9,13 @@ export const cursorIndicator = (text, preview) =>
     const selectionChanged = update.selectionSet && (cursorLineBefore !== cursorLineAfter || cursorLineBefore === 1);
     const markdownUpdated = update.transactions.some((t) => t.effects.some((e) => e.is(markdownUpdatedEffect)));
     const resized = update.geometryChanged && !update.viewportChanged;
-    if (update.docChanged || (!selectionChanged && !markdownUpdated && !resized)) {
+    if (update.docChanged || (!selectionChanged && !markdownUpdated && !resized && !update.focusChanged)) {
       return;
     }
 
     const [matchingElem] = findNearestElementForLine(cursorLineAfter, text.lineMap, preview);
     const previewElement = preview.querySelector(".cm-previewFocus");
-    if (matchingElem) {
+    if (matchingElem && update.view.hasFocus) {
       const previewRect = preview.getBoundingClientRect();
       let matchingRect = matchingElem.getBoundingClientRect();
 
