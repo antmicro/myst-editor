@@ -154,7 +154,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
             to,
             enter(node) {
               if (node.name.startsWith("ATXHeading") && nodeInSelection(view.state, node)) return false;
-              if (tokenElement.includes(node.name) && nodeInSelection(view.state, node)) {
+              if ((node.name.startsWith("SetextHeading") || tokenElement.includes(node.name)) && nodeInSelection(view.state, node)) {
                 const startLine = view.state.doc.lineAt(node.from);
                 const endLine = view.state.doc.lineAt(node.to);
                 widgets.push(decorationMonospace.range(startLine.from, endLine.to));
@@ -179,7 +179,10 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
               }
 
               if (node.name === "HeaderMark") {
-                widgets.push(decorationHidden.range(node.from, node.to + 1));
+                const parent = node.node.parent.type.name;
+                // Hide the space between the HeaderMark and text in ATX headings
+                const to = parent.startsWith("ATX") ? node.to + 1 : node.to;
+                widgets.push(decorationHidden.range(node.from, to));
               }
 
               if (tokenHidden.includes(node.name)) {
