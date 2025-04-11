@@ -16,9 +16,9 @@ import {
   foldGutter,
   indentOnInput,
   syntaxHighlighting,
-  defaultHighlightStyle,
   bracketMatching,
   foldKeymap,
+  HighlightStyle,
 } from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
@@ -34,6 +34,7 @@ import { Autolink, TaskList } from "@lezer/markdown";
 import { colonFencedCodeParser, customTransformsParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
 import { trackHeadings } from "./trackHeadings";
 import { highlightFocusedActiveLine } from "./activeLineHighlight";
+import { tags } from "@lezer/highlight";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -54,6 +55,14 @@ const restoreCursorLocation = (view, location) => {
 
 export const folded = (update) => update.transactions.some((t) => t.effects.some((e) => e.is(foldEffect) || e.is(unfoldEffect)));
 export const collabClientFacet = Facet.define();
+
+const syntaxHighlight = HighlightStyle.define([
+  { tag: [tags.heading, tags.strong], fontWeight: "bold" },
+  { tag: [tags.link, tags.url], textDecoration: "underline", color: "var(--blue-500)" },
+  { tag: tags.macroName, color: "var(--blue-500)" },
+  { tag: tags.emphasis, fontStyle: "italic" },
+  { tag: tags.meta, color: "darkgrey" },
+]);
 
 export class ExtensionBuilder {
   constructor(base = []) {
@@ -88,7 +97,7 @@ export class ExtensionBuilder {
       EditorView.lineWrapping,
       highlightSpecialChars(),
       drawSelection(),
-      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+      syntaxHighlighting(syntaxHighlight, { fallback: true }),
       highlightFocusedActiveLine,
       keymap.of(defaultKeymap),
       keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
