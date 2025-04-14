@@ -33,35 +33,36 @@ export class CollaborationClient {
       });
     }
 
-    // We cannot detect the local user being added in the awareness change callback
-    this.#localUser = {
-      name: settings.username,
-      color: settings.color,
-      avatarUrl: editorOptions.getAvatar(settings.username),
-      userUrl: editorOptions.getUserUrl(settings.username),
-    };
-    this.#users.value = [this.#localUser];
-
-    this.provider.awareness.on("change", ({ added, removed }) => {
-      if (added.length === 0 && removed.length === 0) return;
-      // Get unique users by name
-      const states = [...this.provider.awareness.getStates().values()]
-        .map((state) => state.user)
-        .concat(this.#localUser)
-        .filter((u) => u?.name)
-        .reduce((curr, user) => {
-          curr[user.name] = user;
-          return curr;
-        }, {});
-      this.#users.value = Object.values(states)
-        .sort((u1, u2) => u1.name.localeCompare(u2.name))
-        .map((u) => ({ ...u, avatarUrl: editorOptions.getAvatar(u.name), userUrl: editorOptions.getUserUrl(u.name) }));
-    });
-
-    this.provider.awareness.setLocalStateField("user", {
-      name: settings.username,
-      color: settings.color,
-    });
+    // Allow joining without username to collect data
+    if (settings.username) {
+      // We cannot detect the local user being added in the awareness change callback
+      this.#localUser = {
+        name: settings.username,
+        color: settings.color,
+        avatarUrl: editorOptions.getAvatar(settings.username),
+        userUrl: editorOptions.getUserUrl(settings.username),
+      };
+      this.#users.value = [this.#localUser];
+      this.provider.awareness.on("change", ({ added, removed }) => {
+        if (added.length === 0 && removed.length === 0) return;
+        // Get unique users by name
+        const states = [...this.provider.awareness.getStates().values()]
+          .map((state) => state.user)
+          .concat(this.#localUser)
+          .filter((u) => u?.name)
+          .reduce((curr, user) => {
+            curr[user.name] = user;
+            return curr;
+          }, {});
+        this.#users.value = Object.values(states)
+          .sort((u1, u2) => u1.name.localeCompare(u2.name))
+          .map((u) => ({ ...u, avatarUrl: editorOptions.getAvatar(u.name), userUrl: editorOptions.getUserUrl(u.name) }));
+      });
+      this.provider.awareness.setLocalStateField("user", {
+        name: settings.username,
+        color: settings.color,
+      });
+    }
 
     this.provider.on("sync", (sync) => (this.#synced.value = sync));
     this.provider.on("status", ({ status }) => (this.#connected.value = status == "connected"));
