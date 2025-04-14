@@ -59,6 +59,9 @@ export class TextManager {
       if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
       userSettings.value.filter((s) => s.enabled && s.markdown).forEach((s) => md.use(s.markdown));
 
+      // Customize detecting links
+      md.linkify.set({ fuzzyLink: false });
+
       return md;
     });
     effect(() => this.renderText());

@@ -241,6 +241,7 @@ test.describe.parallel("With collaboration enabled", () => {
         .first()
         .evaluate((e) => Number(e.parentElement?.getAttribute("top")));
       const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
+      await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
       const from = (await pageA.locator(".comment-icon").boundingBox()) as { x: number; y: number; width: number; height: number };
       const to = (await placesForCommentA[3].boundingBox()) as { x: number; y: number; width: number; height: number };
       await pageA.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
@@ -707,6 +708,7 @@ const addComment = async (page: Page, lineNumber: number, text?: string) => {
       { lineNumber, text, id },
     );
   }
+  await page.mouse.move(0, 0, { steps: 100 });
 };
 
 const openResolvedComments = async (page: Page) => {

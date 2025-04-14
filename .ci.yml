@@ -29,7 +29,7 @@ functional-tests:
   artifacts:
     when: always
     paths:
-      - test-results/.last-run.json
+      - test-results
       - playwright-report/index.html
 
 build-docs:
