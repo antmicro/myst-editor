@@ -169,8 +169,14 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
                   curr = curr.parent;
                 }
                 const level = parents.filter((p) => p == "BulletList").length - 1;
+                const line = view.state.doc.lineAt(node.from);
+                const monoCharWidth = 8.43333;
+                const indentSize = 2;
                 widgets.push(
-                  Decoration.mark({ class: "cm-inline-bullet", attributes: { style: `margin-left: ${level * 20}px;` } }).range(node.from, node.to),
+                  Decoration.mark({
+                    class: "cm-inline-bullet",
+                    attributes: { style: `margin-left: ${level * monoCharWidth * indentSize}px;` },
+                  }).range(line.from, node.to),
                 );
               }
 
