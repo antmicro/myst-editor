@@ -12,6 +12,16 @@ const Container = styled.div`
   * {
     box-sizing: border-box;
   }
+
+  .marked::after {
+    content: "";
+    display: inline-block;
+    margin-left: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+    background-color: var(--gray-800);
+  }
 `;
 
 const Toggle = styled.button`
@@ -109,16 +119,6 @@ const OptionList = styled.ul`
       font-weight: bold;
     }
   }
-
-  .marked::after {
-    content: "";
-    display: inline-block;
-    margin-left: 8px;
-    width: 8px;
-    height: 8px;
-    border-radius: 100%;
-    background-color: var(--gray-800);
-  }
 `;
 
 /**
@@ -191,7 +191,7 @@ const Select = ({ options, initialValue, onChange, inputPlaceholder, loadMore, s
   return (
     <Container>
       <Toggle id={name} onClick={toggleDropdown}>
-        <span>{selectedOption.value?.label}</span>
+        <span className={selectedOption.value?.marked ? "marked" : ""}>{selectedOption.value?.label}</span>
         <ArrowIcon up={open.value} />
       </Toggle>
       {open.value && (

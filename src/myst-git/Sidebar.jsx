@@ -20,6 +20,12 @@ const GitSidebar = styled.div`
     font-weight: 600;
     font-size: 14px;
   }
+
+  .others {
+    font-size: 12px;
+    margin: 0;
+    margin-top: 6px;
+  }
 `;
 
 const SidebarDetails = styled.details`
@@ -80,6 +86,15 @@ const UnindexedFiles = styled(SidebarDetails)`
     li {
       &.active {
         color: var(--blue-500);
+      }
+      &.marked::after {
+        content: "";
+        display: inline-block;
+        margin-left: 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 100%;
+        background-color: var(--gray-800);
       }
       &:hover {
         text-decoration: underline;
@@ -147,20 +162,6 @@ const Sidebar = ({
     });
   }
 
-  const branchToSelectOpt = (b) => ({ label: b, value: b, marked: docsWithChanges.value.some((desc) => desc.branch === b) });
-  const commitToSelectOpt = (c) => ({
-    label: c.message,
-    value: c.hash,
-    marked: docsWithChanges.value.some((desc) => desc.branch === branch.peek() && desc.commitHash === c.hash),
-  });
-  const fileToSelectOpt = (f) => ({
-    label: f,
-    value: f,
-    marked: docsWithChanges.value.some(
-      ({ branch: branchName, commitHash, file }) => branchName == branch.peek() && commit.peek().hash === commitHash && f == file,
-    ),
-  });
-
   const indexedFiles = useComputed(() => {
     if (!indexFile.value) return [];
     const start = "```{toctree}";
@@ -179,12 +180,47 @@ const Sidebar = ({
       .filter((f) => files.value.some((file) => file == f.file));
   });
   const unIndexedFiles = useComputed(() => files.value.filter((f) => !indexedFiles.value.some((iF) => iF.file === f)));
+  const markedFiles = useComputed(() =>
+    files.value.filter((f) =>
+      docsWithChanges.value.some(
+        ({ branch: branchName, commitHash, file }) => branchName == branch.value && commit.value.hash === commitHash && f == file,
+      ),
+    ),
+  );
+
+  const branchToSelectOpt = (b) => ({ label: b, value: b, marked: docsWithChanges.value.some((desc) => desc.branch === b) });
+  const commitToSelectOpt = (c) => ({
+    label: c.message,
+    value: c.hash,
+    marked: docsWithChanges.value.some((desc) => desc.branch === branch.peek() && desc.commitHash === c.hash),
+  });
+  const fileToSelectOpt = (f) => ({
+    label: f,
+    value: f,
+    marked: docsWithChanges.value.some(
+      ({ branch: branchName, commitHash, file }) => branchName == branch.peek() && commit.peek().hash === commitHash && f == file,
+    ),
+  });
+
+  const otherBranchesWithChanges = useComputed(() => {
+    const branchesWithChanges = new Set(docsWithChanges.value.map(({ branch }) => branch));
+    console.log(branchesWithChanges);
+    branchesWithChanges.delete(branch.value);
+    return branchesWithChanges.size;
+  });
+  const otherCommitsWithChanges = useComputed(() => {
+    if (!commit.value) return 0;
+    const commitsWithChanges = new Set(docsWithChanges.value.filter(({ branch: b }) => b == branch.value).map(({ commitHash }) => commitHash));
+    commitsWithChanges.delete(commit.value.hash);
+    return commitsWithChanges.size;
+  });
 
   return (
     <GitSidebar>
       {indexFile.value && file.value && (
         <TableOfContents
           indexedFiles={indexedFiles}
+          markedFiles={markedFiles}
           currentFile={file.value}
           onFileClick={(f) => switchFile(f.file)}
           getText={getText}
@@ -196,7 +232,12 @@ const Sidebar = ({
         <summary>Unindexed files:</summary>
         <ul>
           {unIndexedFiles.value.map((f) => (
-            <li key={f} title="Go to file" onClick={() => switchFile(f)} className={file.value == f ? "active" : ""}>
+            <li
+              key={f}
+              title="Go to file"
+              onClick={() => switchFile(f)}
+              className={`${file.value == f ? "active" : ""} ${markedFiles.value.includes(f) ? "marked" : ""}`}
+            >
               {f}
             </li>
           ))}
@@ -224,6 +265,11 @@ const Sidebar = ({
           loadMore={loadBranches}
           searchOptions={(input) => searchBranches(input).then((branches) => branches.map(branchToSelectOpt))}
         />
+        {otherBranchesWithChanges > 0 && (
+          <p className="others">
+            {otherBranchesWithChanges} other {otherBranchesWithChanges == 1 ? "branch has" : "branches have"} changes
+          </p>
+        )}
       </div>
       <div>
         <label>Commit:</label>
@@ -236,6 +282,12 @@ const Sidebar = ({
           initialValue={commit.value?.hash}
           searchOptions={(input) => searchCommits(input, branch.value).then((commits) => commits.map(commitToSelectOpt))}
         />
+        {otherCommitsWithChanges > 0 && (
+          <p className="others">
+            {otherCommitsWithChanges} other commit{otherCommitsWithChanges != 1 && "s"} on this branch {otherCommitsWithChanges == 1 ? "has" : "have"}{" "}
+            changes
+          </p>
+        )}
       </div>
       <ChangeHistory>
         <summary>History</summary>

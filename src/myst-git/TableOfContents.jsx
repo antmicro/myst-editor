@@ -37,6 +37,16 @@ const List = styled.div`
 
     li {
       font-size: 16px;
+
+      .marked::after {
+        content: "";
+        display: inline-block;
+        margin-left: 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 100%;
+        background-color: var(--gray-800);
+      }
     }
   }
 
@@ -81,7 +91,7 @@ function Heading({ heading }) {
   );
 }
 
-export const TableOfContents = ({ indexedFiles, currentFile, onFileClick, getText, branch, commit }) => {
+export const TableOfContents = ({ indexedFiles, markedFiles, currentFile, onFileClick, getText, branch, commit }) => {
   const { headings, editorView } = useContext(MystState);
 
   const fileList = useSignal([]);
@@ -121,7 +131,7 @@ export const TableOfContents = ({ indexedFiles, currentFile, onFileClick, getTex
           return (
             <li key={f.file}>
               <span
-                className={`file ${currentFile.startsWith(f.file) ? "active" : ""}`}
+                className={`file ${currentFile.startsWith(f.file) ? "active" : ""} ${markedFiles.value.includes(f.file) ? "marked" : ""}`}
                 title={`Go to file ${f.file}`}
                 onClick={() => onFileClick(f)}
               >
