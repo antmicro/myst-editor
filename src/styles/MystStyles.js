@@ -20,6 +20,7 @@ export const MystCSSVars = styled.div`
   --orange-500: #f59e0b;
   --green-500: #00af91;
   --green-400: #00ccaa;
+  --brown-500: #940;
   --border-2: 3px;
   --dark-violet: #332d37;
 

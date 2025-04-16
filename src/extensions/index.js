@@ -34,7 +34,7 @@ import { Autolink, TaskList } from "@lezer/markdown";
 import { colonFencedCodeParser, customTransformsParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
 import { trackHeadings } from "./trackHeadings";
 import { highlightFocusedActiveLine } from "./activeLineHighlight";
-import { tags } from "@lezer/highlight";
+import { classHighlighter, tags } from "@lezer/highlight";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -62,6 +62,21 @@ const syntaxHighlight = HighlightStyle.define([
   { tag: tags.macroName, color: "var(--blue-500)" },
   { tag: tags.emphasis, fontStyle: "italic" },
   { tag: tags.meta, color: "darkgrey" },
+  { tag: tags.emphasis, fontStyle: "italic" },
+  { tag: tags.strikethrough, textDecoration: "line-through" },
+  { tag: tags.keyword, color: "#708" },
+  { tag: [tags.atom, tags.bool, tags.contentSeparator, tags.labelName], color: "black" },
+  { tag: [tags.literal, tags.inserted], color: "#164" },
+  { tag: [tags.string, tags.deleted], color: "var(--brown-500)" },
+  { tag: [tags.regexp, tags.escape, tags.special(tags.string)], color: "#e40" },
+  { tag: tags.definition(tags.variableName), color: "#00f" },
+  { tag: tags.local(tags.variableName), color: "#30a" },
+  { tag: [tags.typeName, tags.namespace], color: "#085" },
+  { tag: tags.className, color: "#167" },
+  { tag: tags.special(tags.variableName), color: "#256" },
+  { tag: tags.definition(tags.propertyName), color: "var(--blue-500)" },
+  { tag: tags.comment, color: "var(--brown-500)" },
+  { tag: tags.invalid, color: "#f00" },
 ]);
 
 export class ExtensionBuilder {
@@ -97,7 +112,8 @@ export class ExtensionBuilder {
       EditorView.lineWrapping,
       highlightSpecialChars(),
       drawSelection(),
-      syntaxHighlighting(syntaxHighlight, { fallback: true }),
+      syntaxHighlighting(classHighlighter),
+      syntaxHighlighting(syntaxHighlight),
       highlightFocusedActiveLine,
       keymap.of(defaultKeymap),
       keymap.of([indentWithTab, { key: "Mod-Z", run: redo }]),
@@ -107,7 +123,7 @@ export class ExtensionBuilder {
   useMarkdown(transforms) {
     this.extensions.push(
       markdown({
-        codeLanguages: this.codeLanguage,
+        codeLanguages: ExtensionBuilder.codeLanguage,
         addKeymap: false,
         extensions: [Autolink, colonFencedCodeParser, TaskList, tableParser, roleParser, customTransformsParser(transforms)],
       }),

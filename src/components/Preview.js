@@ -324,7 +324,11 @@ export const MdStyles = css`
   }
 
   .hljs-attr {
-    color: rgb(0, 0, 204);
+    color: var(--blue-500);
+  }
+
+  .hljs-comment {
+    color: var(--brown-500);
   }
 `;
 
