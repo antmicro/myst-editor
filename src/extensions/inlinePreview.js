@@ -68,7 +68,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       if (this.cssClasses.length > 0) {
         content.classList.add("inline-custom-styles");
       }
-      this.cssClasses.forEach((c) => content.classList.add(c));
+      this.cssClasses.flatMap((c) => c.split(" ")).forEach((c) => content.classList.add(c));
       const md = text.md.peek();
 
       for (let l = this.start; l <= this.end; l++) {
