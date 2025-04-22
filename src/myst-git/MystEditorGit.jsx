@@ -117,10 +117,11 @@ const MystEditorGit = ({
   }
 
   const commitButton = {
-    tooltip: "Commit",
+    id: "commit",
+    tooltip: "Compare changes and commit",
     icon: CommitIcon,
     action: async () => {
-      options.includeButtons.value = options.includeButtons.peek().filter((b) => b.tooltip != "Commit");
+      options.includeButtons.value = options.includeButtons.peek().filter((b) => b.id != "commit");
       const changedFiles = docsWithChanges
         .peek()
         .filter((d) => d.branch === branch.peek() && d.commitHash === commit.peek().hash)
@@ -198,15 +199,6 @@ const MystEditorGit = ({
     cleanupConnections(commitDocuments.current, collab);
     commitDocuments.current = null;
   }
-  useSignalEffect(() => {
-    if (commit.value?.hash == commits.value[0]?.hash) {
-      if (!options.includeButtons.peek().some((b) => b.tooltip == "Commit")) {
-        options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
-      }
-    } else {
-      options.includeButtons.value = options.includeButtons.peek().filter((b) => b.tooltip != "Commit");
-    }
-  });
 
   async function switchBranch(newBranch, isNew = false) {
     if (isNew) {
@@ -260,6 +252,7 @@ const MystEditorGit = ({
     } else {
       switchBranch(initialBranches[0]);
     }
+    options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
   }, [initialBranches, initialState]);
 
   async function switchCommit(newCommit, isNew = false) {
