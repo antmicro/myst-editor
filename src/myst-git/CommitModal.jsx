@@ -108,7 +108,7 @@ const Modal = styled.dialog`
   }
 `;
 
-const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], parent }) => {
+const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], parent, latestCommit }) => {
   const summary = useSignal(initialSummary);
   const description = useSignal("");
   const message = useComputed(() => `${summary.value}\n\n${description.value}`);
@@ -138,35 +138,45 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
           <Diff key={d.file} parent={parent} document={d} onStage={(staged) => handleStage(staged, d.file)} />
         ))}
       </div>
-      <form
-        onSubmit={(ev) => {
-          ev.preventDefault();
-          if (stagedDocs.value.length === 0) return;
-          modalRef.current.onclose = () => {};
-          modalRef.current.close();
-          onSubmit({ summary: summary.value, message: message.value, stagedDocs: stagedDocs.value });
-        }}
-      >
-        <label htmlFor="summary">Commit summary</label>
-        <input id="summary" type="text" value={summary.value} onChange={(ev) => (summary.value = ev.target.value)} autoFocus />
-        <label htmlFor="description">Commit description</label>
-        <textarea
-          name="description"
-          id="description"
-          value={description.value}
-          onChange={(ev) => (description.value = ev.target.value)}
-          cols={80}
-          rows={5}
-        />
-        <div id="buttons">
-          <button type="submit" disabled={stagedDocs.value.length === 0}>
-            Commit
-          </button>
-          <button type="button" onClick={() => modalRef.current.close()}>
-            Cancel
-          </button>
-        </div>
-      </form>
+      {latestCommit ? (
+        <form
+          onSubmit={(ev) => {
+            ev.preventDefault();
+            if (stagedDocs.value.length === 0) return;
+            modalRef.current.onclose = () => {};
+            modalRef.current.close();
+            onSubmit({ summary: summary.value, message: message.value, stagedDocs: stagedDocs.value });
+          }}
+        >
+          <label htmlFor="summary">Commit summary</label>
+          <input id="summary" type="text" value={summary.value} onChange={(ev) => (summary.value = ev.target.value)} autoFocus />
+          <label htmlFor="description">Commit description</label>
+          <textarea
+            name="description"
+            id="description"
+            value={description.value}
+            onChange={(ev) => (description.value = ev.target.value)}
+            cols={80}
+            rows={5}
+          />
+          <div id="buttons">
+            <button type="submit" disabled={stagedDocs.value.length === 0}>
+              Commit
+            </button>
+            <button type="button" onClick={() => modalRef.current.close()}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <>
+          <p>You can only commit changes from the latest commit of a branch</p>
+          <div id="buttons">
+            <div />
+            <button onClick={() => modalRef.current.close()}>Close</button>
+          </div>
+        </>
+      )}
     </Modal>
   );
 };
