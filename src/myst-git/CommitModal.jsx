@@ -188,6 +188,10 @@ const Diff = ({ document, parent, onStage }) => {
         unifiedMergeView({
           original: document.initialText,
           mergeControls: false,
+          collapseUnchanged: {
+            margin: 3,
+            minSize: 6,
+          },
         }),
       ],
     });
