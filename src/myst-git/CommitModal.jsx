@@ -50,32 +50,32 @@ const Modal = styled.dialog`
     margin-bottom: 20px;
   }
 
+  button {
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: inherit;
+    border: 1px solid var(--icon-border);
+    background-color: var(--icon-bg);
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 15px;
+    transition: 0.4s ease;
+    border-radius: var(--border-radius);
+
+    &:hover {
+      background-color: var(--icon-selected);
+      border: 1px solid var(--icon-selected);
+    }
+  }
+
   #buttons {
     margin-top: 20px;
     display: flex;
     justify-content: space-between;
-
-    button {
-      cursor: pointer;
-      text-transform: uppercase;
-      font-size: 12px;
-      font-weight: bold;
-      font-family: inherit;
-      border: 1px solid var(--icon-border);
-      background-color: var(--icon-bg);
-      height: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0px 15px;
-      transition: 0.4s ease;
-      border-radius: var(--border-radius);
-
-      &:hover {
-        background-color: var(--icon-selected);
-        border: 1px solid var(--icon-selected);
-      }
-    }
   }
 
   #diffs {
@@ -88,6 +88,12 @@ const Modal = styled.dialog`
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+
+  .file-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .file-name {
@@ -109,10 +115,11 @@ const Modal = styled.dialog`
   }
 `;
 
-const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], parent, latestCommit }) => {
+const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], parent, latestCommit, statusSocket }) => {
   const summary = useSignal(initialSummary);
   const description = useSignal("");
   const message = useComputed(() => `${summary.value}\n\n${description.value}`);
+  const discardedDocs = useSignal([]);
   const stagedDocs = useSignal(documents.map((d) => d.file));
   const modalRef = useRef();
 
@@ -135,9 +142,23 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
   return (
     <Modal ref={modalRef}>
       <div id="diffs">
-        {documents.map((d) => (
-          <Diff key={d.file} parent={parent} document={d} onStage={(staged) => handleStage(staged, d.file)} />
-        ))}
+        {documents
+          .filter((d) => !discardedDocs.value.includes(d.file))
+          .map((d) => (
+            <Diff
+              key={d.file}
+              parent={parent}
+              document={d}
+              onStage={(staged) => handleStage(staged, d.file)}
+              discardFile={() => {
+                discardedDocs.value = [...discardedDocs.peek(), d.file];
+                handleStage(false, d.file);
+                d.client.ytext.delete(0, d.client.ytext.length);
+                d.client.ytext.insert(0, d.initialText);
+                statusSocket.current.send(d.client.provider.roomname);
+              }}
+            />
+          ))}
       </div>
       {latestCommit ? (
         <form
@@ -184,7 +205,7 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
 
 const MergeViewCodeEditor = styled(CodeEditor)``;
 
-const Diff = ({ document, parent, onStage }) => {
+const Diff = ({ document, parent, onStage, discardFile }) => {
   const { options } = useContext(MystState);
   const diffRef = useRef();
   const staged = useSignal(true);
@@ -217,15 +238,24 @@ const Diff = ({ document, parent, onStage }) => {
 
   return (
     <div className="diff-parent">
-      <div className="file-name">
-        <input type="checkbox" name={document.file} id={document.file} checked={staged.value} onChange={(ev) => (staged.value = ev.target.checked)} />
-        <label
-          for={document.file}
-          className={staged.value ? "" : "unstaged"}
-          title={staged.value ? "This file will be committed" : "This file will not be committed"}
-        >
-          {document.file}
-        </label>
+      <div className="file-controls">
+        <div className="file-name">
+          <input
+            type="checkbox"
+            name={document.file}
+            id={document.file}
+            checked={staged.value}
+            onChange={(ev) => (staged.value = ev.target.checked)}
+          />
+          <label
+            for={document.file}
+            className={staged.value ? "" : "unstaged"}
+            title={staged.value ? "This file will be committed" : "This file will not be committed"}
+          >
+            {document.file}
+          </label>
+        </div>
+        <button onClick={() => discardFile()}>Discard changes</button>
       </div>
       {staged.value && <MergeViewCodeEditor ref={diffRef} />}
     </div>

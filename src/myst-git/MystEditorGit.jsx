@@ -374,6 +374,7 @@ const MystEditorGit = ({
             documents={commitDocuments.current?.filter?.((d) => d.textChanged) ?? []}
             parent={props.parent}
             latestCommit={commits.value?.[0]?.hash == commit.value?.hash}
+            statusSocket={statusSocket}
           />
           {room.value && <MystEditorPreact />}
         </MystContainer>
