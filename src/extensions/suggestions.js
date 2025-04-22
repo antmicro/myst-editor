@@ -3,7 +3,7 @@ import { Decoration, EditorView, ViewUpdate, WidgetType } from "@codemirror/view
 import { YComments } from "../comments/ycomments";
 import { lineAuthorsEffect } from "../comments/lineAuthors";
 import styled from "styled-components";
-import DefaultButton from "../components/Buttons";
+import { DefaultButton } from "../components/CommonUI";
 
 export const suggestionEffect = StateEffect.define();
 

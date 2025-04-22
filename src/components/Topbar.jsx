@@ -2,7 +2,7 @@ import { styled } from "styled-components";
 import { useContext, useMemo } from "preact/hooks";
 import purify from "dompurify";
 
-import DefaultButton from "./Buttons";
+import { DefaultButton } from "./CommonUI";
 import ButtonGroup from "./ButtonGroup";
 import Avatars from "./Avatars";
 import { MystState } from "../mystState";

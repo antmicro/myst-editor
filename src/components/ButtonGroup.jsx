@@ -1,6 +1,6 @@
 import { useEffect } from "preact/hooks";
 import styled from "styled-components";
-import DefaultButton from "./Buttons.js";
+import { DefaultButton } from "./CommonUI";
 import { useComputed } from "@preact/signals";
 
 const GroupContainer = styled.div`

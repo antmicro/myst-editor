@@ -1,7 +1,7 @@
 import { useContext, useRef } from "preact/hooks";
 import { css, styled } from "styled-components";
 import { MystState } from "../mystState.js";
-import DefaultButton from "./Buttons.js";
+import { DefaultButton, Modal } from "./CommonUI.js";
 import { useSignal, useSignalEffect } from "@preact/signals";
 
 const TemplatesList = styled.div`
@@ -30,25 +30,6 @@ const TemplateButton = styled(DefaultButton)`
         background-color: var(--icon-bg) !important;
       }
     `}
-`;
-
-const Modal = styled.dialog`
-  width: 450px;
-  padding: 20px;
-  background-color: var(--icon-bg);
-  border: 1px solid var(--icon-border);
-  border-radius: var(--border-radius);
-  margin: 0;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  .buttons {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
 `;
 
 async function fetchTemplates(templateListUrl) {

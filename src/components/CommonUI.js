@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const DefaultButton = styled.button`
+export const DefaultButton = styled.button`
   &:focus {
     outline: 0 !important;
   }
@@ -31,4 +31,21 @@ const DefaultButton = styled.button`
   }
 `;
 
-export default DefaultButton;
+export const Modal = styled.dialog`
+  width: 450px;
+  padding: 20px;
+  background-color: var(--icon-bg);
+  border: 1px solid var(--icon-border);
+  border-radius: var(--border-radius);
+  margin: 0;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  .buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+`;
