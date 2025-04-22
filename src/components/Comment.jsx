@@ -45,7 +45,7 @@ const YCommentWrapper = styled.div`
   }
 
   .cm-scroller {
-    overflow-x: unset;
+    overflow-x: unset !important;
   }
 
   .cm-comment-author-colored {
