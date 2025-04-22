@@ -137,9 +137,13 @@ const MystEditorGit = ({
         });
       }
       documents = documents.map((d) => ({ ...d, textChanged: d.text != d.initialText, commentCount: d.client.ycomments.comments.peek().length }));
+
+      // Filter out documents without any changes and remove the change mark from the UI for them all
       const unchangedDocs = documents.filter((d) => !d.textChanged && d.commentCount == 0);
       cleanupConnections(unchangedDocs, collab);
+      unchangedDocs.map((d) => d.client.provider.roomname).forEach((r) => statusSocket.current.send(r));
       documents = documents.filter((d) => d.textChanged || d.commentCount > 0);
+
       if (!documents.some((d) => d.textChanged)) {
         toastNotify({ text: "No changes to commit" });
         options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
