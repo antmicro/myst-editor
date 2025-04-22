@@ -188,7 +188,13 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
                 const parent = node.node.parent.type.name;
                 // Hide the space between the HeaderMark and text in ATX headings
                 const to = parent.startsWith("ATX") ? node.to + 1 : node.to;
-                widgets.push(decorationHidden.range(node.from, to));
+                const line = view.state.doc.lineAt(node.from);
+                const headingText = line.text.slice(node.to - line.from).trim();
+                if (parent.startsWith("ATX") && headingText.length == 0) {
+                  console.warn(`Empty heading in inline mode, not rendering(line ${line.number}): "${line.text}"`);
+                } else {
+                  widgets.push(decorationHidden.range(node.from, to));
+                }
               }
 
               if (tokenHidden.includes(node.name)) {
