@@ -1,10 +1,11 @@
 import { useComputed, useSignal, useSignalEffect } from "@preact/signals";
 import { EditorView } from "codemirror";
-import { useEffect, useRef } from "preact/hooks";
+import { useContext, useEffect, useRef } from "preact/hooks";
 import styled from "styled-components";
 import { ExtensionBuilder } from "../extensions";
 import { unifiedMergeView } from "@codemirror/merge";
 import { CodeEditor } from "../components/CodeMirror";
+import { MystState } from "../mystState";
 
 const Modal = styled.dialog`
   background-color: white;
@@ -184,6 +185,7 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
 const MergeViewCodeEditor = styled(CodeEditor)``;
 
 const Diff = ({ document, parent, onStage }) => {
+  const { options } = useContext(MystState);
   const diffRef = useRef();
   const staged = useSignal(true);
 
@@ -194,7 +196,7 @@ const Diff = ({ document, parent, onStage }) => {
       root: parent,
       doc: document.text,
       extensions: [
-        ...ExtensionBuilder.basicSetup().useReadonly().create(),
+        ...ExtensionBuilder.basicSetup().useMarkdown(options.transforms.value).useReadonly().create(),
         unifiedMergeView({
           original: document.initialText,
           mergeControls: false,
