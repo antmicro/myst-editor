@@ -142,6 +142,14 @@ graph TD
       (html) => expect(html).toContain("<svg"),
     );
   });
+
+  test("Inline mode", async ({ page }) => {
+    await page.getByTitle("Inline Preview").click();
+    await page.waitForSelector(".cm-inline-rendered-md");
+    await clearEditor(page);
+    await insertToMainEditor(page, { from: 0, insert: `# |date|\n## Test heading\ntest123` });
+    await page.waitForSelector(".inline-custom-styles");
+  });
 });
 
 test.describe.parallel("With collaboration enabled", () => {
