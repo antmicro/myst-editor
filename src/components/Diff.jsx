@@ -5,6 +5,7 @@ import { styled } from "styled-components";
 import { ExtensionBuilder } from "../extensions";
 import { MystState } from "../mystState";
 import { DefaultButton, Modal } from "./CommonUI";
+import { useSignalEffect } from "@preact/signals";
 
 const DiffContainer = styled.div`
   display: grid;
@@ -45,7 +46,7 @@ const Diff = () => {
       return false;
     }
     mergeView.current = initMergeView({
-      old: options.initialText,
+      old: options.initialText.peek(),
       current: text.text.peek(),
       root: options.parent,
       transforms: options.transforms.value,
@@ -61,6 +62,14 @@ const Diff = () => {
     };
   }, []);
 
+  // Sync text changes with diff view
+  useSignalEffect(() => {
+    mergeView.current?.b?.dispatch?.({ changes: { from: 0, to: mergeView.current?.b?.state?.doc?.length, insert: text.text.value } });
+  });
+  useSignalEffect(() => {
+    mergeView.current?.a?.dispatch?.({ changes: { from: 0, to: mergeView.current?.a?.state?.doc?.length, insert: options.initialText.value } });
+  });
+
   return (
     <DiffContainer>
       <MergeViewCodeEditor ref={leftRef} />
@@ -70,9 +79,7 @@ const Diff = () => {
         <div className="buttons">
           <DefaultButton
             onClick={() => {
-              const changes = { from: 0, to: editorView.value.state.doc.length, insert: options.initialText };
-              editorView.value.dispatch({ changes });
-              mergeView.current.b.dispatch({ changes: { ...changes, to: mergeView.current.b.state.doc.length } });
+              editorView.value.dispatch({ changes: { from: 0, to: editorView.value.state.doc.length, insert: options.initialText.peek() } });
               modalRef.current.close();
             }}
           >

@@ -2,6 +2,8 @@ import styled from "styled-components";
 import Select from "./Select";
 import { batch, useComputed } from "@preact/signals";
 import { TableOfContents } from "./TableOfContents";
+import { useContext } from "preact/hooks";
+import { MystState } from "../mystState";
 
 const GitSidebar = styled.div`
   display: flex;
@@ -114,7 +116,6 @@ const Sidebar = ({
   commit,
   files,
   file,
-  initialText,
   getBranches,
   getCommits,
   getText,
@@ -124,6 +125,8 @@ const Sidebar = ({
   indexFile,
   changeHistory,
 }) => {
+  const { options } = useContext(MystState);
+
   async function loadBranches(page) {
     const moreBranches = await getBranches(page);
     if (moreBranches.length == 0) throw "Empty branches";
@@ -143,7 +146,7 @@ const Sidebar = ({
       commit.value = histEntry.commit;
 
       file.value = histEntry.file;
-      initialText.value = "";
+      options.initialText.value = "";
     });
   };
 
@@ -158,7 +161,7 @@ const Sidebar = ({
     const text = await getText(branch.peek(), commit.peek(), newFile);
     batch(() => {
       file.value = newFile;
-      initialText.value = text;
+      options.initialText.value = text;
     });
   }
 

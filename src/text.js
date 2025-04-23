@@ -22,8 +22,8 @@ hljs.registerLanguage("yaml", yamlHighlight);
 
 /** This class stores the document text and renders the Markdown in the Preview */
 export class TextManager {
-  constructor({ initialText = "", editorView, cache, options, userSettings }) {
-    this.text = signal(initialText);
+  constructor({ initialText, editorView, cache, options, userSettings }) {
+    this.text = signal(initialText.peek());
     this.lineMap = new Map();
     this.chunks = [];
     this.editorView = editorView;

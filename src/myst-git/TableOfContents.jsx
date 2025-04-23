@@ -96,13 +96,10 @@ export const TableOfContents = ({ indexedFiles, markedFiles, currentFile, onFile
 
   const fileList = useSignal([]);
   useSignalEffect(() => {
-    branch.value;
-    commit.value;
-
     const files = indexedFiles.value;
     (async () => {
       for (const f of files) {
-        const text = await getText(branch.value, commit.value, f.file);
+        const text = await getText(branch.peek(), commit.peek(), f.file);
         const headingMatch = text.match(/^(#+) (.+)/m);
         if (!headingMatch || headingMatch[1].length !== 1) {
           f.title = f.file;

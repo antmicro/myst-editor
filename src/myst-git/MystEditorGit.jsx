@@ -84,7 +84,6 @@ const MystEditorGit = ({
   const commit = useSignal();
   const files = useSignal([]);
   const file = useSignal();
-  const initialText = useSignal("");
   const room = useComputed(() => (commit.value && file.value ? `${repo}/${branch.value}/${commit.value.hash}/${file.value}` : ""));
   const changeHistory = useSignal(initialHistory);
   const toast = useSignal({ content: null, timeout: null });
@@ -96,12 +95,8 @@ const MystEditorGit = ({
   const commitDocuments = useRef(null);
 
   useEffect(() => {
-    window.myst_editor[props.id].git = { branch, commits, commit, files, file, initialText, room };
+    window.myst_editor[props.id].git = { branch, commits, commit, files, file, room };
   }, [props.id]);
-
-  useSignalEffect(() => {
-    options.initialText = initialText.value;
-  });
 
   useSignalEffect(() => {
     if (!room.value) return;
@@ -132,7 +127,7 @@ const MystEditorGit = ({
         documents.unshift({
           client: collab.peek(),
           file: file.peek(),
-          initialText: initialText.peek(),
+          initialText: options.initialText.peek(),
           text: collab.peek().ytext.toString(),
         });
       }
@@ -219,7 +214,7 @@ const MystEditorGit = ({
       commit.value = resolvedCommits[0];
       files.value = resolvedFiles;
       file.value = resolvedFile;
-      initialText.value = text;
+      options.initialText.value = text;
     });
   }
 
@@ -245,7 +240,7 @@ const MystEditorGit = ({
       commit.value = currCommit;
       files.value = resolvedFiles;
       file.value = currFile;
-      initialText.value = text;
+      options.initialText.value = text;
     });
   };
 
@@ -272,7 +267,7 @@ const MystEditorGit = ({
       commit.value = newCommitFromList;
       files.value = resolvedFiles;
       file.value = resolvedFile;
-      initialText.value = text;
+      options.initialText.value = text;
     });
   }
 
@@ -335,7 +330,6 @@ const MystEditorGit = ({
               commit,
               files,
               file,
-              initialText,
               getBranches,
               getCommits,
               getText,

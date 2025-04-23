@@ -286,7 +286,7 @@ export const EditorTopbar = ({ alert, buttons }) => {
         text: "Diff View",
         disabled: emptyDiff.value,
         action: () => (options.mode.value = "Diff"),
-        hover: () => (emptyDiff.value = options.initialText == editorView.value?.state?.doc?.toString?.()),
+        hover: () => (emptyDiff.value = options.initialText.value == editorView.value?.state?.doc?.toString?.()),
         icon: DiffIcon,
       },
       { id: "outline", text: "Table of Contents", action: () => (options.mode.value = "Outline"), icon: TocIcon },

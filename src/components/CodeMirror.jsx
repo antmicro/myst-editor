@@ -282,11 +282,11 @@ const CodeMirror = () => {
     if (options.collaboration.value.enabled) {
       if (!collab.value.ready.value || collab.value.lockMsg.value) return;
 
-      if (collab.value.ytext.toString().length === 0 && options.initialText.length > 0) {
+      if (collab.value.ytext.toString().length === 0 && options.initialText.peek().length > 0) {
         console.warn("[Collaboration] Remote state is empty, overriding with local state");
-        text.text.value = options.initialText;
+        text.text.value = options.initialText.peek();
         collab.value.ydoc.transact(() => {
-          collab.value.ytext.insert(0, options.initialText);
+          collab.value.ytext.insert(0, options.initialText.peek());
           const metaMap = collab.value.ydoc.getMap("meta");
           metaMap.set("initial", true);
         });
