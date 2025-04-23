@@ -27,14 +27,15 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
   const markdownTheme = EditorView.theme({
     "&": { fontSize: "16px" },
     ".cm-inline-bullet *": { display: "none" },
-    ".cm-inline-ordered-list-marker *": { color: "black !important" },
+    ".cm-inline-ordered-list-marker *": { display: "none" },
+    ".cm-inline-indent": { display: "inline-block" },
+    ".cm-inline-indent *": { display: "none" },
     ":is(.cm-widgetBuffer:has(+ .inline-custom-styles), .inline-custom-styles + .cm-widgetBuffer)": { display: "none" },
   });
 
   const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Image", "Blockquote"];
   const tokenHidden = ["HardBreak", "EmphasisMark"];
   const decorationHidden = Decoration.replace({});
-  const decorationOrderedListNum = Decoration.mark({ class: "cm-inline-ordered-list-marker" });
   const decorationMonospace = Decoration.mark({ class: "cm-inline-mono" });
   const nodeInSelection = (state, node) =>
     editorView.peek()?.hasFocus &&
@@ -162,26 +163,21 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
               }
 
               if (node.name === "ListMark" && node.matchContext(["BulletList", "ListItem"]) && !nodeInSelection(view.state, node)) {
-                const parents = [];
-                let curr = node.node.parent;
-                while (curr.name != "Document") {
-                  parents.push(curr.name);
-                  curr = curr.parent;
-                }
-                const level = parents.filter((p) => p == "BulletList").length - 1;
-                const line = view.state.doc.lineAt(node.from);
-                const monoCharWidth = 8.43333;
-                const indentSize = 2;
                 widgets.push(
                   Decoration.mark({
                     class: "cm-inline-bullet",
-                    attributes: { style: `margin-left: ${level * monoCharWidth * indentSize}px;` },
-                  }).range(line.from, node.to),
+                  }).range(node.from, node.to),
                 );
               }
 
-              if (node.name === "ListMark" && node.matchContext(["OrderedList", "ListItem"])) {
-                widgets.push(decorationOrderedListNum.range(node.from, node.to));
+              if (node.name === "ListMark" && node.matchContext(["OrderedList", "ListItem"]) && !nodeInSelection(view.state, node)) {
+                // Get what list item number should this one have, this is to keep it consistent with standard markdown-it rendering
+                const marks = node.node.parent.parent.getChildren("ListItem").flatMap((i) => i.getChildren("ListMark"));
+                const base = parseInt(view.state.doc.sliceString(marks[0].from, marks[0].to));
+                const num = marks.findIndex((m) => m.from == node.from) + base;
+                widgets.push(
+                  Decoration.mark({ class: "cm-inline-ordered-list-marker", attributes: { "data-item-num": `${num}.` } }).range(node.from, node.to),
+                );
               }
 
               if (node.name === "HeaderMark") {
@@ -212,6 +208,36 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
               widgets.push(decorationMonospace.range(startLine.from, endLine.to));
             }
           });
+        }
+
+        // Make all indenting same width as monospace text indent
+        const selectionLines = editorView.peek()?.hasFocus
+          ? new Set(
+              view.state.selection.ranges.flatMap((r) => {
+                const startLine = view.state.doc.lineAt(r.from).number;
+                const endLine = view.state.doc.lineAt(r.to).number;
+                return Array.from({ length: endLine - startLine + 1 }, (_, i) => i + startLine);
+              }),
+            )
+          : new Set();
+        for (const range of view.visibleRanges) {
+          const start = view.state.doc.lineAt(range.from).number;
+          const end = view.state.doc.lineAt(range.to).number;
+          for (let i = start; i <= end; i++) {
+            if (selectionLines.has(i)) continue;
+            const line = view.state.doc.line(i);
+            const indentLength = line.text.length - line.text.trimStart().length;
+            // Empty line or no indent
+            if (indentLength == line.text.length || indentLength == 0) continue;
+
+            const monoCharWidth = 8.43333;
+            widgets.push(
+              Decoration.mark({ class: "cm-inline-indent", attributes: { style: `width: ${indentLength * monoCharWidth}px;` } }).range(
+                line.from,
+                line.from + indentLength,
+              ),
+            );
+          }
         }
 
         widgets.sort((w1, w2) => w1.from - w2.from);

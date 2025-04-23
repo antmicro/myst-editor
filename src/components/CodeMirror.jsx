@@ -215,6 +215,12 @@ const CodeEditor = styled.div`
     content: "•";
   }
 
+  .cm-inline-ordered-list-marker::after {
+    display: inline-block;
+    color: #000;
+    content: attr(data-item-num);
+  }
+
   .cm-inline-rendered-md {
     &:not(&.inline-custom-styles) {
       all: initial;
