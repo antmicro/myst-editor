@@ -126,6 +126,9 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
   useEffect(() => {
     if (initialSummary) {
       summary.value = initialSummary;
+      description.value = "";
+      discardedDocs.value = [];
+      stagedDocs.value = documents.map((d) => d.file);
       modalRef.current?.showModal?.();
       modalRef.current.onclose = onClose;
     }
