@@ -204,7 +204,6 @@ const Sidebar = ({
 
   const otherBranchesWithChanges = useComputed(() => {
     const branchesWithChanges = new Set(docsWithChanges.value.map(({ branch }) => branch));
-    console.log(branchesWithChanges);
     branchesWithChanges.delete(branch.value);
     return branchesWithChanges.size;
   });
