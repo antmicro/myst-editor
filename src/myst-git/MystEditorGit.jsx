@@ -440,7 +440,7 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
         const text = await params.getText(window.myst_editor[editorId].git.branch.peek(), window.myst_editor[editorId].git.commit.peek(), file);
         batch(() => {
           window.myst_editor[editorId].git.file.value = file;
-          window.myst_editor[editorId].git.initialText.value = text;
+          window.myst_editor[editorId].state.options.initialText.value = text;
         });
       })();
       return true;
