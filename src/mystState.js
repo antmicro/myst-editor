@@ -261,6 +261,17 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     { once: true },
   );
 
+  // Yjs catches errors when handling updates so we need this to detect them
+  const defaultConsoleError = console.error;
+  console.error = (msg, ...args) => {
+    if (typeof msg === "string" && msg.startsWith("Caught error while handling a Yjs update")) {
+      if (state.error.value == null) {
+        state.error.value = { src: "Yjs update error", error: args[0] };
+      }
+    }
+    defaultConsoleError(msg, ...args);
+  };
+
   // Update comment positions when chaning editor modes
   const modeCleanup = effect(() => {
     state.options.mode.value;
