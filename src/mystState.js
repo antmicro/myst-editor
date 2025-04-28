@@ -246,8 +246,20 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     text: null,
     /** @type {Signal<{level: number, text: string, pos: number}[]>} */
     headings: signal([]),
+    /** @type {Signal<{ src: string; error: Error } | null>} */
+    error: signal(null),
   };
   state.text = new TextManager({ ...signalOptions, ...state });
+
+  window.addEventListener(
+    "error",
+    (ev) => {
+      if (state.error.value) return;
+      const err = ev.error instanceof Error ? ev.error : new Error(ev.message);
+      state.error.value = { src: "ErrorEvent", error: err };
+    },
+    { once: true },
+  );
 
   // Update comment positions when chaning editor modes
   const modeCleanup = effect(() => {

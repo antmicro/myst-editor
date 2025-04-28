@@ -244,14 +244,14 @@ const CodeEditor = styled.div`
 `;
 
 const CodeMirror = () => {
-  const { editorView, options, collab, userSettings, linter, text, headings } = useContext(MystState);
+  const { editorView, options, collab, userSettings, linter, text, headings, error } = useContext(MystState);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
   const renderTimer = useRef(null);
 
   useSignalEffect(() => {
-    if (!options.collaboration.value.enabled || (collab.value.ready.value && !collab.value.lockMsg.value)) return;
+    if (!options.collaboration.value.enabled || (collab.value.ready.value && !collab.value.lockMsg.value && !error.value)) return;
     editorView.value?.destroy();
 
     const view = new EditorView({
@@ -280,7 +280,7 @@ const CodeMirror = () => {
 
   useSignalEffect(() => {
     if (options.collaboration.value.enabled) {
-      if (!collab.value.ready.value || collab.value.lockMsg.value) return;
+      if (!collab.value.ready.value || collab.value.lockMsg.value || error.value) return;
 
       if (collab.value.ytext.toString().length === 0 && options.initialText.peek().length > 0) {
         console.warn("[Collaboration] Remote state is empty, overriding with local state");
@@ -335,6 +335,7 @@ const CodeMirror = () => {
         .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView, linter))
         .if(options.mode.value === "Inline", (b) => b.useInlinePreview(text, options, editorView))
         .useTrackHeadings(headings)
+        .useExceptionSink(error)
         .create(),
     });
 

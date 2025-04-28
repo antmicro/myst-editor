@@ -311,6 +311,17 @@ export class ExtensionBuilder {
     return this;
   }
 
+  useExceptionSink(error) {
+    this.extensions.push(
+      EditorView.exceptionSink.of((e) => {
+        if (error.value) return;
+        const err = e instanceof Error ? e : new Error(e.toString());
+        error.value = { src: "exceptionSink", error: err };
+      }),
+    );
+    return this;
+  }
+
   create() {
     return [...this.important, ...this.base, ...this.extensions];
   }
