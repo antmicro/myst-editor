@@ -12,7 +12,7 @@ import { batch, computed, signal, effect, useSignal, useSignalEffect } from "@pr
 import { MystContainer } from "./styles/MystStyles";
 import { syncCheckboxes } from "./markdown/markdownCheckboxes";
 import { TableOfContents } from "./components/TableOfContents";
-import { DefaultButton } from "./components/CommonUI";
+import ErrorModal from "./components/ErrorModal";
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -83,9 +83,6 @@ const FlexWrapper = styled.div`
 
 const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val ? "hidden" : "visible");
 
-const formatError = (/** @type {Error} */ error, src, mode) =>
-  `\`\`\`\nError detected from: ${src}, while in mode: ${mode}\n${error.name}: ${error.message} ${error.cause ?? ""}\n${error.stack ?? ""}\`\`\``;
-
 const MystEditor = () => {
   const { editorView, cache, options, collab, text } = useContext(MystState);
   const fullscreen = useSignal(false);
@@ -136,14 +133,7 @@ const MystEditor = () => {
             <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
           )}
           {options.collaboration.value.enabled && collab.value.lockMsg.value && <StatusBanner>{collab.value.lockMsg}</StatusBanner>}
-          {error.value && (
-            <StatusBanner>
-              The editor ran into an error, please try reloading the page
-              <DefaultButton onClick={() => navigator.clipboard.writeText(formatError(error.value.error, error.value.src, options.mode.value))}>
-                Copy error to clipboard
-              </DefaultButton>
-            </StatusBanner>
-          )}
+          <ErrorModal />
           <MystWrapper fullscreen={fullscreen.value}>
             <FlexWrapper id="editor-wrapper">
               <CodeMirror />
