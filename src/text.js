@@ -93,7 +93,11 @@ export class TextManager {
 
   observePreview() {
     if (!this.preview.value) return;
-    const imageObserver = new ResizeObserver(() => this.editorView.value.dispatch({ effects: markdownUpdatedEffect.of(true) }));
+    const imageObserver = new ResizeObserver(() => {
+      // https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver#observation_errors
+      // Using this without requestAnimationFrame caused some observation errors while rendering
+      requestAnimationFrame(() => this.editorView.value.dispatch({ effects: markdownUpdatedEffect.of(true) }));
+    });
     const observer = new MutationObserver(() => {
       this.editorView.value.dispatch({ effects: markdownUpdatedEffect.of(true) });
       this.preview.value.querySelectorAll("img").forEach((i) => imageObserver.observe(i));

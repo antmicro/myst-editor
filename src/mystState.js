@@ -251,10 +251,12 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
   };
   state.text = new TextManager({ ...signalOptions, ...state });
 
+  const ignoredErrors = ["ResizeObserver loop completed with undelivered notifications"];
   window.addEventListener(
     "error",
     (ev) => {
       if (state.error.value) return;
+      if (typeof ev.message == "string" && ignoredErrors.some((ie) => ev.message.startsWith(ie))) return;
       const err = ev.error instanceof Error ? ev.error : new Error(ev.message);
       state.error.value = { src: "ErrorEvent", error: err };
     },
