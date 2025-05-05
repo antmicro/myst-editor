@@ -13,6 +13,7 @@ import { MystContainer } from "./styles/MystStyles";
 import { syncCheckboxes } from "./markdown/markdownCheckboxes";
 import { TableOfContents } from "./components/TableOfContents";
 import ErrorModal from "./components/ErrorModal";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -127,51 +128,53 @@ const MystEditor = () => {
   return (
     <StyleSheetManager target={options.parent}>
       <MystContainer id="myst-css-namespace">
-        <EditorParent mode={options.mode.value} fullscreen={fullscreen.value}>
-          {options.topbar.value && <EditorTopbar alert={alert} buttons={buttons} />}
-          {options.collaboration.value.enabled && !collab.value.ready.value && (
-            <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
-          )}
-          {options.collaboration.value.enabled && collab.value.lockMsg.value && <StatusBanner>{collab.value.lockMsg}</StatusBanner>}
-          <ErrorModal />
-          <MystWrapper fullscreen={fullscreen.value}>
-            <FlexWrapper id="editor-wrapper">
-              <CodeMirror />
-            </FlexWrapper>
-            <FlexWrapper id="preview-wrapper">
-              <Preview
-                ref={preview}
-                mode={options.mode.value}
-                onClick={(ev) => {
-                  if (options.onPreviewClick.value?.(ev)) return;
-                  syncCheckboxes(ev, text.lineMap, editorView.value);
-                  if (options.syncScroll.value && options.mode.value == "Both")
-                    handlePreviewClickToScroll(ev, text.lineMap, preview, editorView.value);
-                }}
-              >
-                <PreviewFocusHighlight className="cm-previewFocus" />
-              </Preview>
-            </FlexWrapper>
-            {options.mode.value === "Diff" && (
-              <FlexWrapper>
-                <Diff />
-              </FlexWrapper>
+        <ErrorModal />
+        <ErrorBoundary>
+          <EditorParent mode={options.mode.value} fullscreen={fullscreen.value}>
+            {options.topbar.value && <EditorTopbar alert={alert} buttons={buttons} />}
+            {options.collaboration.value.enabled && !collab.value.ready.value && (
+              <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
             )}
-            {options.mode.value == "Resolved" &&
-              options.collaboration.value.commentsEnabled &&
-              options.collaboration.value.resolvingCommentsEnabled &&
-              collab.value.ready.value && (
-                <FlexWrapper id="resolved-wrapper">
-                  <ResolvedComments />
+            {options.collaboration.value.enabled && collab.value.lockMsg.value && <StatusBanner>{collab.value.lockMsg}</StatusBanner>}
+            <MystWrapper fullscreen={fullscreen.value}>
+              <FlexWrapper id="editor-wrapper">
+                <CodeMirror />
+              </FlexWrapper>
+              <FlexWrapper id="preview-wrapper">
+                <Preview
+                  ref={preview}
+                  mode={options.mode.value}
+                  onClick={(ev) => {
+                    if (options.onPreviewClick.value?.(ev)) return;
+                    syncCheckboxes(ev, text.lineMap, editorView.value);
+                    if (options.syncScroll.value && options.mode.value == "Both")
+                      handlePreviewClickToScroll(ev, text.lineMap, preview, editorView.value);
+                  }}
+                >
+                  <PreviewFocusHighlight className="cm-previewFocus" />
+                </Preview>
+              </FlexWrapper>
+              {options.mode.value === "Diff" && (
+                <FlexWrapper>
+                  <Diff />
                 </FlexWrapper>
               )}
-            {options.mode.value === "Outline" && (
-              <FlexWrapper>
-                <TableOfContents />
-              </FlexWrapper>
-            )}
-          </MystWrapper>
-        </EditorParent>
+              {options.mode.value == "Resolved" &&
+                options.collaboration.value.commentsEnabled &&
+                options.collaboration.value.resolvingCommentsEnabled &&
+                collab.value.ready.value && (
+                  <FlexWrapper id="resolved-wrapper">
+                    <ResolvedComments />
+                  </FlexWrapper>
+                )}
+              {options.mode.value === "Outline" && (
+                <FlexWrapper>
+                  <TableOfContents />
+                </FlexWrapper>
+              )}
+            </MystWrapper>
+          </EditorParent>
+        </ErrorBoundary>
       </MystContainer>
     </StyleSheetManager>
   );
