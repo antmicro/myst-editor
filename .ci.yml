@@ -1,3 +1,6 @@
+variables:
+  SCALENODE_RAM: 8192
+
 stages:
   - build
   - doc-deploy
@@ -7,6 +10,8 @@ stages:
 build:
   stage: build
   image: node:20
+  variables:
+    NODE_OPTIONS: "--max-old-space-size=4096"
   before_script:
     - npm ci
   script:
