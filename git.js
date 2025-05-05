@@ -100,3 +100,4 @@ g({
   index: "docs/source/index.md",
   docsRoot: "docs/source"
 }, document.getElementById("myst"));
+//# sourceMappingURL=git.js.map
