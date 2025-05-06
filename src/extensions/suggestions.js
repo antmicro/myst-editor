@@ -104,6 +104,7 @@ class Replacement extends WidgetType {
     this.color = color;
     this.from = from;
     this.to = to;
+    /** @type {EditorView} */
     this.view = view;
     this.remove = remove;
   }
@@ -116,10 +117,16 @@ class Replacement extends WidgetType {
     replacementText.title = this.remove ? "Remove section" : "Accept suggestion";
 
     replacementText.addEventListener("click", () => {
+      let toOffset = 0;
+      const toLine = this.view.state.doc.lineAt(this.to);
+      if (this.remove && this.to < toLine.to) {
+        toOffset = 1;
+      }
+
       this.view.dispatch({
         changes: {
           from: this.from,
-          to: this.remove ? this.to + 1 : this.to,
+          to: this.to + toOffset,
           insert: this.remove ? "" : this.text,
         },
       });

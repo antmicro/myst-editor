@@ -550,13 +550,15 @@ export class YComments {
     });
   }
 
-  mapThroughChanges(comment, transaction, keepNonEmptyLines = false) {
-    const oldPos = transaction.startState.doc.line(comment.lineNumber).from;
+  mapThroughChanges(comment, /** @type {Transaction} */ transaction, keepNonEmptyLines = false) {
+    // Make sure the comment position is not beyond the last line in the document
+    const oldLine = Math.min(comment.lineNumber, transaction.startState.doc.lines);
+    const oldPos = transaction.startState.doc.line(oldLine).from;
     const newPos = transaction.changes.mapPos(oldPos, 1);
     const lineDeletedViaSelection = transaction.changes.mapPos(oldPos, 1, MapMode.TrackDel) == null;
     const lineDeletedViaBackspace =
       transaction.changes.mapPos(oldPos, 1, MapMode.TrackBefore) == null &&
-      (!keepNonEmptyLines || transaction.startState.doc.line(comment.lineNumber).text == "");
+      (!keepNonEmptyLines || transaction.startState.doc.line(oldLine).text == "");
     let lineCut = false;
     transaction.changes.iterChangedRanges((from) => {
       if (from == oldPos) {
