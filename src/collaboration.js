@@ -11,12 +11,15 @@ export class CollaborationClient {
   #lockMsg = signal(null);
   #users = signal([]);
   #localUser = {};
+  #offlineHandler;
+  #onlineHandler;
   lockMsg = computed(() => this.#lockMsg.value);
   users = computed(() => this.#users.value);
 
   constructor(settings, editorOptions = { id: null, parent: null, hideUsernameDelay: null, getAvatar: () => {}, getUserUrl: () => {} }) {
     this.ready = computed(() => this.#synced.value && this.#connected.value);
     this.ydoc = new Y.Doc();
+    this.settings = settings;
     this.provider = new WebsocketProvider(settings.wsUrl, settings.room, this.ydoc, {
       connect: settings.mode === "websocket",
       params: {},
@@ -66,6 +69,10 @@ export class CollaborationClient {
 
     this.provider.on("sync", (sync) => (this.#synced.value = sync));
     this.provider.on("status", ({ status }) => (this.#connected.value = status == "connected"));
+    this.#offlineHandler = this.#handleOffline.bind(this);
+    this.#onlineHandler = this.#handleOnline.bind(this);
+    window.addEventListener("offline", this.#offlineHandler);
+    window.addEventListener("online", this.#onlineHandler);
 
     if (editorOptions.parent) {
       hideUsernames({
@@ -100,7 +107,21 @@ export class CollaborationClient {
     this.metaMap.delete("lock");
   }
 
+  #handleOffline() {
+    if (this.settings.mode !== "local" && import.meta.env.PROD) {
+      this.provider.disconnect();
+    }
+  }
+
+  #handleOnline() {
+    if (this.settings.mode !== "local" && import.meta.env.PROD) {
+      this.provider.connect();
+    }
+  }
+
   destroy() {
+    window.removeEventListener("offline", this.#offlineHandler);
+    window.removeEventListener("online", this.#onlineHandler);
     this.provider.destroy();
     this.ydoc.destroy();
   }
