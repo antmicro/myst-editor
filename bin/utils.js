@@ -474,7 +474,7 @@ export const handleRequest = (/** @type {http.IncomingMessage} */ request) => {
     const doc = docs.get(room);
     if (!doc) return { code: 404, error: `Room ${room} does not exist` };
 
-    console.log(`Disconnecting ${params.get("users")}`);
+    console.log(`[handleRequest] Retaining ${params.get("users")}`);
 
     if (!params.get("users")) {
       return { code: 400, error: "No users were supplied" };
