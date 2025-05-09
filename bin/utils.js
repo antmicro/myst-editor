@@ -356,7 +356,7 @@ const messageListener = (conn, doc, message) => {
  * @param {WSSharedDoc} doc
  * @param {any} conn
  */
-const closeConn = (doc, conn) => {
+const closeConn = (doc, conn, reason) => {
   if (doc.conns.has(conn)) {
     /**
      * @type {Set<number>}
@@ -365,7 +365,7 @@ const closeConn = (doc, conn) => {
     const controlledIds = doc.conns.get(conn);
     doc.conns.delete(conn);
 
-    logAsync(doc.name, { event: "connection-teardown", connectionId: conn.__connectionId });
+    logAsync(doc.name, { event: "connection-teardown", connectionId: conn.__connectionId, reason });
 
     awarenessProtocol.removeAwarenessStates(doc.awareness, Array.from(controlledIds), null);
     if (doc.conns.size === 0 && persistence !== null) {
@@ -374,7 +374,7 @@ const closeConn = (doc, conn) => {
       // is persisted (when a WS connection is being closed) and then immediately loaded from DB (when a new WS connection is being opened).
       persistence
         .writeState(doc.name, doc)
-        .then(() => logAsync(doc.name, { event: "connection-teardown", connectionId: conn.__connectionId, msg: "Document state persisted" }));
+        .then(() => logAsync(doc.name, { event: "connection-teardown", connectionId: conn.__connectionId, reason, msg: "Document state persisted" }));
     }
   }
   conn.close();
@@ -387,18 +387,18 @@ const closeConn = (doc, conn) => {
  */
 const send = (doc, conn, m) => {
   if (conn.readyState !== wsReadyStateConnecting && conn.readyState !== wsReadyStateOpen) {
-    closeConn(doc, conn);
+    closeConn(doc, conn, "Connection state not connecting or open");
   }
   try {
     logAsync(doc.name, { event: "ws-message-send", connectionId: conn.__connectionId, msg: tryDecode(m) });
     conn.send(
       m,
       /** @param {any} err */ (err) => {
-        err != null && closeConn(doc, conn);
+        err != null && closeConn(doc, conn, "Callback error while sending");
       },
     );
   } catch (e) {
-    closeConn(doc, conn);
+    closeConn(doc, conn, "Error caught while sending");
   }
 };
 
@@ -439,7 +439,7 @@ export const setupWSConnection = async (conn, req, { docName = req.url.split("?"
   const pingInterval = setInterval(() => {
     if (!pongReceived) {
       if (doc.conns.has(conn)) {
-        closeConn(doc, conn);
+        closeConn(doc, conn, `Pong not received after ${pingTimeout}ms`);
       }
       clearInterval(pingInterval);
     } else if (doc.conns.has(conn)) {
@@ -447,13 +447,13 @@ export const setupWSConnection = async (conn, req, { docName = req.url.split("?"
       try {
         conn.ping();
       } catch (e) {
-        closeConn(doc, conn);
+        closeConn(doc, conn, "Caught error while pinging");
         clearInterval(pingInterval);
       }
     }
   }, pingTimeout);
   conn.on("close", () => {
-    closeConn(doc, conn);
+    closeConn(doc, conn, "Close event");
     clearInterval(pingInterval);
   });
   conn.on("pong", () => {
