@@ -348,8 +348,7 @@ const closeConn = (doc, conn, reason) => {
     const controlledIds = doc.conns.get(conn);
     doc.conns.delete(conn);
 
-    logAsync(doc.name, { event: "connection-teardown", connectionId: conn.__connectionId, reason });
-
+    logAsync(doc.name, { event: "connection-teardown", username: conn.__username, connectionId: conn.__connectionId, reason });
     awarenessProtocol.removeAwarenessStates(doc.awareness, Array.from(controlledIds), null);
     // We do not unload the document from the memory because loading it can take several seconds for large documents.
     // In the past we have encountered race conditions (#62201) when several people are joining a room which doesn't have its document already in the memory.
