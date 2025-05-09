@@ -5,7 +5,6 @@ import { LeveldbPersistence } from "y-leveldb";
 
 import * as encoding from "lib0/encoding.js";
 import * as decoding from "lib0/decoding.js";
-import * as map from "lib0/map.js";
 
 import debounce from "lodash.debounce";
 
@@ -26,7 +25,7 @@ const wsReadyStateClosed = 3; // eslint-disable-line
 const gcEnabled = process.env.GC !== "false" && process.env.GC !== "0";
 const persistenceDir = process.env.YPERSISTENCE;
 /**
- * @type {{bindState: function(string,WSSharedDoc):Promise<void>, writeState:function(string,WSSharedDoc):Promise<any>, provider: LeveldbPersistence | undefined}|null}
+ * @type {{bindState: function(string,WSSharedDoc):Promise<void>, provider: LeveldbPersistence | undefined}|null}
  */
 let persistence = null;
 if (typeof persistenceDir === "string") {
@@ -49,8 +48,6 @@ if (typeof persistenceDir === "string") {
         },
       );
     },
-    // eslint-disable-next-line no-unused-vars
-    writeState: async (docName, ydoc) => {},
   };
 }
 
@@ -72,20 +69,6 @@ const sendStatusUpdates = (prefix, statuses) => {
     }
   });
 };
-
-/**
- * @param {{bindState: function(string,WSSharedDoc):void,
- * writeState:function(string,WSSharedDoc):Promise<any>,provider:any}|null} persistence_
- */
-export const setPersistence = (persistence_) => {
-  persistence = persistence_;
-};
-
-/**
- * @return {null|{bindState: function(string,WSSharedDoc):void,
- * writeState:function(string,WSSharedDoc):Promise<any>}|null} used persistence layer
- */
-export const getPersistence = () => persistence;
 
 /**
  * @type {Map<string,WSSharedDoc>}
@@ -368,14 +351,8 @@ const closeConn = (doc, conn, reason) => {
     logAsync(doc.name, { event: "connection-teardown", connectionId: conn.__connectionId, reason });
 
     awarenessProtocol.removeAwarenessStates(doc.awareness, Array.from(controlledIds), null);
-    if (doc.conns.size === 0 && persistence !== null) {
-      // If persisted, we store state and destroy ydocument but we do not ever delete a document from the memory.
-      // This is so that we can avoid race condition on the persistence layer which happen when the document
-      // is persisted (when a WS connection is being closed) and then immediately loaded from DB (when a new WS connection is being opened).
-      persistence
-        .writeState(doc.name, doc)
-        .then(() => logAsync(doc.name, { event: "connection-teardown", connectionId: conn.__connectionId, reason, msg: "Document state persisted" }));
-    }
+    // We do not unload the document from the memory because loading it can take several seconds for large documents.
+    // In the past we have encountered race conditions (#62201) when several people are joining a room which doesn't have its document already in the memory.
   }
   conn.close();
 };
