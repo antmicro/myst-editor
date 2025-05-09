@@ -49,7 +49,7 @@
     "vscode-languageserver-textdocument": "^1.0.12",
     "y-codemirror.next": "^0.3.2",
     "y-protocols": "^1.0.5",
-    "y-websocket": "^1.5.0",
+    "y-websocket": "^3.0.0",
     "yaml-language-server": "github:antmicro/yaml-language-server",
     "yjs": "^13.5.44"
   },
