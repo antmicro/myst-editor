@@ -271,6 +271,11 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
         state.error.value = { src: "Yjs update error", error: args[0] };
       }
     }
+
+    if (typeof msg === "string" && msg.startsWith("Unable to compute message")) {
+      return;
+    }
+
     defaultConsoleError(msg, ...args);
   };
 

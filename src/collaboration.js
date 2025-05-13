@@ -15,6 +15,7 @@ export class CollaborationClient {
   #onlineHandler;
   lockMsg = computed(() => this.#lockMsg.value);
   users = computed(() => this.#users.value);
+  #heartbeatInterval = null;
 
   constructor(settings, editorOptions = { id: null, parent: null, hideUsernameDelay: null, getAvatar: () => {}, getUserUrl: () => {} }) {
     this.ready = computed(() => this.#synced.value && this.#connected.value);
@@ -35,6 +36,13 @@ export class CollaborationClient {
         this.#connected.value = true;
       });
     }
+
+    this.#heartbeatInterval = setInterval(() => {
+      if (Date.now() - this.provider.wsLastMessageReceived > 5_000) {
+        console.error("Heartbeat wasn't recieved from signal server in the last 5 seconds");
+        this.#handleOffline();
+      }
+    }, 5_000);
 
     // Allow joining without username to collect data
     if (settings.username) {
@@ -124,5 +132,6 @@ export class CollaborationClient {
     window.removeEventListener("online", this.#onlineHandler);
     this.provider.destroy();
     this.ydoc.destroy();
+    clearInterval(this.#heartbeatInterval);
   }
 }

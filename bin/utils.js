@@ -78,6 +78,7 @@ export const docs = new Map();
 
 const messageSync = 0;
 const messageAwareness = 1;
+const messageHeartbeat = 200;
 // const messageAuth = 2
 
 /**
@@ -385,6 +386,7 @@ const send = (doc, conn, m) => {
 };
 
 const pingTimeout = 30000;
+const heartbeatTimeout = 2000;
 
 /**
  * @param {any} conn
@@ -414,7 +416,28 @@ export const setupWSConnection = async (conn, req, { docName = req.url.split("?"
   }
 
   doc.conns.set(conn, new Set());
-  // listen and reply to events
+
+  const heartbeatInterval = setInterval(() => {
+    if (conn.readyState == wsReadyStateConnecting) {
+      return;
+    }
+
+    if (conn.readyState !== wsReadyStateOpen) {
+      clearInterval(heartbeatInterval);
+    }
+
+    try {
+      const encoder = encoding.createEncoder();
+      encoding.writeVarUint(encoder, messageHeartbeat);
+      conn.send(encoding.toUint8Array(encoder));
+    } catch (e) {
+      logAsync(doc.name, {
+        event: "ws-message-send",
+        msg: `Failed to send heartbeat due to ${e}`,
+      });
+      clearInterval(heartbeatInterval);
+    }
+  }, heartbeatTimeout);
 
   // Check if connection is still alive
   let pongReceived = true;
