@@ -24,7 +24,13 @@ A demo of the editor is available [here](https://antmicro.github.io/myst-editor/
 Changes in the text editor are immediately reflected in the preview.
 The editor also keeps track of where your cursor is and highlight and scroll the preview based on what you are editing.
 
-![Live Preview Demo](./assets/preview.gif)
+![Live Preview Demo](./assets/dual-pane.gif)
+
+### Inline Markdown rendering
+
+You can toggle a mode where the Markdown will be rendered right in the editor.
+
+![Inline Mode Demo](./assets/inline.gif)
 
 ### Collaborative editing
 
@@ -37,7 +43,7 @@ You can work on a document with multiple people at the same time.
 The editor has a comments feature, allowing you to add text that will not appear in the preview.
 You can also suggest changes.
 
-![Comments Demo](./assets/comments.png)
+![Comments Demo](./assets/comments.gif)
 
 ### Templates
 
@@ -48,19 +54,20 @@ You can use document templates to quickly prepare documents and skip repetitive 
 ### Diff
 
 You can use the diff view to see exactly what changes have been made to the document as compared to the original state.
+There is also an option to discard all the changes.
 
-![Diff Demo](./assets/diff.png)
+![Diff Demo](./assets/diff.gif)
 
 ### Exporting the document
 
 Using the buttons in the top-left, you can copy the rendered HTML or export the document to a PDF file.
 
-![Copy Demo](./assets/export.png)
+![Copy Demo](./assets/copy.gif)
 
 ### User settings
 
 Users can customize the editor with the settings dropdown.
-In the example below, we can see settings that allow for scrolling past the last line of the editor and autocompleting Markdown lists.
+In the example below, we can see settings that allow for scrolling past the last line of the editor and a Vim emulation mode.
 
 ![Settings Demo](./assets/settings.gif)
 
