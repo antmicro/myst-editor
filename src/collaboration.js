@@ -37,12 +37,15 @@ export class CollaborationClient {
       });
     }
 
-    this.#heartbeatInterval = setInterval(() => {
-      if (Date.now() - this.provider.wsLastMessageReceived > 5_000) {
-        console.error("Heartbeat wasn't recieved from signal server in the last 5 seconds");
-        this.#handleOffline();
-      }
-    }, 5_000);
+    if (settings.mode !== "local") {
+      this.#heartbeatInterval = setInterval(() => {
+        if (this.ready.peek() && Date.now() - this.provider.wsLastMessageReceived > 5_000) {
+          console.error("Heartbeat wasn't recieved from signal server in the last 5 seconds");
+          this.provider.disconnect();
+          this.provider.connect();
+        }
+      }, 5_000);
+    }
 
     // Allow joining without username to collect data
     if (settings.username) {
