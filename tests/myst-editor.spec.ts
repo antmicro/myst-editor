@@ -1,5 +1,5 @@
 import { ChangeSpec } from "@codemirror/state";
-import { test, expect, Page, BrowserContext } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 import { EditorView } from "codemirror";
 import fs from "fs/promises";
 import { createMystState } from "../src/mystState";
@@ -25,9 +25,11 @@ test.describe.parallel("With collaboration disabled", () => {
   });
 
   test("Loads initial document", async ({ page }) => {
-    const editorContent = await page.evaluate((id) => window.myst_editor[id].text, id);
-    expect(editorContent).toMatch(/^# This is MyST Editor/);
-    expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
+    await expect(async () => {
+      const editorContent = await page.evaluate((id) => window.myst_editor[id].text, id);
+      expect(editorContent).toMatch(/^# This is MyST Editor/);
+      expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
+    }).toPass();
   });
 
   test("Caches async transforms", async ({ page }) => {
@@ -124,8 +126,10 @@ test.describe.parallel("With collaboration disabled", () => {
     await context.grantPermissions(["clipboard-write", "clipboard-read"]);
     await page.getByTitle("Copy document as HTML").click();
     await page.waitForSelector(".topbar-alert");
-    const clipboard = await page.evaluate(() => navigator.clipboard.readText());
-    expect(clipboard).toContain("<h1>");
+    await expect(async () => {
+      const clipboard = await page.evaluate(() => navigator.clipboard.readText());
+      expect(clipboard).toContain("<h1>");
+    }).toPass();
   });
 
   test("Mermaid diagrams", async ({ page }) => {
@@ -157,9 +161,11 @@ test.describe.parallel("With collaboration enabled", () => {
     const collabOpts = { collab_server: "ws://localhost:4455", room: Date.now().toString() };
     const page = await applyPageOpts(await context.newPage(), collabOpts);
 
-    const editorContent = await page.evaluate((id) => window.myst_editor[id].text, id);
-    expect(editorContent).toMatch(/^# This is MyST Editor/);
-    expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
+    await expect(async () => {
+      const editorContent = await page.evaluate((id) => window.myst_editor[id].text, id);
+      expect(editorContent).toMatch(/^# This is MyST Editor/);
+      expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
+    }).toPass();
   });
 
   test("Rejects the initial document if collaborative state is not empty", async ({ context }) => {
@@ -173,11 +179,13 @@ test.describe.parallel("With collaboration enabled", () => {
 
     // Open the document as another user and verify that the initial content was ignored
     const pageB = await applyPageOpts(await context.newPage(), collabOpts);
-    const editorContent = await pageB.evaluate((id) => window.myst_editor[id].text, id);
 
-    expect(editorContent).not.toContain("# This is MyST Editor");
-    expect(editorContent).toContain("Some content");
-    expect(editorContent.indexOf("Some content")).toBe(editorContent.lastIndexOf("Some content")); // Assert that content isn't duplicated
+    await expect(async () => {
+      const editorContent = await pageB.evaluate((id) => window.myst_editor[id].text, id);
+      expect(editorContent).not.toContain("# This is MyST Editor");
+      expect(editorContent).toContain("Some content");
+      expect(editorContent.indexOf("Some content")).toBe(editorContent.lastIndexOf("Some content")); // Assert that content isn't duplicated
+    }).toPass();
   });
 
   test("Synces document between peers", async ({ context }) => {
@@ -190,21 +198,23 @@ test.describe.parallel("With collaboration enabled", () => {
 
     // Open the document as another user and add some content
     const pageB = await applyPageOpts(await context.newPage(), collabOpts);
-    const currentText = await pageB.evaluate((id) => window.myst_editor[id].text, id);
-    expect(currentText).toBe("This is from pageA!");
+    await expect(async () => {
+      const currentText = await pageB.evaluate((id) => window.myst_editor[id].text, id);
+      expect(currentText).toBe("This is from pageA!");
 
-    await insertChangesAndCheckOutput(
-      pageB,
-      {
-        from: currentText.length,
-        insert: "And this is from pageB!",
-      },
-      (html) => {
-        // Verify that both contents are present
-        expect(html).toContain("This is from pageA!");
-        expect(html).toContain("And this is from pageB!");
-      },
-    );
+      await insertChangesAndCheckOutput(
+        pageB,
+        {
+          from: currentText.length,
+          insert: "And this is from pageB!",
+        },
+        (html) => {
+          // Verify that both contents are present
+          expect(html).toContain("This is from pageA!");
+          expect(html).toContain("And this is from pageB!");
+        },
+      );
+    }).toPass();
   });
 
   test.describe("Comments", () => {
@@ -220,16 +230,16 @@ test.describe.parallel("With collaboration enabled", () => {
       await addComment(pageA, 2);
 
       // Confirm that comment was added
-      expect(await pageA.locator(".comment-wrapper").count()).toBe(1);
-      expect(await pageB.locator(".comment-wrapper").count()).toBe(1);
+      await expect(pageA.locator(".comment-wrapper")).toHaveCount(1);
+      await expect(pageB.locator(".comment-wrapper")).toHaveCount(1);
 
       // Remove the comment from pageB
-      await pageB.locator(".comment-gutter-icon.comment-image").hover();
+      await getCommentBtn(pageB, 2).hover({ force: true });
       await pageB.getByText("DELETE").click();
 
       // Verify that comment was removed on both peers
-      expect(await pageB.locator(".comment-wrapper").count()).toBe(0);
-      expect(await pageA.locator(".comment-wrapper").count()).toBe(0);
+      await expect(pageB.locator(".comment-wrapper")).toHaveCount(0);
+      await expect(pageA.locator(".comment-wrapper")).toHaveCount(0);
     });
 
     test("Can be dragged", async ({ context }) => {
@@ -243,29 +253,30 @@ test.describe.parallel("With collaboration enabled", () => {
 
       await addComment(pageA, 1);
 
-      // Drag the comment
       const initialCommentPosition = await pageA
-        .locator(".comment-wrapper")
+        .locator("div:has(> .comment-wrapper)")
         .first()
-        .evaluate((e) => Number(e.parentElement?.getAttribute("top")));
-      const placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-      await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
-      const from = (await pageA.locator(".comment-icon").boundingBox()) as { x: number; y: number; width: number; height: number };
-      const to = (await placesForCommentA[3].boundingBox()) as { x: number; y: number; width: number; height: number };
-      await pageA.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+        .evaluate((e) => Number(e.getAttribute("top")));
+
+      // Drag the comment
+      await getCommentBtn(pageA, 1).hover({ force: true });
       await pageA.mouse.down();
-      await pageA.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 100 });
+      const box = await getCommentBtn(pageA, 3).boundingBox();
+      expect(box).not.toBeNull();
+      await pageA.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2, { steps: 5 });
       await pageA.mouse.up();
 
-      expect(await pageA.locator(".comment-wrapper").count()).toBe(1);
-      expect(await pageB.locator(".comment-wrapper").count()).toBe(1);
+      await expect(pageA.locator(".comment-wrapper")).toHaveCount(1);
+      await expect(pageB.locator(".comment-wrapper")).toHaveCount(1);
 
       // Confirm that the comment position has changed
-      const newCommentPosition = await pageA
-        .locator(".comment-wrapper")
-        .first()
-        .evaluate((e) => Number(e.parentElement?.getAttribute("top")));
-      expect(newCommentPosition).not.toEqual(initialCommentPosition);
+      await expect(async () => {
+        const newCommentPosition = await pageA
+          .locator("div:has(> .comment-wrapper)")
+          .first()
+          .evaluate((e) => Number(e.getAttribute("top")));
+        expect(newCommentPosition).toBeGreaterThan(initialCommentPosition);
+      }).toPass();
     });
 
     test("Can be resolved", async ({ context }) => {
@@ -276,21 +287,21 @@ test.describe.parallel("With collaboration enabled", () => {
       await addComment(pageA, 1);
 
       // Resolve the comment
-      await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+      await getCommentBtn(pageA, 1).hover({ force: true });
       await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       // Verify that it disappeared from the editor
-      expect(await pageA.locator(".comment-wrapper").count()).toBe(0);
+      await expect(pageA.locator(".comment-wrapper")).toHaveCount(0);
 
       // Verify that it appeared in the resolved comments
       await openResolvedComments(pageA);
       await pageA.waitForSelector(".resolved-comment");
-      expect(await pageA.locator(".resolved-comment").count()).toBe(1);
+      await expect(pageA.locator(".resolved-comment")).toHaveCount(1);
 
       // Verify that the resolved comments are synced among peers
       await openResolvedComments(pageB);
       await pageB.waitForSelector(".resolved-comment");
-      expect(await pageB.locator(".resolved-comment").count()).toBe(1);
+      await expect(pageB.locator(".resolved-comment")).toHaveCount(1);
     });
 
     test("Can be deleted", async ({ context }) => {
@@ -301,12 +312,12 @@ test.describe.parallel("With collaboration enabled", () => {
       await addComment(pageA, 1);
 
       // Resolve the comment
-      await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+      await getCommentBtn(pageA, 1).hover({ force: true });
       await pageA.locator("#demo-editor").getByText("DELETE").click();
 
       // Verify it is gone
-      expect(await pageA.locator(".comment-wrapper").count()).toBe(0);
-      expect(await pageB.locator(".comment-wrapper").count()).toBe(0);
+      await expect(pageA.locator(".comment-wrapper")).toHaveCount(0);
+      await expect(pageB.locator(".comment-wrapper")).toHaveCount(0);
     });
 
     test("Can be merged", async ({ context }) => {
@@ -322,23 +333,22 @@ test.describe.parallel("With collaboration enabled", () => {
       await addComment(pageA, 3, "2");
 
       // Drag the comment
-      let placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-      const from = (await placesForCommentA[1].boundingBox()) as { x: number; y: number; width: number; height: number };
-      await pageA.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+      // Locator.dragTo() has issues as reported in https://github.com/microsoft/playwright/issues/20254
+      await getCommentBtn(pageA, 1).hover({ force: true });
       await pageA.mouse.down();
-      placesForCommentA = await pageA.locator(".comment-gutter-icon").all();
-      const to = (await placesForCommentA[3].boundingBox()) as { x: number; y: number; width: number; height: number };
-      await pageA.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 100 });
+      const box = await getCommentBtn(pageA, 3).boundingBox();
+      expect(box).not.toBeNull();
+      await pageA.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2, { steps: 5 });
       await pageA.mouse.up();
 
-      expect(await pageA.locator(".comment-wrapper").count()).toBe(1);
-      expect(await pageB.locator(".comment-wrapper").count()).toBe(1);
+      await expect(pageA.locator(".comment-wrapper")).toHaveCount(1);
+      await expect(pageB.locator(".comment-wrapper")).toHaveCount(1);
 
       // Confirm the comment contents are merged
-      expect(await pageA.locator(".cm-comment-author-colored").first().innerHTML()).toContain("2");
-      expect(await pageA.locator(".cm-comment-author-colored").last().innerHTML()).toContain("1");
-      expect(await pageB.locator(".cm-comment-author-colored").first().innerHTML()).toContain("2");
-      expect(await pageB.locator(".cm-comment-author-colored").last().innerHTML()).toContain("1");
+      await expect(pageA.locator(".cm-comment-author-colored").first()).toContainText("2");
+      await expect(pageA.locator(".cm-comment-author-colored").last()).toContainText("1");
+      await expect(pageB.locator(".cm-comment-author-colored").first()).toContainText("2");
+      await expect(pageB.locator(".cm-comment-author-colored").last()).toContainText("1");
     });
   });
 
@@ -355,20 +365,20 @@ test.describe.parallel("With collaboration enabled", () => {
       await addComment(pageA, 1);
 
       // Resolve the comment
-      await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+      await getCommentBtn(pageA, 1).hover({ force: true });
       await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       // Restore the comment
-      await pageA.locator(".myst-dropdown-toggle").first().hover();
+      await pageA.locator(".myst-dropdown-toggle").first().hover({ force: true });
       await pageA.locator(".myst-restore-btn").first().click();
 
       // Verify it is gone from resolved comments
-      expect(await pageA.locator(".resolved-comment").count()).toBe(0);
-      expect(await pageB.locator(".resolved-comment").count()).toBe(0);
+      await expect(pageA.locator(".resolved-comment")).toHaveCount(0);
+      await expect(pageB.locator(".resolved-comment")).toHaveCount(0);
 
       // Verify it appeared in the editor
-      expect(await pageA.locator(".comment-wrapper").count()).toBe(1);
-      expect(await pageB.locator(".comment-wrapper").count()).toBe(1);
+      await expect(pageA.locator(".comment-wrapper")).toHaveCount(1);
+      await expect(pageB.locator(".comment-wrapper")).toHaveCount(1);
     });
 
     test("Can be occupied and restored", async ({ context }) => {
@@ -383,24 +393,24 @@ test.describe.parallel("With collaboration enabled", () => {
       await addComment(pageA, 1, "1");
 
       // Resolve the comment
-      await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+      await getCommentBtn(pageA, 1).hover({ force: true });
       await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       await addComment(pageA, 1, "2");
 
       // Restore the comment
-      await pageA.locator(".myst-dropdown-toggle").first().hover();
+      await pageA.locator(".myst-dropdown-toggle").first().hover({ force: true });
       await pageA.locator(".myst-restore-btn").first().click();
 
       // Verify it is gone from resolved comments
-      expect(await pageA.locator(".resolved-comment").count()).toBe(0);
-      expect(await pageB.locator(".resolved-comment").count()).toBe(0);
+      await expect(pageA.locator(".resolved-comment")).toHaveCount(0);
+      await expect(pageB.locator(".resolved-comment")).toHaveCount(0);
 
       // Verify it is in the editor and contains both lines
-      expect(await pageA.locator(".cm-comment-author-colored").first().innerHTML()).toContain("2");
-      expect(await pageA.locator(".cm-comment-author-colored").last().innerHTML()).toContain("1");
-      expect(await pageB.locator(".cm-comment-author-colored").first().innerHTML()).toContain("2");
-      expect(await pageB.locator(".cm-comment-author-colored").last().innerHTML()).toContain("1");
+      await expect(pageA.locator(".cm-comment-author-colored").first()).toContainText("2");
+      await expect(pageA.locator(".cm-comment-author-colored").last()).toContainText("1");
+      await expect(pageB.locator(".cm-comment-author-colored").first()).toContainText("2");
+      await expect(pageB.locator(".cm-comment-author-colored").last()).toContainText("1");
     });
 
     test("Can be orphaned and restored", async ({ context }) => {
@@ -415,18 +425,18 @@ test.describe.parallel("With collaboration enabled", () => {
       await addComment(pageA, 1);
 
       // Resolve the comment
-      await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+      await getCommentBtn(pageA, 1).hover({ force: true });
       await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       await clearEditor(pageA);
 
       // Restore comment
-      await pageA.locator(".myst-dropdown-toggle").first().hover();
+      await pageA.locator(".myst-dropdown-toggle").first().hover({ force: true });
       await pageA.locator(".myst-restore-btn").first().click();
 
       // Verify it is at the end of the document
-      expect(await pageA.locator(".comment-wrapper").count()).toBe(1);
-      expect(await pageB.locator(".comment-wrapper").count()).toBe(1);
+      await expect(pageA.locator(".comment-wrapper")).toHaveCount(1);
+      await expect(pageB.locator(".comment-wrapper")).toHaveCount(1);
     });
 
     test("Can be deleted", async ({ context }) => {
@@ -441,16 +451,16 @@ test.describe.parallel("With collaboration enabled", () => {
       await addComment(pageA, 1);
 
       // Resolve the comment
-      await pageA.locator(".comment-gutter-icon.comment-image").first().hover();
+      await getCommentBtn(pageA, 1).hover({ force: true });
       await pageA.locator("#demo-editor").getByText("RESOLVE").click();
 
       // Delete the comment
-      await pageA.locator(".myst-dropdown-toggle").first().hover();
+      await pageA.locator(".myst-dropdown-toggle").first().hover({ force: true });
       await pageA.locator(".myst-delete-btn").first().click();
 
       // Verify it is gone
-      expect(await pageA.locator(".resolved-comment").count()).toBe(0);
-      expect(await pageB.locator(".resolved-comment").count()).toBe(0);
+      await expect(pageA.locator(".resolved-comment")).toHaveCount(0);
+      await expect(pageB.locator(".resolved-comment")).toHaveCount(0);
     });
   });
 
@@ -464,12 +474,12 @@ test.describe.parallel("With collaboration enabled", () => {
       await clearEditor(pageA);
       await insertChangesAndCheckOutput(pageA, { from: 0, insert: "Line1\nLine2\nLine3\nLine4" }, (html) => expect(html).toContain("Line4"));
 
-      await addComment(pageA, 1, "|Line2|");
+      await addComment(pageA, 1, "|Line1|");
 
       // Check if the phrase is highlighted
-      expect(await pageA.locator(".cm-comment-author-colored").first().innerText()).toContain("|Line2|");
-      expect(await pageA.locator(".cm-suggestion").first().innerHTML()).toContain("Line2");
-      expect(await pageB.locator(".cm-suggestion").first().innerHTML()).toContain("Line2");
+      await expect(pageA.locator(".cm-comment-author-colored").first()).toContainText("|Line1|");
+      await expect(pageA.locator(".cm-suggestion").first()).toContainText("Line1");
+      await expect(pageB.locator(".cm-suggestion").first()).toContainText("Line1");
     });
 
     test("Can be added with replacement", async ({ context }) => {
@@ -481,14 +491,14 @@ test.describe.parallel("With collaboration enabled", () => {
       await clearEditor(pageA);
       await insertChangesAndCheckOutput(pageA, { from: 0, insert: "Line1\nLine2\nLine3\nLine4" }, (html) => expect(html).toContain("Line4"));
 
-      await addComment(pageA, 1, "|Line2 -> 2Line|");
+      await addComment(pageA, 2, "|Line2 -> 2Line|");
 
       // Check if the suggestion shows up
-      expect(await pageA.locator(".cm-comment-author-colored").first().innerText()).toContain("|Line2 -> 2Line|");
-      expect(await pageA.locator(".replaced").first().innerHTML()).toContain("Line2");
-      expect(await pageA.locator(".cm-replacement").first().innerHTML()).toContain("2Line");
-      expect(await pageB.locator(".replaced").first().innerHTML()).toContain("Line2");
-      expect(await pageB.locator(".cm-replacement").first().innerHTML()).toContain("2Line");
+      await expect(pageA.locator(".cm-comment-author-colored").first()).toContainText("|Line2 -> 2Line|");
+      await expect(pageA.locator(".replaced").first()).toContainText("Line2");
+      await expect(pageA.locator(".cm-replacement").first()).toContainText("2Line");
+      await expect(pageB.locator(".replaced").first()).toContainText("Line2");
+      await expect(pageB.locator(".cm-replacement").first()).toContainText("2Line");
     });
 
     test("Can be applied", async ({ context }) => {
@@ -500,17 +510,19 @@ test.describe.parallel("With collaboration enabled", () => {
       await clearEditor(pageA);
       await insertChangesAndCheckOutput(pageA, { from: 0, insert: "Line1\nLine2\nLine3\nLine4" }, (html) => expect(html).toContain("Line4"));
 
-      await addComment(pageA, 1, "|Line2 -> 2Line|");
+      await addComment(pageA, 2, "|Line2 -> 2Line|");
 
       // Apply suggestion
-      expect(await pageA.locator(".cm-comment-author-colored").first().innerText()).toContain("|Line2 -> 2Line|");
+      await expect(pageA.locator(".cm-comment-author-colored").first()).toContainText("|Line2 -> 2Line|");
       await pageA.locator(".cm-replacement").first().click();
 
       // Check if the text changed
-      const currentTextA = await pageA.evaluate((id) => window.myst_editor[id].text, id);
-      expect(currentTextA).toContain("2Line");
-      const currentTextB = await pageB.evaluate((id) => window.myst_editor[id].text, id);
-      expect(currentTextB).toContain("2Line");
+      await expect(async () => {
+        const currentTextA = await pageA.evaluate((id) => window.myst_editor[id].text, id);
+        expect(currentTextA).toContain("2Line");
+        const currentTextB = await pageB.evaluate((id) => window.myst_editor[id].text, id);
+        expect(currentTextB).toContain("2Line");
+      }).toPass();
     });
   });
 
@@ -525,11 +537,9 @@ test.describe.parallel("With collaboration enabled", () => {
         window.myst_editor.demo.state.options.mode.value = "Resolved";
       });
 
-      const title = await page.locator("#document-title").innerHTML();
-      expect(title).toContain("Playwright");
-      expect(page.locator("#topbar .side:last-child .btns button")).toHaveCount(2);
-      const resolvedVisible = await page.isVisible("#resolved-wrapper");
-      expect(resolvedVisible).toBeTruthy();
+      await expect(page.locator("#document-title")).toContainText("Playwright");
+      await expect(page.locator("#topbar .side:last-child .btns button")).toHaveCount(2);
+      await expect(page.locator("#resolved-wrapper")).toBeVisible();
     });
 
     test("Can change rooms", async ({ context }) => {
@@ -541,8 +551,10 @@ test.describe.parallel("With collaboration enabled", () => {
       await clearEditor(pageA);
       const text0 = "this is room 0";
       await insertToMainEditor(pageA, { from: 0, insert: text0 });
-      let currentText = await pageB.waitForFunction((id) => window.myst_editor[id].state.collab.value.ytext.toString(), id);
-      expect(await currentText.evaluate((str) => str)).toBe(text0);
+      await expect(async () => {
+        const text = await pageB.evaluate((id) => window.myst_editor[id].text, id);
+        expect(text).toBe(text0);
+      }).toPass();
 
       const text1 = "this is room 1";
       // A - join room 1
@@ -553,8 +565,10 @@ test.describe.parallel("With collaboration enabled", () => {
       await pageA.waitForSelector(".cm-content");
       await clearEditor(pageA);
       await insertToMainEditor(pageA, { from: 0, insert: text1 });
-      currentText = await pageB.waitForFunction((id) => window.myst_editor[id].state.collab.value.ytext.toString(), id);
-      expect(await currentText.evaluate((str) => str)).toBe(text0);
+      await expect(async () => {
+        const text = await pageB.evaluate((id) => window.myst_editor[id].text, id);
+        expect(text).toBe(text0);
+      }).toPass();
 
       // B - join room 1
       await pageB.evaluate((id) => {
@@ -562,8 +576,10 @@ test.describe.parallel("With collaboration enabled", () => {
         window.myst_editor[id].state.options.collaboration.value = { ...collab, room: "1" };
       }, id);
       await pageB.waitForSelector(".cm-content");
-      currentText = await pageB.waitForFunction((id) => window.myst_editor[id].state.collab.value.ytext.toString(), id);
-      expect(await currentText.evaluate((str) => str)).toBe(text1);
+      await expect(async () => {
+        const text = await pageB.evaluate((id) => window.myst_editor[id].text, id);
+        expect(text).toBe(text1);
+      }).toPass();
     });
   });
 });
@@ -579,21 +595,23 @@ test.describe.parallel("MystEditorGit wrapper", () => {
 
     // Open the document as another user and add some content
     const pageB = await applyPageOpts(await context.newPage(), { collab_server }, true);
-    const currentText = await pageB.evaluate((id) => window.myst_editor[id].text, id);
-    expect(currentText).toBe("This is from pageA!");
+    await expect(async () => {
+      const currentText = await pageB.evaluate((id) => window.myst_editor[id].text, id);
+      expect(currentText).toBe("This is from pageA!");
 
-    await insertChangesAndCheckOutput(
-      pageB,
-      {
-        from: currentText.length,
-        insert: "And this is from pageB!",
-      },
-      (html) => {
-        // Verify that both contents are present
-        expect(html).toContain("This is from pageA!");
-        expect(html).toContain("And this is from pageB!");
-      },
-    );
+      await insertChangesAndCheckOutput(
+        pageB,
+        {
+          from: currentText.length,
+          insert: "And this is from pageB!",
+        },
+        (html) => {
+          // Verify that both contents are present
+          expect(html).toContain("This is from pageA!");
+          expect(html).toContain("And this is from pageB!");
+        },
+      );
+    }).toPass();
   });
 
   test("Switches rooms", async ({ context }) => {
@@ -606,8 +624,10 @@ test.describe.parallel("MystEditorGit wrapper", () => {
       await page.click(`#${selectName}`);
       await page.click(`#${selectName}-list li:last-child`);
       await page.waitForSelector(".cm-content");
-      const text = await page.evaluate((id) => window.myst_editor[id].text, id);
-      expect(text).not.toContain(`room ${roomId}`);
+      await expect(async () => {
+        const text = await page.evaluate((id) => window.myst_editor[id].text, id);
+        expect(text).not.toContain(`room ${roomId}`);
+      }).toPass();
     }
 
     await checkSelect(1, "branches");
@@ -628,19 +648,23 @@ test.describe.parallel("MystEditorGit wrapper", () => {
     await pageB.getByText("A commit is being prepared").waitFor();
 
     // Check if text used for commit contains the changes
-    const textA = await pageA.evaluate((id) => window.myst_editor[id].text, id);
-    expect(textA).toContain("change");
-    const textB = await pageB.evaluate((id) => window.myst_editor[id].text, id);
-    expect(textB).toContain("change");
+    await expect(async () => {
+      const textA = await pageA.evaluate((id) => window.myst_editor[id].text, id);
+      expect(textA).toContain("change");
+      const textB = await pageB.evaluate((id) => window.myst_editor[id].text, id);
+      expect(textB).toContain("change");
+    }).toPass();
 
     // Commit
     await pageA.click("button[type=submit]");
     await pageA.waitForSelector(".cm-content");
 
-    const commitA = await pageA.locator("#commits span").innerHTML();
-    expect(commitA).toContain("update docs");
-    const commitB = await pageB.locator("#commits span").innerHTML();
-    expect(commitB).toContain("update docs");
+    await expect(async () => {
+      const commitA = await pageA.locator("#commits span").innerHTML();
+      expect(commitA).toContain("update docs");
+      const commitB = await pageB.locator("#commits span").innerHTML();
+      expect(commitB).toContain("update docs");
+    }).toPass();
   });
 });
 
@@ -673,8 +697,10 @@ const collaborationReady = (page: Page) => page.waitForFunction((id) => window?.
 
 const insertChangesAndCheckOutput = async (page: Page, changes: ChangeSpec | null, check: (html: string) => void | Promise<void>) => {
   await insertToMainEditor(page, changes);
-  const preview = await page.locator(".myst-preview").first().innerHTML();
-  await check(preview);
+  await expect(async () => {
+    const preview = await page.locator(".myst-preview").first().innerHTML();
+    check(preview);
+  }).toPass();
 };
 
 const applyPageOpts = async (page: Page, opts: object, git = false) => {
@@ -699,24 +725,15 @@ const applyPageOpts = async (page: Page, opts: object, git = false) => {
   return page;
 };
 
+const getCommentBtn = (page: Page, lineNumber: number) =>
+  page.locator(`.cm-gutters > .cm-gutter:first-child > .cm-gutterElement:nth-child(${lineNumber + 1}) .comment-gutter-icon`);
+
 const addComment = async (page: Page, lineNumber: number, text?: string) => {
-  const placesForComment = await page.locator(".comment-gutter-icon").all();
-  await placesForComment[lineNumber].hover();
-  await placesForComment[lineNumber].click();
+  await getCommentBtn(page, lineNumber).click();
   if (text) {
     await page.locator(".cm-comment-author-colored").last().fill(text);
-    // for some reason yjs does not pick up the changes made above, so we need to add them below
-    await page.evaluate(
-      ({ lineNumber, text, id }) => {
-        const ycomments = window.myst_editor[id].state.collab.value.ycomments!;
-        const commentId = ycomments.findCommentOn(lineNumber + 1)?.commentId;
-        ycomments.getTextForComment(commentId).insert(0, text);
-        ycomments.syncSuggestions(commentId);
-      },
-      { lineNumber, text, id },
-    );
   }
-  await page.mouse.move(0, 0, { steps: 100 });
+  await page.mouse.move(0, 0);
 };
 
 const openResolvedComments = async (page: Page) => {
