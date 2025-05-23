@@ -9,6 +9,7 @@ import { foldEffect, foldedRanges } from "@codemirror/language";
 import { folded } from "../extensions";
 import { computed, Signal, signal } from "@preact/signals";
 import { yRemoteAnnotation } from "../extensions/collab";
+import { loggerFacet } from "../logger";
 
 /**
  * @typedef {{ height: number, isShown: boolean, top?: number }} CommentInfo
@@ -311,6 +312,7 @@ export class YComments {
   }
 
   deleteComment(commentId) {
+    this.mainCodeMirror.state.facet(loggerFacet).log(`Deleting comment on line ${this.positions().get(commentId)}`);
     this.positions().del(commentId);
     this.display().del(commentId);
     this.delText(commentId);
@@ -318,7 +320,8 @@ export class YComments {
   }
 
   resolveComment(commentId) {
-    const lineNumber = this.positions().get(commentId);
+    const lineNumber = parseInt(this.positions().get(commentId));
+    this.mainCodeMirror.state.facet(loggerFacet).log(`Resolving comment on line ${lineNumber}`);
     const pos = this.mainCodeMirror.state.doc.line(lineNumber).from;
     this.positions().del(commentId);
     this.display().del(commentId);

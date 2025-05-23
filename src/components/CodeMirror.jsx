@@ -12,6 +12,7 @@ import { MystState } from "../mystState";
 import { userExtensionsCompartment } from "./Settings";
 import { useSignalEffect } from "@preact/signals";
 import { MdStyles } from "./Preview";
+import { Logger } from "../logger";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
@@ -245,6 +246,7 @@ const CodeEditor = styled.div`
 
 const CodeMirror = () => {
   const { editorView, options, collab, userSettings, linter, text, headings, error } = useContext(MystState);
+  const logger = useContext(Logger);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
@@ -336,6 +338,7 @@ const CodeMirror = () => {
         .if(options.mode.value === "Inline", (b) => b.useInlinePreview(text, options, editorView))
         .useTrackHeadings(headings)
         .useExceptionSink(error)
+        .useLogger(logger)
         .create(),
     });
 

@@ -35,6 +35,7 @@ import { colonFencedCodeParser, customTransformsParser, roleParser, tableParser 
 import { trackHeadings } from "./trackHeadings";
 import { highlightFocusedActiveLine } from "./activeLineHighlight";
 import { classHighlighter, tags } from "@lezer/highlight";
+import { loggerFacet } from "../logger";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -319,6 +320,11 @@ export class ExtensionBuilder {
         error.value = { src: "exceptionSink", error: err };
       }),
     );
+    return this;
+  }
+
+  useLogger(logger) {
+    this.extensions.push(loggerFacet.of(logger));
     return this;
   }
 

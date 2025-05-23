@@ -1,11 +1,50 @@
 import { useContext, useRef } from "preact/hooks";
 import { DefaultButton, Modal } from "./CommonUI";
 import { MystState } from "../mystState";
+import { getTimestamp, Logger } from "../logger";
 import { useSignal, useSignalEffect } from "@preact/signals";
 import styled from "styled-components";
+import { EditorView } from "codemirror";
+import { CollaborationClient } from "../collaboration";
 
-const formatError = (/** @type {Error} */ error, src, mode) =>
-  `\`\`\`\nError detected from: ${src}, while in mode: ${mode}\n${error.name}: ${error.message} ${error.cause ?? ""}\n${error.stack ?? ""}\`\`\``;
+/**
+ * @param {Error} error
+ * @param {string} src
+ * @param {*} options
+ * @param {() => string} getLogString
+ * @param {EditorView} editorView
+ * @param {CollaborationClient} collabClient
+ */
+const formatError = (error, src, options, getLogString, editorView, collabClient) => {
+  const header = `Error detected from: ${src}, while in mode: ${options.mode.peek()}, editor id: ${options.id.peek()}`;
+  const time = `[${getTimestamp()}]`;
+  const userAgent = `User agent: ${navigator.userAgent}`;
+  const errorText = `${error.name}: ${error.message} ${error.cause ?? ""}\n${error.stack ?? ""}`;
+  let documentInfo = `Document:\nLines: ${editorView.state.doc.lines}\nLength: ${editorView.state.doc.length}`;
+  if (collabClient) {
+    documentInfo += `\nUser count: ${collabClient.users.peek().length}`;
+    documentInfo += `\nComments: count ${collabClient.ycomments.comments.peek().length}, lines [${collabClient.ycomments.comments
+      .peek()
+      .map((c) => c.lineNumber)
+      .toSorted((a, b) => a - b)
+      .join(", ")}]`;
+    documentInfo += `\nResolved comments: count ${collabClient.ycomments.resolver().resolvedCommentsList.peek().length}, lines [${collabClient.ycomments
+      .resolver()
+      .resolvedCommentsList.peek()
+      .map((c) => c.lineNumber)
+      .toSorted((a, b) => a - b)
+      .join(", ")}]`;
+    const suggestionLines = [...collabClient.ycomments.suggestions.entries()]
+      .filter(([_, values]) => values.length > 0)
+      .map(([id]) => parseInt(collabClient.ycomments.positions().get(id)))
+      .filter(Boolean)
+      .toSorted((a, b) => a - b);
+    documentInfo += `\nSuggestions: line count ${suggestionLines.length}, lines [${suggestionLines.join(", ")}]`;
+  }
+  const logs = `Logs:\n${getLogString()}`;
+
+  return `\`\`\`\n${[header, time, userAgent, errorText, documentInfo, logs].join("\n")}\n\`\`\``;
+};
 
 const ErrorContainer = styled(Modal)`
   box-shadow: inset 0 8px var(--red-500);
@@ -19,7 +58,8 @@ const ErrorContainer = styled(Modal)`
 const defaultBtnText = "Copy error to clipboard";
 
 const ErrorModal = () => {
-  const { error, options } = useContext(MystState);
+  const { error, options, editorView, collab } = useContext(MystState);
+  const { getLogString } = useContext(Logger);
   const modalRef = useRef();
   const btnText = useSignal(defaultBtnText);
 
@@ -28,7 +68,7 @@ const ErrorModal = () => {
   });
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(formatError(error.value.error, error.value.src, options.mode.value));
+    navigator.clipboard.writeText(formatError(error.value.error, error.value.src, options, getLogString, editorView.value, collab.value));
     btnText.value = "Copied!";
     setTimeout(() => (btnText.value = defaultBtnText), 2000);
   };

@@ -9,6 +9,7 @@ import CommitModal from "./CommitModal";
 import { useWatchChanges } from "./useWatchChanges";
 import { MystCSSVars } from "../styles/MystStyles";
 import Sidebar from "./Sidebar";
+import { createLogger, Logger } from "../logger";
 
 const MystContainer = styled(MystCSSVars)`
   --text: black;
@@ -447,10 +448,14 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
     },
   });
   window.myst_editor[editorId].state = state;
+  const logger = createLogger(state);
+  window.myst_editor[editorId].logger = logger;
 
   render(
     <MystState.Provider value={state}>
-      <MystEditorGit {...{ ...params, id: editorId }} />
+      <Logger.Provider value={logger}>
+        <MystEditorGit id={editorId} {...params} />
+      </Logger.Provider>
     </MystState.Provider>,
     target.shadowRoot,
   );

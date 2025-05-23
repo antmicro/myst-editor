@@ -1,6 +1,7 @@
 import { gutter, GutterMarker, BlockInfo, EditorView } from "@codemirror/view";
 import { YComments } from "./ycomments";
 import { updateShownComments, ycommentsFacet } from "./state";
+import { loggerFacet } from "../logger";
 
 class CommentMarker extends GutterMarker {
   static MAIN_CLASS = "comment-gutter";
@@ -80,6 +81,7 @@ const getOrCreateComment = (view, line, ycomments) => {
   const comment = ycomments.findCommentOn(lineNumber)?.commentId;
 
   if (!comment) {
+    view.state.facet(loggerFacet).log(`Adding new comment to line ${lineNumber}`);
     return ycomments.newComment(lineNumber);
   }
 

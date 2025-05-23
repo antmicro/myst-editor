@@ -4,6 +4,7 @@ import { YComments } from "../comments/ycomments";
 import { lineAuthorsEffect } from "../comments/lineAuthors";
 import styled from "styled-components";
 import { DefaultButton } from "../components/CommonUI";
+import { loggerFacet } from "../logger";
 
 export const suggestionEffect = StateEffect.define();
 
@@ -122,6 +123,12 @@ class Replacement extends WidgetType {
       if (this.remove && this.to < toLine.to) {
         toOffset = 1;
       }
+
+      this.view.state
+        .facet(loggerFacet)
+        .log(
+          `Applying ${this.remove ? "removal" : "replacement"} suggestion from ${this.from} to ${this.to}, line ${this.view.state.doc.lineAt(this.from).number}`,
+        );
 
       this.view.dispatch({
         changes: {

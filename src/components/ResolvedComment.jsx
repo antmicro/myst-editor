@@ -1,7 +1,8 @@
-import { useEffect, useRef, useMemo } from "preact/hooks";
+import { useEffect, useRef, useMemo, useContext } from "preact/hooks";
 import styled from "styled-components";
 import { Avatar } from "./Avatars";
 import { useSignal } from "@preact/signals";
+import { Logger } from "../logger";
 
 const ResolvedLine = styled.p`
   font-size: 16px;
@@ -186,6 +187,7 @@ const RestoreIcon = () => (
 const formatter = new Intl.RelativeTimeFormat("en", { style: "long" });
 
 const ResolvedComment = ({ c, authors, ycomments, content }) => {
+  const { log } = useContext(Logger);
   const difference = useSignal({ amount: 0, unit: "second" });
   const timer = useRef(null);
 
@@ -264,11 +266,23 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
             <OptionsContainer className="myst-dropdown-toggle">
               <OptionsIcon />
               <DropdownContainer>
-                <DropdownButton className="myst-restore-btn" onClick={() => ycomments.restoreComment(c)}>
+                <DropdownButton
+                  className="myst-restore-btn"
+                  onClick={() => {
+                    log(`Restoring comment on line ${c.orphaned ? "orphaned" : c.lineNumber}`);
+                    ycomments.restoreComment(c);
+                  }}
+                >
                   <RestoreIcon />
                   <p>{restoreText}</p>
                 </DropdownButton>
-                <DropdownButton className="myst-delete-btn" onClick={() => ycomments.resolver().delete(c.commentId)}>
+                <DropdownButton
+                  className="myst-delete-btn"
+                  onClick={() => {
+                    log(`Deleting resolved comment on line ${c.orphaned ? "orphaned" : c.lineNumber}`);
+                    ycomments.resolver().delete(c.commentId);
+                  }}
+                >
                   <DeleteIcon />
                   <p>DELETE</p>
                 </DropdownButton>

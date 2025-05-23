@@ -14,6 +14,7 @@ import { syncCheckboxes } from "./markdown/markdownCheckboxes";
 import { TableOfContents } from "./components/TableOfContents";
 import ErrorModal from "./components/ErrorModal";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { createLogger, Logger } from "./logger";
 
 const EditorParent = styled.div`
   font-family: "Lato";
@@ -206,6 +207,8 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
 
   const state = createMystState({ id: editorId, ...params });
   window.myst_editor[editorId].state = state;
+  const logger = createLogger(state);
+  window.myst_editor[editorId].logger = logger;
 
   // cleanup function
   function remove() {
@@ -227,7 +230,9 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
 
   render(
     <MystState.Provider value={state}>
-      <MystEditor />
+      <Logger.Provider value={logger}>
+        <MystEditor />
+      </Logger.Provider>
     </MystState.Provider>,
     target.shadowRoot,
   );
