@@ -1,5 +1,5 @@
 import { highlightingFor, HighlightStyle, syntaxHighlighting, syntaxTree } from "@codemirror/language";
-import { TextManager } from "../text";
+import { sanitize, TextManager } from "../text";
 import { getStyleTags, tags } from "@lezer/highlight";
 import { EditorView } from "codemirror";
 import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
@@ -47,7 +47,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       return (rFrom >= nodeFrom && rFrom <= nodeTo) || (rTo >= nodeFrom && rTo <= nodeTo) || (nodeFrom >= rFrom && nodeTo <= rTo);
     });
 
-  const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task"];
+  const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task", "HTMLBlock"];
   const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
   class RenderedMarkdownWidget extends WidgetType {
     constructor(src, isBlock, start, end, cssClasses = []) {
@@ -77,7 +77,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       }
 
       const render = (src) => (this.isBlock ? md.render(src, { lineMap: text.lineMap, startLine: this.start, chunkId: 0 }) : md.renderInline(src));
-      content.innerHTML = render(this.src);
+      content.innerHTML = sanitize(render(this.src));
       return content;
     }
 

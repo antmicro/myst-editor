@@ -234,6 +234,10 @@ const CodeEditor = styled.div`
     aside.admonition {
       margin-bottom: 0;
     }
+
+    & > * {
+      margin: 0 !important;
+    }
   }
 
   .cm-inline-mono,

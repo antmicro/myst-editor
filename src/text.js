@@ -144,12 +144,7 @@ export class TextManager {
         }
 
         const html =
-          chunkLookup[hash]?.html ||
-          purify.sanitize(this.md.value.render(text, { chunkId, startLine, lineMap: this.lineMap, view: this.editorView.value }), {
-            // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
-            ADD_TAGS: ["foreignobject", "iframe"],
-            ADD_ATTR: ["dominant-baseline", "target"],
-          });
+          chunkLookup[hash]?.html || sanitize(this.md.value.render(text, { chunkId, startLine, lineMap: this.lineMap, view: this.editorView.value }));
         return { text, hash, id: chunkId, html, oldId: chunkLookup[hash]?.oldId };
       });
   }
@@ -209,3 +204,11 @@ export class TextManager {
 }
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
+
+export function sanitize(unsafeHTML) {
+  return purify.sanitize(unsafeHTML, {
+    // Taken from Mermaid JS settings: https://github.com/mermaid-js/mermaid/blob/dd0304387e85fc57a9ebb666f89ef788c012c2c5/packages/mermaid/src/mermaidAPI.ts#L50
+    ADD_TAGS: ["foreignobject", "iframe"],
+    ADD_ATTR: ["dominant-baseline", "target"],
+  });
+}
