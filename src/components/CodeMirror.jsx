@@ -219,6 +219,7 @@ const CodeEditor = styled.div`
   .cm-inline-ordered-list-marker::after {
     display: inline-block;
     color: #000;
+    font-family: "Lato";
     content: attr(data-item-num);
   }
 
