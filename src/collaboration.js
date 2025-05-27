@@ -57,8 +57,7 @@ export class CollaborationClient {
         userUrl: editorOptions.getUserUrl(settings.username),
       };
       this.#users.value = [this.#localUser];
-      this.provider.awareness.on("change", ({ added, removed }) => {
-        if (added.length === 0 && removed.length === 0) return;
+      this.provider.awareness.on("update", () => {
         // Get unique users by name
         const states = [...this.provider.awareness.getStates().values()]
           .map((state) => state.user)
@@ -68,6 +67,11 @@ export class CollaborationClient {
             curr[user.name] = user;
             return curr;
           }, {});
+        // Added and removed awaraness params are not reliable in all browsers
+        const newUsers = Object.values(states).map((u) => u.name);
+        const currentUsers = this.#users.peek().map((u) => u.name);
+        if (newUsers.every((u) => currentUsers.includes(u)) && currentUsers.every((u) => newUsers.includes(u))) return;
+
         this.#users.value = Object.values(states)
           .sort((u1, u2) => u1.name.localeCompare(u2.name))
           .map((u) => ({ ...u, avatarUrl: editorOptions.getAvatar(u.name), userUrl: editorOptions.getUserUrl(u.name) }));
@@ -80,8 +84,16 @@ export class CollaborationClient {
 
     this.provider.on("sync", (sync) => (this.#synced.value = sync));
     this.provider.on("status", ({ status }) => (this.#connected.value = status == "connected"));
-    this.#offlineHandler = this.#handleOffline.bind(this);
-    this.#onlineHandler = this.#handleOnline.bind(this);
+    this.#offlineHandler = () => {
+      if (this.settings.mode !== "local" && import.meta.env.PROD) {
+        this.provider.disconnect();
+      }
+    };
+    this.#onlineHandler = () => {
+      if (this.settings.mode !== "local" && import.meta.env.PROD) {
+        this.provider.connect();
+      }
+    };
     window.addEventListener("offline", this.#offlineHandler);
     window.addEventListener("online", this.#onlineHandler);
 
@@ -116,18 +128,6 @@ export class CollaborationClient {
 
   unlock() {
     this.metaMap.delete("lock");
-  }
-
-  #handleOffline() {
-    if (this.settings.mode !== "local" && import.meta.env.PROD) {
-      this.provider.disconnect();
-    }
-  }
-
-  #handleOnline() {
-    if (this.settings.mode !== "local" && import.meta.env.PROD) {
-      this.provider.connect();
-    }
   }
 
   destroy() {
