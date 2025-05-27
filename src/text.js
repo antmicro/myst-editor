@@ -71,8 +71,12 @@ export class TextManager {
 
   renderText(useCache = true, force = false) {
     const previewVisible = ["Both", "Preview"].includes(this.options.mode.value) || force;
-    if (!this.preview.value || !this.editorView.value || !previewVisible) return;
-    const cache = !this.lastMd || this.lastMd == this.md.value ? useCache : false;
+    if (!this.preview.value || !this.editorView.value || !previewVisible) {
+      this.lastMode = this.options.mode.value;
+      return;
+    }
+    const newMode = this.lastMode && this.options.mode.value !== this.lastMode;
+    const cache = (!this.lastMd || this.lastMd == this.md.value) && !newMode && useCache;
     const chunkLookup = cache ? this.chunks.reduce((lookup, chunk) => ({ ...lookup, [chunk.hash]: { html: chunk.html, oldId: chunk.id } }), {}) : {};
     const newChunks = this.splitTextIntoChunks(chunkLookup);
 
@@ -89,6 +93,7 @@ export class TextManager {
 
     this.chunks = newChunks;
     this.lastMd = this.md.value;
+    this.lastMode = this.options.mode.value;
   }
 
   observePreview() {
