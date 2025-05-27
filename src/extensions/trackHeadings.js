@@ -1,4 +1,4 @@
-import { syntaxTree } from "@codemirror/language";
+import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { EditorState, StateField } from "@codemirror/state";
 
 export const trackHeadings = (headings) =>
@@ -21,7 +21,7 @@ export const trackHeadings = (headings) =>
             to: range[i == 0 ? 1 : 3],
             enter(nodeRef) {
               if (headingChanged) return false;
-              headingChanged = nodeRef.name.startsWith("ATXHeading");
+              headingChanged = nodeRef.name.startsWith("ATXHeading") || nodeRef.name.startsWith("SetextHeading");
               return !headingChanged;
             },
           });
@@ -36,11 +36,24 @@ export const trackHeadings = (headings) =>
   });
 
 function getHeadingsFlat(/** @type {EditorState} */ state) {
-  return [...state.doc.toString().matchAll(/^(#{1,6}) (.+)/gm)].map((match) => ({
-    level: match[1].length,
-    text: match[2],
-    pos: match.index,
-  }));
+  const headingsFlat = [];
+  const maxParseTimeMs = 10_000;
+  ensureSyntaxTree(state, state.doc.length, maxParseTimeMs).iterate({
+    enter(nodeRef) {
+      const isATX = nodeRef.name.startsWith("ATXHeading");
+      if (!isATX && !nodeRef.name.startsWith("SetextHeading")) return true;
+
+      const level = parseInt(nodeRef.name.replace("ATXHeading", "").replace("SetextHeading", ""));
+      const fullText = state.sliceDoc(nodeRef.from, nodeRef.to);
+      headingsFlat.push({
+        level,
+        text: isATX ? fullText.slice(level + 1) : fullText.split("\n")[0],
+        pos: nodeRef.from,
+      });
+      return false;
+    },
+  });
+  return headingsFlat;
 }
 
 function nestHeadings(headingsFlat) {

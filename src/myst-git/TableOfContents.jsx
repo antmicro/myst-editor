@@ -100,18 +100,18 @@ export const TableOfContents = ({ indexedFiles, markedFiles, currentFile, onFile
     (async () => {
       for (const f of files) {
         const text = await getText(branch.peek(), commit.peek(), f.file);
-        const headingMatch = text.match(/^(#+) (.+)/m);
-        if (!headingMatch || headingMatch[1].length !== 1) {
+        const headingMatch = text.match(/(?:^# (.+))|(?:^(.*)\n=+)/);
+        if (!headingMatch) {
           f.title = f.file;
         } else {
-          f.title = headingMatch[2];
+          f.title = headingMatch[1] ?? headingMatch[2];
         }
       }
       fileList.value = files;
     })();
   });
 
-  const fileHeadings = useComputed(() => headings.value.flatMap((h, i) => (i == 0 && h.level == 1 ? h.children : h)));
+  const fileHeadings = useComputed(() => headings.value.flatMap((h, i) => (i == 0 && h.level == 1 && h.pos === 0 ? h.children : h)));
 
   function handleHeadingClick(ev) {
     const posAttr = ev.target?.dataset?.headingPos;
@@ -125,6 +125,17 @@ export const TableOfContents = ({ indexedFiles, markedFiles, currentFile, onFile
       <p>Page index:</p>
       <ul>
         {fileList.value.map((f) => {
+          let fileLabel = f.title;
+          if (f.file === currentFile) {
+            // Use first h1 heading as file label if possible
+            if (headings.value[0]?.level === 1 && headings.value[0]?.pos === 0) {
+              fileLabel = headings.value[0].text;
+            } else {
+              // Otherwise use the file path
+              fileLabel = currentFile;
+            }
+          }
+
           return (
             <li key={f.file}>
               <span
@@ -132,7 +143,7 @@ export const TableOfContents = ({ indexedFiles, markedFiles, currentFile, onFile
                 title={`Go to file ${f.file}`}
                 onClick={() => onFileClick(f)}
               >
-                {f.file === currentFile ? (headings.value[0]?.level === 1 ? headings.value[0].text : currentFile) : f.title}
+                {fileLabel}
               </span>
               {currentFile.startsWith(f.file) && (
                 <ul id="headings" onClick={handleHeadingClick}>
