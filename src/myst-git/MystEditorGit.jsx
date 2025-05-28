@@ -96,7 +96,7 @@ const MystEditorGit = ({
   const commitDocuments = useRef(null);
 
   useEffect(() => {
-    window.myst_editor[props.id].git = { branch, commits, commit, files, file, room };
+    window.myst_editor[props.id].git = { branch, commits, commit, files, file, room, statusSocket };
   }, [props.id]);
 
   useSignalEffect(() => {
@@ -186,11 +186,11 @@ const MystEditorGit = ({
     } catch (error) {
       console.error(error);
       toastNotify({ text: `Error occured while commiting: ${error}` });
-      options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
       cleanupConnections(commitDocuments.current, collab);
       commitDocuments.current = null;
     } finally {
       cleanupConnections(newConnections, collab);
+      options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
     }
   }
   function onCommitCancel() {
@@ -445,6 +445,11 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
         });
       })();
       return true;
+    },
+    onDiscardChanges: () => {
+      // Unmark file in the sidebar
+      window.myst_editor[editorId].git.statusSocket.current.send(window.myst_editor[editorId].git.room.peek());
+      params.onDiscardChanges?.();
     },
   });
   window.myst_editor[editorId].state = state;

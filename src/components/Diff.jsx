@@ -80,6 +80,7 @@ const Diff = () => {
           <DefaultButton
             onClick={() => {
               editorView.value.dispatch({ changes: { from: 0, to: editorView.value.state.doc.length, insert: options.initialText.peek() } });
+              options.onDiscardChanges?.value?.();
               modalRef.current.close();
             }}
           >

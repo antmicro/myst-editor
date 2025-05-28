@@ -188,6 +188,7 @@ const defaults = {
   mapUrl: (tag, url) => url,
   yamlSchema: null,
   onPreviewClick: () => {},
+  onDiscardChanges: () => {},
 };
 
 export const modeChangeAnnotation = Annotation.define();
