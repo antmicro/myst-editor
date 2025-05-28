@@ -1,12 +1,12 @@
-import { MystEditorGit as g } from "./MystEditor.js";
-const i = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), d = a.get("username") || Math.floor(Math.random() * 1e3).toString(), u = i[Math.floor(Math.random() * i.length)];
-let h = [{
+import { MystEditorGit as u } from "./MystEditor.js";
+const i = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], r = new URLSearchParams(window.location.search), g = r.get("username") || Math.floor(Math.random() * 1e3).toString(), h = i[Math.floor(Math.random() * i.length)];
+let b = [{
   target: "say",
-  transform: async (e) => d + " says: '" + e + "'"
-}], b = [{
+  transform: async (e) => g + " says: '" + e + "'"
+}], f = [{
   target: "bold",
   transform: (e, t) => `<b style="white-space: pre-wrap;">${t.body}</b>`
-}], f = [{
+}], p = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
     const [t, s] = e.split("#");
@@ -39,15 +39,15 @@ let h = [{
     timeZone: "UTC"
   })))
 }];
-const r = {}.VITE_COLLAB != "OFF" && a.get("collab") != "false";
+const n = {}.VITE_COLLAB != "OFF" && r.get("collab") != "false";
 var l;
-const o = (l = {}.VITE_WS_URL) != null ? l : a.get("collab_server"), n = ["main", "dev"], m = [{
+const o = (l = {}.VITE_WS_URL) != null ? l : r.get("collab_server"), a = ["main", "dev"], m = [{
   message: "commit 2",
   hash: "aaa"
 }, {
   message: "commit 1",
   hash: "bbb"
-}], p = ["docs/source/file1.md", "docs/source/file2.md", "docs/source/index.md"], y = {
+}], y = ["docs/source/file1.md", "docs/source/file2.md", "docs/source/index.md"], _ = {
   ["docs/source/index.md"]: "# {{project}}\n\n```{toctree}\nfile2\nfile1\n```\n",
   ["docs/source/file1.md"]: `# Document 1
 line1
@@ -64,17 +64,18 @@ line3
 ## Heading2_2
 line4`
 };
-g({
-  repo: "repos/myst",
-  initialBranches: n,
-  getBranches: (e) => e == 1 ? n : [],
-  searchBranches: (e) => n.filter((t) => t.includes(e)),
+var d;
+u({
+  repo: (d = r.get("repo")) != null ? d : "repos/myst",
+  initialBranches: a,
+  getBranches: (e) => e == 1 ? a : [],
+  searchBranches: (e) => a.filter((t) => t.includes(e)),
   getCommits: (e, t) => t == 1 ? m : [],
   searchCommits: (e) => m.filter((t) => t.message.includes(e)),
-  getFiles: () => p,
+  getFiles: () => y,
   getText: async (e, t, s) => {
     var c;
-    return (c = y[s]) != null ? c : "";
+    return (c = _[s]) != null ? c : "";
   },
   storeHistory: () => {
   },
@@ -84,18 +85,18 @@ g({
   }),
   id: "demo",
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
-  transforms: f,
+  transforms: p,
   collaboration: {
-    enabled: r,
-    commentsEnabled: r,
-    resolvingCommentsEnabled: r,
+    enabled: n,
+    commentsEnabled: n,
+    resolvingCommentsEnabled: n,
     wsUrl: o != null ? o : "#",
-    username: d,
-    color: u,
+    username: g,
+    color: h,
     mode: o ? "websocket" : "local"
   },
-  customRoles: h,
-  customDirectives: b,
+  customRoles: b,
+  customDirectives: f,
   syncScroll: !0,
   index: "docs/source/index.md",
   docsRoot: "docs/source"
