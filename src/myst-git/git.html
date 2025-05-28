@@ -106,7 +106,7 @@ file1
 
       MystEditorGit(
         {
-          repo: `repos/myst`,
+          repo: urlParams.get("repo") ?? `repos/myst`,
           initialBranches: branches,
           getBranches: (page) => (page == 1 ? branches : []),
           searchBranches: (input) => branches.filter((b) => b.includes(input)),

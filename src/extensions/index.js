@@ -317,6 +317,7 @@ export class ExtensionBuilder {
       EditorView.exceptionSink.of((e) => {
         if (error.value) return;
         const err = e instanceof Error ? e : new Error(e.toString());
+        console.error(err);
         error.value = { src: "exceptionSink", error: err };
       }),
     );

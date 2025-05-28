@@ -158,8 +158,7 @@ graph TD
 
 test.describe.parallel("With collaboration enabled", () => {
   test("Keeps the initial document if collaborative state is empty", async ({ context }) => {
-    const collabOpts = { collab_server: "ws://localhost:4455", room: Date.now().toString() };
-    const page = await applyPageOpts(await context.newPage(), collabOpts);
+    const page = await applyPageOpts(await context.newPage(), defaultCollabOpts());
 
     await expect(async () => {
       const editorContent = await page.evaluate((id) => window.myst_editor[id].text, id);
@@ -169,7 +168,7 @@ test.describe.parallel("With collaboration enabled", () => {
   });
 
   test("Rejects the initial document if collaborative state is not empty", async ({ context }) => {
-    const collabOpts = { collab_server: "ws://localhost:4455", collab: "true", room: Date.now().toString() };
+    const collabOpts = defaultCollabOpts();
     const pageA = await applyPageOpts(await context.newPage(), collabOpts);
 
     // Initialize the document from pageA
@@ -557,25 +556,22 @@ test.describe.parallel("With collaboration enabled", () => {
       }).toPass();
 
       const text1 = "this is room 1";
+      const room1 = collabOpts.room + "1";
       // A - join room 1
-      await pageA.evaluate((id) => {
-        const collab = window.myst_editor[id].state.options.collaboration.value;
-        window.myst_editor[id].state.options.collaboration.value = { ...collab, room: "1" };
-      }, id);
-      await pageA.waitForSelector(".cm-content");
+      await changeRoom(pageA, room1);
       await clearEditor(pageA);
       await insertToMainEditor(pageA, { from: 0, insert: text1 });
+      await expect(async () => {
+        const text = await pageA.evaluate((id) => window.myst_editor[id].text, id);
+        expect(text).toBe(text1);
+      }).toPass();
+
       await expect(async () => {
         const text = await pageB.evaluate((id) => window.myst_editor[id].text, id);
         expect(text).toBe(text0);
       }).toPass();
-
       // B - join room 1
-      await pageB.evaluate((id) => {
-        const collab = window.myst_editor[id].state.options.collaboration.value;
-        window.myst_editor[id].state.options.collaboration.value = { ...collab, room: "1" };
-      }, id);
-      await pageB.waitForSelector(".cm-content");
+      await changeRoom(pageB, room1);
       await expect(async () => {
         const text = await pageB.evaluate((id) => window.myst_editor[id].text, id);
         expect(text).toBe(text1);
@@ -586,15 +582,15 @@ test.describe.parallel("With collaboration enabled", () => {
 
 test.describe.parallel("MystEditorGit wrapper", () => {
   test("Synces document between peers", async ({ context }) => {
-    const { collab_server } = defaultCollabOpts();
-    const pageA = await applyPageOpts(await context.newPage(), { collab_server }, true);
+    const collabOpts = defaultCollabOpts();
+    const pageA = await applyPageOpts(await context.newPage(), collabOpts, true);
 
     // Initialize the document from pageA and add some content
     await clearEditor(pageA);
     await insertChangesAndCheckOutput(pageA, { from: 0, insert: "This is from pageA!" }, (html) => expect(html).toContain("This is from pageA!"));
 
     // Open the document as another user and add some content
-    const pageB = await applyPageOpts(await context.newPage(), { collab_server }, true);
+    const pageB = await applyPageOpts(await context.newPage(), collabOpts, true);
     await expect(async () => {
       const currentText = await pageB.evaluate((id) => window.myst_editor[id].text, id);
       expect(currentText).toBe("This is from pageA!");
@@ -615,8 +611,8 @@ test.describe.parallel("MystEditorGit wrapper", () => {
   });
 
   test("Switches rooms", async ({ context }) => {
-    const { collab_server } = defaultCollabOpts();
-    const page = await applyPageOpts(await context.newPage(), { collab_server }, true);
+    const collabOpts = defaultCollabOpts();
+    const page = await applyPageOpts(await context.newPage(), collabOpts, true);
 
     async function checkSelect(roomId: number, selectName: string) {
       await clearEditor(page);
@@ -636,12 +632,12 @@ test.describe.parallel("MystEditorGit wrapper", () => {
   });
 
   test("Commits changes", async ({ context }) => {
-    const { collab_server } = defaultCollabOpts();
-    const pageA = await applyPageOpts(await context.newPage(), { collab_server }, true);
+    const collabOpts = defaultCollabOpts();
+    const pageA = await applyPageOpts(await context.newPage(), collabOpts, true);
     await clearEditor(pageA);
     await insertToMainEditor(pageA, { from: 0, insert: `change` });
 
-    const pageB = await applyPageOpts(await context.newPage(), { collab_server }, true);
+    const pageB = await applyPageOpts(await context.newPage(), collabOpts, true);
 
     await pageA.getByTitle("Commit").click();
     // Check if document is locked for the other user
@@ -691,7 +687,7 @@ const clearEditor = async (page: Page) => {
   });
 };
 
-const defaultCollabOpts = () => ({ collab_server: "ws://localhost:4455", room: Date.now().toString() });
+const defaultCollabOpts = () => ({ collab_server: "ws://localhost:4455", room: crypto.randomUUID(), repo: `repos/${crypto.randomUUID()}` });
 
 const collaborationReady = (page: Page) => page.waitForFunction((id) => window?.myst_editor[id]?.state?.collab?.value?.ready?.value, id);
 
@@ -722,6 +718,11 @@ const applyPageOpts = async (page: Page, opts: object, git = false) => {
   if ("collab_server" in opts) {
     await collaborationReady(page);
   }
+  // Wait for initial text
+  await expect(async () => {
+    const text = await page.evaluate((id) => window.myst_editor[id].text, id);
+    expect(text).not.toHaveLength(0);
+  }).toPass();
   return page;
 };
 
@@ -740,3 +741,19 @@ const openResolvedComments = async (page: Page) => {
   await page.hover(".more");
   await page.click('[name="resolved"]');
 };
+
+async function changeRoom(page: Page, room: string) {
+  await page.evaluate(
+    ({ id, room }) => {
+      const collab = window.myst_editor[id].state.options.collaboration.value;
+      window.myst_editor[id].state.options.collaboration.value = { ...collab, room };
+    },
+    { id, room },
+  );
+  await page.waitForSelector(".cm-content");
+  await collaborationReady(page);
+  await expect(async () => {
+    const text = await page.evaluate((id) => window.myst_editor[id].main_editor?.state?.doc?.toString?.(), id);
+    expect(text).not.toHaveLength(0);
+  }).toPass();
+}

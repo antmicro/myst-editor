@@ -9,6 +9,7 @@ class ErrorBoundary extends Component {
   componentDidCatch(err) {
     if (this.context.error.value) return;
     this.context.error.value = { src: "ErrorBoundary", error: err };
+    console.error(err);
   }
 
   render() {

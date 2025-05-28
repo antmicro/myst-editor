@@ -9,7 +9,7 @@ stages:
 
 build:
   stage: build
-  image: node:20
+  image: node:22
   variables:
     NODE_OPTIONS: "--max-old-space-size=4096"
   before_script:
@@ -23,7 +23,7 @@ build:
 
 functional-tests:
   stage: ui-tests
-  image: node:20
+  image: node:22
   dependencies: [build]
   before_script:
     - npm ci
@@ -36,6 +36,8 @@ functional-tests:
     paths:
       - test-results
       - playwright-report/index.html
+  variables:
+    SCALENODE_CPU: 8
 
 build-docs:
   stage: build
@@ -65,7 +67,7 @@ build-docs:
 
 doc-deploy:
   stage: doc-deploy
-  image: node:20
+  image: node:22
   tags: ["docs"]
   dependencies: [build]
   script:
