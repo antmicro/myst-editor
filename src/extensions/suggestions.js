@@ -232,11 +232,11 @@ export const AddSuggestionBtn = styled(DefaultButton)`
   padding: 0 !important;
 
   &:hover {
-    background-color: var(--gray-400);
+    background-color: var(--button-bg-hover);
   }
 
   img {
-    filter: invert(100%);
+    filter: invert(calc(-2 * var(--icon-invert) + 1));
   }
 
   &.dir-up::before {
@@ -246,7 +246,7 @@ export const AddSuggestionBtn = styled(DefaultButton)`
     transform: translate(10px, -18px);
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-bottom: 10px solid var(--icon-border);
+    border-bottom: 10px solid var(--border);
   }
 
   &:not(.dir-up)::after {
@@ -256,6 +256,6 @@ export const AddSuggestionBtn = styled(DefaultButton)`
     transform: translate(10px, 8px);
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-top: 10px solid var(--icon-border);
+    border-top: 10px solid var(--border);
   }
 `;

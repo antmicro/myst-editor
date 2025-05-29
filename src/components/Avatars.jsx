@@ -24,13 +24,12 @@ const AvatarsWrapper = styled.div`
     &.placeholder {
       margin-left: -7px;
       line-height: 33px;
-      color: var(--icon-color);
-      border-color: var(--icon-border);
+      border-color: var(--border);
       font-style: normal;
       font-size: small;
       font-weight: 700;
       text-align: center;
-      background-color: var(--icon-bg);
+      background-color: var(--button-bg);
     }
   }
 `;

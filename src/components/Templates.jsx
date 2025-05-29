@@ -19,15 +19,15 @@ const TemplatesList = styled.div`
 `;
 
 const TemplateButton = styled(DefaultButton)`
-  color: ${(props) => (props.error ? "var(--red-500)" : "var(--icon-color)")};
-  border: 1px solid ${(props) => (props.error ? "var(--red-500)" : "var(--icon-border)")};
+  color: ${(props) => (props.error ? "var(--error-bg)" : "inherit")};
+  border: 1px solid ${(props) => (props.error ? "var(--error-bg)" : "var(--border)")};
 
   ${(props) =>
     props.error &&
     css`
       &:hover {
-        border: 1px solid var(--red-500) !important;
-        background-color: var(--icon-bg) !important;
+        border: 1px solid var(--error-bg) !important;
+        background-color: var(--button-bg) !important;
       }
     `}
 `;

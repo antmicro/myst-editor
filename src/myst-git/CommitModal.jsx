@@ -6,23 +6,12 @@ import { ExtensionBuilder } from "../extensions";
 import { unifiedMergeView } from "@codemirror/merge";
 import { CodeEditor } from "../components/CodeMirror";
 import { MystState } from "../mystState";
+import { Modal } from "../components/CommonUI";
 
-const Modal = styled.dialog`
-  background-color: white;
-  border-radius: var(--border-radius);
-  top: 80px;
-  border: none;
-  margin: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  max-height: calc(100vh - 160px);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  overscroll-behavior: contain;
-  box-shadow: 4px 4px 10px var(--gray-600);
-  padding: 20px 15px;
-  width: 800px;
-  max-width: 100vw;
+const CommitForm = styled(Modal)`
+  && {
+    width: 800px;
+  }
 
   form {
     margin-top: 20px;
@@ -44,6 +33,9 @@ const Modal = styled.dialog`
     font-family: inherit;
     width: 100%;
     box-sizing: border-box;
+    background-color: var(--button-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
   }
 
   input {
@@ -56,8 +48,8 @@ const Modal = styled.dialog`
     font-size: 12px;
     font-weight: bold;
     font-family: inherit;
-    border: 1px solid var(--icon-border);
-    background-color: var(--icon-bg);
+    border: 1px solid var(--border);
+    background-color: var(--button-bg);
     height: 40px;
     display: flex;
     justify-content: center;
@@ -67,15 +59,9 @@ const Modal = styled.dialog`
     border-radius: var(--border-radius);
 
     &:hover {
-      background-color: var(--icon-selected);
-      border: 1px solid var(--icon-selected);
+      background-color: var(--button-bg-hover);
+      border: 1px solid var(--button-bg-hover);
     }
-  }
-
-  #buttons {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
   }
 
   #diffs {
@@ -143,7 +129,7 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
   }
 
   return (
-    <Modal ref={modalRef}>
+    <CommitForm ref={modalRef}>
       <div id="diffs">
         {documents
           .filter((d) => !discardedDocs.value.includes(d.file))
@@ -184,7 +170,7 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
             cols={80}
             rows={5}
           />
-          <div id="buttons">
+          <div className="buttons">
             <button type="submit" disabled={stagedDocs.value.length === 0}>
               Commit
             </button>
@@ -196,13 +182,13 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
       ) : (
         <>
           <p>You can only commit changes from the latest commit of a branch</p>
-          <div id="buttons">
+          <div className="buttons">
             <div />
             <button onClick={() => modalRef.current.close()}>Close</button>
           </div>
         </>
       )}
-    </Modal>
+    </CommitForm>
   );
 };
 

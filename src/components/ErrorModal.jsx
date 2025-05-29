@@ -47,11 +47,11 @@ const formatError = (error, src, options, getLogString, editorView, collabClient
 };
 
 const ErrorContainer = styled(Modal)`
-  box-shadow: inset 0 8px var(--red-500);
+  box-shadow: inset 0 8px var(--error-bg);
 
   button:hover {
-    background-color: var(--icon-selected);
-    border: 1px solid var(--icon-selected);
+    background-color: var(--button-bg-hover);
+    border: 1px solid var(--button-bg-hover);
   }
 `;
 

@@ -7,7 +7,7 @@ const GroupContainer = styled.div`
   display: flex;
 
   & > button:first-child {
-    border-left: 1px solid var(--icon-border) !important;
+    border-left: 1px solid var(--border) !important;
     border-radius: var(--border-radius) 0 0 var(--border-radius);
   }
 
@@ -23,15 +23,14 @@ const GroupContainer = styled.div`
 `;
 
 const RadioButton = styled(DefaultButton)`
-  color: ${(props) => (props.active ? "white" : "var(--icon-color)")};
-  background-color: ${(props) => (props.active ? "var(--icon-main-active)" : "var(--navbar-bg)")};
+  background-color: ${(props) => (props.active ? "var(--accent)" : "var(--button-bg)")};
   width: 40px;
-  border: "1px solid var(--icon-border)";
+  border: "1px solid var(--border)";
   border-left: none;
   border-radius: 0;
 
   &:hover:not(&:disabled) {
-    background-color: var(--icon-main-selected);
+    background-color: var(--accent-light);
   }
 
   &:hover ~ .btn-dropdown {
@@ -48,11 +47,11 @@ const DropdownButton = styled(DefaultButton)`
   width: 100%;
   padding: 0 16px;
   justify-content: start;
-  background-color: ${(props) => (props.active ? "var(--icon-main-active) !important" : "var(--icon-bg)")};
+  background-color: ${(props) => (props.active ? "var(--accent) !important" : "var(--button-bg)")};
 `;
 
 const MoreIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000">
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
     <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z" />
   </svg>
 );

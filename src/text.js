@@ -50,7 +50,7 @@ export class TextManager {
         .use(markdownReplacer(options.transforms.value, options.parent, cache.transform))
         .use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))
         .use(useCustomDirectives(options.customDirectives.value, options.parent, cache.transform))
-        .use(markdownMermaid, { lineMap: this.lineMap, parent: options.parent })
+        .use(markdownMermaid, { lineMap: this.lineMap, parent: options.parent, theme: options.mermaidTheme.value })
         .use(markdownSourceMap)
         .use(checkLinks)
         .use(colonFencedBlocks)

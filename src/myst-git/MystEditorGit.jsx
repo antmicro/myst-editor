@@ -12,18 +12,23 @@ import Sidebar from "./Sidebar";
 import { createLogger, Logger } from "../logger";
 
 const MystContainer = styled(MystCSSVars)`
-  --text: black;
-  color: var(--text);
   display: grid;
   grid-template-columns: 300px 1fr;
   grid-template-rows: 100%;
   height: 100%;
   font-family: "Lato";
   position: relative;
+
+  button,
+  input,
+  dialog,
+  textarea {
+    color: inherit;
+  }
 `;
 
 const Toast = styled.div`
-  background-color: white;
+  background-color: var(--button-bg);
   position: absolute;
   top: 10px;
   left: 50%;
@@ -36,7 +41,7 @@ const Toast = styled.div`
   border-radius: var(--border-radius);
 
   button {
-    color: gray;
+    color: var(--border);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -46,7 +51,7 @@ const Toast = styled.div`
 
   a {
     display: inline-block;
-    color: var(--blue-500);
+    color: var(--accent-dark);
   }
 `;
 
@@ -54,7 +59,7 @@ const CommitIcon = () => (
   <svg width="24" height="26" viewBox="0 0 24 26" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M17.5 24.2941V18.1277C17.4997 17.8572 17.446 17.5895 17.3421 17.3398C17.2383 17.0901 17.0862 16.8634 16.8946 16.6725C16.703 16.4817 16.4757 16.3304 16.2256 16.2275C15.9755 16.1246 15.7076 16.0719 15.4372 16.0726H8.56282C8.29239 16.0719 8.02448 16.1246 7.7744 16.2275C7.52433 16.3304 7.297 16.4817 7.10542 16.6725C6.91383 16.8634 6.76175 17.0901 6.65787 17.3398C6.55398 17.5895 6.50034 17.8572 6.5 18.1277V24.2941M17.5 1.36884V4.42554C17.4997 4.69597 17.446 4.96369 17.3421 5.21337C17.2383 5.46306 17.0862 5.68981 16.8946 5.88068C16.703 6.07154 16.4757 6.22277 16.2256 6.32571C15.9755 6.42865 15.7076 6.48128 15.4372 6.4806H8.56282C8.29239 6.48128 8.02448 6.42865 7.7744 6.32571C7.52433 6.22277 7.297 6.07154 7.10542 5.88068C6.91383 5.68981 6.76175 5.46306 6.65787 5.21337C6.55398 4.96369 6.50034 4.69597 6.5 4.42554V1.00001M17.5 1.36884C16.9633 1.12578 16.3809 1.00004 15.7918 1.00001H6.5M17.5 1.36884C17.9452 1.57072 18.3554 1.85284 18.7087 2.20354L21.7913 5.27707C22.1741 5.65796 22.4779 6.11066 22.6853 6.60922C22.8927 7.10778 22.9997 7.64238 23 8.18237V20.1814C22.9997 20.7224 22.8927 21.258 22.6851 21.7576C22.4776 22.2572 22.1736 22.7109 21.7905 23.0929C21.4075 23.4749 20.9529 23.7776 20.4527 23.9837C19.9525 24.1898 19.4166 24.2953 18.8756 24.2941H5.12565C4.58468 24.2955 4.04874 24.1902 3.54851 23.9842C3.04828 23.7783 2.59356 23.4757 2.21037 23.0938C1.82719 22.712 1.52305 22.2583 1.31536 21.7588C1.10767 21.2593 1.00051 20.7237 1 20.1827V5.11013C1.00068 4.56927 1.10797 4.03384 1.31573 3.53447C1.5235 3.0351 1.82766 2.58159 2.21083 2.19986C2.594 1.81813 3.04866 1.51568 3.54881 1.3098C4.04896 1.10392 4.58478 0.998652 5.12565 1.00001H6.5"
-      stroke="black"
+      stroke="currentColor"
       stroke-width="1.5"
       stroke-linecap="round"
       stroke-linejoin="round"
@@ -319,7 +324,7 @@ const MystEditorGit = ({
   return (
     <div style="all: initial;">
       <StyleSheetManager target={props.parent}>
-        <MystContainer id="myst-git-container">
+        <MystContainer id="myst-css-namespace">
           <Sidebar
             {...{
               searchBranches,

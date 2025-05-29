@@ -189,6 +189,8 @@ const defaults = {
   yamlSchema: null,
   onPreviewClick: () => {},
   onDiscardChanges: () => {},
+  mermaidTheme: "neutral",
+  cmDarkTheme: false,
 };
 
 export const modeChangeAnnotation = Annotation.define();

@@ -50,7 +50,7 @@ const ToggleContainer = styled.span`
     transition: 0.4s;
     cursor: pointer;
     position: relative;
-    background-color: var(--gray-600);
+    background-color: var(--switch-bg);
 
     &::before {
       content: "";
@@ -66,7 +66,7 @@ const ToggleContainer = styled.span`
   }
 
   input:checked + label {
-    background-color: var(--blue-500);
+    background-color: var(--switch-active-bg);
 
     &::before {
       transform: translateX(24px);

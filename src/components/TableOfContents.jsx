@@ -5,15 +5,13 @@ import { EditorView } from "codemirror";
 import { useSignalEffect } from "@preact/signals";
 
 const Wrapper = styled.div`
-  background-color: white;
+  background-color: var(--panel-bg);
   padding: 20px 0;
   box-sizing: border-box;
   height: 100%;
-  border: 1px solid var(--gray-400);
-  border-left: 1px solid var(--gray-600);
-  box-shadow: inset 0px 0px 4px var(--gray-600);
+  border: 1px solid var(--border);
+  box-shadow: inset 0px 0px 4px var(--box-shadow);
   border-radius: var(--border-radius);
-  color: var(--gray-900);
   overflow-y: auto;
   overscroll-behavior: contain;
 
@@ -27,7 +25,7 @@ const Wrapper = styled.div`
 const VerticalSparator = styled.hr`
   border: none;
   height: 1px;
-  background-color: var(--gray-600);
+  background-color: var(--border);
   margin-top: 20px;
   margin-bottom: 0;
 `;

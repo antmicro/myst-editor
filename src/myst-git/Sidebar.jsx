@@ -15,6 +15,7 @@ const GitSidebar = styled.div`
   padding-bottom: 24px;
   overscroll-behavior: contain;
   gap: 24px;
+  background-color: var(--navbar-bg);
 
   label {
     display: block;
@@ -54,8 +55,8 @@ const ChangeHistory = styled(SidebarDetails)`
 
   button {
     cursor: pointer;
-    background: white;
-    border: 1px solid var(--icon-border);
+    background: var(--button-bg);
+    border: 1px solid var(--border);
     font-family: "Lato";
     font-weight: 600;
     display: flex;
@@ -64,9 +65,10 @@ const ChangeHistory = styled(SidebarDetails)`
     border-radius: var(--border-radius);
     flex-direction: column;
     gap: 12px;
+    transition: 0.4s ease;
 
     &:hover {
-      background: var(--icon-selected);
+      background: var(--button-bg-hover);
     }
 
     .hash,
@@ -87,7 +89,7 @@ const UnindexedFiles = styled(SidebarDetails)`
 
     li {
       &.active {
-        color: var(--blue-500);
+        color: var(--accent-dark);
       }
       &.marked::after {
         content: "";
@@ -96,7 +98,7 @@ const UnindexedFiles = styled(SidebarDetails)`
         width: 8px;
         height: 8px;
         border-radius: 100%;
-        background-color: var(--gray-800);
+        background-color: currentColor;
       }
       &:hover {
         text-decoration: underline;

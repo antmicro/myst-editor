@@ -166,7 +166,7 @@ These features include:
   - suggestions - non-destructively suggest changes to the document`;
       console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
 
-      import MystEditor, { defaultButtons } from "./MystEditor.jsx";
+      import MystEditor, { defaultButtons, darkTheme } from "./MystEditor.jsx";
 
       const usercolors = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"];
 
@@ -268,6 +268,9 @@ These features include:
           ]),
           spellcheckOpts: { dict: "en_US", dictionaryPath: `${window.location.pathname}dictionaries` },
           syncScroll: true,
+          additionalStyles: darkTheme,
+          cmDarkTheme: true,
+          mermaidTheme: "dark",
         },
         document.getElementById("myst"),
       );

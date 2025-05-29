@@ -65,7 +65,7 @@ const YCommentWrapper = styled.div`
     border-radius: 50%;
     height: 24px;
     width: 24px;
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 4px;
+    box-shadow: 0px 0px 4px var(--box-shadow);
     position: absolute;
     transform: translateX(-30px);
   }
@@ -161,7 +161,7 @@ const YComment = ({ commentId }) => {
             />
 
             <svg width="3" height="22" viewBox="0 10 2 19" fill="none">
-              <path d="M1 1V25" stroke="#DDDDDD" stroke-width="0.75" stroke-linecap="round" />
+              <path d="M1 1V25" stroke="var(--border)" stroke-width="0.75" stroke-linecap="round" />
             </svg>
 
             <PopupButton icon={trashcanIcon} bgOnHover={"#e7473c15"} text="DELETE" onClick={() => collab.value.ycomments.deleteComment(commentId)} />
@@ -171,6 +171,7 @@ const YComment = ({ commentId }) => {
                 bgOnHover={"#AAE17320"}
                 text="RESOLVE"
                 onClick={() => collab.value.ycomments.resolveComment(commentId)}
+                invert
               />
             )}
           </YCommentPopup>
@@ -187,12 +188,12 @@ const YCommentPopup = styled.div`
   height: 25px;
   border-radius: 2px;
   position: absolute;
-  background-color: white;
-  border: 1px solid var(--icon-border);
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border);
   z-index: 30000000;
   left: ${(props) => -props.left - 13}px;
   top: ${(props) => -props.shift}px;
-  box-shadow: 0 0 3px #ccc;
+  box-shadow: 0 0 3px var(--box-shadow);
   box-sizing: content-box;
 
   .comment-icon {
@@ -200,6 +201,7 @@ const YCommentPopup = styled.div`
     padding: 3px;
     margin-left: 10px;
     margin-right: 10px;
+    filter: invert(var(--icon-invert));
   }
 
   .resolve-icon {
@@ -224,30 +226,22 @@ const PopupButtonWrapper = styled.div`
 
   img {
     height: 20px;
+    filter: ${(props) => (props.invert ? "invert(var(--icon-invert))" : "none")}};
   }
 
-  .delete-btn,
   .resolve-btn {
-    color: #e7473c;
+    color: var(--error-bg);
     line-height: 25px;
     font-size: 10px;
     margin-left: 5px;
     margin-right: 5px;
     box-sizing: content-box;
   }
-
-  .delete-icon,
-  resolve-icon {
-    width: 11px;
-    margin-top: 2px;
-    margin-left: 5px;
-    box-sizing: content-box;
-  }
 `;
 
-const PopupButton = ({ icon, onClick, text, bgOnHover }) => {
+const PopupButton = ({ icon, onClick, text, bgOnHover, invert }) => {
   return (
-    <PopupButtonWrapper bgOnHover={bgOnHover} onClick={onClick}>
+    <PopupButtonWrapper bgOnHover={bgOnHover} onClick={onClick} invert={invert}>
       <img class="resolve-icon" src={icon} />
       <span class="resolve-btn"> {text} </span>
     </PopupButtonWrapper>

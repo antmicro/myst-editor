@@ -7,7 +7,6 @@ const Container = styled.div`
   width: 250px;
   position: relative;
   font-family: "Lato";
-  color: black;
 
   * {
     box-sizing: border-box;
@@ -20,7 +19,7 @@ const Container = styled.div`
     width: 8px;
     height: 8px;
     border-radius: 100%;
-    background-color: var(--gray-800);
+    background-color: currentColor;
   }
 `;
 
@@ -30,11 +29,10 @@ const Toggle = styled.button`
   justify-content: space-between;
   padding: 0 15px;
   cursor: pointer;
-  color: var(--icon-color);
   font-size: 12px;
   font-weight: bold;
-  border: 1px solid var(--icon-border);
-  background-color: var(--icon-bg);
+  border: 1px solid var(--border);
+  background-color: var(--button-bg);
   height: 40px;
   display: flex;
   margin-top: 0px;
@@ -55,35 +53,36 @@ const Toggle = styled.button`
   }
 
   &:hover {
-    background-color: var(--icon-selected);
-    border: 1px solid var(--icon-selected);
+    background-color: var(--button-bg-hover);
+    border: 1px solid var(--button-bg-hover);
   }
 `;
 
 const ArrowIcon = ({ up }) => (
   <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg" style={up ? "rotate: 180deg;" : ""}>
-    <path d="M1 1L4 7L7 1" stroke="rgb(108, 108, 108)" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M1 1L4 7L7 1" stroke="var(--border)" stroke-linecap="round" stroke-linejoin="round" />
   </svg>
 );
 
 const Dropdown = styled.div`
   position: absolute;
   z-index: 100;
-  background-color: white;
+  background-color: var(--navbar-bg);
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 10px;
   border-radius: var(--border-radius);
-  border: 1px solid var(--icon-border);
+  border: 1px solid var(--border);
 
   input {
     width: 100%;
     height: 40px;
     padding: 0 15px;
+    background-color: var(--button-bg);
     border-radius: var(--border-radius);
-    border: 1px solid var(--icon-border);
+    border: 1px solid var(--border);
   }
 `;
 
@@ -111,11 +110,11 @@ const OptionList = styled.ul`
     font-size: 12px;
 
     &:hover {
-      background-color: var(--icon-selected);
+      background-color: var(--button-bg-hover);
     }
 
     &.active {
-      color: var(--blue-500);
+      color: var(--accent-dark);
       font-weight: bold;
     }
   }

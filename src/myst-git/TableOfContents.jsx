@@ -9,7 +9,7 @@ const List = styled.div`
   width: 100%;
 
   .active {
-    color: var(--blue-500);
+    color: var(--accent-dark);
   }
 
   .file {
@@ -45,13 +45,13 @@ const List = styled.div`
         width: 8px;
         height: 8px;
         border-radius: 100%;
-        background-color: var(--gray-800);
+        background-color: currentColor;
       }
     }
   }
 
   #headings {
-    border-left: 1px solid var(--blue-500);
+    border-left: 1px solid var(--accent-dark);
 
     &,
     & ul {

@@ -6,15 +6,13 @@ import { MystState } from "../mystState";
 import { useComputed } from "@preact/signals";
 
 const ResolvedWrapper = styled.div`
-  background-color: white;
+  background-color: var(--panel-bg);
   padding: 20px 0;
   box-sizing: border-box;
   height: 100%;
-  border: 1px solid var(--gray-400);
-  border-left: 1px solid var(--gray-600);
-  box-shadow: inset 0px 0px 4px var(--gray-600);
+  border: 1px solid var(--border);
+  box-shadow: inset 0px 0px 4px var(--box-shadow);
   border-radius: var(--border-radius);
-  color: var(--gray-900);
   overflow-y: auto;
   overscroll-behavior: contain;
 
@@ -49,6 +47,7 @@ const NoCommentsText = styled.p`
   img {
     margin: 0 5px;
     transform: translateY(20%);
+    filter: invert(var(--icon-invert));
   }
 
   span {
@@ -58,8 +57,6 @@ const NoCommentsText = styled.p`
     margin: 0 5px;
   }
 `;
-
-ResolvedWrapper.defaultProps = { className: "myst-resolved" };
 
 function dateComparator(c1, c2) {
   return c1.resolvedDate - c2.resolvedDate;
@@ -77,7 +74,7 @@ const ResolvedComments = () => {
   const authors = useComputed(() => resolvedComments.value.map((c) => ycomments.lineAuthors(c.commentId)));
 
   return (
-    <ResolvedWrapper>
+    <ResolvedWrapper className="myst-resolved">
       <h1>Resolved comments</h1>
       <VerticalSparator />
       <CommentsContainer>

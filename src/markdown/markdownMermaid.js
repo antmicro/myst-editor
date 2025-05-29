@@ -3,7 +3,7 @@ import { waitForElement } from "../utils";
 import { getLineById } from "./markdownSourceMap";
 import IMurMurHash from "imurmurhash";
 
-const markdownItMermaid = (md, { lineMap, parent }) => {
+const markdownItMermaid = (md, { lineMap, parent, theme }) => {
   // We want to keep a cache based on line numbers to retrieve the previous version.
   // This allows for a flicker-free editing experience.
   // key = line number
@@ -13,7 +13,7 @@ const markdownItMermaid = (md, { lineMap, parent }) => {
   const contentCache = new Map();
 
   mermaid.initialize({
-    theme: "neutral",
+    theme,
     suppressErrorRendering: true,
   });
 

@@ -16,7 +16,7 @@ import { Logger } from "../logger";
 
 const CodeEditor = styled.div`
   border-radius: var(--border-radius);
-  background: ${(props) => (props.$mode != "Inline" ? "var(--gray-200)" : "transparent")};
+  background: ${(props) => (props.$mode != "Inline" ? "var(--editor-bg)" : "var(--panel-bg)")};
   font-family: monospace;
   font-size: 14px;
   resize: none;
@@ -27,12 +27,12 @@ const CodeEditor = styled.div`
   scrollbar-width: thin;
   overflow-y: auto;
   overscroll-behavior: contain;
-  color: black;
   position: relative;
-  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0px 0px 4px var(--box-shadow);
 
-  .cm-gutters {
-    background-color: ${(props) => (props.$mode != "Inline" ? "var(--gray-200)" : "transparent")} !important;
+  .cm-editor .cm-gutters {
+    background-color: ${(props) => (props.$mode != "Inline" ? "var(--editor-bg)" : "var(--panel-bg)")};
+    border-right: 1px solid var(--border);
   }
 
   .comment-gutter-icon {
@@ -44,8 +44,8 @@ const CodeEditor = styled.div`
   .comment-image {
     position: absolute;
     display: inline;
-    background-color: var(--gray-200);
     background-image: url("data:image/svg+xml;charset=UTF-8,${() => encodeURIComponent(commentIcon)}");
+    filter: invert(var(--icon-invert));
     background-repeat: no-repeat;
   }
 
@@ -68,14 +68,14 @@ const CodeEditor = styled.div`
     }
   }
 
-  .cm-ySelectionInfo {
+  .cm-editor .cm-ySelectionInfo {
     font-size: 10px;
-    padding: 4px 8px !important;
+    padding: 4px 8px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
-    font-family: "Lato" !important;
-    font-weight: 600 !important;
+    font-family: "Lato";
+    font-weight: 600;
     transition: none;
 
     &.active {
@@ -107,11 +107,11 @@ const CodeEditor = styled.div`
   }
 
   .cm-error {
-    text-decoration: underline red;
+    text-decoration: underline var(--error-bg) 2px;
   }
 
   .cm-link {
-    color: var(--blue-500);
+    color: var(--accent-dark);
 
     .cm-error {
       text-decoration: unset;
@@ -123,7 +123,7 @@ const CodeEditor = styled.div`
   }
 
   .cm-mono {
-    color: #219;
+    color: var(--accent-dark);
   }
 
   [title="Fold line"] {
@@ -140,7 +140,7 @@ const CodeEditor = styled.div`
     &.replaced *,
     &.replaced {
       font-weight: initial;
-      color: initial !important;
+      color: inherit !important;
       text-decoration: line-through;
     }
 
@@ -162,12 +162,29 @@ const CodeEditor = styled.div`
     cursor: pointer;
   }
 
+  .cm-editor.cm-focused > .cm-scroller > .cm-selectionLayer > .cm-selectionBackground {
+    background: var(--editor-selection-bg);
+  }
+
+  .cm-editor .cm-activeLine {
+    background-color: var(--editor-active-line-bg);
+  }
+
+  .cm-editor .cm-cursor,
+  .cm-editor .cm-dropCursor {
+    border-left: 1.2px solid currentColor;
+  }
+
   :not(.cm-focused) > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
     background: transparent;
   }
 
-  .cm-focused {
-    outline: none !important;
+  .cm-editor.cm-focused {
+    outline: none;
+  }
+
+  .cm-gutterElement {
+    color: var(--editor-gutter-fg);
   }
 
   .cm-foldGutter {
@@ -193,7 +210,7 @@ const CodeEditor = styled.div`
       height: 100%;
       position: absolute;
       z-index: 200;
-      background-color: var(--blue-200);
+      background-color: var(--accent);
       transform: translateX(-11px);
     }
   }
@@ -212,13 +229,11 @@ const CodeEditor = styled.div`
 
   .cm-inline-bullet::after {
     display: inline-block;
-    color: #000;
     content: "•";
   }
 
   .cm-inline-ordered-list-marker::after {
     display: inline-block;
-    color: #000;
     font-family: "Lato";
     content: attr(data-item-num);
   }
@@ -226,6 +241,7 @@ const CodeEditor = styled.div`
   .cm-inline-rendered-md {
     &:not(&.inline-custom-styles) {
       all: initial;
+      color: inherit;
       font-family: "Lato";
       font-size: 16px;
     }
@@ -246,6 +262,23 @@ const CodeEditor = styled.div`
     font-family: monospace !important;
     line-height: 1.3em !important;
     font-size: 14px !important;
+  }
+
+  .cm-editor .cm-lintRange-error {
+    background-image: none;
+    text-decoration: underline var(--error-bg) 2px;
+  }
+
+  .cm-editor .cm-diagnostic-error {
+    border-left: 5px solid var(--error-bg);
+  }
+
+  .cm-editor .cm-tooltip {
+    max-width: min(90vw, 600px);
+
+    a {
+      color: var(--accent-dark);
+    }
   }
 `;
 
@@ -344,6 +377,7 @@ const CodeMirror = () => {
         .useTrackHeadings(headings)
         .useExceptionSink(error)
         .useLogger(logger)
+        .if(options.cmDarkTheme.value, (b) => b.useCmDarkTheme())
         .create(),
     });
 

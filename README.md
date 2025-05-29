@@ -155,9 +155,10 @@ You can change the port it runs on by setting a `PORT` environment variable.
 ### Customizing the CSS
 
 Note that MyST Editor uses the Shadow DOM to encapsulate the styles from the rest of the page.
-In order to customize the look and feel, you can either change the CSS variables
-listed in [MystEditor.css](./src/styles/MystEditor.css) or use the `additionalStyles` option
+In order to customize the look and feel, you can change the CSS variables
+listed in [MystStyles.js](./src/styles/MystStyles.js) with the `additionalStyles` option
 of the `MystEditor` function.
+The editor exports an example `darkTheme` stylesheet.
 
 ### MystEditor options
 
@@ -200,6 +201,8 @@ Here are the options you can pass to the MystEditor function:
 - `yamlSchema` - must be an absoulte URL. If provided, a language server will launch in the background to provide tooltips, diagnostics and autocompletions based on the schema in YAML code blocks.
 - `onPreviewClick` *(`(ev: MouseEvent) => boolean`)* - callback for when the preview is clicked, if the builtin click actions should be skipped, it should return `true`
 - `onDiscardChanges` *(`() => void`)* - callback for when changes are discarded from the diff view mode
+- `mermaidTheme` *(default: "neutral")* - theme to use for Mermaid.js diagrams
+- `cmDarkTheme` *(default: false)* - whether to use a dark theme for CodeMirror
 
 Also see [the demo HTML](./src/index.html) for an example on how you can set these options.
 Using `window.myst_editor` or the return value of the `MystEditor` function, you can modify these options at runtime.

@@ -12,7 +12,7 @@ export const MdStyles = css`
   }
 
   a {
-    color: var(--blue-500);
+    color: var(--accent-dark);
     word-break: break-word;
   }
 
@@ -55,13 +55,12 @@ export const MdStyles = css`
   code,
   pre {
     border-radius: var(--border-radius);
-    background-color: var(--gray-200);
+    background-color: var(--editor-bg);
   }
   code {
     padding: 0.1em 0.4em;
     font-family: "Source Code Pro";
     font-size: 0.9em;
-    color: var(--black);
     border: none;
   }
   pre {
@@ -94,7 +93,7 @@ export const MdStyles = css`
         margin-bottom: 0;
       }
       & > header {
-        color: var(--white);
+        color: white;
         font-weight: bold;
         background: var(--green-500);
         display: flex;
@@ -114,10 +113,10 @@ export const MdStyles = css`
     }
 
     &.note {
-      border-color: var(--blue-200);
+      border-color: var(--accent);
 
       & > header {
-        background-color: var(--blue-200);
+        background-color: var(--accent);
 
         &::before {
           content: url("data:image/svg+xml,%3Csvg style='color: white' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-pencil' viewBox='0 0 16 16'%3E%3Cpath d='M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z' fill='white'%3E%3C/path%3E%3C/svg%3E");
@@ -154,7 +153,7 @@ export const MdStyles = css`
 
       & > header {
         padding: 10px;
-        color: var(--white);
+        color: white;
 
         mark {
           background: transparent;
@@ -172,7 +171,7 @@ export const MdStyles = css`
       }
 
       pre {
-        background-color: var(--white);
+        background-color: var(--panel-bg);
         margin: 0;
         font-family: "Lato", sans-serif;
       }
@@ -186,9 +185,9 @@ export const MdStyles = css`
     }
 
     &.directive-error {
-      border: 3px solid var(--red-500);
+      border: 3px solid var(--error-bg);
       & > header {
-        background-color: var(--red-500);
+        background-color: var(--error-bg);
       }
     }
   }
@@ -252,7 +251,7 @@ export const MdStyles = css`
   th {
     background: var(--gray-900);
     border-top: 1px solid var(--gray-500);
-    color: var(--white);
+    color: white;
 
     &:first-of-type {
       border-top-left-radius: var(--border-radius);
@@ -324,25 +323,23 @@ export const MdStyles = css`
   }
 
   .hljs-attr {
-    color: var(--blue-500);
+    color: var(--accent-dark);
   }
 
   .hljs-comment {
-    color: var(--brown-500);
+    color: var(--string-fg);
   }
 `;
 
 const Preview = styled.div`
-  background-color: white;
+  background-color: var(--panel-bg);
   padding: 20px;
   box-sizing: border-box;
   height: 100%;
-  border: 1px solid var(--gray-400);
-  border-left: 1px solid var(--gray-600);
-  box-shadow: inset 0px 0px 4px var(--gray-600);
+  border: 1px solid var(--border);
+  box-shadow: inset 0px 0px 4px var(--box-shadow);
   border-radius: var(--border-radius);
   vertical-align: top;
-  color: var(--gray-900);
   word-wrap: break-word;
   position: relative;
   overflow-y: auto;
@@ -371,12 +368,11 @@ const Preview = styled.div`
     }
   }
 `;
-Preview.defaultProps = { className: "myst-preview" };
 
 export const PreviewFocusHighlight = styled.div`
   position: absolute;
   width: 5px;
-  background-color: var(--blue-200);
+  background-color: var(--accent);
 `;
 
 export default Preview;

@@ -14,7 +14,7 @@ const ResolvedLine = styled.p`
   max-width: 95%;
   min-height: 22px;
   text-decoration: ${(props) => (props.orphaned ? "line-through" : "none")};
-  color: ${(props) => (props.orphaned ? "var(--gray-700)" : "var(--gray-900)")};
+  color: ${(props) => (props.orphaned ? "var(--editor-gutter-fg)" : "currentColor")};
 
   & > span {
     display: ${(props) => (props.orphaned ? "none" : "block")};
@@ -23,6 +23,7 @@ const ResolvedLine = styled.p`
 
 const CommentContainer = styled.div`
   background-color: color-mix(in srgb, ${(props) => props.color}, white);
+  color: black;
   border: 2px solid ${(props) => props.color};
   padding-top: 10px;
   margin-left: -1px;
@@ -84,7 +85,7 @@ const CommentLine = styled.span`
 const LineNumber = styled.span`
   position: absolute;
   transform: translateX(calc(-100% - 24px));
-  color: var(--gray-700);
+  color: var(--editor-gutter-fg);
 `;
 
 const OptionsContainer = styled.span`
@@ -103,16 +104,16 @@ const OptionsContainer = styled.span`
 const DropdownContainer = styled.div`
   align-items: center;
   position: absolute;
-  background-color: var(--gray-200);
+  background-color: var(--panel-bg);
   transform: translate(calc(-100% + 22px), calc(100% - 10px));
   width: max-content;
-  border: 1px solid var(--gray-600);
+  border: 1px solid var(--border);
   display: none;
 
   & p {
     margin: 0;
     font-size: 12px;
-    color: var(--red-500);
+    color: var(--error-bg);
     font-weight: 700;
   }
 `;
@@ -129,16 +130,18 @@ const DropdownButton = styled.button`
   font-family: inherit;
 
   &:hover {
-    background-color: var(--gray-300);
+    background-color: var(--button-bg-hover);
   }
 
   &.myst-restore-btn {
     svg {
       padding-right: 10px;
+      filter: invert(var(--icon-invert));
     }
 
     p {
-      color: var(--gray-900);
+      color: black;
+      filter: invert(var(--icon-invert));
     }
   }
 `;

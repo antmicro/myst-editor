@@ -1,8 +1,6 @@
 import styled from "styled-components";
 
 export const MystCSSVars = styled.div`
-  --border-radius: 5px;
-  --black: #000;
   --gray-900: #333;
   --gray-800: #5c5c5c;
   --gray-700: #88818c;
@@ -12,7 +10,6 @@ export const MystCSSVars = styled.div`
   --gray-300: #e8e6e8;
   --gray-200: #f8f8f8;
   --gray-100: #f9f9f9;
-  --white: #fff;
   --blue-500: #0083e1;
   --blue-200: #82cfe6;
   --blue-100: #c1e4ef;
@@ -21,18 +18,31 @@ export const MystCSSVars = styled.div`
   --green-500: #00af91;
   --green-400: #00ccaa;
   --brown-500: #940;
+
+  --accent: var(--blue-200);
+  --accent-light: var(--blue-100);
+  --accent-dark: var(--blue-500);
+
   --border-2: 3px;
-  --dark-violet: #332d37;
+  --border-radius: 5px;
+  --border: var(--gray-600);
 
   --navbar-bg: var(--gray-200);
-  --icon-border: var(--gray-600);
-  --icon-bg: var(--white);
-  --icon-main-selected: var(--blue-100);
-  --icon-main-active: var(--blue-200);
-  --icon-selected: var(--gray-400);
-  --icon-color: var(--dark-violet);
-  --separator: var(--gray-500);
-  --alert: var(--blue-100);
+  --button-bg: white;
+  --button-bg-hover: var(--gray-400);
+  --modal-bg: white;
+  --switch-bg: var(--gray-500);
+  --switch-active-bg: var(--blue-500);
+  --panel-bg: white;
+  --box-shadow: var(--gray-600);
+  --icon-invert: 0;
+  --string-fg: var(--brown-500);
+
+  --editor-bg: var(--gray-200);
+  --editor-gutter-fg: var(--gray-800);
+  --editor-selection-bg: rgb(215, 212, 240);
+  --editor-active-line-bg: #cceeff44;
+  --error-bg: var(--red-500);
 `;
 
 export const MystContainer = styled(MystCSSVars)`
@@ -51,11 +61,47 @@ export const MystContainer = styled(MystCSSVars)`
   }
 
   .file-link {
-    color: var(--blue-500);
+    color: var(--accent-dark);
 
     &:hover {
       cursor: pointer;
       text-decoration: underline;
     }
   }
+
+  button,
+  input,
+  dialog,
+  textarea {
+    color: inherit;
+  }
 `;
+
+export const darkTheme = new CSSStyleSheet();
+darkTheme.replaceSync(`
+  #myst-css-namespace {
+    color: white;
+    --navbar-bg: #1a1a1a;
+    --border: #878787;
+    --button-bg: #333;
+    --button-bg-hover: #5c5c5c;
+    --switch-bg: #5c5c5c;
+    --modal-bg: #1a1a1a;
+    --panel-bg: #1a1a1a;
+    --box-shadow: #333;
+    --icon-invert: 1;
+    --string-fg: #ffa657;
+
+    --accent: #0083e1;
+    --accent-light: #82cfe6;
+    --accent-dark: rgb(121, 192, 255);
+
+    --editor-bg: #2a2a2a;
+    --editor-gutter-fg: #ddd;
+    --editor-selection-bg: #d7d4f020;
+    --editor-active-line-bg: #cceeff10;
+    --error-bg: #f5766e;
+    
+    color-scheme: dark;
+  }
+`);

@@ -59,25 +59,25 @@ export const collabClientFacet = Facet.define();
 
 const syntaxHighlight = HighlightStyle.define([
   { tag: [tags.heading, tags.strong], fontWeight: "bold" },
-  { tag: [tags.link, tags.url], textDecoration: "underline", color: "var(--blue-500)" },
-  { tag: tags.macroName, color: "var(--blue-500)" },
+  { tag: [tags.link, tags.url], textDecoration: "underline", color: "var(--accent-dark)" },
+  { tag: tags.macroName, color: "var(--accent-dark)" },
   { tag: tags.emphasis, fontStyle: "italic" },
   { tag: tags.meta, color: "darkgrey" },
   { tag: tags.emphasis, fontStyle: "italic" },
   { tag: tags.strikethrough, textDecoration: "line-through" },
   { tag: tags.keyword, color: "#708" },
-  { tag: [tags.atom, tags.bool, tags.contentSeparator, tags.labelName], color: "black" },
   { tag: [tags.literal, tags.inserted], color: "#164" },
-  { tag: [tags.string, tags.deleted], color: "var(--brown-500)" },
+  { tag: [tags.string, tags.deleted], color: "var(--string-fg)" },
   { tag: [tags.regexp, tags.escape, tags.special(tags.string)], color: "#e40" },
   { tag: tags.definition(tags.variableName), color: "#00f" },
   { tag: tags.local(tags.variableName), color: "#30a" },
   { tag: [tags.typeName, tags.namespace], color: "#085" },
   { tag: tags.className, color: "#167" },
   { tag: tags.special(tags.variableName), color: "#256" },
-  { tag: tags.definition(tags.propertyName), color: "var(--blue-500)" },
-  { tag: tags.comment, color: "var(--brown-500)" },
+  { tag: tags.definition(tags.propertyName), color: "var(--accent-dark)" },
+  { tag: tags.comment, color: "var(--string-fg)" },
   { tag: tags.invalid, color: "#f00" },
+  // { tag: tags.monospace, color: "var(--accent-dark)" },
 ]);
 
 export class ExtensionBuilder {
@@ -326,6 +326,11 @@ export class ExtensionBuilder {
 
   useLogger(logger) {
     this.extensions.push(loggerFacet.of(logger));
+    return this;
+  }
+
+  useCmDarkTheme() {
+    this.extensions.push(EditorView.darkTheme.of(true));
     return this;
   }
 

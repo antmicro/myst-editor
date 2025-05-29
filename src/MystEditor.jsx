@@ -52,10 +52,9 @@ const MystWrapper = styled.div`
   height: calc(100% - 60px);
   width: 100%;
   position: relative;
-  background-color: white;
+  background-color: var(--panel-bg);
   ${(props) => props.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px);"}
 `;
-MystWrapper.defaultProps = { className: "myst-editor-wrapper" };
 
 const StatusBanner = styled.div`
   height: 40px;
@@ -66,7 +65,7 @@ const StatusBanner = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--blue-100);
+  background-color: var(--accent-light);
   font-weight: 600;
 `;
 
@@ -137,12 +136,13 @@ const MystEditor = () => {
               <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
             )}
             {options.collaboration.value.enabled && collab.value.lockMsg.value && <StatusBanner>{collab.value.lockMsg}</StatusBanner>}
-            <MystWrapper fullscreen={fullscreen.value}>
-              <FlexWrapper id="editor-wrapper">
+            <MystWrapper className="myst-editor-wrapper" fullscreen={fullscreen.value}>
+              <FlexWrapper id="editor-wrapper" className="flex-wrapper">
                 <CodeMirror />
               </FlexWrapper>
-              <FlexWrapper id="preview-wrapper">
+              <FlexWrapper id="preview-wrapper" className="flex-wrapper">
                 <Preview
+                  className="myst-preview"
                   ref={preview}
                   mode={options.mode.value}
                   onClick={(ev) => {
@@ -156,7 +156,7 @@ const MystEditor = () => {
                 </Preview>
               </FlexWrapper>
               {options.mode.value === "Diff" && (
-                <FlexWrapper>
+                <FlexWrapper className="flex-wrapper">
                   <Diff />
                 </FlexWrapper>
               )}
@@ -164,12 +164,12 @@ const MystEditor = () => {
                 options.collaboration.value.commentsEnabled &&
                 options.collaboration.value.resolvingCommentsEnabled &&
                 collab.value.ready.value && (
-                  <FlexWrapper id="resolved-wrapper">
+                  <FlexWrapper id="resolved-wrapper" className="flex-wrapper">
                     <ResolvedComments />
                   </FlexWrapper>
                 )}
               {options.mode.value === "Outline" && (
-                <FlexWrapper>
+                <FlexWrapper className="flex-wrapper">
                   <TableOfContents />
                 </FlexWrapper>
               )}
@@ -243,3 +243,4 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
 export { defaultButtons, predefinedButtons, batch, computed, signal, effect, MystEditor as MystEditorPreact };
 export { default as MystEditorGit } from "./myst-git/MystEditorGit";
 export { CollaborationClient } from "./collaboration";
+export { darkTheme } from "./styles/MystStyles";
