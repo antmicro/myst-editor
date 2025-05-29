@@ -1,5 +1,5 @@
-import d, { defaultButtons as h } from "./MystEditor.js";
-let l = `# This is MyST Editor
+import d, { defaultButtons as h, darkTheme as l } from "./MystEditor.js";
+let c = `# This is MyST Editor
 
 A Markdown editor using the [markdown-it parser](https://github.com/markdown-it/markdown-it), based on the [CommonMark specification](https://spec.commonmark.org/0.31.2/).
 We added some extensions so that users can make use of various features of the [MyST Markdown flavor](https://mystmd.org/).
@@ -150,14 +150,14 @@ These features include:
   - resolved comments - a new view to see comments that were resolved
   - suggestions - non-destructively suggest changes to the document`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const n = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), c = a.get("room") || "0", m = a.get("username") || Math.floor(Math.random() * 1e3).toString(), u = n[Math.floor(Math.random() * n.length)];
-let p = [{
+const n = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), u = a.get("room") || "0", m = a.get("username") || Math.floor(Math.random() * 1e3).toString(), p = n[Math.floor(Math.random() * n.length)];
+let g = [{
   target: "say",
   transform: async (e) => m + " says: '" + e + "'"
-}], g = [{
+}], w = [{
   target: "bold",
   transform: (e, t) => `<b style="white-space: pre-wrap;">${t.body}</b>`
-}], w = [{
+}], f = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
     const [t, s] = e.split("#");
@@ -196,21 +196,21 @@ const o = (r = {}.VITE_WS_URL) != null ? r : a.get("collab_server");
 d({
   id: "demo",
   templatelist: "linkedtemplatelist.json",
-  initialText: l,
+  initialText: c,
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
-  transforms: w,
+  transforms: f,
   collaboration: {
     enabled: i,
     commentsEnabled: i,
     resolvingCommentsEnabled: i,
     wsUrl: o != null ? o : "#",
     username: m,
-    room: c,
-    color: u,
+    room: u,
+    color: p,
     mode: o ? "websocket" : "local"
   },
-  customRoles: p,
-  customDirectives: g,
+  customRoles: g,
+  customDirectives: w,
   includeButtons: h.concat([{
     text: "Custom button",
     action: () => alert("Custom button action")
@@ -219,6 +219,9 @@ d({
     dict: "en_US",
     dictionaryPath: `${window.location.pathname}dictionaries`
   },
-  syncScroll: !0
+  syncScroll: !0,
+  additionalStyles: l,
+  cmDarkTheme: !0,
+  mermaidTheme: "dark"
 }, document.getElementById("myst"));
 //# sourceMappingURL=index.js.map
