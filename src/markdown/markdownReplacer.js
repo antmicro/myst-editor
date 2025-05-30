@@ -1,6 +1,8 @@
 import MarkdownIt from "markdown-it";
 import { Directive, directivePlugin, Role, rolePlugin } from "markdown-it-docutils";
 import { waitForElement } from "../utils";
+import { escapeRE } from "markdown-it/lib/common/utils";
+
 /**
  * @typedef {{
  *  target: string | RegExp,
@@ -90,12 +92,32 @@ const applyTransform = (txt, { transform, target }) => txt.replaceAll(target, tr
  */
 const markdownReplacer = (transforms, editorParent, cache) => (markdownIt) => {
   const preview = new PreviewWrapper(editorParent, cache);
+  const mappedTransforms = transforms.map((t) => ({
+    ...preview.overloadTransform(t),
+    /** A regular expression for a transform that only matches at the beggining of a string, useful for parsing */
+    beginTarget: new RegExp(`^(?:${t.target instanceof RegExp ? t.target.source : escapeRE(t.target)})`, t.target.flags ?? "g"),
+  }));
 
-  const defaultRender = markdownIt.renderer.rules.text;
-  markdownIt.renderer.rules.text = function (...args) {
-    const defaultOutput = defaultRender(...args);
-    return transforms.map((t) => preview.overloadTransform(t, editorParent)).reduce(applyTransform, defaultOutput);
-  };
+  const defaultTextRule = markdownIt.renderer.rules.text;
+  markdownIt.renderer.rules.text = (...args) => mappedTransforms.reduce(applyTransform, defaultTextRule(...args));
+
+  // This ruler entry ensures that no preexisting inline Markdown rules will be applied to any text that matches a transform.
+  // The `text` rule above will handle it instead.
+  markdownIt.inline.ruler.before("text", "transforms", (state, silent) => {
+    const src = state.src.slice(state.pos, state.posMax);
+    for (const transform of mappedTransforms) {
+      /** Check if the current source fragment starts with a transform */
+      const match = transform.beginTarget.exec(src);
+      if (!match) continue;
+      state.pos += match[0].length;
+      if (silent) return true;
+
+      const token = state.push("text", "", 0);
+      token.content = src.slice(0, match[0].length);
+      return true;
+    }
+    return false;
+  });
 };
 
 /***************************** CUSTOM ROLES *****************************/
