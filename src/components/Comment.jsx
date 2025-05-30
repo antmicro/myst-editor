@@ -115,11 +115,9 @@ const YComment = ({ commentId }) => {
     });
     cmView.current = view;
 
-    collab.value.ycomments.syncSuggestions(commentId);
     collab.value.ycomments.registerCommentEditor(commentId, view);
     ytext.observe((_, tr) => {
       if (!tr.local) return;
-      collab.value.ycomments.syncSuggestions(commentId);
       collab.value.ycomments.provider.awareness.setLocalStateField("lastChanged", Date.now());
     });
 
@@ -138,6 +136,7 @@ const YComment = ({ commentId }) => {
       left={collab.value.ycomments.marginLeft()}
       top={collab.value.ycomments.display().comments.value[commentId]?.top}
       fade={collab.value.ycomments.draggedComment.value == commentId}
+      data-comment-line={collab.value.ycomments.positions().get(commentId)}
     >
       <div class="comment-wrapper" style="position:relative">
         {collab.value.ycomments.commentWithPopup.value == commentId && (

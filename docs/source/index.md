@@ -10,4 +10,5 @@ collaboration
 mermaid
 rich-links
 comments
+suggestions
 ```

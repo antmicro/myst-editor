@@ -14,9 +14,11 @@ export const MystCSSVars = styled.div`
   --blue-200: #82cfe6;
   --blue-100: #c1e4ef;
   --red-500: #e74a3c;
+  --red-400: #fae6e6;
   --orange-500: #f59e0b;
   --green-500: #00af91;
   --green-400: #00ccaa;
+  --green-300: #ecfce6;
   --brown-500: #940;
 
   --accent: var(--blue-200);
@@ -37,6 +39,8 @@ export const MystCSSVars = styled.div`
   --box-shadow: var(--gray-600);
   --icon-invert: 0;
   --string-fg: var(--brown-500);
+  --deleted-bg: var(--red-400);
+  --inserted-bg: var(--green-300);
 
   --editor-bg: var(--gray-200);
   --editor-gutter-fg: var(--gray-800);
@@ -101,6 +105,8 @@ darkTheme.replaceSync(`
     --editor-selection-bg: #d7d4f020;
     --editor-active-line-bg: #cceeff10;
     --error-bg: #f5766e;
+    --deleted-bg: #e74a3cb2;
+    --inserted-bg: #00af91b2;
     
     color-scheme: dark;
   }

@@ -1,6 +1,7 @@
 // https://github.com/lezer-parser/markdown/blob/main/src/markdown.ts
 import { tags } from "@lezer/highlight";
 import { Element, Table } from "@lezer/markdown";
+import { criticMarkers } from "../markdown/markdownCriticMarkup";
 
 const Type = {
   FencedCode: 3,

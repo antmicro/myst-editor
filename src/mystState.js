@@ -26,6 +26,7 @@ export const predefinedButtons = {
   fullscreen: { id: "fullscreen", tooltip: "Fullscreen" },
   refresh: { id: "refresh", tooltip: "Refresh issue links" },
   settings: { id: "settings", tooltip: "Editor settings", dropdown: Settings },
+  suggestMode: { id: "suggest-mode", tooltip: "Toggle suggest mode", active: (state) => state.suggestMode.value },
 };
 
 export const defaultButtons = [
@@ -35,6 +36,7 @@ export const defaultButtons = [
   predefinedButtons.refresh,
   predefinedButtons.printToPdf,
   predefinedButtons.templateManager,
+  predefinedButtons.suggestMode,
 ];
 
 // The vim plugin stores some functions as globals, but we need to differentiate between editors
@@ -251,6 +253,7 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     headings: signal([]),
     /** @type {Signal<{ src: string; error: Error } | null>} */
     error: signal(null),
+    suggestMode: signal(false),
   };
   state.text = new TextManager({ ...signalOptions, ...state });
 

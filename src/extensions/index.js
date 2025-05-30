@@ -5,10 +5,8 @@ import { yCollab } from "y-codemirror.next";
 import { markdown } from "@codemirror/lang-markdown";
 import { indentWithTab, redo, history, defaultKeymap, historyKeymap } from "@codemirror/commands";
 import spellcheck from "./spellchecker";
-import { customHighlighter } from "./customHighlights";
 import { commentExtension } from "../comments";
 import { commentAuthoring } from "../comments/lineAuthors";
-import { suggestionPopup } from "./suggestions";
 import {
   foldEffect,
   unfoldEffect,
@@ -36,6 +34,7 @@ import { trackHeadings } from "./trackHeadings";
 import { highlightFocusedActiveLine } from "./activeLineHighlight";
 import { classHighlighter, tags } from "@lezer/highlight";
 import { loggerFacet } from "../logger";
+import { criticMarkup, suggestMode } from "./criticMarkup";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -66,8 +65,10 @@ const syntaxHighlight = HighlightStyle.define([
   { tag: tags.emphasis, fontStyle: "italic" },
   { tag: tags.strikethrough, textDecoration: "line-through" },
   { tag: tags.keyword, color: "#708" },
-  { tag: [tags.literal, tags.inserted], color: "#164" },
-  { tag: [tags.string, tags.deleted], color: "var(--string-fg)" },
+  { tag: tags.literal, color: "#164" },
+  { tag: tags.string, color: "var(--string-fg)" },
+  { tag: tags.deleted, background: "var(--deleted-bg)", textDecoration: "line-through" },
+  { tag: tags.inserted, background: "var(--inserted-bg)", textDecoration: "underline" },
   { tag: [tags.regexp, tags.escape, tags.special(tags.string)], color: "#e40" },
   { tag: tags.definition(tags.variableName), color: "#00f" },
   { tag: tags.local(tags.variableName), color: "#30a" },
@@ -149,11 +150,6 @@ export class ExtensionBuilder {
 
   useSpellcheck(opts) {
     this.extensions.push(spellcheck(opts));
-    return this;
-  }
-
-  useHighlighter(opts) {
-    this.extensions.push(customHighlighter(opts));
     return this;
   }
 
@@ -244,11 +240,6 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useSuggestionPopup({ ycomments, editorMountpoint }) {
-    this.extensions.push(EditorView.updateListener.of((update) => suggestionPopup(update, ycomments, editorMountpoint)));
-    return this;
-  }
-
   // This is added due to a bug with Chrome and Codemirror, where folding a section will sometimes scroll to that section.
   useFixFoldingScroll(focusScroll) {
     this.extensions.push(
@@ -331,6 +322,16 @@ export class ExtensionBuilder {
 
   useCmDarkTheme() {
     this.extensions.push(EditorView.darkTheme.of(true));
+    return this;
+  }
+
+  useCriticMarkupBtns() {
+    this.extensions.push(criticMarkup);
+    return this;
+  }
+
+  useSuggestMode() {
+    this.extensions.push(suggestMode);
     return this;
   }
 

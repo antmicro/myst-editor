@@ -329,6 +329,16 @@ export const MdStyles = css`
   .hljs-comment {
     color: var(--string-fg);
   }
+
+  ins {
+    background: var(--inserted-bg);
+    white-space: pre;
+  }
+
+  del {
+    background: var(--deleted-bg);
+    white-space: pre;
+  }
 `;
 
 const Preview = styled.div`

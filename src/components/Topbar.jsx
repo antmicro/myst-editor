@@ -259,6 +259,16 @@ const ResolvedIcon = () => (
   </svg>
 );
 
+const SuggestIcon = () => (
+  <svg width="19" height="21" viewBox="0 0 19 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M2.08422 16.0583L1.31738 19.2613L4.6646 18.4945M2.08422 16.0583L14.6334 2L17.3174 4.48441L4.6646 18.4945M2.08422 16.0583L4.6646 18.4945"
+      stroke="currentColor"
+      stroke-width="1.75"
+    />
+  </svg>
+);
+
 const icons = {
   fullscreen: FullscreenIcon,
   "copy-html": CopyIcon,
@@ -266,10 +276,11 @@ const icons = {
   "print-to-pdf": PrintPDFIcon,
   settings: SettingsIcon,
   templates: TemplatesIcon,
+  "suggest-mode": SuggestIcon,
 };
 
 export const EditorTopbar = ({ alert, buttons }) => {
-  const { options, editorView, collab } = useContext(MystState);
+  const { options, editorView, collab, suggestMode } = useContext(MystState);
   const titleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.title.value)));
   const emptyDiff = useSignal(false);
   const editorModeButtons = useComputed(() => {
@@ -305,7 +316,14 @@ export const EditorTopbar = ({ alert, buttons }) => {
         <div class="btns">
           {buttonsLeft.map((button) => (
             <div key={button.id}>
-              <TopbarButton className="icon" type="button" title={button.tooltip} name={button.id} onClick={button.action}>
+              <TopbarButton
+                className="icon"
+                active={button.active?.({ suggestMode })}
+                type="button"
+                title={button.tooltip}
+                name={button.id}
+                onClick={button.action}
+              >
                 {typeof button.icon == "function" ? <button.icon /> : <img src={button.icon} />}
               </TopbarButton>
               {button.dropdown && (

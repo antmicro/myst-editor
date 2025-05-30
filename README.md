@@ -41,9 +41,15 @@ You can work on a document with multiple people at the same time.
 ### Comments
 
 The editor has a comments feature, allowing you to add text that will not appear in the preview.
-You can also suggest changes.
 
 ![Comments Demo](./assets/comments.gif)
+
+### Suggestions
+
+You can suggest changes that others can accept or reject later.
+Suggestions are based on the [CriticMarkup](https://fletcher.github.io/MultiMarkdown-6/syntax/critic.html) syntax.
+
+![Suggestions Demo](./assets/suggestions.gif)
 
 ### Templates
 

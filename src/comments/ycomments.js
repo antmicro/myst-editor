@@ -2,9 +2,7 @@ import * as Y from "yjs";
 import { updateShownComments } from "./state";
 import { WebsocketProvider } from "y-websocket";
 import { EditorView, ViewUpdate } from "@codemirror/view";
-import { customHighlighter } from "../extensions/customHighlights";
-import { MapMode, Transaction } from "@codemirror/state";
-import { modifyHighlight, parseCommentLine, suggestionCompartment } from "../extensions/suggestions";
+import { MapMode } from "@codemirror/state";
 import { foldEffect, foldedRanges } from "@codemirror/language";
 import { folded } from "../extensions";
 import { computed, Signal, signal } from "@preact/signals";
@@ -130,14 +128,11 @@ export class CommentPositionManager {
     this.ydoc = ydoc;
   }
 
-  move(commentId, targetLine, syncSuggestions = true) {
+  move(commentId, targetLine) {
     if (targetLine > 0 && !this.isOccupied(targetLine)) {
       this.ydoc.transact(() => {
         this.syncedPositions.set(commentId, targetLine);
       }, "comments");
-    }
-    if (syncSuggestions) {
-      this.ycomments.syncSuggestions(commentId);
     }
   }
 
@@ -250,18 +245,6 @@ export class YComments {
     /** commentId -> CodeMirror View */
     this.commentEditors = new Map();
 
-    this.suggestions = ydoc.getMap("suggestions");
-    this.suggestionHighlighter = customHighlighter([]);
-    this.suggestions.observe(() => {
-      if (!this.mainCodeMirror) return;
-      const highlights = [...this.suggestions.values()].flat().map((h) => ({ ...h, target: new RegExp(h.targetRegexSrc, h.targetRegexFlags) }));
-      this.suggestionHighlighter = customHighlighter(highlights, modifyHighlight, this.positions());
-      this.mainCodeMirror.dispatch({
-        effects: suggestionCompartment.reconfigure(this.suggestionHighlighter),
-        annotations: Transaction.userEvent.of("suggestion"),
-      });
-    });
-
     this.positionManager.syncedPositions.observeDeep(() => this.updateMainCodeMirror());
   }
 
@@ -316,7 +299,6 @@ export class YComments {
     this.positions().del(commentId);
     this.display().del(commentId);
     this.delText(commentId);
-    this.suggestions.set(commentId, []);
   }
 
   resolveComment(commentId) {
@@ -387,7 +369,6 @@ export class YComments {
     for (let commentId in this.display().comments.peek()) {
       if (!remoteComments.includes(commentId)) {
         this.display().del(commentId);
-        this.suggestions.set(commentId, []);
       }
     }
   }
@@ -422,35 +403,11 @@ export class YComments {
   /** Full synchronization between Y.js and Preact state */
   /** @param {ViewUpdate} update  */
   syncComments(update) {
-    // prevent syncing from suggestion updates
-    if (update.transactions.some((t) => t.isUserEvent("suggestion"))) return;
-
     this.syncCommentLocations(update);
     this.syncFoldedComments(update);
     this.syncRemoteComments();
     this.removeLocalComments();
     this.syncResolvedComments(update);
-  }
-
-  /** If multiple ids are passed, they are updated in one yjs transaction */
-  syncSuggestions(...commentIds) {
-    let suggestions = {};
-    for (const commentId of commentIds) {
-      const text = this.getTextForComment(commentId).toString();
-      const authors = this.lineAuthors(commentId);
-      const lines = text.split("\n").map((text, i) => ({
-        text,
-        commentId,
-        color: authors.get(i + 1)?.color ?? "#111",
-      }));
-      suggestions[commentId] = lines.flatMap(parseCommentLine);
-    }
-
-    this.suggestions.doc.transact(() => {
-      for (const [id, commentSuggestions] of Object.entries(suggestions)) {
-        this.suggestions.set(id, commentSuggestions);
-      }
-    });
   }
 
   updateMainCodeMirror() {
@@ -580,7 +537,6 @@ export class YComments {
 
   encodeState() {
     const positions = this.positions().syncedPositions.toJSON();
-    const suggestions = this.suggestions.toJSON();
     const resolved = this.resolver().resolvedComments.toJSON();
     const lineAuthors = {};
     const text = {};
@@ -592,16 +548,13 @@ export class YComments {
       text[commentId] = commentText.toString();
     }
 
-    return { positions, suggestions, resolved, lineAuthors, text };
+    return { positions, resolved, lineAuthors, text };
   }
 
-  applyState({ positions, suggestions, resolved, lineAuthors, text }) {
+  applyState({ positions, resolved, lineAuthors, text }) {
     this.ydoc.transact(() => {
       for (const id in positions) {
         this.positions().syncedPositions.set(id, positions[id]);
-      }
-      for (const id in suggestions) {
-        this.suggestions.set(id, suggestions[id]);
       }
       for (const id in resolved) {
         this.resolver().resolvedComments.set(id, resolved[id]);

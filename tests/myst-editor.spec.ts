@@ -154,6 +154,42 @@ graph TD
     await insertToMainEditor(page, { from: 0, insert: `# |date|\n## Test heading\ntest123` });
     await page.waitForSelector(".inline-custom-styles");
   });
+
+  test.describe.parallel("Suggestions", () => {
+    test("Can accept suggestions", async ({ page }) => {
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: `# {~~Heading~>Better heading~~}\nThis{++ is++} some text.\nThis is some text{-- text--}.` });
+      await page.waitForSelector(".cm-critic-widget");
+      await page.getByTitle("Accept suggestion").first().click();
+      await page.getByTitle("Accept suggestion").first().click();
+      await page.getByTitle("Accept suggestion").first().click();
+      await expect(async () => {
+        const text = await page.evaluate((id) => window.myst_editor[id].text, id);
+        expect(text).toBe(`# Better heading\nThis is some text.\nThis is some text.`);
+      }).toPass();
+    });
+
+    test("Can reject suggestions", async ({ page }) => {
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: `# {~~Heading~>Better heading~~}\nThis{++ is++} some text.\nThis is some text{-- text--}.` });
+      await page.waitForSelector(".cm-critic-widget");
+      await page.getByTitle("Reject suggestion").first().click();
+      await page.getByTitle("Reject suggestion").first().click();
+      await page.getByTitle("Reject suggestion").first().click();
+      await expect(async () => {
+        const text = await page.evaluate((id) => window.myst_editor[id].text, id);
+        expect(text).toBe(`# Heading\nThis some text.\nThis is some text text.`);
+      }).toPass();
+    });
+
+    test("Can use suggest mode", async ({ page }) => {
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: `# Heading` });
+      await page.locator('[name="suggest-mode"]').click();
+      await insertToMainEditor(page, { from: 2, to: 9, insert: `Better heading` });
+      await expect(page.locator(".cm-critic-widget")).toBeVisible();
+    });
+  });
 });
 
 test.describe.parallel("With collaboration enabled", () => {
@@ -463,68 +499,6 @@ test.describe.parallel("With collaboration enabled", () => {
     });
   });
 
-  test.describe("Suggestions", () => {
-    test("Can be added without replacement", async ({ context }) => {
-      const collabOpts = defaultCollabOpts();
-      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
-      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
-
-      // Initialize the document from pageA and add some content
-      await clearEditor(pageA);
-      await insertChangesAndCheckOutput(pageA, { from: 0, insert: "Line1\nLine2\nLine3\nLine4" }, (html) => expect(html).toContain("Line4"));
-
-      await addComment(pageA, 1, "|Line1|");
-
-      // Check if the phrase is highlighted
-      await expect(pageA.locator(".cm-comment-author-colored").first()).toContainText("|Line1|");
-      await expect(pageA.locator(".cm-suggestion").first()).toContainText("Line1");
-      await expect(pageB.locator(".cm-suggestion").first()).toContainText("Line1");
-    });
-
-    test("Can be added with replacement", async ({ context }) => {
-      const collabOpts = defaultCollabOpts();
-      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
-      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
-
-      // Initialize the document from pageA and add some content
-      await clearEditor(pageA);
-      await insertChangesAndCheckOutput(pageA, { from: 0, insert: "Line1\nLine2\nLine3\nLine4" }, (html) => expect(html).toContain("Line4"));
-
-      await addComment(pageA, 2, "|Line2 -> 2Line|");
-
-      // Check if the suggestion shows up
-      await expect(pageA.locator(".cm-comment-author-colored").first()).toContainText("|Line2 -> 2Line|");
-      await expect(pageA.locator(".replaced").first()).toContainText("Line2");
-      await expect(pageA.locator(".cm-replacement").first()).toContainText("2Line");
-      await expect(pageB.locator(".replaced").first()).toContainText("Line2");
-      await expect(pageB.locator(".cm-replacement").first()).toContainText("2Line");
-    });
-
-    test("Can be applied", async ({ context }) => {
-      const collabOpts = defaultCollabOpts();
-      const pageA = await applyPageOpts(await context.newPage(), collabOpts);
-      const pageB = await applyPageOpts(await context.newPage(), collabOpts);
-
-      // Initialize the document from pageA and add some content
-      await clearEditor(pageA);
-      await insertChangesAndCheckOutput(pageA, { from: 0, insert: "Line1\nLine2\nLine3\nLine4" }, (html) => expect(html).toContain("Line4"));
-
-      await addComment(pageA, 2, "|Line2 -> 2Line|");
-
-      // Apply suggestion
-      await expect(pageA.locator(".cm-comment-author-colored").first()).toContainText("|Line2 -> 2Line|");
-      await pageA.locator(".cm-replacement").first().click();
-
-      // Check if the text changed
-      await expect(async () => {
-        const currentTextA = await pageA.evaluate((id) => window.myst_editor[id].text, id);
-        expect(currentTextA).toContain("2Line");
-        const currentTextB = await pageB.evaluate((id) => window.myst_editor[id].text, id);
-        expect(currentTextB).toContain("2Line");
-      }).toPass();
-    });
-  });
-
   test.describe("Dynamic options", () => {
     test("Can modify UI", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
@@ -732,7 +706,7 @@ const getCommentBtn = (page: Page, lineNumber: number) =>
 const addComment = async (page: Page, lineNumber: number, text?: string) => {
   await getCommentBtn(page, lineNumber).click();
   if (text) {
-    await page.locator(".cm-comment-author-colored").last().fill(text);
+    await page.locator(`[data-comment-line="${lineNumber}"] .cm-line`).first().fill(text);
   }
   await page.mouse.move(0, 0);
 };

@@ -23,6 +23,7 @@ Starting from the left, the left side topbar visible in {numref}`left-side-butto
   Applying a template while there is already text in the document will replace all the text with the template. 
   You can undo this action, however any comments in the document will be removed.
   ```
+- `Toggle suggest mode` - toggles a mode that turns all your changes to the document into suggestions.
 
 ## Document Name
 

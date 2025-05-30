@@ -73,18 +73,15 @@ const moveComments = (transaction, ycomments) => {
     (transaction.isUserEvent("input") || transaction.isUserEvent("delete") || transaction.annotation(yHistoryAnnotation)) &&
     transaction.startState.doc.lines != transaction.state.doc.lines
   ) {
-    const moved = [];
     ycomments.positions().positions.value.forEach((pos) => {
       const { deleted, oldPos, newPos, newLine } = ycomments.mapThroughChanges(pos, transaction, true);
 
       if (deleted) {
         ycomments.deleteComment(pos.commentId);
       } else if (oldPos != newPos) {
-        moved.push(pos.commentId);
-        ycomments.positions().move(pos.commentId, newLine, false);
+        ycomments.positions().move(pos.commentId, newLine);
       }
     });
-    ycomments.syncSuggestions(...moved);
   }
 };
 

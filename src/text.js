@@ -15,6 +15,7 @@ import { StateEffect } from "@codemirror/state";
 import hljs from "highlight.js/lib/core";
 import yamlHighlight from "highlight.js/lib/languages/yaml";
 import { markdownCheckboxes } from "./markdown/markdownCheckboxes";
+import { criticMarkup } from "./markdown/markdownCriticMarkup";
 
 export const markdownUpdatedEffect = StateEffect.define();
 
@@ -55,7 +56,8 @@ export class TextManager {
         .use(checkLinks)
         .use(colonFencedBlocks)
         .use(markdownItMapUrls, options.mapUrl.value)
-        .use(markdownCheckboxes);
+        .use(markdownCheckboxes)
+        .use(criticMarkup);
       if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
       userSettings.value.filter((s) => s.enabled && s.markdown).forEach((s) => md.use(s.markdown));
 

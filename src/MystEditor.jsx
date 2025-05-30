@@ -85,7 +85,7 @@ const FlexWrapper = styled.div`
 const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val ? "hidden" : "visible");
 
 const MystEditor = () => {
-  const { editorView, cache, options, collab, text } = useContext(MystState);
+  const { editorView, cache, options, collab, text, suggestMode } = useContext(MystState);
   const fullscreen = useSignal(false);
   useSignalEffect(() => hideBodyScrollIf(fullscreen.value));
 
@@ -112,6 +112,7 @@ const MystEditor = () => {
         text.renderText(false);
         alertFor("Rich links refreshed!", 1);
       },
+      "suggest-mode": () => (suggestMode.value = !suggestMode.peek()),
     }),
     [],
   );

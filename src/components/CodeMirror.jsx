@@ -5,9 +5,6 @@ import styled from "styled-components";
 import { ExtensionBuilder, skipAndFoldAll } from "../extensions";
 import { YCommentsParent } from "./Comment";
 import commentIcon from "../icons/comment.svg?raw";
-import { customHighlighter } from "../extensions/customHighlights";
-import { AddSuggestionBtn, suggestionCompartment } from "../extensions/suggestions";
-import editIcon from "../icons/edit.svg";
 import { MystState } from "../mystState";
 import { userExtensionsCompartment } from "./Settings";
 import { useSignalEffect } from "@preact/signals";
@@ -134,47 +131,6 @@ const CodeEditor = styled.div`
     z-index: 3;
   }
 
-  .cm-suggestion {
-    font-weight: 700;
-
-    &.replaced *,
-    &.replaced {
-      font-weight: initial;
-      color: inherit !important;
-      text-decoration: line-through;
-    }
-
-    & * {
-      color: inherit;
-    }
-  }
-
-  .cm-suggestion-remove {
-    text-decoration: line-through;
-    font-weight: initial;
-    cursor: pointer;
-  }
-
-  .cm-replacement {
-    font-weight: 700;
-    display: inline-block;
-    margin-left: 4px;
-    cursor: pointer;
-  }
-
-  .cm-editor.cm-focused > .cm-scroller > .cm-selectionLayer > .cm-selectionBackground {
-    background: var(--editor-selection-bg);
-  }
-
-  .cm-editor .cm-activeLine {
-    background-color: var(--editor-active-line-bg);
-  }
-
-  .cm-editor .cm-cursor,
-  .cm-editor .cm-dropCursor {
-    border-left: 1.2px solid currentColor;
-  }
-
   :not(.cm-focused) > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {
     background: transparent;
   }
@@ -258,10 +214,12 @@ const CodeEditor = styled.div`
   }
 
   .cm-inline-mono,
-  .cm-inline-mono * {
+  .cm-inline-mono *,
+  .cm-line > *:has(> .cm-inline-mono) {
     font-family: monospace !important;
     line-height: 1.3em !important;
     font-size: 14px !important;
+    display: inline-block !important;
   }
 
   .cm-editor .cm-lintRange-error {
@@ -280,10 +238,44 @@ const CodeEditor = styled.div`
       color: var(--accent-dark);
     }
   }
+
+  .cm-critic-widget {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    transform: translateY(2px);
+
+    button {
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      height: 16px;
+
+      img {
+        width: 16px;
+        height: auto;
+      }
+    }
+  }
+
+  .cm-critic-meta {
+    color: darkgray;
+  }
+
+  .cm-critic-ins {
+    background: var(--inserted-bg);
+    text-decoration: underline;
+  }
+
+  .cm-critic-del {
+    background: var(--deleted-bg);
+    text-decoration: line-through;
+  }
 `;
 
 const CodeMirror = () => {
-  const { editorView, options, collab, userSettings, linter, text, headings, error } = useContext(MystState);
+  const { editorView, options, collab, userSettings, linter, text, headings, error, suggestMode } = useContext(MystState);
   const logger = useContext(Logger);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
@@ -345,19 +337,13 @@ const CodeMirror = () => {
       extensions: ExtensionBuilder.basicSetup()
         .useMarkdown(options.transforms.value)
         .if(options.mode.value !== "Inline", (b) => b.useLineNumbers())
-        .useCompartment(suggestionCompartment, collab.value?.ycomments?.suggestionHighlighter ?? customHighlighter([]))
         .useCompartment(userExtensionsCompartment, [])
         .useSpellcheck(options.spellcheckOpts.value)
         .if(options.collaboration.value.enabled, (b) => {
           return b.useCollaboration({ collabClient: collab.value, editorView });
         })
         .if(!options.collaboration.value.enabled, (b) => b.useDefaultHistory())
-        .if(options.collaboration.value.commentsEnabled, (b) =>
-          b.useComments({ ycomments: collab.value.ycomments }).useSuggestionPopup({
-            ycomments: collab.value.ycomments,
-            editorMountpoint,
-          }),
-        )
+        .if(options.collaboration.value.commentsEnabled, (b) => b.useComments({ ycomments: collab.value.ycomments }))
         .addUpdateListener((update) => {
           if (!update.docChanged) return;
           clearTimeout(renderTimer.current);
@@ -378,6 +364,8 @@ const CodeMirror = () => {
         .useExceptionSink(error)
         .useLogger(logger)
         .if(options.cmDarkTheme.value, (b) => b.useCmDarkTheme())
+        .useCriticMarkupBtns()
+        .if(suggestMode.value, (b) => b.useSuggestMode())
         .create(),
     });
 
@@ -402,11 +390,6 @@ const CodeMirror = () => {
   return (
     <CodeEditor className="myst-main-editor" ref={editorMountpoint} $mode={options.mode.value} id={`${options.id.value}-editor`}>
       {options.collaboration.value.commentsEnabled && collab.value.ready.value && collab.value.ycomments?.mainCodeMirror && <YCommentsParent />}
-      {options.collaboration.value.commentsEnabled && (
-        <AddSuggestionBtn style="display: none" className="myst-add-suggestion" title="Suggest Changes">
-          <img src={editIcon} alt="edit" />
-        </AddSuggestionBtn>
-      )}
     </CodeEditor>
   );
 };

@@ -6,6 +6,7 @@ import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
 import { RangeSet, StateField } from "@codemirror/state";
 import { findSoruceMappedPreviousElement } from "./syncDualPane";
 import { getLineById } from "../markdown/markdownSourceMap";
+import { criticMarkup } from "./criticMarkup";
 
 export const inlinePreview = (/** @type {TextManager} */ text, options, editorView) => {
   const previewFont = "Lato";
@@ -21,7 +22,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     { tag: tags.emphasis, ...baseFont, fontStyle: "italic" },
     { tag: tags.strong, ...baseFont, fontWeight: "bold" },
     { tag: [tags.monospace, tags.atom], ...baseFont, fontFamily: "monospace" },
-    { tag: tags.content, ...baseFont },
+    { tag: [tags.content], ...baseFont },
     { tag: tags.meta, color: "darkgrey" },
   ]);
   const markdownTheme = EditorView.theme({
@@ -31,12 +32,14 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     ".cm-inline-indent": { display: "inline-block" },
     ".cm-inline-indent *": { display: "none" },
     ":is(.cm-widgetBuffer:has(+ .inline-custom-styles), .inline-custom-styles + .cm-widgetBuffer)": { display: "none" },
+    ".cm-critic-meta": { display: "none" },
   });
 
   const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Image", "Blockquote"];
   const tokenHidden = ["HardBreak", "EmphasisMark"];
   const decorationHidden = Decoration.replace({});
   const decorationMonospace = Decoration.mark({ class: "cm-inline-mono" });
+  const nodeInSuggestion = (state, node) => state.field(criticMarkup).suggestionRanges.some((r) => node.from >= r.from && node.to <= r.to);
   const nodeInSelection = (state, node) =>
     editorView.peek()?.hasFocus &&
     state.selection.ranges.some((r) => {
@@ -46,6 +49,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       const nodeTo = state.doc.lineAt(node.to).number;
       return (rFrom >= nodeFrom && rFrom <= nodeTo) || (rTo >= nodeFrom && rTo <= nodeTo) || (nodeFrom >= rFrom && nodeTo <= rTo);
     });
+  const nodeInMonospace = (...args) => nodeInSelection(...args) || nodeInSuggestion(...args);
 
   const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task", "HTMLBlock"];
   const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
@@ -93,7 +97,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       enter(node) {
         const isBlock = renderedBlockNodes.includes(node.name);
         if (!isBlock && !renderedInlineNodes.includes(node.name)) return;
-        if (nodeInSelection(state, node)) return false;
+        if (nodeInMonospace(state, node)) return false;
 
         const lineFrom = state.doc.lineAt(node.from);
         const lineTo = state.doc.lineAt(node.to);
@@ -154,15 +158,15 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
             from,
             to,
             enter(node) {
-              if (node.name.startsWith("ATXHeading") && nodeInSelection(view.state, node)) return false;
-              if ((node.name.startsWith("SetextHeading") || tokenElement.includes(node.name)) && nodeInSelection(view.state, node)) {
+              if (node.name.startsWith("ATXHeading") && nodeInMonospace(view.state, node)) return false;
+              if ((node.name.startsWith("SetextHeading") || tokenElement.includes(node.name)) && nodeInMonospace(view.state, node)) {
                 const startLine = view.state.doc.lineAt(node.from);
                 const endLine = view.state.doc.lineAt(node.to);
                 widgets.push(decorationMonospace.range(startLine.from, endLine.to));
                 return false;
               }
 
-              if (node.name === "ListMark" && node.matchContext(["BulletList", "ListItem"]) && !nodeInSelection(view.state, node)) {
+              if (node.name === "ListMark" && node.matchContext(["BulletList", "ListItem"]) && !nodeInMonospace(view.state, node)) {
                 widgets.push(
                   Decoration.mark({
                     class: "cm-inline-bullet",
@@ -170,7 +174,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
                 );
               }
 
-              if (node.name === "ListMark" && node.matchContext(["OrderedList", "ListItem"]) && !nodeInSelection(view.state, node)) {
+              if (node.name === "ListMark" && node.matchContext(["OrderedList", "ListItem"]) && !nodeInMonospace(view.state, node)) {
                 // Get what list item number should this one have, this is to keep it consistent with standard markdown-it rendering
                 const marks = node.node.parent.parent.getChildren("ListItem").flatMap((i) => i.getChildren("ListMark"));
                 const base = parseInt(view.state.doc.sliceString(marks[0].from, marks[0].to));
@@ -193,7 +197,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
                 }
               }
 
-              if (tokenHidden.includes(node.name)) {
+              if (tokenHidden.includes(node.name) && !nodeInMonospace(view.state, node)) {
                 widgets.push(decorationHidden.range(node.from, node.to));
               }
             },
@@ -208,6 +212,9 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
               widgets.push(decorationMonospace.range(startLine.from, endLine.to));
             }
           });
+
+          const { suggestionRanges } = view.state.field(criticMarkup);
+          suggestionRanges.filter((r) => nodeInSelection(view.state, r)).forEach((r) => widgets.push(decorationMonospace.range(r.from, r.to)));
         }
 
         // Make all indenting same width as monospace text indent
