@@ -1,5 +1,5 @@
 import { lineNumbers, highlightSpecialChars, drawSelection, dropCursor, rectangularSelection, crosshairCursor, keymap } from "@codemirror/view";
-import { EditorSelection, EditorState, Facet, Prec } from "@codemirror/state";
+import { Compartment, EditorSelection, EditorState, Facet, Prec } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { yCollab } from "y-codemirror.next";
 import { markdown } from "@codemirror/lang-markdown";
@@ -78,8 +78,9 @@ const syntaxHighlight = HighlightStyle.define([
   { tag: tags.definition(tags.propertyName), color: "var(--accent-dark)" },
   { tag: tags.comment, color: "var(--string-fg)" },
   { tag: tags.invalid, color: "#f00" },
-  // { tag: tags.monospace, color: "var(--accent-dark)" },
 ]);
+
+export const lineNumbersCompartment = new Compartment();
 
 export class ExtensionBuilder {
   constructor(base = []) {
@@ -134,7 +135,7 @@ export class ExtensionBuilder {
   }
 
   useLineNumbers() {
-    this.base.unshift(lineNumbers());
+    this.base.unshift(lineNumbersCompartment.of(lineNumbers()));
     return this;
   }
 

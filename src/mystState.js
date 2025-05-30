@@ -1,6 +1,6 @@
 import { markdownKeymap } from "@codemirror/lang-markdown";
 import { Annotation, Prec } from "@codemirror/state";
-import { keymap, ViewPlugin } from "@codemirror/view";
+import { keymap, lineNumbers, ViewPlugin } from "@codemirror/view";
 import { Signal, signal, effect } from "@preact/signals";
 import { EditorView } from "codemirror";
 import { createContext } from "preact";
@@ -8,7 +8,7 @@ import { closeBrackets } from "@codemirror/autocomplete";
 import Settings from "./components/Settings";
 import { CollaborationClient } from "./collaboration";
 import { CodeMirror as VimCM, vim } from "@replit/codemirror-vim";
-import { collabClientFacet } from "./extensions";
+import { collabClientFacet, lineNumbersCompartment } from "./extensions";
 import { TextManager } from "./text";
 import Templates from "./components/Templates";
 import { yRemoteAnnotation } from "./extensions/collab";
@@ -46,6 +46,12 @@ VimCM.commands.undo = (cm) => (undoManagers.get(cm)?.undo ?? originalUndo)(cm);
 VimCM.commands.redo = (cm) => (undoManagers.get(cm)?.redo ?? originalRedo)(cm);
 
 const reorderAnnotation = Annotation.define();
+
+const formatRelativeNumbers = (line, state) => {
+  if (line > state.doc.lines) return "0";
+  const cursorLine = state.doc.lineAt(state.selection.main.head).number;
+  return Math.abs(cursorLine - line).toString();
+};
 
 const defaultUserSettings = [
   {
@@ -106,6 +112,39 @@ const defaultUserSettings = [
           constructor(view) {
             const undoManager = view.state.facet(collabClientFacet)[0]?.undoManager;
             if (undoManager) undoManagers.set(view.cm, { undo: () => undoManager.undo(), redo: () => undoManager.redo() });
+          }
+        },
+      ),
+    ],
+  },
+  {
+    id: "relative-line-numbers",
+    title: "Relative line numbers",
+    enabled: false,
+    extension: [
+      ViewPlugin.fromClass(
+        class {
+          constructor(view) {
+            this.view = view;
+            this.setRelativeLines();
+          }
+          update(update) {
+            if (!update.selectionSet) return;
+            this.setRelativeLines();
+          }
+          setRelativeLines() {
+            queueMicrotask(() => {
+              this.view.dispatch({
+                effects: lineNumbersCompartment.reconfigure(lineNumbers({ formatNumber: formatRelativeNumbers })),
+              });
+            });
+          }
+          destroy() {
+            queueMicrotask(() => {
+              this.view.dispatch({
+                effects: lineNumbersCompartment.reconfigure(lineNumbers()),
+              });
+            });
           }
         },
       ),
