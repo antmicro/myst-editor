@@ -416,17 +416,26 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#suggestions" class="md-nav__link">
-    <span class="md-ellipsis">Suggestions</span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="suggestions.html" class="md-nav__link">
+        <span class="md-ellipsis">Suggestions</span>
+      </a>
     </li>
   
 
@@ -548,50 +557,6 @@ From there you can move it wherever you want.</p>
 <p class="admonition-title">Warning</p>
 <p>Applying a document template to a document with resolved comments, will make all of them <code class="docutils literal notranslate"><span class="pre">orphaned</span></code>.</p>
 </div>
-<h2 id="suggestions">Suggestions<a class="headerlink" href="#suggestions" title="Link to this heading">¶</a></h2>
-<figure class="align-default" id="suggest-change">
-<img alt="Suggest Change" src="_images/suggestion.png" />
-<figcaption>
-<p><span class="caption-number">Figure 12 </span><span class="caption-text"><span class="caption-text">
-Change suggestion</span><a class="headerlink" href="#suggest-change" title="Permalink to this image">¶</a></figcaption>
-</figure>
-<p>You can suggest changes to a line in a comment.
-To do so, you can use the following syntax within the comment:</p>
-<div class="highlight-md notranslate"><div class="highlight"><pre><span></span><code>|&lt;text to replace&gt; -&gt; &lt;replacement&gt;|
-eg. |is -&gt; was|
-</code></pre></div>
-</div>
-<p>This will cross out all the occurrences of such text within the line and place a suggested replacement next to them in the document.
-The suggestion will be colored after the color of the comment line it is in.
-Clicking the colored suggestion will apply it, which can be undone/redone.
-This will only apply to one occurrence of the suggestion.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Suggestions only match against whole words/symbols.
-If you want to match a certain occurrence of a word, try adding more context (more words/symbols around it).</p>
-</div>
-<p>You can also suggest deleting a portion of text. To do this, simply leave the replacement after <code class="docutils literal notranslate"><span class="pre">-&gt;</span></code> blank:</p>
-<figure class="align-default" id="suggest-deletion">
-<img alt="Suggest Deletion" src="_images/suggest-del.png" />
-<figcaption>
-<p><span class="caption-number">Figure 13 </span><span class="caption-text"><span class="caption-text">
-Removal suggestion</span><a class="headerlink" href="#suggest-deletion" title="Permalink to this image">¶</a></figcaption>
-</figure>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>If you don’t specify a replacement, the text between <code class="docutils literal notranslate"><span class="pre">||</span></code> will be highlighted.
-This can be useful to bring attention to a section of a line.</p>
-<div class="highlight-md notranslate"><div class="highlight"><pre><span></span><code>eg. |something| - this will highlight the word something
-</code></pre></div>
-</div>
-</div>
-<p>To easily add suggestions, you can select some text from one line and click the button that appears near your selection:</p>
-<figure class="align-default" id="suggest-button">
-<img alt="Suggest Button" src="_images/suggest-btn.png" />
-<figcaption>
-<p><span class="caption-number">Figure 14 </span><span class="caption-text"><span class="caption-text">
-Add suggestion button</span><a class="headerlink" href="#suggest-button" title="Permalink to this image">¶</a></figcaption>
-</figure>
 
 
   <hr>
@@ -638,6 +603,21 @@ Add suggestion button</span><a class="headerlink" href="#suggest-button" title="
         </a>
       
       
+        
+        <a href="suggestions.html" class="md-footer__link md-footer__link--next" aria-label="Next: Suggestions" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Suggestions
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
     </nav>
   
   
@@ -652,7 +632,7 @@ Add suggestion button</span><a class="headerlink" href="#suggest-button" title="
         
     </div>
   
-      <a href="https://github.com/antmicro/myst-editor/tree/4fbf24efa173e93f032e0ec9c29dbcafe85197f0">4fbf24ef</a>
+      <a href="https://github.com/antmicro/myst-editor/tree/f844d7dfb6015b9d8411948163223f9892ff2706">f844d7df</a>
         @ <a href="https://github.com/antmicro/myst-editor/tree/main">main</a>
   
 </div>

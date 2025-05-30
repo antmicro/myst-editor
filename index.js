@@ -147,8 +147,7 @@ These features include:
 - real-time editing with other people
 - seeing remote cursors
 - comments - add some text that does not show up in the preview
-  - resolved comments - a new view to see comments that were resolved
-  - suggestions - non-destructively suggest changes to the document`;
+  - resolved comments - a new view to see comments that were resolved`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
 const n = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), c = a.get("room") || "0", m = a.get("username") || Math.floor(Math.random() * 1e3).toString(), u = n[Math.floor(Math.random() * n.length)];
 let p = [{
@@ -160,14 +159,14 @@ let p = [{
 }], w = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
-    const [t, s] = e.split("#");
-    return `<a href="https://github.com/${t}/issues/${s}">${e}</a>`;
+    const [t, i] = e.split("#");
+    return `<a href="https://github.com/${t}/issues/${i}">${e}</a>`;
   }
 }, {
   target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
   transform: (e) => {
-    const [t, s] = e.split("!");
-    return `<a href="https://github.com/${t}/pull/${s}">${e}</a>`;
+    const [t, i] = e.split("!");
+    return `<a href="https://github.com/${t}/pull/${i}">${e}</a>`;
   }
 }, {
   target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
@@ -190,7 +189,7 @@ let p = [{
     timeZone: "UTC"
   })))
 }];
-const i = {}.VITE_COLLAB != "OFF" && a.get("collab") != "false";
+const s = {}.VITE_COLLAB != "OFF" && a.get("collab") != "false";
 var r;
 const o = (r = {}.VITE_WS_URL) != null ? r : a.get("collab_server");
 d({
@@ -200,9 +199,9 @@ d({
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
   transforms: w,
   collaboration: {
-    enabled: i,
-    commentsEnabled: i,
-    resolvingCommentsEnabled: i,
+    enabled: s,
+    commentsEnabled: s,
+    resolvingCommentsEnabled: s,
     wsUrl: o != null ? o : "#",
     username: m,
     room: c,
