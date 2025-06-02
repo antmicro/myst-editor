@@ -1,7 +1,6 @@
-import { useEffect, useRef } from "preact/hooks";
 import styled from "styled-components";
 import { Avatar } from "./Avatars";
-import { useSignal } from "@preact/signals";
+import { useTimeDifference } from "../hooks/useTimeDifference";
 
 const TextChanges = styled.p`
   font-size: 16px;
@@ -65,45 +64,8 @@ const LineNumbers = styled.span`
   color: var(--editor-gutter-fg);
 `;
 
-const formatter = new Intl.RelativeTimeFormat("en", { style: "long" });
-
 const ResolvedSuggestion = ({ suggestion }) => {
-  const difference = useSignal({ amount: 0, unit: "second" });
-  const timer = useRef(null);
-
-  function setTimeDifference() {
-    const secondDifference = Math.floor((Date.now() - suggestion.appliedTimestamp) / 1000);
-    const minuteDifference = Math.floor(secondDifference / 60);
-    const hourDifference = Math.floor(minuteDifference / 60);
-    const dayDifference = Math.floor(hourDifference / 24);
-    const monthDifference = Math.floor(dayDifference / 30);
-    const yearDifference = Math.floor(monthDifference / 12);
-
-    if (minuteDifference >= 60) {
-      clearInterval(timer.current);
-    }
-
-    if (secondDifference < 60) {
-      difference.value = { amount: secondDifference, unit: "second" };
-    } else if (minuteDifference < 60) {
-      difference.value = { amount: minuteDifference, unit: "minute" };
-    } else if (hourDifference < 24) {
-      difference.value = { amount: hourDifference, unit: "hour" };
-    } else if (dayDifference < 30) {
-      difference.value = { amount: dayDifference, unit: "day" };
-    } else if (monthDifference < 12) {
-      difference.value = { amount: monthDifference, unit: "month" };
-    } else {
-      difference.value = { amount: yearDifference, unit: "year" };
-    }
-  }
-
-  useEffect(() => {
-    timer.current = setInterval(setTimeDifference, 1000);
-    return () => {
-      clearInterval(timer.current);
-    };
-  }, []);
+  const timeText = useTimeDifference(suggestion.appliedTimestamp);
 
   return (
     <div style="position: relative;">
@@ -129,7 +91,7 @@ const ResolvedSuggestion = ({ suggestion }) => {
         </FlexRow>
         <FlexRow>
           <AppliedAt>
-            Suggestion {suggestion.action === "accept" ? "accepted" : "rejected"} {formatter.format(-difference.value.amount, difference.value.unit)}
+            Suggestion {suggestion.action === "accept" ? "accepted" : "rejected"} {timeText}
           </AppliedAt>
         </FlexRow>
       </SuggestionContainer>
