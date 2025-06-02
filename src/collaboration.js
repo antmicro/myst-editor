@@ -16,6 +16,7 @@ export class CollaborationClient {
   lockMsg = computed(() => this.#lockMsg.value);
   users = computed(() => this.#users.value);
   #heartbeatInterval = null;
+  storedSuggestions = signal([]);
 
   constructor(settings, editorOptions = { id: null, parent: null, hideUsernameDelay: null, getAvatar: () => {}, getUserUrl: () => {} }) {
     this.ready = computed(() => this.#synced.value && this.#connected.value);
@@ -120,6 +121,12 @@ export class CollaborationClient {
     this.metaMap.observe(() => {
       this.#lockMsg.value = this.metaMap.get("lock");
     });
+
+    const suggestions = this.ydoc.getArray("critic-suggestions");
+    this.storedSuggestions.value = suggestions.toArray();
+    suggestions.observe(() => {
+      this.storedSuggestions.value = suggestions.toArray();
+    });
   }
 
   lock(msg = "Document locked") {
@@ -128,6 +135,11 @@ export class CollaborationClient {
 
   unlock() {
     this.metaMap.delete("lock");
+  }
+
+  storeSuggestion(suggestion) {
+    const suggestions = this.ydoc.getArray("critic-suggestions");
+    suggestions.push([{ ...suggestion, appliedBy: this.#localUser, appliedTimestamp: Date.now() }]);
   }
 
   destroy() {

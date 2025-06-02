@@ -4,6 +4,7 @@ import rejectImg from "../icons/reject.svg?url";
 import { EditorSelection, EditorState, Range, StateField } from "@codemirror/state";
 import { yRemoteAnnotation } from "./collab";
 import { criticMarkers } from "../markdown/markdownCriticMarkup";
+import { collabClientFacet } from ".";
 
 const criticMetaDeco = Decoration.mark({ class: "cm-critic-meta" });
 const criticInsDeco = Decoration.mark({ class: "cm-critic-ins" });
@@ -121,6 +122,7 @@ class CriticButtonsWidget extends WidgetType {
   }
 
   toDOM(/** @type {EditorView} */ view) {
+    const collab = view.state.facet(collabClientFacet)[0];
     const container = document.createElement("div");
     container.className = "cm-critic-widget";
 
@@ -131,7 +133,10 @@ class CriticButtonsWidget extends WidgetType {
     acceptBtn.appendChild(acceptIcon);
     acceptBtn.addEventListener("mousedown", (ev) => {
       ev.preventDefault();
+      const fromLine = view.state.doc.lineAt(this.range.from).number;
+      const toLine = view.state.doc.lineAt(this.range.to).number;
       view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.insert ?? "" } });
+      collab.storeSuggestion({ insert: this.insert, remove: this.remove, action: "accept", fromLine, toLine });
     });
 
     const rejectBtn = document.createElement("button");
@@ -141,7 +146,10 @@ class CriticButtonsWidget extends WidgetType {
     rejectBtn.appendChild(rejectIcon);
     rejectBtn.addEventListener("mousedown", (ev) => {
       ev.preventDefault();
+      const fromLine = view.state.doc.lineAt(this.range.from).number;
+      const toLine = view.state.doc.lineAt(this.range.to).number;
       view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.remove ?? "" } });
+      collab.storeSuggestion({ insert: this.insert, remove: this.remove, action: "reject", fromLine, toLine });
     });
 
     container.appendChild(acceptBtn);
