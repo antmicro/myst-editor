@@ -136,7 +136,7 @@ class CriticButtonsWidget extends WidgetType {
       const fromLine = view.state.doc.lineAt(this.range.from).number;
       const toLine = view.state.doc.lineAt(this.range.to).number;
       view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.insert ?? "" } });
-      collab.storeSuggestion({ insert: this.insert, remove: this.remove, action: "accept", fromLine, toLine });
+      collab?.storeSuggestion?.({ insert: this.insert, remove: this.remove, action: "accept", fromLine, toLine });
     });
 
     const rejectBtn = document.createElement("button");
@@ -149,7 +149,7 @@ class CriticButtonsWidget extends WidgetType {
       const fromLine = view.state.doc.lineAt(this.range.from).number;
       const toLine = view.state.doc.lineAt(this.range.to).number;
       view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.remove ?? "" } });
-      collab.storeSuggestion({ insert: this.insert, remove: this.remove, action: "reject", fromLine, toLine });
+      collab?.storeSuggestion?.({ insert: this.insert, remove: this.remove, action: "reject", fromLine, toLine });
     });
 
     container.appendChild(acceptBtn);
