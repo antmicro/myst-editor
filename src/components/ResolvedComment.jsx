@@ -1,55 +1,12 @@
 import { useMemo, useContext } from "preact/hooks";
 import styled from "styled-components";
-import { Avatar } from "./Avatars";
 import { Logger } from "../logger";
 import { useTimeDifference } from "../hooks/useTimeDifference";
+import ResolvedEntry from "./ResolvedEntry";
 
-const ResolvedLine = styled.p`
-  font-size: 16px;
-  padding: 10px 6px;
-  margin-bottom: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 95%;
-  min-height: 22px;
+const ResolvedLine = styled.span`
   text-decoration: ${(props) => (props.orphaned ? "line-through" : "none")};
   color: ${(props) => (props.orphaned ? "var(--editor-gutter-fg)" : "currentColor")};
-
-  & > span {
-    display: ${(props) => (props.orphaned ? "none" : "block")};
-  }
-`;
-
-const CommentContainer = styled.div`
-  background-color: color-mix(in srgb, ${(props) => props.color}, white);
-  color: black;
-  border: 2px solid ${(props) => props.color};
-  padding-top: 10px;
-  margin-left: -1px;
-  width: calc(100% - 3px);
-`;
-
-const CommentTopbar = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  line-height: 22px;
-  padding: 0 6px;
-`;
-
-const CommentAuthor = styled.h2`
-  font-weight: bold;
-  font-size: 12px;
-  margin: 0;
-`;
-
-const ResolvedBy = styled.p`
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 14px;
-  margin: 0;
-  margin-right: 25px;
 `;
 
 const CommentContent = styled.p`
@@ -60,20 +17,6 @@ const CommentContent = styled.p`
   font-weight: 400;
 `;
 
-const FlexRow = styled.div`
-  display: flex;
-  align-items: center;
-
-  & .avatar {
-    border-radius: 50%;
-    border: 3px solid;
-    height: 28px;
-    width: 28px;
-    position: absolute;
-    transform: translateX(calc(-100% - 12px));
-  }
-`;
-
 const CommentLine = styled.span`
   display: block;
   background-color: color-mix(in srgb, ${(props) => props.color}, white);
@@ -82,13 +25,8 @@ const CommentLine = styled.span`
   white-space: pre-wrap;
 `;
 
-const LineNumber = styled.span`
-  position: absolute;
-  transform: translateX(calc(-100% - 24px));
-  color: var(--editor-gutter-fg);
-`;
-
 const OptionsContainer = styled.span`
+  margin-left: 24px;
   margin-right: 6px;
   display: block;
   display: flex;
@@ -214,59 +152,51 @@ const ResolvedComment = ({ c, authors, ycomments, content }) => {
     return "RESTORE";
   }, [c]);
 
+  const user = authors.get(1);
+
   return (
-    <div style="position: relative;">
-      <ResolvedLine orphaned={c.orphaned}>
-        <LineNumber>{c.lineNumber}</LineNumber>
-        {c.resolvedLine}
-      </ResolvedLine>
-      <CommentContainer className="resolved-comment" color={authors.get(1).color}>
-        <CommentTopbar>
-          <FlexRow>
-            <Avatar login={authors.get(1).name} color={authors.get(1).color} avatarUrl={authors.get(1).avatar} userUrl={authors.get(1).url} />
-            <CommentAuthor>{authors.get(1).name}</CommentAuthor>
-          </FlexRow>
-          <FlexRow>
-            <ResolvedBy>
-              Comment resolved by @{c.resolvedBy.name} {timeText}
-            </ResolvedBy>
-            <OptionsContainer className="myst-dropdown-toggle">
-              <OptionsIcon />
-              <DropdownContainer>
-                <DropdownButton
-                  className="myst-restore-btn"
-                  onClick={() => {
-                    log(`Restoring comment on line ${c.orphaned ? "orphaned" : c.lineNumber}`);
-                    ycomments.restoreComment(c);
-                  }}
-                >
-                  <RestoreIcon />
-                  <p>{restoreText}</p>
-                </DropdownButton>
-                <DropdownButton
-                  className="myst-delete-btn"
-                  onClick={() => {
-                    log(`Deleting resolved comment on line ${c.orphaned ? "orphaned" : c.lineNumber}`);
-                    ycomments.resolver().delete(c.commentId);
-                  }}
-                >
-                  <DeleteIcon />
-                  <p>DELETE</p>
-                </DropdownButton>
-              </DropdownContainer>
-            </OptionsContainer>
-          </FlexRow>
-        </CommentTopbar>
-        <CommentContent>
-          {" "}
-          {groupedLines.map((lineData, i) => (
-            <CommentLine key={i} color={lineData.author.color}>
-              {lineData.text}
-            </CommentLine>
-          ))}{" "}
-        </CommentContent>
-      </CommentContainer>
-    </div>
+    <ResolvedEntry
+      user={{ ...user, avatarUrl: user.avatar, userUrl: user.url }}
+      lineNumber={c.orphaned ? "" : c.lineNumber}
+      action={`Comment resolved by @${c.resolvedBy.name} ${timeText}`}
+      className="resolved-comment"
+      lineText={<ResolvedLine orphaned={c.orphaned}>{c.resolvedLine}</ResolvedLine>}
+      options={
+        <OptionsContainer className="myst-dropdown-toggle">
+          <OptionsIcon />
+          <DropdownContainer>
+            <DropdownButton
+              className="myst-restore-btn"
+              onClick={() => {
+                log(`Restoring comment on line ${c.orphaned ? "orphaned" : c.lineNumber}`);
+                ycomments.restoreComment(c);
+              }}
+            >
+              <RestoreIcon />
+              <p>{restoreText}</p>
+            </DropdownButton>
+            <DropdownButton
+              className="myst-delete-btn"
+              onClick={() => {
+                log(`Deleting resolved comment on line ${c.orphaned ? "orphaned" : c.lineNumber}`);
+                ycomments.resolver().delete(c.commentId);
+              }}
+            >
+              <DeleteIcon />
+              <p>DELETE</p>
+            </DropdownButton>
+          </DropdownContainer>
+        </OptionsContainer>
+      }
+    >
+      <CommentContent>
+        {groupedLines.map((lineData, i) => (
+          <CommentLine key={i} color={lineData.author.color}>
+            {lineData.text}
+          </CommentLine>
+        ))}
+      </CommentContent>
+    </ResolvedEntry>
   );
 };
 
