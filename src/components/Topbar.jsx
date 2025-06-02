@@ -301,7 +301,7 @@ export const EditorTopbar = ({ alert, buttons }) => {
       { id: "outline", text: "Table of Contents", action: () => (options.mode.value = "Outline"), icon: TocIcon },
     ];
     if (options.collaboration.value.resolvingCommentsEnabled) {
-      modeButtons.push({ id: "resolved", text: "Resolved Comments", action: () => (options.mode.value = "Resolved"), icon: ResolvedIcon });
+      modeButtons.push({ id: "resolved", text: "Resolved", action: () => (options.mode.value = "Resolved"), icon: ResolvedIcon });
     }
 
     return modeButtons;
