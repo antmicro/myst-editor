@@ -131,11 +131,7 @@ class CriticButtonsWidget extends WidgetType {
     acceptBtn.appendChild(acceptIcon);
     acceptBtn.addEventListener("mousedown", (ev) => {
       ev.preventDefault();
-      if (this.insert) {
-        view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.insert } });
-      } else if (this.remove) {
-        view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: "" } });
-      }
+      view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.insert ?? "" } });
     });
 
     const rejectBtn = document.createElement("button");
@@ -145,11 +141,7 @@ class CriticButtonsWidget extends WidgetType {
     rejectBtn.appendChild(rejectIcon);
     rejectBtn.addEventListener("mousedown", (ev) => {
       ev.preventDefault();
-      if (this.remove) {
-        view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.remove } });
-      } else {
-        view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: "" } });
-      }
+      view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.remove ?? "" } });
     });
 
     container.appendChild(acceptBtn);
