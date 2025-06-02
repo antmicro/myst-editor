@@ -4,6 +4,7 @@ import ResolvedComment from "./ResolvedComment";
 import CommentIcon from "../icons/comment.svg";
 import { MystState } from "../mystState";
 import { useComputed } from "@preact/signals";
+import ResolvedSuggestion from "./ResolvedSuggestion";
 
 const ResolvedWrapper = styled.div`
   background-color: var(--panel-bg);
@@ -20,6 +21,10 @@ const ResolvedWrapper = styled.div`
     font-size: 20px;
     padding-left: 100px;
     margin-bottom: 0;
+
+    &.suggestions-heading {
+      margin-top: 20px;
+    }
   }
 `;
 
@@ -31,7 +36,7 @@ const VerticalSparator = styled.hr`
   margin-bottom: 0;
 `;
 
-const CommentsContainer = styled.div`
+const Container = styled.div`
   margin-left: 100px;
   border-left: 1px solid var(--gray-600);
 
@@ -43,6 +48,7 @@ const CommentsContainer = styled.div`
 
 const NoCommentsText = styled.p`
   padding: 10px 6px;
+  margin: 0;
 
   img {
     margin: 0 5px;
@@ -63,7 +69,9 @@ function dateComparator(c1, c2) {
 }
 
 const ResolvedComments = () => {
-  const { ycomments } = useContext(MystState).collab.value;
+  const { collab } = useContext(MystState);
+  const ycomments = collab.value.ycomments;
+  const suggestions = collab.value.storedSuggestions;
   const resolvedComments = useComputed(() => ycomments.resolver().resolvedCommentsList.value.sort(dateComparator));
   const commentContents = useComputed(() =>
     resolvedComments.value.reduce((contents, { commentId }) => {
@@ -77,7 +85,7 @@ const ResolvedComments = () => {
     <ResolvedWrapper className="myst-resolved">
       <h1>Resolved comments</h1>
       <VerticalSparator />
-      <CommentsContainer>
+      <Container>
         {resolvedComments.value.length === 0 ? (
           <NoCommentsText>
             No resolved comments yet, to resolve a comment hover over it's icon <img src={CommentIcon} /> and click <span>RESOLVE</span>
@@ -93,7 +101,17 @@ const ResolvedComments = () => {
             />
           ))
         )}
-      </CommentsContainer>
+      </Container>
+      <VerticalSparator style="margin-top: 0;" />
+      <h1 className="suggestions-heading">Resolved suggestions</h1>
+      <VerticalSparator />
+      <Container>
+        {suggestions.value.length === 0 ? (
+          <NoCommentsText>No resolved suggestions yet.</NoCommentsText>
+        ) : (
+          suggestions.value.map((s, idx) => <ResolvedSuggestion key={idx} suggestion={s} />)
+        )}
+      </Container>
     </ResolvedWrapper>
   );
 };

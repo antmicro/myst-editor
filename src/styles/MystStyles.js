@@ -79,6 +79,14 @@ export const MystContainer = styled(MystCSSVars)`
   textarea {
     color: inherit;
   }
+
+  ins {
+    background: var(--inserted-bg);
+  }
+
+  del {
+    background: var(--deleted-bg);
+  }
 `;
 
 export const darkTheme = new CSSStyleSheet();
