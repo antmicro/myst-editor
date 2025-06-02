@@ -552,6 +552,25 @@ test.describe.parallel("With collaboration enabled", () => {
       }).toPass();
     });
   });
+
+  test("Resolved suggestions are shown", async ({ context }) => {
+    const collabOpts = defaultCollabOpts();
+    const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+    const pageB = await applyPageOpts(await context.newPage(), collabOpts);
+
+    await clearEditor(pageA);
+    await insertToMainEditor(pageA, { from: 0, insert: `# {~~Heading~>Better heading~~}\nThis{++ is++} some text.\nThis is some text{-- text--}.` });
+    await pageA.waitForSelector(".cm-critic-widget");
+
+    await openResolvedComments(pageA);
+    await pageA.getByTitle("Accept suggestion").first().click();
+    await pageA.getByTitle("Reject suggestion").first().click();
+    await pageA.getByTitle("Accept suggestion").first().click();
+    await expect(pageA.locator(".resolved-suggestion")).toHaveCount(3);
+
+    await openResolvedComments(pageB);
+    await expect(pageB.locator(".resolved-suggestion")).toHaveCount(3);
+  });
 });
 
 test.describe.parallel("MystEditorGit wrapper", () => {
