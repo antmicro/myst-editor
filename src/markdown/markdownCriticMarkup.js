@@ -23,10 +23,12 @@ export const criticMarkup = (/** @type {markdownIt} */ md) => {
       pos++;
     }
     const content = state.src.slice(innerStart, pos);
-    // Reject if no replacement mark
-    if (marker == 0x7e /* ~ */ && !content.includes("~>")) return false;
-    // Reject empty suggestions
-    if (content.replace("~>", "").length === 0) return false;
+    if (marker == 0x7e /* ~ */) {
+      // Reject if no replacement mark
+      if (!content.includes("~>")) return false;
+      const [del, ins] = content.split("~>");
+      if (!del || !ins) return false;
+    } else if (content.length === 0) return false;
 
     // Closing
     if (state.src.charCodeAt(pos) != marker) return false;

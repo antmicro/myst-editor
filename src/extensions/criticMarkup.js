@@ -39,9 +39,9 @@ const parseSuggestion = (text, widgets, start) => {
   if (marker == 0x7e /* ~ */) {
     if (!content.includes("~>")) return -1;
     markPos = content.indexOf("~>");
-  }
-  // Reject empty suggestions
-  if (content.replace("~>", "").length === 0) return -1;
+    const [del, ins] = content.split("~>");
+    if (!del || !ins) return -1;
+  } else if (content.length === 0) return -1;
 
   // Closing
   const closeStart = pos;
