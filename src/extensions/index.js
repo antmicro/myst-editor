@@ -20,7 +20,7 @@ import {
 } from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
-import { yaml } from "@codemirror/lang-yaml";
+import { yaml, yamlFrontmatter } from "@codemirror/lang-yaml";
 import { ySync } from "./collab";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
@@ -124,13 +124,12 @@ export class ExtensionBuilder {
   }
 
   useMarkdown(transforms) {
-    this.extensions.push(
-      markdown({
-        codeLanguages: ExtensionBuilder.codeLanguage,
-        addKeymap: false,
-        extensions: [Autolink, colonFencedCodeParser, TaskList, tableParser, roleParser, customTransformsParser(transforms)],
-      }),
-    );
+    const md = markdown({
+      codeLanguages: ExtensionBuilder.codeLanguage,
+      addKeymap: false,
+      extensions: [Autolink, colonFencedCodeParser, TaskList, tableParser, roleParser, customTransformsParser(transforms)],
+    });
+    this.extensions.push(yamlFrontmatter({ content: md.language }), md);
     return this;
   }
 

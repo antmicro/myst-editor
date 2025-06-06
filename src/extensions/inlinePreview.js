@@ -159,7 +159,8 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
             to,
             enter(node) {
               if (node.name.startsWith("ATXHeading") && nodeInMonospace(view.state, node)) return false;
-              if ((node.name.startsWith("SetextHeading") || tokenElement.includes(node.name)) && nodeInMonospace(view.state, node)) {
+              const elementToken = node.name.startsWith("SetextHeading") || tokenElement.includes(node.name);
+              if ((elementToken && nodeInMonospace(view.state, node)) || node.name == "Frontmatter") {
                 const startLine = view.state.doc.lineAt(node.from);
                 const endLine = view.state.doc.lineAt(node.to);
                 widgets.push(decorationMonospace.range(startLine.from, endLine.to));
