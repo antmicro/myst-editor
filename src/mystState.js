@@ -266,12 +266,15 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
       getUserUrl: signalOptions.getUserUrl.value,
     });
     collab.value = client;
-    const destroy = () => client.destroy();
-    window.addEventListener("beforeunload", destroy);
+    const destroy = (/** @type {PageTransitionEvent} */ ev) => {
+      if (ev.persisted) return;
+      client.destroy();
+    };
+    window.addEventListener("pagehide", destroy);
 
     return () => {
       client.destroy();
-      window.removeEventListener("beforeunload", destroy);
+      window.removeEventListener("pagehide", destroy);
     };
   });
 
