@@ -2,8 +2,8 @@ import { highlightingFor, HighlightStyle, syntaxHighlighting, syntaxTree } from 
 import { sanitize, TextManager } from "../text";
 import { getStyleTags, tags } from "@lezer/highlight";
 import { EditorView } from "codemirror";
-import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
-import { RangeSet, StateField } from "@codemirror/state";
+import { Decoration, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
+import { RangeSet, StateEffect, StateField } from "@codemirror/state";
 import { findSoruceMappedPreviousElement } from "./syncDualPane";
 import { getLineById } from "../markdown/markdownSourceMap";
 import { criticMarkup } from "./criticMarkup";
@@ -50,6 +50,8 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       return (rFrom >= nodeFrom && rFrom <= nodeTo) || (rTo >= nodeFrom && rTo <= nodeTo) || (nodeFrom >= rFrom && nodeTo <= rTo);
     });
   const nodeInMonospace = (...args) => nodeInSelection(...args) || nodeInSuggestion(...args);
+
+  const focusEffect = StateEffect.define();
 
   const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task", "HTMLBlock"];
   const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
@@ -131,7 +133,12 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
         return RangeSet.of(replaceMd(state), true);
       },
 
-      update(_, transaction) {
+      update(curr, transaction) {
+        const focusChanged = transaction.effects.some((e) => e.is(focusEffect));
+        const selectionChanged =
+          transaction.startState.doc.lineAt(transaction.startState.selection.main.head).number !==
+          transaction.state.doc.lineAt(transaction.state.selection.main.head).number;
+        if (!focusChanged && !transaction.docChanged && !selectionChanged) return curr;
         return RangeSet.of(replaceMd(transaction.state), true);
       },
 
@@ -146,8 +153,8 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
         this.decorations = this.process(view);
       }
 
-      update(update) {
-        if (update.docChanged || update.viewportChanged || update.selectionSet) this.decorations = this.process(update.view);
+      update(/** @type {ViewUpdate} */ update) {
+        if (update.docChanged || update.viewportChanged || update.selectionSet || update.focusChanged) this.decorations = this.process(update.view);
       }
 
       process(/** @type {EditorView} */ view) {
@@ -254,7 +261,12 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       }
     },
     {
-      provide: () => [syntaxHighlighting(markdownHighlightStyle), markdownTheme, renderMdInline()],
+      provide: () => [
+        syntaxHighlighting(markdownHighlightStyle),
+        markdownTheme,
+        renderMdInline(),
+        EditorView.focusChangeEffect.of((_, focus) => focusEffect.of(focus)),
+      ],
       decorations: (v) => v.decorations,
       eventHandlers: {
         mousedown(ev, view) {
