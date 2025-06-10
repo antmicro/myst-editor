@@ -34,7 +34,7 @@ import { trackHeadings } from "./trackHeadings";
 import { highlightFocusedActiveLine } from "./activeLineHighlight";
 import { classHighlighter, tags } from "@lezer/highlight";
 import { loggerFacet } from "../logger";
-import { criticMarkup, suggestMode } from "./criticMarkup";
+import { criticHistory, criticMarkup, suggestMode } from "./criticMarkup";
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -325,8 +325,8 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useCriticMarkupBtns() {
-    this.extensions.push(criticMarkup);
+  useCriticMarkup() {
+    this.extensions.push([criticMarkup, criticHistory]);
     return this;
   }
 

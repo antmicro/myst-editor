@@ -142,6 +142,18 @@ export class CollaborationClient {
     suggestions.push([{ ...suggestion, appliedBy: this.#localUser, appliedTimestamp: Date.now() }]);
   }
 
+  getSuggestion(id) {
+    const suggestions = this.ydoc.getArray("critic-suggestions");
+    return suggestions.toArray().find((s) => s.id === id);
+  }
+
+  removeSuggestion(id) {
+    const suggestions = this.ydoc.getArray("critic-suggestions");
+    const idx = suggestions.toArray().findIndex((s) => s.id === id);
+    if (idx === -1) return;
+    suggestions.delete(idx, 1);
+  }
+
   destroy() {
     window.removeEventListener("offline", this.#offlineHandler);
     window.removeEventListener("online", this.#onlineHandler);

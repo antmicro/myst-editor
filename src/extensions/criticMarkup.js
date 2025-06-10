@@ -1,8 +1,8 @@
 import { Decoration, EditorView, WidgetType } from "@codemirror/view";
 import acceptImg from "../icons/accept.svg?url";
 import rejectImg from "../icons/reject.svg?url";
-import { EditorSelection, EditorState, Range, StateField } from "@codemirror/state";
-import { yRemoteAnnotation } from "./collab";
+import { Annotation, EditorSelection, EditorState, Range, StateField } from "@codemirror/state";
+import { yHistoryAnnotation, yRemoteAnnotation } from "./collab";
 import { criticMarkers } from "../markdown/markdownCriticMarkup";
 import { collabClientFacet } from ".";
 
@@ -113,6 +113,8 @@ export const criticMarkup = StateField.define({
   },
 });
 
+export const criticAnnotation = Annotation.define();
+
 class CriticButtonsWidget extends WidgetType {
   constructor({ insert, remove, range }) {
     super();
@@ -135,8 +137,9 @@ class CriticButtonsWidget extends WidgetType {
       ev.preventDefault();
       const fromLine = view.state.doc.lineAt(this.range.from).number;
       const toLine = view.state.doc.lineAt(this.range.to).number;
-      view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.insert ?? "" } });
-      collab?.storeSuggestion?.({ insert: this.insert, remove: this.remove, action: "accept", fromLine, toLine });
+      const id = crypto.randomUUID();
+      collab?.storeSuggestion?.({ insert: this.insert, remove: this.remove, action: "accept", fromLine, toLine, id });
+      view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.insert ?? "" }, annotations: criticAnnotation.of(id) });
     });
 
     const rejectBtn = document.createElement("button");
@@ -148,8 +151,9 @@ class CriticButtonsWidget extends WidgetType {
       ev.preventDefault();
       const fromLine = view.state.doc.lineAt(this.range.from).number;
       const toLine = view.state.doc.lineAt(this.range.to).number;
-      view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.remove ?? "" } });
-      collab?.storeSuggestion?.({ insert: this.insert, remove: this.remove, action: "reject", fromLine, toLine });
+      const id = crypto.randomUUID();
+      collab?.storeSuggestion?.({ insert: this.insert, remove: this.remove, action: "reject", fromLine, toLine, id });
+      view.dispatch({ changes: { from: this.range.from, to: this.range.to, insert: this.remove ?? "" }, annotations: criticAnnotation.of(id) });
     });
 
     container.appendChild(acceptBtn);
@@ -200,4 +204,65 @@ export const suggestMode = EditorState.transactionFilter.of((tr) => {
   });
 
   return { ...tr, changes, selection: EditorSelection.create(selectRanges) };
+});
+
+export const criticHistory = StateField.define({
+  create() {
+    return { undoStack: [], redoStack: [] };
+  },
+  update(prev, tr) {
+    if (!tr.docChanged) return prev;
+
+    const next = { ...prev };
+    const criticId = tr.annotation(criticAnnotation);
+    const historyChange = tr.annotation(yHistoryAnnotation);
+    const collab = tr.state.facet(collabClientFacet)[0];
+    let from, insert, remove;
+    tr.changes.iterChanges((fromA, toA, __, ___, inserted) => {
+      from = fromA;
+      insert = inserted.toString();
+      remove = tr.startState.sliceDoc(fromA, toA).toString();
+    });
+
+    // Map current suggestions to new positions
+    next.undoStack.forEach((s) => (s.from = tr.changes.mapPos(s.from)));
+    next.redoStack.forEach((s) => (s.from = tr.changes.mapPos(s.from)));
+
+    // Save newly resolved suggestion
+    if (criticId) {
+      next.undoStack.push({ id: criticId, from });
+      return next;
+    }
+
+    if (!collab) return next;
+    const insertMatch = insert.matchAll(criticRegexp).next()?.value;
+    const removeMatch = remove.matchAll(criticRegexp).next()?.value;
+
+    // Undo
+    if (historyChange && insertMatch) {
+      const pos = from + insertMatch.index;
+      const stackItem = next.undoStack.find((s) => s.from === pos);
+      if (!stackItem) return next;
+      const suggestion = collab.getSuggestion(stackItem.id);
+      if (!suggestion) return next;
+
+      collab.removeSuggestion(stackItem.id);
+      suggestion.from = pos;
+      next.undoStack = next.undoStack.filter((s) => s.id !== stackItem.id);
+      next.redoStack.push(suggestion);
+    }
+
+    // Redo
+    if (historyChange && removeMatch) {
+      const pos = from + removeMatch.index;
+      const suggestion = next.redoStack.find((s) => s.from === pos);
+      if (!suggestion) return next;
+
+      collab.storeSuggestion(suggestion);
+      next.redoStack = next.redoStack.filter((s) => s.id !== suggestion.id);
+      next.undoStack.push({ id: suggestion.id, from: suggestion.from });
+    }
+
+    return next;
+  },
 });

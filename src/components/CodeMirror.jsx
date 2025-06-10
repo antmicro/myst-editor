@@ -364,7 +364,7 @@ const CodeMirror = () => {
         .useExceptionSink(error)
         .useLogger(logger)
         .if(options.cmDarkTheme.value, (b) => b.useCmDarkTheme())
-        .useCriticMarkupBtns()
+        .useCriticMarkup()
         .if(suggestMode.value, (b) => b.useSuggestMode())
         .create(),
     });
