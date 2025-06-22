@@ -28,8 +28,8 @@ import { lintKeymap } from "@codemirror/lint";
 import { yamlSchema } from "./yamlSchema";
 import { CollaborationClient } from "../collaboration";
 import { inlinePreview } from "./inlinePreview";
-import { Autolink, TaskList } from "@lezer/markdown";
-import { colonFencedCodeParser, customTransformsParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
+import { Autolink } from "@lezer/markdown";
+import { checkboxParser, colonFencedCodeParser, customTransformsParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
 import { trackHeadings } from "./trackHeadings";
 import { highlightFocusedActiveLine } from "./activeLineHighlight";
 import { classHighlighter, tags } from "@lezer/highlight";
@@ -127,7 +127,7 @@ export class ExtensionBuilder {
     const md = markdown({
       codeLanguages: ExtensionBuilder.codeLanguage,
       addKeymap: false,
-      extensions: [Autolink, colonFencedCodeParser, TaskList, tableParser, roleParser, customTransformsParser(transforms)],
+      extensions: [Autolink, colonFencedCodeParser, checkboxParser, tableParser, roleParser, customTransformsParser(transforms)],
     });
     this.extensions.push(yamlFrontmatter({ content: md.language }), md);
     return this;

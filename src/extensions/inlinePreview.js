@@ -53,7 +53,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
 
   const focusEffect = StateEffect.define();
 
-  const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Task", "HTMLBlock"];
+  const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Checkbox", "HTMLBlock"];
   const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
   class RenderedMarkdownWidget extends WidgetType {
     constructor(src, isBlock, start, end, cssClasses = []) {
