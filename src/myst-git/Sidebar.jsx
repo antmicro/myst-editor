@@ -170,9 +170,9 @@ const Sidebar = ({
   const indexedFiles = useComputed(() => {
     if (!indexFile.value) return [];
     const start = "```{toctree}";
-    if (!indexFile.value.includes(start)) return;
+    if (!indexFile.value.includes(start)) return [];
     let file = indexFile.value.slice(indexFile.value.indexOf(start) + start.length);
-    if (!file.includes("```")) return;
+    if (!file.includes("```")) return [];
     file = file.slice(0, file.indexOf("```"));
     let prefix = docsRoot;
     if (prefix === "." || prefix === "./") prefix = ""; // these 3 should be equivalent meaning "top-level dir"
