@@ -15,15 +15,14 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 
 const yamlService = getLanguageService({
   async schemaRequestService(uri) {
-    const res = await fetch(uri);
+    const res = await fetch(uri.replace("file://", self.location.origin));
     return res.text();
   },
 });
 
 const docs = {};
 
-const worker = self;
-const conn = createProtocolConnection(new BrowserMessageReader(worker), new BrowserMessageWriter(worker));
+const conn = createProtocolConnection(new BrowserMessageReader(self), new BrowserMessageWriter(self));
 
 async function handleDiagnostics(uri) {
   const diagnostics = await yamlService.doValidation(docs[uri]);
