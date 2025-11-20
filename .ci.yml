@@ -38,6 +38,10 @@ functional-tests:
       - playwright-report/index.html
   variables:
     SCALENODE_CPU: 8
+  
+  except:
+    variables:
+      - $CI_COMMIT_REF_NAME =~ /experiment.*/i
 
 build-docs:
   stage: build
@@ -93,3 +97,6 @@ deploy-docs:
   artifacts:
     paths:
       - $CI_DOCS_ARCHIVE
+  except:
+    variables:
+      - $CI_COMMIT_REF_NAME =~ /experiment.*/i
