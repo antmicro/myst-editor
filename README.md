@@ -191,9 +191,9 @@ Here are the options you can pass to the MystEditor function:
 - `spellcheckOpts` - Configuration for the spellchecker. If the value is *null* or *false* then the spellchecker will be disabled.
   - `dict` *(default: "en_US")* - Name of the desired dictionary. For an example, see `public/dictionaries/en_US`.
   - `dictionaryPath` *(default: "/dictionaries")*  - Path to a folder with dictionaries. For an example, see `public/dictionaries/`.
-- `customRoles` - custom MyST roles. See [the demo HTML](./src/index.html) for examples.
+- `customRoles` - custom MyST roles. See the `exampleCustomRoles` object in [the demo HTML](./src/index.html) for examples.
 - `transforms` - [custom transforms](#custom-transforms)
-- `customDirectives` - custom MyST directives. See [the demo HTML](./src/index.html) for examples.
+- `customDirectives` - custom MyST directives. See the `exampleCustomDirectives` object in [the demo HTML](./src/index.html) for examples.
 - `getAvatar` *(default: (login) => `https://secure.gravatar.com/avatar/${login}?s=30&d=identicon`)* - a function that returns the avatar for a given username
 - `getUserUrl` *(default: (login) => `#`)* - a function that returns the URL to the web page with the user's profile
   It is used when an avatar is clicked.
