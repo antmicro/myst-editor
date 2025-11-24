@@ -1,6 +1,7 @@
 import { MergeView } from "@codemirror/merge";
 import { useRef, useEffect, useContext } from "preact/hooks";
 import { CodeEditor } from "./CodeMirror";
+import { ViewUpdate } from "@codemirror/view";
 import { styled } from "styled-components";
 import { ExtensionBuilder } from "../extensions";
 import { MystState } from "../mystState";
@@ -24,18 +25,8 @@ const MergeViewCodeEditor = styled(CodeEditor)`
   display: block;
 `;
 
-const initMergeView = ({ old, current, root, transforms }) => {
-  const extensions = new ExtensionBuilder().useReadonly().useMarkdown(transforms).create();
-  return new MergeView({
-    a: { doc: old, extensions },
-    b: { doc: current, extensions },
-    orientation: "b-a",
-    root,
-  });
-};
-
 const Diff = () => {
-  const { options, text, editorView } = useContext(MystState);
+  const { options, text, editorView, collab, error } = useContext(MystState);
   const leftRef = useRef();
   const rightRef = useRef();
   const mergeView = useRef();
@@ -45,12 +36,31 @@ const Diff = () => {
     if (mergeView.current) {
       return false;
     }
-    mergeView.current = initMergeView({
-      old: options.initialText.peek(),
-      current: text.text.peek(),
+
+    mergeView.current = new MergeView({
+      a: {
+        doc: options.initialText.peek(),
+        extensions: new ExtensionBuilder().useReadonly().useMarkdown(options.transforms.value).create(),
+      },
+      b: {
+        doc: text.text.peek(),
+        extensions: ExtensionBuilder.basicSetup()
+          .useMarkdown(options.transforms.value)
+          .if(options.collaboration.value.enabled, (b) => {
+            return b.useCollaboration({ collabClient: collab.value, editorView });
+          })
+          .if(!options.collaboration.value.enabled, (b) => b.useDefaultHistory())
+          .addUpdateListener((update) => {
+            if (!update.docChanged) return;
+            text.shiftLineMap(update);
+            text.text.value = update.view.state.doc.toString();
+          })
+          .useExceptionSink(error)
+          .create(),
+      },
       root: options.parent,
-      transforms: options.transforms.value,
     });
+
     leftRef.current.appendChild(mergeView.current.b.dom);
     rightRef.current.appendChild(mergeView.current.a.dom);
 
@@ -62,10 +72,7 @@ const Diff = () => {
     };
   }, []);
 
-  // Sync text changes with diff view
-  useSignalEffect(() => {
-    mergeView.current?.b?.dispatch?.({ changes: { from: 0, to: mergeView.current?.b?.state?.doc?.length, insert: text.text.value } });
-  });
+  // Update the initial state when it changes
   useSignalEffect(() => {
     mergeView.current?.a?.dispatch?.({ changes: { from: 0, to: mergeView.current?.a?.state?.doc?.length, insert: options.initialText.value } });
   });
