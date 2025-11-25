@@ -38,6 +38,8 @@ const Diff = () => {
     }
 
     mergeView.current = new MergeView({
+      // Regarding the a/b distinction: the MergeView library expects that the old state is in `a` and that the new state is in `b`.
+      // We want to show the new state on the left side so the `b` editor is on the left and `a` editor is on the right.
       a: {
         doc: options.initialText.peek(),
         extensions: new ExtensionBuilder().useReadonly().useMarkdown(options.transforms.value).create(),
