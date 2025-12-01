@@ -237,7 +237,7 @@ const defaults = {
 export const modeChangeAnnotation = Annotation.define();
 
 export function createMystState(/** @type {typeof defaults} */ opts) {
-  const fullOptions = { ...defaults, ...opts };
+  const fullOptions = { ...defaults, ...opts, initialText: opts.initialText?.replace(/\r/g, "") };
   /** @typedef {Omit<typeof defaults, "parent">} SignalOpts */
   /** @type {{ [key in keyof SignalOpts]: Signal<SignalOpts[key]> } & { parent: DocumentFragment }} */
   const signalOptions = { parent: fullOptions.parent };
