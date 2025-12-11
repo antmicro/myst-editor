@@ -290,7 +290,7 @@ const CodeMirror = () => {
       root: options.parent,
       state: EditorState.create({
         doc: text.text.peek(),
-        extensions: ExtensionBuilder.basicSetup().useMarkdown(options.transforms.value).useReadonly().useNoSelection().create(),
+        extensions: ExtensionBuilder.basicSetup().useMarkdown(options.transforms.value).useReadonly().create(),
       }),
       parent: editorMountpoint.current,
     });
