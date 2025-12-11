@@ -59,7 +59,7 @@ export const MdStyles = css`
   }
   code {
     padding: 0.1em 0.4em;
-    font-family: "Source Code Pro";
+    font-family: monospace;
     font-size: 0.9em;
     border: none;
   }
