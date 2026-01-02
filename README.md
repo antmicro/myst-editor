@@ -209,6 +209,7 @@ Here are the options you can pass to the MystEditor function:
 - `onDiscardChanges` *(`() => void`)* - callback for when changes are discarded from the diff view mode
 - `mermaidTheme` *(default: "neutral")* - theme to use for Mermaid.js diagrams
 - `cmDarkTheme` *(default: false)* - whether to use a dark theme for CodeMirror
+- `onExit` *(`() => void | false`)* - If provided an exit button will be shown. The button will execute the provided hook.
 
 Also see [the demo HTML](./src/index.html) for an example on how you can set these options.
 Using `window.myst_editor` or the return value of the `MystEditor` function, you can modify these options at runtime.

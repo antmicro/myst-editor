@@ -232,6 +232,7 @@ const defaults = {
   onDiscardChanges: () => {},
   mermaidTheme: "neutral",
   cmDarkTheme: false,
+  onExit: false,
 };
 
 export const modeChangeAnnotation = Annotation.define();

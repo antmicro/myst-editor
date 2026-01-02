@@ -112,6 +112,22 @@ export const TopbarButton = styled(DefaultButton)`
   }
 `;
 
+const ExitIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_367_5917)">
+      <path
+        d="M12.6667 4.27331L11.7267 3.33331L8.00004 7.05998L4.27337 3.33331L3.33337 4.27331L7.06004 7.99998L3.33337 11.7266L4.27337 12.6666L8.00004 8.93998L11.7267 12.6666L12.6667 11.7266L8.94004 7.99998L12.6667 4.27331Z"
+        fill="currentColor"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_367_5917">
+        <rect width="16" height="16" fill="white" />
+      </clipPath>
+    </defs>
+  </svg>
+);
+
 const FullscreenIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
     <path d="M20.35 1.78003L12.61 9.51003" stroke-width="1.75" stroke="currentColor" />
@@ -349,6 +365,12 @@ export const EditorTopbar = ({ alert, buttons }) => {
           </div>
         )}
         <ButtonGroup buttons={editorModeButtons} clickedId={clickedId.value} mainButtonsNum={4} />
+
+        {options.onExit.value && (
+          <TopbarButton className="icon" active={false} type="button" title={"Quit"} name={"Quit"} onClick={() => options.onExit.value()}>
+            <ExitIcon></ExitIcon>
+          </TopbarButton>
+        )}
       </div>
     </Topbar>
   );
