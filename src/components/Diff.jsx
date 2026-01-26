@@ -1,7 +1,6 @@
 import { MergeView } from "@codemirror/merge";
 import { useRef, useEffect, useContext } from "preact/hooks";
 import { CodeEditor } from "./CodeMirror";
-import { ViewUpdate } from "@codemirror/view";
 import { styled } from "styled-components";
 import { ExtensionBuilder } from "../extensions";
 import { MystState } from "../mystState";
@@ -42,12 +41,12 @@ const Diff = () => {
       // We want to show the new state on the left side so the `b` editor is on the left and `a` editor is on the right.
       a: {
         doc: options.initialText.peek(),
-        extensions: new ExtensionBuilder().useReadonly().useMarkdown(options.transforms.value).create(),
+        extensions: new ExtensionBuilder().useReadonly().useLanguage(options.language.value, options.transforms.value).create(),
       },
       b: {
         doc: text.text.peek(),
         extensions: ExtensionBuilder.basicSetup()
-          .useMarkdown(options.transforms.value)
+          .useLanguage("markdown", options.transforms.value)
           .if(options.collaboration.value.enabled, (b) => {
             return b.useCollaboration({ collabClient: collab.value, editorView });
           })

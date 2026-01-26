@@ -8,65 +8,69 @@ import { EditorView, ViewPlugin } from "@codemirror/view";
 import { setDiagnostics } from "@codemirror/lint";
 import { CompletionItemKind } from "vscode-languageserver-protocol";
 
-export const yamlSchema = (schema, editorView, linter) => {
+export const newLspClient = () => {
   const yamlTransport = new PostMessageWorkerTransport(new YamlLSPWorker());
-  const lspClient = new LanguageServerClient({
+  return new LanguageServerClient({
     transport: yamlTransport,
     rootUri: "file:///",
     workspaceFolders: null,
     languageId: "yaml",
     autoClose: true,
   });
+};
+
+export const buildYamlLspPlugin = (lspClient, schema) =>
+  ViewPlugin.fromClass(
+    class {
+      constructor(/** @type {EditorView} */ view) {
+        this.id = view.state.field(subEditorId)[0];
+        this.view = view;
+        this.version = 0;
+        lspClient.attachPlugin(this);
+        lspClient.initializePromise.then(() => {
+          lspClient.textDocumentDidOpen({
+            textDocument: {
+              uri: getUri(this.id),
+              languageId: "yaml",
+              text: stateToYamlDoc(schema, view.state),
+              version: this.version,
+            },
+          });
+        });
+      }
+
+      update(update) {
+        if (!update.docChanged) return;
+        clearTimeout(this.changesTimeout);
+        this.changesTimeout = setTimeout(() => {
+          if (!lspClient.ready) return;
+          lspClient.textDocumentDidChange({
+            textDocument: { uri: getUri(this.id), version: this.version++ },
+            contentChanges: [{ text: stateToYamlDoc(schema, update.state) }],
+          });
+        }, 200);
+      }
+
+      processNotification(notification) {
+        if (notification.method !== "textDocument/publishDiagnostics" || notification.params.uri !== getUri(this.id)) return;
+        const diag = notification.params.diagnostics.map((d) => ({
+          message: d.message,
+          source: d.source,
+          from: lspPosToCmPos(this.view.state, d.range.start),
+          to: lspPosToCmPos(this.view.state, d.range.end),
+          severity: lspSeverityToCm(d.severity),
+        }));
+        this.view.dispatch(setDiagnostics(this.view.state, diag));
+      }
+    },
+  );
+
+export const yamlSchema = (schema, editorView, linter) => {
+  const lspClient = newLspClient();
 
   return codeBlockExtensions({
     extensions: {
-      yaml: [
-        yaml(),
-        ViewPlugin.fromClass(
-          class {
-            constructor(/** @type {EditorView} */ view) {
-              this.id = view.state.field(subEditorId)[0];
-              this.view = view;
-              this.version = 0;
-              lspClient.attachPlugin(this);
-              lspClient.initializePromise.then(() => {
-                lspClient.textDocumentDidOpen({
-                  textDocument: {
-                    uri: getUri(this.id),
-                    languageId: "yaml",
-                    text: stateToYamlDoc(schema, view.state),
-                    version: this.version,
-                  },
-                });
-              });
-            }
-
-            update(update) {
-              if (!update.docChanged) return;
-              clearTimeout(this.changesTimeout);
-              this.changesTimeout = setTimeout(() => {
-                if (!lspClient.ready) return;
-                lspClient.textDocumentDidChange({
-                  textDocument: { uri: getUri(this.id), version: this.version++ },
-                  contentChanges: [{ text: stateToYamlDoc(schema, update.state) }],
-                });
-              }, 200);
-            }
-
-            processNotification(notification) {
-              if (notification.method !== "textDocument/publishDiagnostics" || notification.params.uri !== getUri(this.id)) return;
-              const diag = notification.params.diagnostics.map((d) => ({
-                message: d.message,
-                source: d.source,
-                from: lspPosToCmPos(this.view.state, d.range.start),
-                to: lspPosToCmPos(this.view.state, d.range.end),
-                severity: lspSeverityToCm(d.severity),
-              }));
-              this.view.dispatch(setDiagnostics(this.view.state, diag));
-            }
-          },
-        ),
-      ],
+      yaml: [yaml(), buildYamlLspPlugin(lspClient, schema)],
     },
     editorView,
     tooltipSources: {

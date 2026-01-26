@@ -123,13 +123,24 @@ export class ExtensionBuilder {
     ];
   }
 
-  useMarkdown(transforms) {
-    const md = markdown({
-      codeLanguages: ExtensionBuilder.codeLanguage,
-      addKeymap: false,
-      extensions: [Autolink, colonFencedCodeParser, checkboxParser, tableParser, roleParser, customTransformsParser(transforms)],
-    });
-    this.extensions.push(yamlFrontmatter({ content: md.language }), md);
+  useLanguage(lang, transforms) {
+    const transformParser = customTransformsParser(transforms);
+    if (lang === "markdown") {
+      const md = markdown({
+        codeLanguages: ExtensionBuilder.codeLanguage,
+        addKeymap: false,
+        extensions: [Autolink, colonFencedCodeParser, checkboxParser, tableParser, roleParser, transformParser],
+      });
+      this.extensions.push(yamlFrontmatter({ content: md.language }), md);
+    } else if (lang === "yaml") {
+      this.extensions.push(
+        yaml({
+          extensions: [transformParser],
+        }),
+      );
+    } else {
+      console.warn(`Unsupported language string in argument to useLanguage(): ${lang}.`);
+    }
     return this;
   }
 

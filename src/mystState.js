@@ -233,6 +233,7 @@ const defaults = {
   mermaidTheme: "neutral",
   cmDarkTheme: false,
   onExit: false,
+  language: "markdown",
 };
 
 export const modeChangeAnnotation = Annotation.define();

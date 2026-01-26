@@ -290,7 +290,7 @@ const CodeMirror = () => {
       root: options.parent,
       state: EditorState.create({
         doc: text.text.peek(),
-        extensions: ExtensionBuilder.basicSetup().useMarkdown(options.transforms.value).useReadonly().create(),
+        extensions: ExtensionBuilder.basicSetup().useLanguage(options.language.value, options.transforms.value).useReadonly().create(),
       }),
       parent: editorMountpoint.current,
     });
@@ -335,7 +335,7 @@ const CodeMirror = () => {
       root: options.parent,
       doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.text.peek(),
       extensions: ExtensionBuilder.basicSetup()
-        .useMarkdown(options.transforms.value)
+        .useLanguage(options.language.value, options.transforms.value)
         .if(options.mode.value !== "Inline", (b) => b.useLineNumbers())
         .useCompartment(userExtensionsCompartment, [])
         .useSpellcheck(options.spellcheckOpts.value)

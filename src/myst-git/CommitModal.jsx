@@ -206,7 +206,7 @@ const Diff = ({ document, parent, onStage, discardFile }) => {
       root: parent,
       doc: document.text,
       extensions: [
-        ...ExtensionBuilder.basicSetup().useMarkdown(options.transforms.value).useReadonly().create(),
+        ...ExtensionBuilder.basicSetup().useLanguage("markdown", options.transforms.value).useReadonly().create(),
         unifiedMergeView({
           original: document.initialText,
           mergeControls: false,
