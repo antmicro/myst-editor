@@ -26,7 +26,7 @@ import { ySync } from "./collab";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { lintKeymap } from "@codemirror/lint";
-import { yamlSchema } from "./yamlSchema";
+import { yamlLSPExtension } from "./yamlLSPExtension";
 import { CollaborationClient } from "../collaboration";
 import { inlinePreview } from "./inlinePreview";
 import { Autolink, Strikethrough } from "@lezer/markdown";
@@ -312,8 +312,13 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useYamlSchema(schema, editorView, linter) {
-    this.extensions.push(yamlSchema(schema, editorView, linter));
+  useYamlLSPExtension(schema, editorView, linter, lang) {
+    if (lang !== "markdown" && lang !== "yaml") {
+      console.warn(`Unsupported language string in argument to useLanguage(): ${lang}.`);
+      return this;
+    }
+
+    this.extensions.push(yamlLSPExtension(schema, editorView, linter, lang));
     return this;
   }
 

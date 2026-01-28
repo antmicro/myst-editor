@@ -1,0 +1,180 @@
+import markdownIt from "markdown-it";
+import YamlLSPWorker from "../lsp/yamlLSPWorker.js?worker";
+import { yaml, yamlLanguage } from "@codemirror/lang-yaml";
+import PostMessageWorkerTransport from "../lsp/messageTransport";
+import { LanguageServerClient } from "codemirror-languageserver";
+import { codeBlockExtensions, subEditorId } from "./codeBlockExtensions";
+import { EditorView, ViewPlugin, hoverTooltip } from "@codemirror/view";
+import { setDiagnostics } from "@codemirror/lint";
+import { CompletionItemKind } from "vscode-languageserver-protocol";
+
+export const newLspClient = () => {
+  const yamlTransport = new PostMessageWorkerTransport(new YamlLSPWorker());
+  return new LanguageServerClient({
+    transport: yamlTransport,
+    rootUri: "file:///",
+    workspaceFolders: null,
+    languageId: "yaml",
+    autoClose: true,
+  });
+};
+
+export const buildYamlLspPlugin = (lspClient, schema) =>
+  ViewPlugin.fromClass(
+    class {
+      constructor(/** @type {EditorView} */ view) {
+        this.id = view.state.facet(subEditorId)[0];
+        this.view = view;
+        this.version = 0;
+        lspClient.attachPlugin(this);
+        lspClient.initializePromise.then(() => {
+          lspClient.textDocumentDidOpen({
+            textDocument: {
+              uri: getUri(this.id),
+              languageId: "yaml",
+              text: stateToYamlDoc(schema, view.state),
+              version: this.version,
+            },
+          });
+        });
+      }
+
+      update(update) {
+        if (!update.docChanged) return;
+        clearTimeout(this.changesTimeout);
+        this.changesTimeout = setTimeout(() => {
+          if (!lspClient.ready) return;
+          lspClient.textDocumentDidChange({
+            textDocument: { uri: getUri(this.id), version: this.version++ },
+            contentChanges: [{ text: stateToYamlDoc(schema, update.state) }],
+          });
+        }, 200);
+      }
+
+      processNotification(notification) {
+        if (notification.method !== "textDocument/publishDiagnostics" || notification.params.uri !== getUri(this.id)) return;
+        const diag = notification.params.diagnostics.map((d) => ({
+          message: d.message,
+          source: d.source,
+          from: lspPosToCmPos(this.view.state, d.range.start),
+          to: lspPosToCmPos(this.view.state, d.range.end),
+          severity: lspSeverityToCm(d.severity),
+        }));
+        this.view.dispatch(setDiagnostics(this.view.state, diag));
+      }
+    },
+  );
+
+const buildYamlTooltipSource = (lspClient) => ({
+  async doHover(view, pos) {
+    if (!lspClient.ready || !lspClient.capabilities?.hoverProvider || pos < 0 || pos > view.state.doc.length) return null;
+
+    const id = view.state.facet(subEditorId)[0];
+    const result = await lspClient.textDocumentHover({
+      textDocument: { uri: getUri(id) },
+      position: cmPosToLspPos(view.state, pos),
+    });
+    if (!result) return null;
+
+    const dom = document.createElement("div");
+    dom.innerHTML = tooltipRenderer.render(result.contents.value);
+
+    return {
+      pos: lspPosToCmPos(view.state, result.range.start),
+      end: lspPosToCmPos(view.state, result.range.end),
+      create: () => ({ dom }),
+      above: true,
+    };
+  },
+});
+
+const buildYamlCompletionSource = (lspClient) => ({
+  async doComplete(ctx) {
+    if (!lspClient.ready) return;
+    const id = ctx.state.facet(subEditorId)[0];
+    const completions = await lspClient.textDocumentCompletion({
+      textDocument: { uri: getUri(id) },
+      position: cmPosToLspPos(ctx.state, ctx.pos),
+    });
+    const items = completions?.items ?? completions;
+    if (!items?.length) return;
+
+    // Only show completions when at the end of a line
+    const line = ctx.state.doc.lineAt(ctx.pos);
+    if (ctx.pos !== line.to) return;
+
+    const token = ctx.matchBefore(/^.*/m);
+    const tokenSplit = token ? token.text.trimStart().split(": ") : null;
+    const completionStart = token ? tokenSplit[tokenSplit.length - 1] : null;
+    const property = !token || tokenSplit.length === 1;
+    const options = items
+      .map(({ detail, label, kind, textEdit, documentation }) => ({
+        label,
+        detail,
+        type: kind && CompletionItemKindMap[kind]?.toLowerCase(),
+        info: documentation?.toString(),
+        apply(view, _, from, to) {
+          const start = lspPosToCmPos(ctx.state, textEdit.range.start) + from - ctx.pos;
+          const startLine = view.state.doc.lineAt(start);
+          const text = textEdit.newText.replace("\n", "\n" + " ".repeat(start - startLine.from)).replace(/\${[0-9]+}/g, "");
+          view.dispatch({
+            changes: { from: start, to, insert: text },
+            selection: { anchor: start + text.length, head: start + text.length },
+          });
+        },
+      }))
+      .filter(({ type, label }) => type !== "class" && (type !== "property" || property) && (!token || label.startsWith(completionStart)));
+    return { from: ctx.pos, to: ctx.pos, options, filter: false };
+  },
+});
+
+export const yamlLSPExtension = (schema, editorView, linter, language) => {
+  const lspClient = newLspClient();
+  const tooltipSource = buildYamlTooltipSource(lspClient);
+  const completionSource = buildYamlCompletionSource(lspClient);
+
+  if (language === "markdown") {
+    return codeBlockExtensions({
+      extensions: {
+        yaml: [yaml(), buildYamlLspPlugin(lspClient, schema)],
+      },
+      editorView,
+      tooltipSources: { yaml: tooltipSource },
+      completionSources: [{ languageData: yamlLanguage.data, source: completionSource }],
+      linter,
+    });
+  }
+
+  const documentId = crypto.randomUUID();
+  return [
+    subEditorId.of(documentId),
+    buildYamlLspPlugin(lspClient, schema),
+    hoverTooltip((view, pos) => tooltipSource.doHover(view, pos)),
+    yamlLanguage.data.of({ autocomplete: (ctx) => completionSource.doComplete(ctx) }),
+  ];
+};
+
+const tooltipRenderer = markdownIt();
+const CompletionItemKindMap = Object.fromEntries(Object.entries(CompletionItemKind).map(([key, value]) => [value, key]));
+
+/** This is a workaround to pass the schema to the language server. The server schema file association options do not seem to work. */
+const stateToYamlDoc = (schema, state) => `# yaml-language-server: $schema=${schema}\n${state.doc.toString()}`;
+
+const cmPosToLspPos = (state, pos) => {
+  const line = state.doc.lineAt(pos);
+  return { line: line.number, character: pos - line.from };
+};
+
+const lspPosToCmPos = (state, pos) => {
+  const line = state.doc.line(pos.line);
+  return line.from + pos.character;
+};
+
+const lspSeverityToCm = (severityLevel) => {
+  if (severityLevel === 2) return "error";
+  if (severityLevel === 1) return "warning";
+  if (severityLevel === 0) return "info";
+  return "hint";
+};
+
+const getUri = (filename) => `file:///${filename}.yaml`;
