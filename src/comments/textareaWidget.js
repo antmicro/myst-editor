@@ -47,22 +47,28 @@ const sortByLine = (commentA, commentB) => commentA.lineNumber - commentB.lineNu
  */
 const shouldUpdateTextWidget = (transaction) => transaction.docChanged || transaction.effects.some((eff) => eff.is(updateShownComments));
 
-/** @param {Transaction} transaction */
-const buildTextareaWidgets = (transaction) => [
-  (builder, { commentId, lineNumber, height, isShown }) => {
-    if (lineNumber > transaction.state.doc.lines) return builder;
+/**
+ * @param {import("@codemirror/state").Text} doc
+ * @param {{ commentId: string, lineNumber: number, height: number, isShown: boolean }[]} comments
+ * @returns {RangeSet<Decoration>}
+ */
+const buildTextareaWidgets = (doc, comments) => {
+  const builder = new RangeSetBuilder();
+
+  [...comments].sort(sortByLine).forEach(({ commentId, lineNumber, height = 18, isShown = false }) => {
+    if (lineNumber > doc.lines) return;
 
     try {
-      const mountPoint = transaction.newDoc.line(lineNumber).to;
+      const mountPoint = doc.line(lineNumber).to;
       builder.add(mountPoint, mountPoint, commentWidget(height, commentId, isShown));
     } catch (e) {
       console.warn(e);
       console.warn(`An error occured when rendering comment ${commentId}. Comment will not be shown.`);
     }
-    return builder;
-  },
-  new RangeSetBuilder(),
-];
+  });
+
+  return builder.finish();
+};
 
 /**
  * @param {Transaction} transaction
@@ -88,10 +94,12 @@ const moveComments = (transaction, ycomments) => {
 /** @type {StateField<RangeSet<Decoration>>} */
 const commentStateEffect = StateField.define({
   /**
+   * @param {import("@codemirror/state").EditorState} state
    * @returns {RangeSet<Decoration>}
    */
-  create() {
-    return new RangeSetBuilder().finish();
+  create(state) {
+    const ycomments = state.facet(ycommentsFacet);
+    return buildTextareaWidgets(state.doc, ycomments.comments.peek());
   },
 
   /**
@@ -105,10 +113,7 @@ const commentStateEffect = StateField.define({
 
       moveComments(transaction, ycomments);
 
-      return ycomments.comments.value
-        .sort(sortByLine)
-        .reduce(...buildTextareaWidgets(transaction))
-        .finish();
+      return buildTextareaWidgets(transaction.state.doc, ycomments.comments.peek());
     }
 
     return oldState;
