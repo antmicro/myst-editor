@@ -158,6 +158,34 @@ npm i && npm run server
 ```
 You can change the port it runs on by setting a `PORT` environment variable.
 
+### Running tests
+
+To run the Playwright test suite (including `MystEditorGit` tests), run the app preview and collaboration server in separate terminals, then run tests in a third terminal.
+
+Use Node 20 and start services with persistence enabled:
+
+Terminal 1:
+
+```bash
+npm run build && npm run preview
+```
+
+Terminal 2:
+
+```bash
+cd bin
+npm i
+YPERSISTENCE=/tmp/myst-yjs-db PORT=4455 node server.js
+```
+
+Terminal 3 (ensuring you run Node 20, otherwise it may not work):
+
+```bash
+npx -y node@20 /usr/bin/npm run test
+```
+
+Without `YPERSISTENCE`, some git-wrapper tests may fail because change-status tracking is disabled on the server.
+
 ### Customizing the CSS
 
 Note that MyST Editor uses the Shadow DOM to encapsulate the styles from the rest of the page.
