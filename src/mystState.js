@@ -329,9 +329,16 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     defaultConsoleError(msg, ...args);
   };
 
-  // Update comment positions when chaning editor modes
+  let initialLoad = true;
+
+  // Update comment positions when changing editor modes
   const modeCleanup = effect(() => {
     state.options.mode.value;
+    // It doesn't make sense to update comment positions on initial load because it's already done at src/components/CodeMirror.jsx:389
+    if (initialLoad) {
+      initialLoad = false;
+      return;
+    }
     // Prevent tracking further nested signals with queueMicrotask
     queueMicrotask(() => state.collab.peek()?.ycomments?.updateMainCodeMirror());
   });
