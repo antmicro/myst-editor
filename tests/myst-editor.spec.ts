@@ -226,6 +226,53 @@ graph TD
       await insertToMainEditor(page, { from: 2, to: 9, insert: `Better heading` });
       await expect(page.locator(".cm-critic-widget")).toBeVisible();
     });
+
+    test("A multiline suggestion doesn't delete the paragraph above", async ({ page }) => {
+      await clearEditor(page);
+      await insertToMainEditor(page, {
+        from: 0,
+        insert: `Paragraph 1 {++
+      The text here shouldn't overwrite the text above++}`,
+      });
+      const ins = page.locator("ins").first();
+      await ins.waitFor();
+      await expect(ins.locator("xpath=../span").filter({ hasText: "Paragraph 1" })).toBeVisible();
+    });
+
+    test("A multiline suggestion doesn't delete the paragraph below", async ({ page }) => {
+      await clearEditor(page);
+      await insertToMainEditor(page, {
+        from: 0,
+        insert: `Paragraph 1 {++
+        The text here shouldn't overwrite the text below
+        ++} Paragraph 2`,
+      });
+      const ins = page.locator("ins").last();
+      await ins.waitFor();
+      await expect(ins.locator("xpath=../span").filter({ hasText: "Paragraph 2" })).toBeVisible();
+    });
+
+    test("The original type of the block is preserved when using multiline suggestions", async ({ page }) => {
+      await clearEditor(page);
+      await insertToMainEditor(page, {
+        from: 0,
+        insert: `# Heading 1 {++
+      The text here shouldn't overwrite the text above++}`,
+      });
+      const ins = page.locator("ins").first();
+      await expect(ins).toHaveJSProperty("parentElement.tagName", "H1");
+    });
+  });
+
+  test("Unfinished substitution suggestions don't cause the text inside to merge into the previous block", async ({ page }) => {
+    await clearEditor(page);
+    await insertToMainEditor(page, {
+      from: 0,
+      insert: `# Heading 1 {~~
+This text shouldn't merge inside the previous block~~}`,
+    });
+    // Check whether the heading exists and whether the line under it is rendered in a seperate block.
+    await expect(page.locator("html-chunk").locator("h1").locator("..").locator("p")).toHaveCount(1);
   });
 });
 

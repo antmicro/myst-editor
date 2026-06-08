@@ -70,63 +70,66 @@ export const criticMarkup = (/** @type {markdownIt} */ md) => {
     return true;
   });
 
-  // Detect lines that contain a multi line suggestion and mark them as an inline token
-  // This way the rule above can render these without other block tokens interrupting.
-  md.block.ruler.before("table", "critic-block", (state, startLine, endLine, silent) => {
-    const start = state.bMarks[startLine] + state.tShift[startLine];
-    const line = state.src.slice(start, state.eMarks[startLine]);
+  const findMultilineSuggestion = (state, token, closingMarker) => {
+    const lines = state.src.split("\n");
+    const lineStartPosition = lines.slice(0, token.map[0]).join("\n").length;
+    const lineEndPosition = state.src.slice(lineStartPosition).indexOf(closingMarker) + closingMarker.length;
+    const prefixStartPosition = state.src.slice(lineStartPosition).indexOf(token.content);
+    return { closeLine: token.map[0], content: state.src.slice(prefixStartPosition, lineEndPosition) };
+  };
 
-    // Detect CriticMarkup opening on this line
-    const [openingEnd, marker] = findOpening(line);
-    if (openingEnd == -1) return false;
-    const openingEndPos = start + openingEnd;
-
-    // Find closing tag
-    const text = state.src.slice(openingEndPos, state.eMarks[endLine]);
-    const closingStart = text.indexOf(`${String.fromCharCode(marker).repeat(2)}}`);
-    if (closingStart == -1) return false;
-    const closingPos = openingEndPos + closingStart;
-    if (closingPos < state.eMarks[startLine]) return false;
-    if (marker == 0x7e /* ~ */ && !text.slice(0, closingStart).includes("~>")) return false;
-
-    if (silent) return true;
-
-    let closeLine = startLine;
-    while (closingPos + 3 > state.eMarks[closeLine]) {
-      closeLine++;
+  const extendOpenTokenMaps = (tokens, inlineIdx, endLine) => {
+    const openTokens = [];
+    for (let idx = 0; idx < inlineIdx; idx++) {
+      const token = tokens[idx];
+      if (token.nesting == 1) {
+        openTokens.push(token);
+      } else if (token.nesting == -1) {
+        openTokens.pop();
+      }
     }
 
-    state.line = closeLine + 1;
+    openTokens.filter((token) => token.map).forEach((token) => (token.map[1] = endLine));
+  };
 
-    const token_o = state.push("critic_block_open", "div", 1);
-    token_o.map = [startLine, state.line];
+  const findRemovalEnd = (tokens, startIdx, closingTokenIdx) => {
+    let depth = 0;
+    for (let idx = startIdx; idx < tokens.length; idx++) {
+      depth += tokens[idx].nesting;
+      if (idx >= closingTokenIdx && depth <= 0) return idx;
+    }
 
-    const token = state.push("inline", "", 0);
-    token.content = state.src.slice(openingEndPos - 3, openingEndPos + closingStart + 3);
-    token.children = [];
-    token.map = [startLine, state.line];
+    return closingTokenIdx;
+  };
 
-    state.push("critic_block_close", "div", -1);
+  md.core.ruler.after("block", "critic-block", (state) => {
+    for (let idx = 0; idx < state.tokens.length; idx++) {
+      const token = state.tokens[idx];
+      if (token.type != "inline") continue;
 
-    return true;
+      const match = token.content.match(`{(\\${criticMarkers.map((m) => String.fromCharCode(m)).join("{2}|\\")}{2})`);
+      if (!match) continue;
+
+      const openingEnd = match.index + 3;
+      const closingMarker = match[1] + "}";
+      if (token.content.slice(openingEnd).includes(closingMarker)) continue;
+
+      const suggestion = findMultilineSuggestion(state, token, closingMarker);
+      if (!suggestion) continue;
+      if (match[1] == "~~" && !suggestion.content.includes("~>")) continue;
+
+      const closingTokenIdx = state.tokens.slice(idx + 1).findIndex((t) => t.content.includes(closingMarker));
+      if (closingTokenIdx === -1) continue;
+
+      token.content = suggestion.content;
+      token.children = [];
+      token.map = [token.map[0], suggestion.closeLine + 1];
+
+      extendOpenTokenMaps(state.tokens, idx, token.map[1]);
+
+      const removeStart = state.tokens.slice(idx + 1).findIndex((t) => t.nesting === -1) + idx + 2;
+      const removeEnd = findRemovalEnd(state.tokens, removeStart, idx + closingTokenIdx + 1);
+      state.tokens.splice(removeStart, removeEnd - removeStart + 1);
+    }
   });
-};
-
-const findOpening = (line) => {
-  let pos = -1;
-  while (pos < line.length) {
-    pos++;
-
-    if (line.charCodeAt(pos) != 0x7b /* { */) continue;
-    pos++;
-    const marker = line.charCodeAt(pos);
-    if (!criticMarkers.includes(marker)) continue;
-    pos++;
-    if (line.charCodeAt(pos) != marker) continue;
-    pos++;
-
-    return [pos, marker];
-  }
-
-  return [-1, -1];
 };
