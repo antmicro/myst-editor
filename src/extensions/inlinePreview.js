@@ -21,6 +21,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     { tag: tags.macroName, ...baseFont, color: "var(--accent-dark)" },
     { tag: tags.emphasis, ...baseFont, fontStyle: "italic" },
     { tag: tags.strong, ...baseFont, fontWeight: "bold" },
+    { tag: tags.strikethrough, ...baseFont, textDecoration: "line-through" },
     { tag: [tags.monospace, tags.atom], ...baseFont, fontFamily: "monospace" },
     { tag: [tags.content], ...baseFont },
     { tag: tags.meta, color: "darkgrey" },
@@ -35,7 +36,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     ".cm-critic-meta": { display: "none" },
   });
 
-  const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "FencedCode", "Image", "Blockquote"];
+  const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "Strikethrough", "FencedCode", "Image", "Blockquote"];
   const decorationHidden = Decoration.replace({});
   const decorationMonospace = Decoration.mark({ class: "cm-inline-mono" });
   const nodeInSuggestion = (state, node) => state.field(criticMarkup).suggestionRanges.some((r) => node.from >= r.from && node.to <= r.to);
@@ -207,7 +208,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
                 }
               }
 
-              if (node.name == "EmphasisMark" && !nodeInMonospace(view.state, node)) {
+              if ((node.name == "EmphasisMark" || node.name == "StrikethroughMark") && !nodeInMonospace(view.state, node)) {
                 widgets.push(decorationHidden.range(node.from, node.to));
               }
 

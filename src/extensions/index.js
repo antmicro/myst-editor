@@ -28,7 +28,7 @@ import { lintKeymap } from "@codemirror/lint";
 import { yamlSchema } from "./yamlSchema";
 import { CollaborationClient } from "../collaboration";
 import { inlinePreview } from "./inlinePreview";
-import { Autolink } from "@lezer/markdown";
+import { Autolink, Strikethrough } from "@lezer/markdown";
 import { checkboxParser, colonFencedCodeParser, customTransformsParser, roleParser, tableParser } from "./lezerMarkdownExtensions";
 import { trackHeadings } from "./trackHeadings";
 import { highlightFocusedActiveLine } from "./activeLineHighlight";
@@ -129,7 +129,7 @@ export class ExtensionBuilder {
       const md = markdown({
         codeLanguages: ExtensionBuilder.codeLanguage,
         addKeymap: false,
-        extensions: [Autolink, colonFencedCodeParser, checkboxParser, tableParser, roleParser, transformParser],
+        extensions: [Autolink, Strikethrough, colonFencedCodeParser, checkboxParser, tableParser, roleParser, transformParser],
       });
       this.extensions.push(yamlFrontmatter({ content: md.language }), md);
     } else if (lang === "yaml") {

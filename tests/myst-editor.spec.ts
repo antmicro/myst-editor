@@ -147,12 +147,49 @@ graph TD
     );
   });
 
-  test("Inline mode", async ({ page }) => {
-    await page.getByTitle("Inline Preview").click();
-    await page.waitForSelector(".cm-inline-rendered-md");
-    await clearEditor(page);
-    await insertToMainEditor(page, { from: 0, insert: `# |date|\n## Test heading\ntest123` });
-    await page.waitForSelector(".inline-custom-styles");
+  test.describe.parallel("Inline mode", () => {
+    test("Starts properly", async ({ page }) => {
+      await startInlineMode(page);
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: `# |date|\n## Test heading\ntest123` });
+      await page.waitForSelector(".inline-custom-styles");
+    });
+
+    test.describe("Common transforms", () => {
+      test("Bold text is being rendered", async ({ page }) => {
+        await startInlineMode(page);
+        await clearEditor(page);
+        const text = "This text should render as bold";
+        await insertToMainEditor(page, { from: 0, insert: `**${text}**` });
+        expect((await page.locator(".tok-strong").allInnerTexts()).join("")).toBe(text);
+      });
+
+      test("Italic text is being rendered", async ({ page }) => {
+        await startInlineMode(page);
+        await clearEditor(page);
+        const text = "This text should render as italic";
+        await insertToMainEditor(page, { from: 0, insert: `_${text}_` });
+        expect((await page.locator(".tok-emphasis").allInnerTexts()).join("")).toBe(text);
+      });
+
+      test("Strikethrough text is being rendered", async ({ page }) => {
+        await startInlineMode(page);
+        await clearEditor(page);
+        const text = "This text should render as strikethrough";
+        await insertToMainEditor(page, { from: 0, insert: `~~${text}~~` });
+        // Strikethrough is special because it doesn't add any "tok-..." classes to the tokens. Therefore we need to check the style manually.
+        expect(
+          await page.locator(".cm-content *").evaluateAll((elements) =>
+            elements
+              .filter((element) => getComputedStyle(element).textDecorationLine === "line-through")
+              .map((element) => element.textContent)
+              .filter(Boolean)
+              .join(" ")
+              .replace(/\s+/g, " "),
+          ),
+        ).toBe(text);
+      });
+    });
   });
 
   test.describe.parallel("Suggestions", () => {
@@ -750,3 +787,8 @@ async function changeRoom(page: Page, room: string) {
     expect(text).not.toHaveLength(0);
   }).toPass();
 }
+
+const startInlineMode = async (page: Page) => {
+  await page.getByTitle("Inline Preview").click();
+  await expect(page.locator("#preview-wrapper")).toHaveCSS("display", "none");
+};
