@@ -82,15 +82,30 @@ const Topbar = styled.div`
   }
 `;
 
+const TitleBlock = styled.div`
+  min-width: 0;
+  overflow: hidden;
+  font-family: "Lato";
+  line-height: 1.2;
+`;
+
 const Title = styled.div`
   font-size: large;
   white-space: nowrap;
-  font-family: "Lato";
   overflow: hidden;
   text-overflow: ellipsis;
   a {
     color: var(--accent-dark);
   }
+`;
+
+const Subtitle = styled.div`
+  margin-top: 2px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--gray-800);
 `;
 
 const Alert = styled(DefaultButton)`
@@ -351,7 +366,10 @@ export const EditorTopbar = ({ alert, buttons }) => {
           ))}
         </div>
         {alert.value && <Alert className="topbar-alert"> {alert} </Alert>}
-        <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
+        <TitleBlock>
+          <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
+          {options.subtitle.value && <Subtitle id="document-subtitle">{options.subtitle.value}</Subtitle>}
+        </TitleBlock>
       </div>
       <div className="side">
         {collab.value && <Avatars />}

@@ -595,6 +595,10 @@ test.describe.parallel("With collaboration enabled", () => {
       });
 
       await expect(page.locator("#document-title")).toContainText("Playwright");
+      await page.evaluate(() => {
+        window.myst_editor.demo.state.options.subtitle.value = "A subtitle";
+      });
+      await expect(page.locator("#document-subtitle")).toContainText("A subtitle");
       await expect(page.locator("#topbar .side:last-child .btns button")).toHaveCount(2);
       await expect(page.locator("#resolved-wrapper")).toBeVisible();
     });
@@ -658,6 +662,11 @@ test.describe.parallel("With collaboration enabled", () => {
 });
 
 test.describe.parallel("MystEditorGit wrapper", () => {
+  test("Shows branch and commit in subtitle", async ({ context }) => {
+    const page = await applyPageOpts(await context.newPage(), defaultCollabOpts(), true);
+    await expect(page.locator("#document-subtitle")).toContainText("feature @ bbb");
+  });
+
   test("Synces document between peers", async ({ context }) => {
     const collabOpts = defaultCollabOpts();
     const pageA = await applyPageOpts(await context.newPage(), collabOpts, true);

@@ -197,6 +197,7 @@ const defaultUserSettings = [
 const defaults = {
   id: "",
   title: "",
+  subtitle: "",
   /** @type {"Both" | "Preview" | "Source" | "Diff" | "Resolved" | "Outline" | "Inline"} */
   mode: "Both",
   initialText: "",

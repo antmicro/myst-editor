@@ -110,6 +110,10 @@ const MystEditorGit = ({
     options.collaboration.value = { ...collaboration, room: room.value, mode: props.collaboration.mode };
   });
 
+  useSignalEffect(() => {
+    options.subtitle.value = branch.value && commit.value?.hash ? `${branch.value} @ ${commit.value.hash}` : "";
+  });
+
   function toastNotify(content) {
     if (toast.value.timeout) {
       clearTimeout(toast.value.timeout);
