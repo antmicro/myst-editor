@@ -129,12 +129,14 @@ const MystEditorGit = ({
         .map(({ file }) => file);
       const otherFiles = changedFiles.filter((f) => f !== file.peek());
       let documents = await setupFileConnections(repo, props, branch.peek(), commit.peek().hash, otherFiles, getText);
-      if (otherFiles.length < changedFiles.length) {
+      const currentText = collab.peek().ytext.toString();
+      const currentInitialText = options.initialText.peek();
+      if (otherFiles.length < changedFiles.length || currentText !== currentInitialText) {
         documents.unshift({
           client: collab.peek(),
           file: file.peek(),
-          initialText: options.initialText.peek(),
-          text: collab.peek().ytext.toString(),
+          initialText: currentInitialText,
+          text: currentText,
         });
       }
       documents = documents.map((d) => ({ ...d, textChanged: d.text != d.initialText, commentCount: d.client.ycomments.comments.peek().length }));
@@ -317,8 +319,8 @@ const MystEditorGit = ({
   });
 
   useSignalEffect(() => {
-    if (!branch.value || !commit.value?.hash) return;
-    getText(branch.value, commit.value, index).then((txt) => (indexFile.value = txt));
+    if (!branch.value || !commit.value?.hash || !index) return;
+    Promise.resolve(getText(branch.value, commit.value, index)).then((txt) => (indexFile.value = txt));
   });
 
   return (

@@ -703,8 +703,9 @@ test.describe.parallel("MystEditorGit wrapper", () => {
       }).toPass();
     }
 
-    await checkSelect(1, "branches");
-    await checkSelect(2, "commits");
+    // commits first — feature has two revisions; main only has one
+    await checkSelect(1, "commits");
+    await checkSelect(2, "branches");
     await checkSelect(3, "files");
   });
 

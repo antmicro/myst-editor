@@ -173,13 +173,16 @@ const Select = ({ options, initialValue, onChange, inputPlaceholder, loadMore, s
   useSignalEffect(() => {
     search.value;
     allOptions.value;
-    const timer = setTimeout(() => {
-      if (search.value.trim() == "") {
-        shownOptions.value = allOptions.value;
-      } else {
-        searchOptions(search.value).then((opts) => (shownOptions.value = opts));
-      }
-    }, 300);
+    const timer = setTimeout(
+      () => {
+        if (search.value.trim() == "") {
+          shownOptions.value = allOptions.value;
+        } else {
+          searchOptions(search.value).then((opts) => (shownOptions.value = opts));
+        }
+      },
+      search.value.trim() == "" ? 0 : 300,
+    );
 
     return () => clearTimeout(timer);
   });

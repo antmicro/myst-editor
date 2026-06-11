@@ -15,6 +15,8 @@
     </style>
     <script type="module">
       import MystEditorGit from "./MystEditorGit.jsx";
+      import { createGitBackend } from "./stubGitBackend.js";
+      import { docsRoot, indexPath } from "./demo-data.js";
 
       const usercolors = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"];
       const urlParams = new URLSearchParams(window.location.search);
@@ -86,36 +88,19 @@
 
       const collabEnabled = !(import.meta.env.VITE_COLLAB == "OFF") && urlParams.get("collab") != "false";
       const collabUrl = import.meta.env.VITE_WS_URL ?? urlParams.get("collab_server");
-      const branches = ["main", "dev"];
-      const commits = [
-        { message: "commit 2", hash: "aaa" },
-        { message: "commit 1", hash: "bbb" },
-      ];
-      const files = ["docs/source/file1.md", "docs/source/file2.md", "docs/source/index.md"];
-      const text = {
-        ["docs/source/index.md"]: `# {{project}}
 
-\`\`\`{toctree}
-file2
-file1
-\`\`\`
-`,
-        ["docs/source/file1.md"]: `# Document 1\nline1\nline2\n## Heading2_1\nline3\n## Heading2_2\nline4`,
-        ["docs/source/file2.md"]: `# Document 2\nline1\nline2\n## Heading2_1\nline3\n## Heading2_2\nline4`,
-      };
+      // git_backend=stub (default). A future http backend can be selected here once implemented.
+      const gitBackendKind = urlParams.get("git_backend") ?? "stub";
+      const { initialBranches, ...gitCallbacks } = createGitBackend(gitBackendKind, {
+        repoKey: urlParams.get("repo") ?? "repos/myst",
+        getBranch: () => window.myst_editor?.demo?.git?.branch?.value ?? "main",
+      });
 
       MystEditorGit(
         {
-          repo: urlParams.get("repo") ?? `repos/myst`,
-          initialBranches: branches,
-          getBranches: (page) => (page == 1 ? branches : []),
-          searchBranches: (input) => branches.filter((b) => b.includes(input)),
-          getCommits: (_, page) => (page == 1 ? commits : []),
-          searchCommits: (input) => commits.filter((c) => c.message.includes(input)),
-          getFiles: () => files,
-          getText: async (_, __, f) => text[f] ?? "",
-          storeHistory: () => {},
-          commitChanges: (msg) => ({ hash: "ccc", webUrl: "#" }),
+          repo: urlParams.get("repo") ?? "repos/myst",
+          initialBranches,
+          ...gitCallbacks,
           id: "demo",
           title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
           transforms: exampleTransforms,
@@ -131,8 +116,8 @@ file1
           customRoles: exampleCustomRoles,
           customDirectives: exampleCustomDirectives,
           syncScroll: true,
-          index: "docs/source/index.md",
-          docsRoot: "docs/source",
+          index: indexPath,
+          docsRoot,
         },
         document.getElementById("myst"),
       );
