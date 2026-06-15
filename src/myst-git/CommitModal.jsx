@@ -105,7 +105,7 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
   const summary = useSignal(initialSummary);
   const description = useSignal("");
   const message = useComputed(() => `${summary.value}\n\n${description.value}`);
-  const discardedDocs = useSignal([]);
+  const changedDocs = useSignal(documents);
   const stagedDocs = useSignal(documents.map((d) => d.file));
   const modalRef = useRef();
 
@@ -113,7 +113,7 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
     if (initialSummary) {
       summary.value = initialSummary;
       description.value = "";
-      discardedDocs.value = [];
+      changedDocs.value = documents;
       stagedDocs.value = documents.map((d) => d.file);
       modalRef.current?.showModal?.();
       modalRef.current.onclose = onClose;
@@ -131,23 +131,22 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
   return (
     <CommitForm ref={modalRef}>
       <div id="diffs">
-        {documents
-          .filter((d) => !discardedDocs.value.includes(d.file))
-          .map((d) => (
-            <Diff
-              key={d.file}
-              parent={parent}
-              document={d}
-              onStage={(staged) => handleStage(staged, d.file)}
-              discardFile={() => {
-                discardedDocs.value = [...discardedDocs.peek(), d.file];
-                handleStage(false, d.file);
-                d.client.ytext.delete(0, d.client.ytext.length);
-                d.client.ytext.insert(0, d.initialText);
-                statusSocket.current.send(d.client.provider.roomname);
-              }}
-            />
-          ))}
+        {changedDocs.value.map((d) => (
+          <Diff
+            key={d.file}
+            parent={parent}
+            document={d}
+            onStage={(staged) => handleStage(staged, d.file)}
+            discardFile={() => {
+              handleStage(false, d.file);
+              d.client.ytext.delete(0, d.client.ytext.length);
+              d.client.ytext.insert(0, d.initialText);
+              statusSocket.current?.send?.(d.client.provider.roomname);
+              changedDocs.value = changedDocs.peek().filter((doc) => doc.file !== d.file);
+              if (changedDocs.peek().length === 0) modalRef.current?.close?.();
+            }}
+          />
+        ))}
       </div>
       {latestCommit ? (
         <form
