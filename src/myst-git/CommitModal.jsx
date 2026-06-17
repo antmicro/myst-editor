@@ -131,22 +131,24 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
   return (
     <CommitForm ref={modalRef}>
       <div id="diffs">
-        {changedDocs.value.map((d) => (
-          <Diff
-            key={d.file}
-            parent={parent}
-            document={d}
-            onStage={(staged) => handleStage(staged, d.file)}
-            discardFile={() => {
-              handleStage(false, d.file);
-              d.client.ytext.delete(0, d.client.ytext.length);
-              d.client.ytext.insert(0, d.initialText);
-              statusSocket.current?.send?.(d.client.provider.roomname);
-              changedDocs.value = changedDocs.peek().filter((doc) => doc.file !== d.file);
-              if (changedDocs.peek().length === 0) modalRef.current?.close?.();
-            }}
-          />
-        ))}
+        {/* Only mount the diff editors while the modal is open, so they are destroyed on close. */}
+        {initialSummary &&
+          changedDocs.value.map((d) => (
+            <Diff
+              key={d.file}
+              parent={parent}
+              document={d}
+              onStage={(staged) => handleStage(staged, d.file)}
+              discardFile={() => {
+                handleStage(false, d.file);
+                d.client.ytext.delete(0, d.client.ytext.length);
+                d.client.ytext.insert(0, d.initialText);
+                statusSocket.current?.send?.(d.client.provider.roomname);
+                changedDocs.value = changedDocs.peek().filter((doc) => doc.file !== d.file);
+                if (changedDocs.peek().length === 0) modalRef.current?.close?.();
+              }}
+            />
+          ))}
       </div>
       {latestCommit ? (
         <form

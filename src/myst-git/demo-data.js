@@ -1,7 +1,17 @@
 export const docsRoot = "docs";
 export const indexPath = "docs/index.md";
 
-export const demoBranches = ["feature", "main"];
+/** Enough items to paginate past PAGE_SIZE (20) in stubGitBackend. */
+export const DEMO_BRANCH_COUNT = 45;
+export const DEMO_FEATURE_COMMIT_COUNT = 45;
+
+/** 7-char hex hashes (git-style abbreviations). */
+export const DEMO_INITIAL_COMMIT = "4a3f2b1";
+export const DEMO_FEATURE_TIP = "e7c91d0";
+
+function demoMiddleCommitHash(seq) {
+  return ((seq * 2654435761) >>> 0).toString(16).padStart(7, "0").slice(-7);
+}
 
 const mainIndex = `# Demo Documentation
 
@@ -56,20 +66,57 @@ const featureCommitFiles = {
   "docs/feature.md": feature,
 };
 
+export const demoBranches = [
+  "feature",
+  "main",
+  ...Array.from({ length: DEMO_BRANCH_COUNT - 2 }, (_, i) => `branch-${String(i + 3).padStart(3, "0")}`),
+];
+
+function buildFeatureHistory() {
+  const commits = {
+    [DEMO_INITIAL_COMMIT]: { message: "Initial commit", files: { ...initialCommitFiles } },
+  };
+
+  let parent = DEMO_INITIAL_COMMIT;
+  const middleHashes = [];
+  for (let i = 1; i < DEMO_FEATURE_COMMIT_COUNT - 1; i++) {
+    const hash = demoMiddleCommitHash(i);
+    commits[hash] = {
+      message: `Update docs (${i})`,
+      parent,
+      files: { ...initialCommitFiles },
+    };
+    middleHashes.push(hash);
+    parent = hash;
+  }
+
+  commits[DEMO_FEATURE_TIP] = { message: "Add feature document", parent, files: { ...featureCommitFiles } };
+
+  return {
+    commits,
+    history: [DEMO_FEATURE_TIP, ...middleHashes.reverse(), DEMO_INITIAL_COMMIT],
+  };
+}
+
 /**
  * In-memory repo state matching the demo layout used by a future real git backend.
  * @returns {{ branches: Record<string, string>, commits: Record<string, { message: string, parent?: string, files: Record<string, string> }>, history: Record<string, string[]> }}
  */
 export function createInitialRepoState() {
+  const { commits, history: featureHistory } = buildFeatureHistory();
+  const extraBranches = demoBranches.filter((b) => b !== "main" && b !== "feature");
+
   return {
-    branches: { main: "aaa", feature: "bbb" },
-    commits: {
-      aaa: { message: "Initial commit", files: { ...initialCommitFiles } },
-      bbb: { message: "Add feature document", parent: "aaa", files: { ...featureCommitFiles } },
+    branches: {
+      main: DEMO_INITIAL_COMMIT,
+      feature: DEMO_FEATURE_TIP,
+      ...Object.fromEntries(extraBranches.map((b) => [b, DEMO_INITIAL_COMMIT])),
     },
+    commits,
     history: {
-      main: ["aaa"],
-      feature: ["bbb", "aaa"],
+      main: [DEMO_INITIAL_COMMIT],
+      feature: featureHistory,
+      ...Object.fromEntries(extraBranches.map((b) => [b, [DEMO_INITIAL_COMMIT]])),
     },
   };
 }

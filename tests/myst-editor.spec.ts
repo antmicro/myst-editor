@@ -3,6 +3,7 @@ import { test, expect, Page } from "@playwright/test";
 import { EditorView } from "codemirror";
 import fs from "fs/promises";
 import { createMystState } from "../src/mystState";
+import { DEMO_FEATURE_TIP } from "../src/myst-git/demo-data.js";
 
 declare global {
   interface Window {
@@ -664,7 +665,8 @@ test.describe.parallel("With collaboration enabled", () => {
 test.describe.parallel("MystEditorGit wrapper", () => {
   test("Shows branch and commit in subtitle", async ({ context }) => {
     const page = await applyPageOpts(await context.newPage(), defaultCollabOpts(), true);
-    await expect(page.locator("#document-subtitle")).toContainText("feature @ bbb");
+    await expect(page.locator("[data-git-branch]")).toContainText("feature");
+    await expect(page.locator("[data-git-commit]")).toContainText(DEMO_FEATURE_TIP);
   });
 
   test("Synces document between peers", async ({ context }) => {
@@ -700,11 +702,10 @@ test.describe.parallel("MystEditorGit wrapper", () => {
     const collabOpts = defaultCollabOpts();
     const page = await applyPageOpts(await context.newPage(), collabOpts, true);
 
-    async function checkSelect(roomId: number, selectName: string) {
+    async function checkRoomSwitch(roomId: number, action: () => Promise<void>) {
       await clearEditor(page);
       await insertToMainEditor(page, { from: 0, insert: `room ${roomId}` });
-      await page.click(`#${selectName}`);
-      await page.click(`#${selectName}-list li:last-child`);
+      await action();
       await page.waitForSelector(".cm-content");
       await expect(async () => {
         const text = await page.evaluate((id) => window.myst_editor[id].text, id);
@@ -712,10 +713,20 @@ test.describe.parallel("MystEditorGit wrapper", () => {
       }).toPass();
     }
 
-    // commits first — feature has two revisions; main only has one
-    await checkSelect(1, "commits");
-    await checkSelect(2, "branches");
-    await checkSelect(3, "files");
+    // commits first — pick a different revision than the current tip
+    await checkRoomSwitch(1, async () => {
+      await page.click("[data-git-commit]");
+      await page.locator("#git-commit-picker[open]").waitFor();
+      await page.locator("#git-commit-picker-list li").nth(1).click();
+    });
+    await checkRoomSwitch(2, async () => {
+      await page.click("[data-git-branch]");
+      await page.locator("#git-branch-picker[open]").waitFor();
+      await page.locator("#git-branch-picker-list >> text=main").click();
+    });
+    await checkRoomSwitch(3, async () => {
+      await page.locator(".file").nth(1).click();
+    });
   });
 
   test("Commits changes", async ({ context }) => {
@@ -743,10 +754,12 @@ test.describe.parallel("MystEditorGit wrapper", () => {
     await pageA.waitForSelector(".cm-content");
 
     await expect(async () => {
-      const commitA = await pageA.locator("#commits span").innerHTML();
-      expect(commitA).toContain("update docs");
-      const commitB = await pageB.locator("#commits span").innerHTML();
-      expect(commitB).toContain("update docs");
+      const hashA = await pageA.evaluate((id) => window.myst_editor[id].git.commit.value.hash, id);
+      const hashB = await pageB.evaluate((id) => window.myst_editor[id].git.commit.value.hash, id);
+      expect(hashA).toMatch(/^offline-/);
+      expect(hashB).toBe(hashA);
+      await expect(pageA.locator("[data-git-commit]")).toContainText(hashA);
+      await expect(pageB.locator("[data-git-commit]")).toContainText(hashB);
     }).toPass();
   });
 });

@@ -160,9 +160,17 @@ You can change the port it runs on by setting a `PORT` environment variable.
 
 ### Running tests
 
-To run the Playwright test suite (including `MystEditorGit` tests), run the app preview and collaboration server in separate terminals, then run tests in a third terminal.
+The Playwright test suite (including the `MystEditorGit` tests) runs against the **built and previewed** app, so it needs the app preview and the collaboration server running alongside the test runner. Use three terminals.
 
-Use Node 20 and start services with persistence enabled:
+> [!IMPORTANT]
+> Run the tests with **Node 20**.
+
+First-time setup (once):
+
+```bash
+npm i
+npx playwright install
+```
 
 Terminal 1:
 
@@ -184,7 +192,14 @@ Terminal 3 (ensuring you run Node 20, otherwise it may not work):
 npx -y node@20 /usr/bin/npm run test
 ```
 
-Without `YPERSISTENCE`, some git-wrapper tests may fail because change-status tracking is disabled on the server.
+To run a single test (or a subset), pass a `-g` name filter through to Playwright:
+
+```bash
+npx -y node@20 node_modules/@playwright/test/cli.js test -c tests/playwright.config.js -g "Commits changes"
+```
+
+> [!NOTE]
+> Without `YPERSISTENCE`, some git-wrapper tests may fail because change-status tracking is disabled on the server.
 
 ### Customizing the CSS
 
@@ -252,6 +267,26 @@ import { MystEditorGit } from "MystEditor.js";
 ```
 There is an example page that makes use of this wrapper in [src/myst-git/git.html](src/myst-git/git.html).
 The example page can be accessed while the Editor is running in development mode via the following URL: `/myst-git/git.html`.
+
+### Running the stub git mode locally
+
+The git demo runs against an in-memory stub git backend ([src/myst-git/stubGitBackend.js](src/myst-git/stubGitBackend.js)), so you can try the
+branch/commit/file navigation and the commit flow without a real git server. The demo repository state (branches, commits and file
+snapshots) comes from [src/myst-git/demo-data.js](src/myst-git/demo-data.js). Any commits you make are kept in `localStorage`, so clearing
+site data resets the "repo".
+
+Start the dev server and open the git demo:
+
+```bash
+npm run dev
+# then open /myst-git/git.html on the URL Vite prints (typically http://localhost:5173)
+```
+
+By default collaboration runs in local mode, so no collaboration server is required. To test real-time collaboration against a local server:
+
+```
+/myst-git/git.html?collab_server=ws://localhost:4455&username=alice
+```
 
 ## License
 

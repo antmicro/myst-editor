@@ -106,6 +106,20 @@ const Subtitle = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--gray-800);
+
+  a {
+    color: var(--accent-dark);
+  }
+
+  .git-branch-link,
+  .git-commit-link {
+    cursor: pointer;
+    color: var(--accent-dark);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const Alert = styled(DefaultButton)`
@@ -313,6 +327,7 @@ const icons = {
 export const EditorTopbar = ({ alert, buttons }) => {
   const { options, editorView, collab, suggestMode } = useContext(MystState);
   const titleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.title.value)));
+  const subtitleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.subtitle.value)));
   const emptyDiff = useSignal(false);
   const editorModeButtons = useComputed(() => {
     const modeButtons = [
@@ -368,7 +383,13 @@ export const EditorTopbar = ({ alert, buttons }) => {
         {alert.value && <Alert className="topbar-alert"> {alert} </Alert>}
         <TitleBlock>
           <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
-          {options.subtitle.value && <Subtitle id="document-subtitle">{options.subtitle.value}</Subtitle>}
+          {options.subtitle.value && (
+            <Subtitle
+              id="document-subtitle"
+              dangerouslySetInnerHTML={{ __html: subtitleHtml.value }}
+              onClick={(ev) => options.onSubtitleClick.value?.(ev)}
+            />
+          )}
         </TitleBlock>
       </div>
       <div className="side">

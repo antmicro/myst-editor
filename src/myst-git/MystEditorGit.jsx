@@ -4,12 +4,16 @@ import { useContext, useEffect, useRef } from "preact/hooks";
 import { batch, effect, useComputed, useSignal, useSignalEffect } from "@preact/signals";
 import { createMystState, MystState } from "../mystState";
 import styled, { StyleSheetManager } from "styled-components";
-import * as Y from "yjs";
 import CommitModal from "./CommitModal";
 import { useWatchChanges } from "./useWatchChanges";
 import { MystCSSVars } from "../styles/MystStyles";
 import Sidebar from "./Sidebar";
+import GitPickerModal from "./GitPickerModal";
 import { createLogger, Logger } from "../logger";
+
+function escapeHtml(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
 
 const MystContainer = styled(MystCSSVars)`
   display: grid;
@@ -76,8 +80,6 @@ const MystEditorGit = ({
   searchCommits = async () => [],
   getFiles = async () => [],
   getText = async () => "",
-  initialHistory = [],
-  storeHistory = () => {},
   initialState = null,
   commitChanges = async () => {},
   index = null,
@@ -91,8 +93,9 @@ const MystEditorGit = ({
   const files = useSignal([]);
   const file = useSignal();
   const room = useComputed(() => (commit.value && file.value ? `${repo}/${branch.value}/${commit.value.hash}/${file.value}` : ""));
-  const changeHistory = useSignal(initialHistory);
   const toast = useSignal({ content: null, timeout: null });
+  const branchPickerOpen = useSignal(false);
+  const commitPickerOpen = useSignal(false);
   const commitSummary = useSignal(null);
   const commentStateToApply = useRef(null);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
@@ -110,9 +113,54 @@ const MystEditorGit = ({
     options.collaboration.value = { ...collaboration, room: room.value, mode: props.collaboration.mode };
   });
 
+  useEffect(() => {
+    options.onSubtitleClick.value = (ev) => {
+      if (props.onSubtitleClick?.(ev)) return true;
+      if (ev.target.closest?.("[data-git-branch]")) {
+        ev.preventDefault();
+        branchPickerOpen.value = true;
+        return true;
+      }
+      if (ev.target.closest?.("[data-git-commit]")) {
+        ev.preventDefault();
+        commitPickerOpen.value = true;
+        return true;
+      }
+      return false;
+    };
+  }, []);
+
   useSignalEffect(() => {
-    options.subtitle.value = branch.value && commit.value?.hash ? `${branch.value} @ ${commit.value.hash}` : "";
+    const commitHash = commit.value?.hash;
+    if (!branch.value || !commitHash) {
+      options.subtitle.value = "";
+      return;
+    }
+    options.subtitle.value = `<span class="git-branch-link" data-git-branch>${escapeHtml(branch.value)}</span> @ <span class="git-commit-link" data-git-commit title="${escapeHtml(commit.value.message)}">${commitHash}</span>`;
   });
+
+  async function loadBranches(page) {
+    const moreBranches = await getBranches(page);
+    if (moreBranches.length == 0) throw "Empty branches";
+    branches.value = [...new Set([...branches.value, ...moreBranches])];
+  }
+
+  async function loadCommits(page) {
+    let moreCommits = await getCommits(branch.value, page);
+    if (moreCommits.length == 0) throw "Empty commits";
+    moreCommits = moreCommits.filter((newC) => !commits.value.some((oldC) => newC.hash == oldC.hash));
+    commits.value = [...commits.value, ...moreCommits];
+  }
+
+  const branchRow = (b) => ({ label: b, value: b, marked: docsWithChanges.value.some((d) => d.branch === b) });
+  const commitRow = (c) => ({
+    label: `[${c.hash}] ${c.message}`,
+    value: c.hash,
+    message: c.message,
+    marked: docsWithChanges.value.some((d) => d.branch === branch.peek() && d.commitHash === c.hash),
+  });
+  const branchOptions = useComputed(() => branches.value.map(branchRow));
+  const commitOptions = useComputed(() => commits.value.map(commitRow));
 
   function toastNotify(content) {
     if (toast.value.timeout) {
@@ -288,16 +336,6 @@ const MystEditorGit = ({
     const awareness = collab.value.provider.awareness;
     if (!doc) return;
 
-    const handleChange = (/** @type {Y.Transaction} */ tr) => {
-      if (tr.local && tr.origin) {
-        const old = changeHistory.peek().filter((ch) => ch.room != room.peek());
-        changeHistory.value = [{ branch: branch.peek(), commit: commit.peek(), file: file.peek(), room: room.peek(), timestamp: Date.now() }, ...old];
-        storeHistory(changeHistory.peek());
-        doc.off("afterTransaction", handleChange);
-      }
-    };
-    doc.on("afterTransaction", handleChange);
-
     awareness.on("change", ({ added, updated }) => {
       const ids = [...added, ...updated];
       const states = awareness.getStates();
@@ -318,8 +356,6 @@ const MystEditorGit = ({
         commentStateToApply.current = null;
       }
     });
-
-    return () => doc.off("afterTransaction", handleChange);
   });
 
   useSignalEffect(() => {
@@ -331,26 +367,28 @@ const MystEditorGit = ({
     <div style="all: initial;">
       <StyleSheetManager target={props.parent}>
         <MystContainer id="myst-css-namespace">
-          <Sidebar
-            {...{
-              searchBranches,
-              searchCommits,
-              docsRoot,
-              branches,
-              branch,
-              commits,
-              commit,
-              files,
-              file,
-              getBranches,
-              getCommits,
-              getText,
-              docsWithChanges,
-              switchBranch,
-              switchCommit,
-              indexFile,
-              changeHistory,
-            }}
+          <Sidebar {...{ docsRoot, files, file, branch, commit, getText, docsWithChanges, indexFile, index }} />
+          <GitPickerModal
+            id="git-branch-picker"
+            title="Switch branch"
+            open={branchPickerOpen}
+            options={branchOptions}
+            selectedValue={branch.value}
+            searchPlaceholder="Search branches"
+            searchOptions={(q) => searchBranches(q).then((bs) => bs.map(branchRow))}
+            loadMore={loadBranches}
+            onSelect={(o, isNew) => switchBranch(o.value, isNew)}
+          />
+          <GitPickerModal
+            id="git-commit-picker"
+            title="Switch commit"
+            open={commitPickerOpen}
+            options={commitOptions}
+            selectedValue={commit.value?.hash}
+            searchPlaceholder="Search commits"
+            searchOptions={(q) => searchCommits(q, branch.value).then((cs) => cs.map(commitRow))}
+            loadMore={loadCommits}
+            onSelect={(o, isNew) => switchCommit({ hash: o.value, message: o.message }, isNew)}
           />
           {toast.value.content && (
             <Toast id="toast">

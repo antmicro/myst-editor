@@ -230,6 +230,7 @@ const defaults = {
   mapUrl: (tag, url) => url,
   yamlSchema: null,
   onPreviewClick: () => {},
+  onSubtitleClick: () => false,
   onDiscardChanges: () => {},
   mermaidTheme: "neutral",
   cmDarkTheme: false,

@@ -37,7 +37,7 @@ export function createStubGitBackend(options = {}) {
   }
 
   return {
-    initialBranches: [...demoBranches],
+    initialBranches: demoBranches.slice(0, PAGE_SIZE),
 
     async getBranches(page) {
       const start = (Math.max(1, page) - 1) * PAGE_SIZE;
@@ -101,8 +101,6 @@ export function createStubGitBackend(options = {}) {
       } catch {}
       return { hash, webUrl: "#" };
     },
-
-    storeHistory: () => {},
   };
 }
 
