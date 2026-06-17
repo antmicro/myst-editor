@@ -1,5 +1,9 @@
-import { MystEditorGit as M } from "./MystEditor.js";
-const F = "docs", p = "docs/index.md", b = ["feature", "main"], k = `# Demo Documentation
+import { MystEditorGit as F } from "./MystEditor.js";
+const L = "docs", C = "docs/index.md", R = 45, A = 45, d = "4a3f2b1", w = "e7c91d0";
+function N(e) {
+  return (e * 2654435761 >>> 0).toString(16).padStart(7, "0").slice(-7);
+}
+const x = `# Demo Documentation
 
 \`\`\`{toctree}
 file1
@@ -7,7 +11,7 @@ file2
 \`\`\`
 
 Welcome to the MyST editor git demo. Edit files, then use the Commit button to save.
-`, R = k.replace("file2\n```", "file2\nfeature\n```"), U = `# Document 1
+`, P = x.replace("file2\n```", "file2\nfeature\n```"), z = `# Document 1
 
 ## Introduction
 
@@ -16,7 +20,7 @@ This is the first document in the demo repository.
 ## Content
 
 Edit this text and commit the changes to see git history.
-`, O = `# Document 2
+`, G = `# Document 2
 
 ## Overview
 
@@ -25,172 +29,196 @@ This is the second document in the demo repository.
 ## Details
 
 Edit this text and commit the changes to see git history.
-`, z = `# Feature Document
+`, H = `# Feature Document
 
 This file was added on the feature branch.
-`, T = {
-  [p]: k,
-  "docs/file1.md": U,
-  "docs/file2.md": O
-}, G = {
-  ...T,
-  [p]: R,
-  "docs/feature.md": z
-};
-function P() {
+`, E = {
+  [C]: x,
+  "docs/file1.md": z,
+  "docs/file2.md": G
+}, K = {
+  ...E,
+  [C]: P,
+  "docs/feature.md": H
+}, y = ["feature", "main", ...Array.from({
+  length: R - 2
+}, (e, s) => `branch-${String(s + 3).padStart(3, "0")}`)];
+function W() {
+  const e = {
+    [d]: {
+      message: "Initial commit",
+      files: {
+        ...E
+      }
+    }
+  };
+  let s = d;
+  const r = [];
+  for (let o = 1; o < A - 1; o++) {
+    const i = N(o);
+    e[i] = {
+      message: `Update docs (${o})`,
+      parent: s,
+      files: {
+        ...E
+      }
+    }, r.push(i), s = i;
+  }
+  return e[w] = {
+    message: "Add feature document",
+    parent: s,
+    files: {
+      ...K
+    }
+  }, {
+    commits: e,
+    history: [w, ...r.reverse(), d]
+  };
+}
+function j() {
+  const {
+    commits: e,
+    history: s
+  } = W(), r = y.filter((o) => o !== "main" && o !== "feature");
   return {
     branches: {
-      main: "aaa",
-      feature: "bbb"
+      main: d,
+      feature: w,
+      ...Object.fromEntries(r.map((o) => [o, d]))
     },
-    commits: {
-      aaa: {
-        message: "Initial commit",
-        files: {
-          ...T
-        }
-      },
-      bbb: {
-        message: "Add feature document",
-        parent: "aaa",
-        files: {
-          ...G
-        }
-      }
-    },
+    commits: e,
     history: {
-      main: ["aaa"],
-      feature: ["bbb", "aaa"]
+      main: [d],
+      feature: s,
+      ...Object.fromEntries(r.map((o) => [o, [d]]))
     }
   };
 }
-const d = 20;
-function A(e) {
+const h = 20;
+function q(e) {
   return structuredClone(e);
 }
-function K(e = {}) {
-  var w, C;
-  const r = `myst-stub-repo:${(w = e.repoKey) != null ? w : "default"}`;
-  let a = A((C = e.initialState) != null ? C : P()), l = 0;
-  const m = () => {
+function J(e = {}) {
+  var I, S;
+  const s = `myst-stub-repo:${(I = e.repoKey) != null ? I : "default"}`;
+  let r = q((S = e.initialState) != null ? S : j()), o = 0;
+  const i = () => {
     try {
-      const s = localStorage.getItem(r);
-      s && ({
-        state: a,
-        commitCounter: l
-      } = JSON.parse(s));
+      const n = localStorage.getItem(s);
+      n && ({
+        state: r,
+        commitCounter: o
+      } = JSON.parse(n));
     } catch {
     }
   };
-  m();
-  const v = () => {
-    var s, t;
-    return (t = (s = e.getBranch) == null ? void 0 : s.call(e)) != null ? t : "main";
+  i();
+  const U = () => {
+    var n, t;
+    return (t = (n = e.getBranch) == null ? void 0 : n.call(e)) != null ? t : "main";
   };
-  function h(s) {
-    const t = a.commits[s];
+  function u(n) {
+    const t = r.commits[n];
     if (!t)
-      throw new Error(`Unknown commit: ${s}`);
+      throw new Error(`Unknown commit: ${n}`);
     return t;
   }
-  function D(s) {
-    return Object.keys(h(s).files).filter((t) => t.endsWith(".md") || t.endsWith(".rst"));
+  function k(n) {
+    return Object.keys(u(n).files).filter((t) => t.endsWith(".md") || t.endsWith(".rst"));
   }
   return {
-    initialBranches: [...b],
-    async getBranches(s) {
-      const t = (Math.max(1, s) - 1) * d;
-      return b.slice(t, t + d);
+    initialBranches: y.slice(0, h),
+    async getBranches(n) {
+      const t = (Math.max(1, n) - 1) * h;
+      return y.slice(t, t + h);
     },
-    async searchBranches(s) {
-      const t = s.toLowerCase();
-      return b.filter((n) => n.toLowerCase().includes(t)).slice(0, d);
+    async searchBranches(n) {
+      const t = n.toLowerCase();
+      return y.filter((a) => a.toLowerCase().includes(t)).slice(0, h);
     },
-    async getCommits(s, t) {
-      var o;
-      const n = (o = a.history[s]) != null ? o : [], i = (Math.max(1, t) - 1) * d;
-      return n.slice(i, i + d).map((c) => ({
-        hash: c,
-        message: h(c).message
+    async getCommits(n, t) {
+      var c;
+      const a = (c = r.history[n]) != null ? c : [], m = (Math.max(1, t) - 1) * h;
+      return a.slice(m, m + h).map((l) => ({
+        hash: l,
+        message: u(l).message
       }));
     },
-    async searchCommits(s, t) {
-      var o;
-      const n = s.toLowerCase();
-      return ((o = a.history[t]) != null ? o : []).filter((c) => h(c).message.toLowerCase().includes(n)).slice(0, d).map((c) => ({
-        hash: c,
-        message: h(c).message
+    async searchCommits(n, t) {
+      var c;
+      const a = n.toLowerCase();
+      return ((c = r.history[t]) != null ? c : []).filter((l) => u(l).message.toLowerCase().includes(a)).slice(0, h).map((l) => ({
+        hash: l,
+        message: u(l).message
       }));
     },
-    async getFiles(s, t) {
-      return t != null && t.hash ? (m(), D(t.hash)) : [];
+    async getFiles(n, t) {
+      return t != null && t.hash ? (i(), k(t.hash)) : [];
     },
-    async getText(s, t, n) {
-      var i;
-      return t != null && t.hash ? (m(), (i = h(t.hash).files[n]) != null ? i : "") : "";
+    async getText(n, t, a) {
+      var m;
+      return t != null && t.hash ? (i(), (m = u(t.hash).files[a]) != null ? m : "") : "";
     },
-    async commitChanges(s, t) {
-      var $;
-      m();
-      const n = v(), i = a.branches[n];
-      if (!i)
-        throw new Error(`Unknown branch: ${n}`);
-      l++;
-      const o = `offline-${l}`, c = {
-        ...h(i).files
+    async commitChanges(n, t) {
+      var _;
+      i();
+      const a = U(), m = r.branches[a];
+      if (!m)
+        throw new Error(`Unknown branch: ${a}`);
+      o++;
+      const c = `offline-${o}`, l = {
+        ...u(m).files
       };
       for (const {
-        file: g,
-        text: L
+        file: b,
+        text: v
       } of t)
-        c[g] = L;
-      a.commits[o] = {
-        message: s,
-        parent: i,
-        files: c
-      }, a.branches[n] = o, a.history[n] = [o, ...(($ = a.history[n]) != null ? $ : []).filter((g) => g !== o)];
+        l[b] = v;
+      r.commits[c] = {
+        message: n,
+        parent: m,
+        files: l
+      }, r.branches[a] = c, r.history[a] = [c, ...((_ = r.history[a]) != null ? _ : []).filter((b) => b !== c)];
       try {
-        localStorage.setItem(r, JSON.stringify({
-          state: a,
-          commitCounter: l
+        localStorage.setItem(s, JSON.stringify({
+          state: r,
+          commitCounter: o
         }));
       } catch {
       }
       return {
-        hash: o,
+        hash: c,
         webUrl: "#"
       };
-    },
-    storeHistory: () => {
     }
   };
 }
-function W(e = "stub", r = {}) {
+function V(e = "stub", s = {}) {
   switch (e) {
     case "stub":
-      return K(r);
+      return J(s);
     default:
       throw new Error(`Unknown git backend: ${e}`);
   }
 }
-const E = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], u = new URLSearchParams(window.location.search), _ = u.get("username") || Math.floor(Math.random() * 1e3).toString(), q = E[Math.floor(Math.random() * E.length)];
-let J = [{
+const $ = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], f = new URLSearchParams(window.location.search), D = f.get("username") || Math.floor(Math.random() * 1e3).toString(), Z = $[Math.floor(Math.random() * $.length)];
+let Q = [{
   target: "say",
-  transform: async (e) => _ + " says: '" + e + "'"
-}], N = [{
+  transform: async (e) => D + " says: '" + e + "'"
+}], X = [{
   target: "bold",
-  transform: (e, r) => `<b style="white-space: pre-wrap;">${r.body}</b>`
-}], V = [{
+  transform: (e, s) => `<b style="white-space: pre-wrap;">${s.body}</b>`
+}], Y = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
-    const [r, a] = e.split("#");
-    return `<a href="https://github.com/${r}/issues/${a}">${e}</a>`;
+    const [s, r] = e.split("#");
+    return `<a href="https://github.com/${s}/issues/${r}">${e}</a>`;
   }
 }, {
   target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
   transform: (e) => {
-    const [r, a] = e.split("!");
-    return `<a href="https://github.com/${r}/pull/${a}">${e}</a>`;
+    const [s, r] = e.split("!");
+    return `<a href="https://github.com/${s}/pull/${r}">${e}</a>`;
   }
 }, {
   target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
@@ -201,55 +229,55 @@ let J = [{
 }, {
   target: /@[0-9a-z\-]+/g,
   transform: (e) => {
-    const r = e.slice(1);
+    const s = e.slice(1);
     return `
-                <a href='https://github.com/${r}'>
-                  ${r}
+                <a href='https://github.com/${s}'>
+                  ${s}
                 </a>`;
   }
 }, {
   target: /\|date\|/g,
-  transform: (e) => new Promise((r) => r(new Date().toLocaleString("en-GB", {
+  transform: (e) => new Promise((s) => s(new Date().toLocaleString("en-GB", {
     timeZone: "UTC"
   })))
 }];
-const y = {}.VITE_COLLAB != "OFF" && u.get("collab") != "false";
-var S;
-const f = (S = {}.VITE_WS_URL) != null ? S : u.get("collab_server");
-var x;
-const Z = (x = u.get("git_backend")) != null ? x : "stub";
+const p = {}.VITE_COLLAB != "OFF" && f.get("collab") != "false";
+var M;
+const g = (M = {}.VITE_WS_URL) != null ? M : f.get("collab_server");
+var T;
+const ee = (T = f.get("git_backend")) != null ? T : "stub";
 var B;
 const {
-  initialBranches: j,
-  ...H
-} = W(Z, {
-  repoKey: (B = u.get("repo")) != null ? B : "repos/myst",
+  initialBranches: te,
+  ...se
+} = V(ee, {
+  repoKey: (B = f.get("repo")) != null ? B : "repos/myst",
   getBranch: () => {
-    var e, r, a, l, m;
-    return (m = (l = (a = (r = (e = window.myst_editor) == null ? void 0 : e.demo) == null ? void 0 : r.git) == null ? void 0 : a.branch) == null ? void 0 : l.value) != null ? m : "main";
+    var e, s, r, o, i;
+    return (i = (o = (r = (s = (e = window.myst_editor) == null ? void 0 : e.demo) == null ? void 0 : s.git) == null ? void 0 : r.branch) == null ? void 0 : o.value) != null ? i : "main";
   }
 });
-var I;
-M({
-  repo: (I = u.get("repo")) != null ? I : "repos/myst",
-  initialBranches: j,
-  ...H,
+var O;
+F({
+  repo: (O = f.get("repo")) != null ? O : "repos/myst",
+  initialBranches: te,
+  ...se,
   id: "demo",
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
-  transforms: V,
+  transforms: Y,
   collaboration: {
-    enabled: y,
-    commentsEnabled: y,
-    resolvingCommentsEnabled: y,
-    wsUrl: f != null ? f : "#",
-    username: _,
-    color: q,
-    mode: f ? "websocket" : "local"
+    enabled: p,
+    commentsEnabled: p,
+    resolvingCommentsEnabled: p,
+    wsUrl: g != null ? g : "#",
+    username: D,
+    color: Z,
+    mode: g ? "websocket" : "local"
   },
-  customRoles: J,
-  customDirectives: N,
+  customRoles: Q,
+  customDirectives: X,
   syncScroll: !0,
-  index: p,
-  docsRoot: F
+  index: C,
+  docsRoot: L
 }, document.getElementById("myst"));
 //# sourceMappingURL=git.js.map
