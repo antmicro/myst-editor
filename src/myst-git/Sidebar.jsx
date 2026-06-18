@@ -1,8 +1,5 @@
 import styled from "styled-components";
-import { batch, useComputed } from "@preact/signals";
 import { TableOfContents } from "./TableOfContents";
-import { useContext } from "preact/hooks";
-import { MystState } from "../mystState";
 
 const GitSidebar = styled.div`
   display: flex;
@@ -52,47 +49,8 @@ const UnindexedFiles = styled.details`
   }
 `;
 
-const Sidebar = ({ docsRoot, files, file, branch, commit, getText, docsWithChanges, indexFile, index }) => {
-  const { options } = useContext(MystState);
-
-  async function switchFile(newFile) {
-    const text = await getText(branch.peek(), commit.peek(), newFile);
-    batch(() => {
-      file.value = newFile;
-      options.initialText.value = text;
-    });
-  }
-
-  const indexedFiles = useComputed(() => {
-    const entries = index ? [{ file: index, fileName: index }] : [];
-    const start = "```{toctree}";
-    if (indexFile.value?.includes(start)) {
-      let body = indexFile.value.slice(indexFile.value.indexOf(start) + start.length);
-      if (body.includes("```")) {
-        body = body.slice(0, body.indexOf("```"));
-        let prefix = docsRoot;
-        if (prefix === "." || prefix === "./") prefix = "";
-        if (prefix !== "") prefix += "/";
-        entries.push(
-          ...body
-            .split("\n")
-            .map((l) => l.trim())
-            .filter((l) => l && !l.startsWith(":"))
-            .map((f) => ({ file: prefix + f + ".md", fileName: f })),
-        );
-      }
-    }
-    return entries.filter((f) => files.value.some((file) => file == f.file));
-  });
-  const unIndexedFiles = useComputed(() => files.value.filter((f) => !indexedFiles.value.some((iF) => iF.file === f)));
-  const markedFiles = useComputed(() =>
-    files.value.filter((f) =>
-      docsWithChanges.value.some(
-        ({ branch: branchName, commitHash, file }) => branchName == branch.value && commit.value.hash === commitHash && f == file,
-      ),
-    ),
-  );
-
+// Page-index data and `switchFile` are computed in MystEditorGit and passed in so an external integration can reuse them.
+const Sidebar = ({ file, branch, commit, getText, indexFile, indexedFiles, unIndexedFiles, markedFiles, switchFile }) => {
   return (
     <GitSidebar>
       {indexFile.value && file.value && (

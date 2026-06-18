@@ -1,5 +1,6 @@
 import { MystEditorPreact, CollaborationClient } from "../MystEditor";
 import { render } from "preact";
+import { EditorView } from "codemirror";
 import { useContext, useEffect, useRef } from "preact/hooks";
 import { batch, effect, useComputed, useSignal, useSignalEffect } from "@preact/signals";
 import { createMystState, MystState } from "../mystState";
@@ -17,7 +18,7 @@ function escapeHtml(text) {
 
 const MystContainer = styled(MystCSSVars)`
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: ${(props) => (props.$noSidebar ? "1fr" : "300px 1fr")};
   grid-template-rows: 100%;
   height: 100%;
   font-family: "Lato";
@@ -100,11 +101,90 @@ const MystEditorGit = ({
   const commentStateToApply = useRef(null);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
   const indexFile = useSignal();
-  const { collab, options } = useContext(MystState);
+  const { collab, options, editorView } = useContext(MystState);
   const commitDocuments = useRef(null);
 
+  // Lifted out of <Sidebar> so it can also be exposed to an external integration via externalSidebar.
+  const indexedFiles = useComputed(() => {
+    const entries = index ? [{ file: index, fileName: index }] : [];
+    const start = "```{toctree}";
+    if (indexFile.value?.includes(start)) {
+      let body = indexFile.value.slice(indexFile.value.indexOf(start) + start.length);
+      if (body.includes("```")) {
+        body = body.slice(0, body.indexOf("```"));
+        let prefix = docsRoot;
+        if (prefix === "." || prefix === "./") prefix = "";
+        if (prefix !== "") prefix += "/";
+        entries.push(
+          ...body
+            .split("\n")
+            .map((l) => l.trim())
+            .filter((l) => l && !l.startsWith(":"))
+            .map((f) => ({ file: prefix + f + ".md", fileName: f })),
+        );
+      }
+    }
+    return entries.filter((f) => files.value.some((file) => file == f.file));
+  });
+  const unIndexedFiles = useComputed(() => files.value.filter((f) => !indexedFiles.value.some((iF) => iF.file === f)));
+  const markedFiles = useComputed(() =>
+    files.value.filter((f) =>
+      docsWithChanges.value.some(
+        ({ branch: branchName, commitHash, file: changedFile }) =>
+          branchName == branch.value && commit.value?.hash === commitHash && f == changedFile,
+      ),
+    ),
+  );
+
+  // Resolved titles for external integrations only; the built-in <TableOfContents> resolves its own.
+  const pageIndex = useSignal([]);
+  useSignalEffect(() => {
+    if (!options.externalSidebar.value) return;
+    const entries = indexedFiles.value;
+    (async () => {
+      const resolved = await Promise.all(
+        entries.map(async (f) => {
+          const text = await getText(branch.peek(), commit.peek(), f.file);
+          const headingMatch = text.match(/(?:^# (.+))|(?:^(.*)\n=+)/);
+          return { ...f, title: headingMatch ? (headingMatch[1] ?? headingMatch[2]) : f.file };
+        }),
+      );
+      pageIndex.value = resolved;
+    })();
+  });
+
+  async function switchFile(newFile) {
+    const text = await getText(branch.peek(), commit.peek(), newFile);
+    batch(() => {
+      file.value = newFile;
+      options.initialText.value = text;
+    });
+  }
+
+  function scrollToHeading(pos) {
+    const view = editorView.peek();
+    if (!view) return;
+    view.dispatch({ selection: { anchor: pos, head: pos }, effects: EditorView.scrollIntoView(pos, { y: "start" }) });
+  }
+
   useEffect(() => {
-    window.myst_editor[props.id].git = { branch, commits, commit, files, file, room, statusSocket };
+    window.myst_editor[props.id].git = {
+      branch,
+      commits,
+      commit,
+      files,
+      file,
+      room,
+      statusSocket,
+      indexFile,
+      indexedFiles,
+      unIndexedFiles,
+      markedFiles,
+      pageIndex,
+      switchFile,
+      scrollToHeading,
+    };
+    options.onReady.value?.({ state: window.myst_editor[props.id].state, git: window.myst_editor[props.id].git });
   }, [props.id]);
 
   useSignalEffect(() => {
@@ -366,8 +446,10 @@ const MystEditorGit = ({
   return (
     <div style="all: initial;">
       <StyleSheetManager target={props.parent}>
-        <MystContainer id="myst-css-namespace">
-          <Sidebar {...{ docsRoot, files, file, branch, commit, getText, docsWithChanges, indexFile, index }} />
+        <MystContainer id="myst-css-namespace" $noSidebar={options.externalSidebar.value}>
+          {!options.externalSidebar.value && (
+            <Sidebar {...{ file, branch, commit, getText, indexFile, indexedFiles, unIndexedFiles, markedFiles, switchFile }} />
+          )}
           <GitPickerModal
             id="git-branch-picker"
             title="Switch branch"
