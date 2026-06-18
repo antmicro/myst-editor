@@ -381,16 +381,18 @@ export const EditorTopbar = ({ alert, buttons }) => {
           ))}
         </div>
         {alert.value && <Alert className="topbar-alert"> {alert} </Alert>}
-        <TitleBlock>
-          <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
-          {options.subtitle.value && (
-            <Subtitle
-              id="document-subtitle"
-              dangerouslySetInnerHTML={{ __html: subtitleHtml.value }}
-              onClick={(ev) => options.onSubtitleClick.value?.(ev)}
-            />
-          )}
-        </TitleBlock>
+        {options.showTitle.value && (
+          <TitleBlock>
+            <Title id="document-title" dangerouslySetInnerHTML={{ __html: titleHtml.value }} />
+            {options.subtitle.value && (
+              <Subtitle
+                id="document-subtitle"
+                dangerouslySetInnerHTML={{ __html: subtitleHtml.value }}
+                onClick={(ev) => options.onSubtitleClick.value?.(ev)}
+              />
+            )}
+          </TitleBlock>
+        )}
       </div>
       <div className="side">
         {collab.value && <Avatars />}
@@ -403,7 +405,7 @@ export const EditorTopbar = ({ alert, buttons }) => {
             ))}
           </div>
         )}
-        <ButtonGroup buttons={editorModeButtons} clickedId={clickedId.value} mainButtonsNum={4} />
+        {options.showModeButtons.value && <ButtonGroup buttons={editorModeButtons} clickedId={clickedId.value} mainButtonsNum={4} />}
 
         {options.onExit.value && (
           <TopbarButton className="icon" active={false} type="button" title={"Quit"} name={"Quit"} onClick={() => options.onExit.value()}>
