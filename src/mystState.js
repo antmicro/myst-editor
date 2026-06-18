@@ -235,6 +235,12 @@ const defaults = {
   mermaidTheme: "neutral",
   cmDarkTheme: false,
   onExit: false,
+  // Let the external integration render the page index instead of the built-in sidebar.
+  externalSidebar: false,
+  showTitle: true,
+  showModeButtons: true,
+  // Called with { state, git } once the git API is ready.
+  onReady: null,
   language: "markdown",
 };
 
