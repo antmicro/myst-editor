@@ -9,16 +9,12 @@ const subEditorUpdate = Annotation.define();
 
 export const subEditorId = Facet.define();
 
-const getCodeBlockContentEndPos = (doc, startLine, endLine) => {
-  const contentFrom = Math.min(doc.length, startLine.to + 1);
-  const openingFence = startLine.text.trimStart().match(/^([`:~])\1{2,}/)?.[0];
-  const closingFence = endLine.text.trim();
-  const hasClosingFence =
-    endLine.from > startLine.from &&
-    openingFence &&
-    closingFence.length >= openingFence.length &&
-    closingFence.split(openingFence[0]).join("") === "";
-  return { contentFrom, contentTo: Math.max(contentFrom, Math.min(doc.length, hasClosingFence ? endLine.from - 1 : endLine.to)) };
+const getContentFrom = (doc, startLine) => Math.min(doc.length, startLine.to + 1);
+
+const getCodeBlockContent = (doc, startLine, endLine, closed) => {
+  const contentFrom = getContentFrom(doc, startLine);
+  const contentTo = Math.max(contentFrom, Math.min(doc.length, closed ? endLine.from - 1 : endLine.to));
+  return { contentFrom, contentTo };
 };
 
 const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, completionSources = [], linter) =>
@@ -44,10 +40,12 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, compl
           }
           return true;
         });
+      const tree = tr.reconfigured ? ensureSyntaxTree(tr.state, tr.state.doc.length, 5000) : syntaxTree(tr.state);
+
       value.editors.forEach((e) => {
         const startLine = tr.state.doc.lineAt(e.from);
         const endLine = tr.state.doc.lineAt(e.to);
-        const { contentFrom, contentTo } = getCodeBlockContentEndPos(tr.state.doc, startLine, endLine);
+        const { contentFrom, contentTo } = getCodeBlockContent(tr.state.doc, startLine, endLine, tree.resolve(e.to, -1).name === "CodeMark");
         const contents = tr.state.doc.slice(contentFrom, contentTo).toString();
         if (contents != e.editor.state.doc.toString()) {
           linter.value = { ...linter.peek(), status: "pending" };
@@ -56,12 +54,6 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, compl
       });
 
       // detect new editors
-      let tree;
-      if (tr.reconfigured) {
-        tree = ensureSyntaxTree(tr.state, tr.state.doc.length, 5000);
-      } else {
-        tree = syntaxTree(tr.state);
-      }
       tree.iterate({
         enter(ref) {
           if (ref.name !== "FencedCode") return true;
@@ -71,7 +63,8 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, compl
           if (!(lang in value.extensions)) return false;
 
           const endLine = tr.state.doc.lineAt(ref.to);
-          const { contentFrom, contentTo } = getCodeBlockContentEndPos(tr.state.doc, startLine, endLine);
+          const closed = ref.node.lastChild?.name === "CodeMark" && ref.node.lastChild.from > ref.from;
+          const { contentFrom, contentTo } = getCodeBlockContent(tr.state.doc, startLine, endLine, closed);
           const contents = tr.state.doc.slice(contentFrom, contentTo).toString();
 
           const id = crypto.randomUUID();
@@ -128,9 +121,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, compl
           for (const id in subeditors.diagnostics) {
             const editor = subeditors.editors.find((e) => e.id == id);
             const doc = u.view.state.doc;
-            const startLine = doc.lineAt(editor.from);
-            const endLine = doc.lineAt(editor.to);
-            const { contentFrom } = getCodeBlockContentEndPos(doc, startLine, endLine);
+            const contentFrom = getContentFrom(doc, doc.lineAt(editor.from));
             diagnostics[id] = subeditors.diagnostics[id].map((d) => ({
               ...d,
               from: Math.min(doc.length, d.from + contentFrom),
@@ -147,9 +138,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, compl
           const subeditors = view.state.field(field);
           for (const subeditor of subeditors.editors) {
             if (pos < subeditor.from || pos > subeditor.to) continue;
-            const startLine = view.state.doc.lineAt(subeditor.from);
-            const endLine = view.state.doc.lineAt(subeditor.to);
-            const { contentFrom } = getCodeBlockContentEndPos(view.state.doc, startLine, endLine);
+            const contentFrom = getContentFrom(view.state.doc, view.state.doc.lineAt(subeditor.from));
             const mappedPos = pos - contentFrom;
             const tooltip = await tooltipSources[subeditor.lang]?.doHover?.(subeditor.editor, mappedPos, side);
             if (!tooltip) return;
@@ -165,9 +154,7 @@ const codeBlocksSubeditors = (extensions, editorView, tooltipSources = {}, compl
               const subeditors = ctx.view.state.field(field);
               for (const subeditor of subeditors.editors) {
                 if (ctx.pos < subeditor.from || ctx.pos > subeditor.to) continue;
-                const startLine = ctx.view.state.doc.lineAt(subeditor.from);
-                const endLine = ctx.view.state.doc.lineAt(subeditor.to);
-                const { contentFrom } = getCodeBlockContentEndPos(ctx.view.state.doc, startLine, endLine);
+                const contentFrom = getContentFrom(ctx.view.state.doc, ctx.view.state.doc.lineAt(subeditor.from));
                 const innerCtx = new CompletionContext(subeditor.editor.state, ctx.pos - contentFrom, ctx.explicit, subeditor.editor);
                 const completion = await src.source.doComplete(innerCtx);
                 if (!completion) return null;
