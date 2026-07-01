@@ -1,8 +1,8 @@
 import { useContext } from "preact/hooks";
 import styled from "styled-components";
 import { MystState } from "../mystState";
-import { EditorView } from "codemirror";
 import { useSignalEffect } from "@preact/signals";
+import { scrollToPos } from "../utils";
 
 const Wrapper = styled.div`
   background-color: var(--panel-bg);
@@ -78,15 +78,14 @@ function Heading({ heading }) {
 }
 
 export const TableOfContents = () => {
-  const { headings, editorView } = useContext(MystState);
+  const { headings, editorView, options, text } = useContext(MystState);
 
   useSignalEffect(() => console.log(headings.value));
 
   function handleClick(ev) {
     const posAttr = ev.target?.dataset?.headingPos;
     if (!posAttr) return;
-    const pos = parseInt(posAttr, 10);
-    editorView.value.dispatch({ selection: { anchor: pos, head: pos }, effects: EditorView.scrollIntoView(pos, { y: "start" }) });
+    scrollToPos(parseInt(posAttr, 10), { editorView, options, text });
   }
 
   return (

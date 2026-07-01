@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { EditorView } from "codemirror";
 import { useContext } from "preact/hooks";
 import { MystState } from "../mystState";
 import { useComputed, useSignal, useSignalEffect } from "@preact/signals";
+import { scrollToPos } from "../utils";
 
 const List = styled.div`
   font-size: 12px;
@@ -92,7 +92,7 @@ function Heading({ heading }) {
 }
 
 export const TableOfContents = ({ indexedFiles, markedFiles, currentFile, onFileClick, getText, branch, commit }) => {
-  const { headings, editorView } = useContext(MystState);
+  const { headings, editorView, options, text } = useContext(MystState);
 
   const fileList = useSignal([]);
   useSignalEffect(() => {
@@ -116,8 +116,7 @@ export const TableOfContents = ({ indexedFiles, markedFiles, currentFile, onFile
   function handleHeadingClick(ev) {
     const posAttr = ev.target?.dataset?.headingPos;
     if (!posAttr) return;
-    const pos = parseInt(posAttr, 10);
-    editorView.value.dispatch({ selection: { anchor: pos, head: pos }, effects: EditorView.scrollIntoView(pos, { y: "start" }) });
+    scrollToPos(parseInt(posAttr, 10), { editorView, options, text });
   }
 
   return (

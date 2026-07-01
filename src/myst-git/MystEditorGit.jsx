@@ -1,6 +1,5 @@
 import { MystEditorPreact, CollaborationClient } from "../MystEditor";
 import { render } from "preact";
-import { EditorView } from "codemirror";
 import { useContext, useEffect, useRef } from "preact/hooks";
 import { batch, effect, useComputed, useSignal, useSignalEffect } from "@preact/signals";
 import { createMystState, MystState } from "../mystState";
@@ -11,6 +10,7 @@ import { MystCSSVars } from "../styles/MystStyles";
 import Sidebar from "./Sidebar";
 import GitPickerModal from "./GitPickerModal";
 import { createLogger, Logger } from "../logger";
+import { scrollToPos } from "../utils";
 
 function escapeHtml(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -101,7 +101,7 @@ const MystEditorGit = ({
   const commentStateToApply = useRef(null);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
   const indexFile = useSignal();
-  const { collab, options, editorView } = useContext(MystState);
+  const { collab, options, editorView, text } = useContext(MystState);
   const commitDocuments = useRef(null);
 
   // Lifted out of <Sidebar> so it can also be exposed to an external integration via externalSidebar.
@@ -162,9 +162,7 @@ const MystEditorGit = ({
   }
 
   function scrollToHeading(pos) {
-    const view = editorView.peek();
-    if (!view) return;
-    view.dispatch({ selection: { anchor: pos, head: pos }, effects: EditorView.scrollIntoView(pos, { y: "start" }) });
+    scrollToPos(pos, { editorView, options, text });
   }
 
   useEffect(() => {
