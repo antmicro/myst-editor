@@ -227,6 +227,7 @@ const defaults = {
   parent: null,
   syncScroll: false,
   unfoldedHeadings: null,
+  collapsibleHeadingMarker: false,
   mapUrl: (tag, url) => url,
   yamlSchema: null,
   onPreviewClick: () => {},

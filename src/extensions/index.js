@@ -367,3 +367,17 @@ export function skipAndFoldAll(/** @type {EditorView} */ view, skip = 0) {
   }
   if (effects.length) view.dispatch({ effects });
 }
+
+/** Folds any ATX heading line ending in `(^)` (e.g. `## Section (^)`), so it starts collapsed.
+ * Runs once, at editor creation, same timing as `skipAndFoldAll`/`unfoldedHeadings` above. */
+export function foldMarkedHeadings(/** @type {EditorView} */ view) {
+  const { state } = view;
+  const effects = [];
+  for (let lineNo = 1; lineNo <= state.doc.lines; lineNo++) {
+    const line = state.doc.line(lineNo);
+    if (!/^#{1,6}\s.*\(\^\)\s*$/.test(line.text)) continue;
+    const range = foldable(state, line.from, line.to);
+    if (range) effects.push(foldEffect.of(range));
+  }
+  if (effects.length) view.dispatch({ effects });
+}

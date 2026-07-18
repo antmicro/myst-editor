@@ -2,7 +2,7 @@ import { useContext, useRef } from "preact/hooks";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import styled from "styled-components";
-import { ExtensionBuilder, skipAndFoldAll } from "../extensions";
+import { ExtensionBuilder, skipAndFoldAll, foldMarkedHeadings } from "../extensions";
 import { YCommentsParent } from "./Comment";
 import commentIcon from "../icons/comment.svg?raw";
 import { MystState } from "../mystState";
@@ -378,6 +378,9 @@ const CodeMirror = () => {
 
     if (options.unfoldedHeadings.value != undefined) {
       skipAndFoldAll(view, options.unfoldedHeadings.value);
+    }
+    if (options.collapsibleHeadingMarker.value) {
+      foldMarkedHeadings(view);
     }
 
     collab.value?.ycomments?.registerCodeMirror(view);
