@@ -17,6 +17,7 @@ import {
   bracketMatching,
   foldKeymap,
   HighlightStyle,
+  forceParsing,
 } from "@codemirror/language";
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
@@ -369,8 +370,15 @@ export function skipAndFoldAll(/** @type {EditorView} */ view, skip = 0) {
 }
 
 /** Folds any ATX heading line ending in `(^)` (e.g. `## Section (^)`), so it starts collapsed.
- * Runs once, at editor creation, same timing as `skipAndFoldAll`/`unfoldedHeadings` above. */
+ * Runs once, at editor creation, same timing as `skipAndFoldAll`/`unfoldedHeadings` above.
+ *
+ * `foldable()` reads a cached parse tree that, this soon after editor creation, may not have
+ * reached a marker deep in a large document yet. `forceParsing` parses forward and resyncs that
+ * cache (bounded to 300ms — a one-time cost at editor open, not a per-keystroke one), so the
+ * plain `foldable()` lookup below then sees a complete tree. */
 export function foldMarkedHeadings(/** @type {EditorView} */ view) {
+  forceParsing(view, view.state.doc.length, 300);
+
   const { state } = view;
   const effects = [];
   for (let lineNo = 1; lineNo <= state.doc.lines; lineNo++) {
