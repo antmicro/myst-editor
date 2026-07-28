@@ -1,4 +1,5 @@
 import { useContext, useRef } from "preact/hooks";
+import { createPortal } from "preact/compat";
 import { css, styled } from "styled-components";
 import { MystState } from "../mystState.js";
 import { DefaultButton, Modal } from "./CommonUI.js";
@@ -58,6 +59,7 @@ const Templates = () => {
   const templates = useSignal({});
   const selectedTemplate = useSignal(null);
   const modalRef = useRef(null);
+  const modalHost = options.parent.querySelector("#myst-css-namespace");
 
   useSignalEffect(() => {
     if (!options.templatelist.value) {
@@ -98,22 +100,28 @@ const Templates = () => {
           ))}
         </div>
       </TemplatesList>
-      <Modal ref={modalRef}>
-        <h3>
-          Are you sure you want to apply the {selectedTemplate.value?.id} template? It will replace the current document and remove all comments.
-        </h3>
-        <div className="buttons">
-          <DefaultButton
-            onClick={() => {
-              editorView.value.dispatch({ changes: { from: 0, to: editorView.value.state.doc.length, insert: selectedTemplate.value.templatetext } });
-              selectedTemplate.value = null;
-            }}
-          >
-            Yes, apply
-          </DefaultButton>
-          <DefaultButton onClick={() => (selectedTemplate.value = null)}>No, cancel</DefaultButton>
-        </div>
-      </Modal>
+      {modalHost &&
+        createPortal(
+          <Modal ref={modalRef} onClose={() => (selectedTemplate.value = null)}>
+            <h3>
+              Are you sure you want to apply the {selectedTemplate.value?.id} template? It will replace the current document and remove all comments.
+            </h3>
+            <div className="buttons">
+              <DefaultButton
+                onClick={() => {
+                  editorView.value.dispatch({
+                    changes: { from: 0, to: editorView.value.state.doc.length, insert: selectedTemplate.value.templatetext },
+                  });
+                  selectedTemplate.value = null;
+                }}
+              >
+                Yes, apply
+              </DefaultButton>
+              <DefaultButton onClick={() => (selectedTemplate.value = null)}>No, cancel</DefaultButton>
+            </div>
+          </Modal>,
+          modalHost,
+        )}
     </>
   );
 };

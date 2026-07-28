@@ -33,6 +33,36 @@ test.describe.parallel("With collaboration disabled", () => {
     }).toPass();
   });
 
+  test("Keeps the template confirmation dialog outside the hover dropdown", async ({ page }) => {
+    await page.route("**/linkedtemplatelist.json", (route) =>
+      route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify([{ id: "Test template", templatetext: "/template.md" }]),
+      }),
+    );
+    await page.route("**/template.md", (route) => route.fulfill({ contentType: "text/markdown", body: "# Test template" }));
+    await applyPageOpts(page, { collab: "false" });
+
+    await page.getByTitle("Templates").hover();
+    await page.getByRole("button", { name: "Test template" }).click();
+
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    expect(await dialog.evaluate((element) => element.closest(".btn-dropdown"))).toBeNull();
+
+    await page.mouse.move(1200, 700);
+    await expect(dialog).toBeVisible();
+
+    const otherPage = await page.context().newPage();
+    await otherPage.bringToFront();
+    await page.bringToFront();
+    await expect(dialog).toBeVisible();
+    await otherPage.close();
+
+    await page.getByRole("button", { name: "No, cancel" }).click();
+    await expect(dialog).not.toBeVisible();
+  });
+
   test("Caches async transforms", async ({ page }) => {
     await clearEditor(page);
     const todayDate = new Date().toLocaleString("en-GB", { timeZone: "UTC" }).split(" ")[0];
