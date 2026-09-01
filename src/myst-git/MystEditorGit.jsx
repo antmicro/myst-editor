@@ -12,6 +12,9 @@ import GitPickerModal from "./GitPickerModal";
 import { createLogger, Logger } from "../logger";
 import { scrollToPos } from "../utils";
 
+/** Paths are relative to the repository root, so a leading `./` or `/` does not change what they point at. */
+const normalizePath = (path) => path?.replace(/^\.?\/+/, "");
+
 function escapeHtml(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -87,6 +90,7 @@ const MystEditorGit = ({
   docsRoot = "",
   ...props
 }) => {
+  const indexPath = normalizePath(index);
   const branches = useSignal(initialBranches);
   const branch = useSignal(initialBranches[0]);
   const commits = useSignal([]);
@@ -106,14 +110,13 @@ const MystEditorGit = ({
 
   // Lifted out of <Sidebar> so it can also be exposed to an external integration via externalSidebar.
   const indexedFiles = useComputed(() => {
-    const entries = index ? [{ file: index, fileName: index }] : [];
+    const entries = indexPath ? [{ file: indexPath, fileName: indexPath }] : [];
     const start = "```{toctree}";
     if (indexFile.value?.includes(start)) {
       let body = indexFile.value.slice(indexFile.value.indexOf(start) + start.length);
       if (body.includes("```")) {
         body = body.slice(0, body.indexOf("```"));
-        let prefix = docsRoot;
-        if (prefix === "." || prefix === "./") prefix = "";
+        let prefix = docsRoot === "." ? "" : normalizePath(docsRoot).replace(/\/+$/, "");
         if (prefix !== "") prefix += "/";
         entries.push(
           ...body
@@ -154,9 +157,10 @@ const MystEditorGit = ({
   });
 
   async function switchFile(newFile) {
-    const text = await getText(branch.peek(), commit.peek(), newFile);
+    const path = normalizePath(newFile);
+    const text = await getText(branch.peek(), commit.peek(), path);
     batch(() => {
-      file.value = newFile;
+      file.value = path;
       options.initialText.value = text;
     });
   }
@@ -369,7 +373,8 @@ const MystEditorGit = ({
     }
 
     const resolvedFiles = await getFiles(currBranch, currCommit);
-    const currFile = initialState.file && resolvedFiles.includes(initialState.file) ? initialState.file : resolvedFiles[0];
+    const stateFile = normalizePath(initialState.file);
+    const currFile = stateFile && resolvedFiles.includes(stateFile) ? stateFile : resolvedFiles[0];
     const text = await getText(currBranch, currCommit, currFile);
 
     batch(() => {
@@ -437,8 +442,8 @@ const MystEditorGit = ({
   });
 
   useSignalEffect(() => {
-    if (!branch.value || !commit.value?.hash || !index) return;
-    Promise.resolve(getText(branch.value, commit.value, index)).then((txt) => (indexFile.value = txt));
+    if (!branch.value || !commit.value?.hash || !indexPath) return;
+    Promise.resolve(getText(branch.value, commit.value, indexPath)).then((txt) => (indexFile.value = txt));
   });
 
   return (
@@ -543,7 +548,7 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   const fileLinkTransform = {
     target: /\[\[(.+)\]\]/g,
     transform: async (input, file) => {
-      const fileFull = file + ".md";
+      const fileFull = normalizePath(file) + ".md";
       const files = window.myst_editor[editorId].git.files.peek();
       if (!files.includes(fileFull)) return `<span title="Invalid file path">${input}</span>`;
       const text = await params.getText(window.myst_editor[editorId].git.branch.peek(), window.myst_editor[editorId].git.commit.peek(), fileFull);
