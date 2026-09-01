@@ -1,4 +1,4 @@
-import d, { defaultButtons as h } from "./MystEditor.js";
+import m, { defaultButtons as h } from "./MystEditor.js";
 let l = `# This is MyST Editor
 
 A Markdown editor using the [markdown-it parser](https://github.com/markdown-it/markdown-it), based on the [CommonMark specification](https://spec.commonmark.org/0.31.2/).
@@ -112,6 +112,13 @@ Some of the buttons include:
 
 In the top right corner you will find various view modes, including the source mode, preview mode, dual pane mode and the text diff mode, allowing you to see what changes were made.
 
+## Folded sections (^)
+
+Every heading in the preview can be folded using the arrow which shows up to the left of it on hover.
+Headings ending in \`(^)\` start out folded, both in the preview and in the editor.
+
+### This subsection is folded along with it
+
 ## Custom transforms
 
 The editor allows you to easily extend the standard Markdown syntax without having to write your own \`markdown-it\` plugins using the custom transforms feature.
@@ -149,10 +156,10 @@ These features include:
 - comments - add some text that does not show up in the preview
   - resolved comments - a new view to see comments that were resolved`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const n = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), c = a.get("room") || "0", m = a.get("username") || Math.floor(Math.random() * 1e3).toString(), u = n[Math.floor(Math.random() * n.length)];
+const n = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), c = a.get("room") || "0", d = a.get("username") || Math.floor(Math.random() * 1e3).toString(), u = n[Math.floor(Math.random() * n.length)];
 let p = [{
   target: "say",
-  transform: async (e) => m + " says: '" + e + "'"
+  transform: async (e) => d + " says: '" + e + "'"
 }], g = [{
   target: "bold",
   transform: (e, t) => `<b style="white-space: pre-wrap;">${t.body}</b>`
@@ -192,18 +199,19 @@ let p = [{
 const s = {}.VITE_COLLAB != "OFF" && a.get("collab") != "false";
 var r;
 const o = (r = {}.VITE_WS_URL) != null ? r : a.get("collab_server");
-d({
+m({
   id: "demo",
   templatelist: "linkedtemplatelist.json",
   initialText: l,
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
   transforms: w,
+  collapsibleHeadingMarker: !0,
   collaboration: {
     enabled: s,
     commentsEnabled: s,
     resolvingCommentsEnabled: s,
     wsUrl: o != null ? o : "#",
-    username: m,
+    username: d,
     room: c,
     color: u,
     mode: o ? "websocket" : "local"
