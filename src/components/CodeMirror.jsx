@@ -354,10 +354,8 @@ const CodeMirror = () => {
         })
         .useFixFoldingScroll(focusScroll)
         .useMoveCursorAfterFold()
-        .if(options.mode.value === "Both", (b) => b.useCursorIndicator({ text, preview: text.preview.value }))
-        .if(options.syncScroll.value && options.mode.value === "Both", (b) =>
-          b.useSyncPreviewWithCursor({ text, preview: text.preview.value, lastTyped }),
-        )
+        .if(options.mode.value === "Both", (b) => b.useCursorIndicator({ text }))
+        .if(options.syncScroll.value && options.mode.value === "Both", (b) => b.useSyncPreviewWithCursor({ text, lastTyped }))
         .if(options.yamlSchema.value, (b) => b.useYamlSchema(options.yamlSchema.value, editorView, linter))
         .if(options.mode.value === "Inline", (b) => b.useInlinePreview(text, options, editorView))
         .useTrackHeadings(headings)

@@ -10,7 +10,7 @@ const debounceTimeout = 100;
  */
 const typedToUpdateThreshold = 500;
 
-export const syncPreviewWithCursor = (text, preview, lastTyped) => {
+export const syncPreviewWithCursor = (text, lastTyped) => {
   let timeout;
 
   return EditorView.updateListener.of((update) => {
@@ -26,6 +26,9 @@ export const syncPreviewWithCursor = (text, preview, lastTyped) => {
     }
 
     function sync() {
+      const preview = text.preview.peek();
+      if (!preview) return;
+
       const [matchingElem, matchingLine] = findNearestElementForLine(cursorLineAfter, text.lineMap, preview);
       if (matchingElem) {
         scrollPreviewElemIntoView({

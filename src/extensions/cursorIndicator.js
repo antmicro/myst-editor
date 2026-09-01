@@ -2,7 +2,7 @@ import { EditorView } from "codemirror";
 import { markdownUpdatedEffect } from "../text";
 import { findNearestElementForLine } from "../markdown/markdownSourceMap";
 
-export const cursorIndicator = (text, preview) =>
+export const cursorIndicator = (text) =>
   EditorView.updateListener.of((update) => {
     const cursorLineBefore = update.startState.doc.lineAt(update.startState.selection.main.head).number;
     const cursorLineAfter = update.state.doc.lineAt(update.state.selection.main.head).number;
@@ -12,6 +12,10 @@ export const cursorIndicator = (text, preview) =>
     if (update.docChanged || (!selectionChanged && !markdownUpdated && !resized && !update.focusChanged)) {
       return;
     }
+
+    // Read here, since the preview can mount after the editor and be replaced on a mode switch.
+    const preview = text.preview.peek();
+    if (!preview) return;
 
     const [matchingElem] = findNearestElementForLine(cursorLineAfter, text.lineMap, preview);
     const previewElement = preview.querySelector(".cm-previewFocus");

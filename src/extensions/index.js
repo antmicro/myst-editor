@@ -214,13 +214,13 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useSyncPreviewWithCursor({ text, preview, lastTyped }) {
-    this.extensions.push(syncPreviewWithCursor(text, preview, lastTyped));
+  useSyncPreviewWithCursor({ text, lastTyped }) {
+    this.extensions.push(syncPreviewWithCursor(text, lastTyped));
     return this;
   }
 
-  useCursorIndicator({ text, preview }) {
-    this.extensions.push(cursorIndicator(text, preview));
+  useCursorIndicator({ text }) {
+    this.extensions.push(cursorIndicator(text));
     return this;
   }
 
