@@ -8,7 +8,7 @@ import commentIcon from "../icons/comment.svg?raw";
 import { MystState } from "../mystState";
 import { userExtensionsCompartment } from "./Settings";
 import { useSignalEffect } from "@preact/signals";
-import { MdStyles } from "./Preview";
+import { FoldChevron, MdStyles } from "./Preview";
 import { Logger } from "../logger";
 
 const CodeEditor = styled.div`
@@ -146,9 +146,14 @@ const CodeEditor = styled.div`
   .cm-foldGutter {
     margin-right: 5px;
 
-    .cm-gutterElement span[title="Fold line"],
-    .cm-gutterElement span[title="Unfold line"] {
-      user-select: none;
+    .cm-foldMarker {
+      ${FoldChevron}
+      width: 12px;
+      height: 100%;
+    }
+
+    .cm-foldMarker[data-fold="closed"]::before {
+      transform: rotate(-45deg) translate(-0.75px, -0.75px);
     }
   }
 

@@ -93,7 +93,15 @@ export class ExtensionBuilder {
 
   static basicSetup() {
     return new ExtensionBuilder([
-      foldGutter(),
+      foldGutter({
+        markerDOM: (open) => {
+          const marker = document.createElement("span");
+          marker.className = "cm-foldMarker";
+          marker.dataset.fold = open ? "open" : "closed";
+          marker.title = open ? "Fold line" : "Unfold line";
+          return marker;
+        },
+      }),
       dropCursor(),
       EditorState.allowMultipleSelections.of(true),
       indentOnInput(),

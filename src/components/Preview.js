@@ -1,5 +1,26 @@
 import styled, { css } from "styled-components";
 
+/** A right-angle chevron, drawn rather than typeset - the `⌄` and `›` glyphs used by CodeMirror
+ * sit at different heights in the font, so as a pair they always look misaligned. Rotating one
+ * shape keeps both states identical. Callers set the size and rotate `closed` by -45deg. */
+export const FoldChevron = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--editor-gutter-fg);
+  cursor: pointer;
+  user-select: none;
+
+  &::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translate(-0.75px, -0.75px);
+  }
+`;
+
 export const MdStyles = css`
   p {
     margin-top: 0px;
@@ -308,24 +329,17 @@ export const MdStyles = css`
     position: relative;
   }
 
-  /* Same glyphs, color and spacing as the fold markers in the editor gutter. */
+  /* The same marker as in the editor gutter. */
   .myst-fold-arrow {
+    ${FoldChevron}
     position: absolute;
     right: 100%;
     margin-right: 4px;
     top: 50%;
-    transform: translateY(-50%);
     width: 12px;
-    font-size: 16px;
-    text-align: center;
-    color: var(--editor-gutter-fg);
-    cursor: pointer;
-    user-select: none;
+    height: 12px;
+    margin-top: -6px;
     opacity: 0;
-
-    &::before {
-      content: "⌄";
-    }
   }
 
   [data-fold]:hover .myst-fold-arrow,
@@ -334,7 +348,7 @@ export const MdStyles = css`
   }
 
   [data-fold="closed"] .myst-fold-arrow::before {
-    content: "›";
+    transform: rotate(-45deg) translate(-0.75px, -0.75px);
   }
 
   .myst-folded {
