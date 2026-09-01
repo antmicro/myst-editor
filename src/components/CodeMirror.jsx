@@ -217,6 +217,8 @@ const CodeEditor = styled.div`
       color: inherit;
       font-family: "Lato";
       font-size: 16px;
+      /* Takes back the mid-word breaking of the line, without which content too long to fit widens the editor instead of wrapping. */
+      word-break: inherit;
     }
 
     ${MdStyles}
@@ -236,7 +238,8 @@ const CodeEditor = styled.div`
     font-family: monospace !important;
     line-height: 1.3em !important;
     font-size: 14px !important;
-    display: inline-block !important;
+    /* An inline-block would be sized against the whole line instead of the space left in the row, so it would move down as a whole and break the text early. */
+    display: inline !important;
   }
 
   .cm-editor .cm-lintRange-error {
