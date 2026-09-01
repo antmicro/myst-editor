@@ -1,5 +1,6 @@
 import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { EditorState, StateField } from "@codemirror/state";
+import { FOLD_MARKER } from "../text";
 
 export const trackHeadings = (headings) =>
   StateField.define({
@@ -47,7 +48,7 @@ function getHeadingsFlat(/** @type {EditorState} */ state) {
       const fullText = state.sliceDoc(nodeRef.from, nodeRef.to);
       headingsFlat.push({
         level,
-        text: isATX ? fullText.slice(level + 1) : fullText.split("\n")[0],
+        text: (isATX ? fullText.slice(level + 1) : fullText.split("\n")[0]).replace(FOLD_MARKER, ""),
         pos: nodeRef.from,
       });
       return false;

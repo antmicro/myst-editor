@@ -304,6 +304,32 @@ export const MdStyles = css`
     display: ${(props) => (props.mode === "Both" ? "block" : "none")};
   }
 
+  [data-fold] {
+    cursor: pointer;
+
+    &::after {
+      content: "▾";
+      font-size: 0.7em;
+      opacity: 0.5;
+      margin-left: 0.4em;
+    }
+  }
+
+  [data-fold="closed"]::after {
+    content: "▸";
+  }
+
+  .myst-folded {
+    display: none;
+  }
+
+  /* Folds are a reading aid, a printout should still contain the whole document. */
+  @media print {
+    .myst-folded {
+      display: revert;
+    }
+  }
+
   .mermaid {
     background-color: transparent;
     padding: 0;

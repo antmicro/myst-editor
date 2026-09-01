@@ -35,6 +35,7 @@ import { trackHeadings } from "./trackHeadings";
 import { highlightFocusedActiveLine } from "./activeLineHighlight";
 import { classHighlighter, tags } from "@lezer/highlight";
 import { loggerFacet } from "../logger";
+import { FOLD_MARKER } from "../text";
 import { criticHistory, criticMarkup, suggestMode } from "./criticMarkup";
 
 const getRelativeCursorLocation = (view) => {
@@ -383,7 +384,7 @@ export function foldMarkedHeadings(/** @type {EditorView} */ view) {
   const effects = [];
   for (let lineNo = 1; lineNo <= state.doc.lines; lineNo++) {
     const line = state.doc.line(lineNo);
-    if (!/^#{1,6}\s.*\(\^\)\s*$/.test(line.text)) continue;
+    if (!/^#{1,6}\s/.test(line.text) || !FOLD_MARKER.test(line.text)) continue;
     const range = foldable(state, line.from, line.to);
     if (range) effects.push(foldEffect.of(range));
   }

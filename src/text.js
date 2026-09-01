@@ -95,6 +95,8 @@ export class TextManager {
         .forEach((chunk) => (this.preview.value.querySelector(`html-chunk#html-chunk-${chunk.id}`).innerHTML = chunk.html));
     }
 
+    if (this.options.collapsibleHeadingMarker.value) foldMarkedSections(this.preview.value);
+
     this.chunks = newChunks;
     this.lastMd = this.md.value;
     this.lastMode = this.options.mode.value;
@@ -201,6 +203,8 @@ export class TextManager {
       }
     });
     doc.querySelectorAll("[data-remove]").forEach((n) => n.remove());
+    // The cached chunk HTML still has the markers, they are only stripped from the preview DOM.
+    if (this.options.collapsibleHeadingMarker.value) doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach(stripFoldMarker);
     const sanitized = doc.body.innerHTML;
 
     await navigator.clipboard.write([
@@ -213,6 +217,45 @@ export class TextManager {
 }
 
 const countOccurences = (str, pattern) => (str?.match(pattern) || []).length;
+
+/** Trailing marker which makes a heading start folded, e.g. `## Section (^)`. */
+export const FOLD_MARKER = /\s*\(\^\)\s*$/;
+
+/** Edits the trailing text node, not `innerHTML`, to leave source mapping spans untouched. */
+export function stripFoldMarker(heading) {
+  let node = heading;
+  while (node.lastChild) node = node.lastChild;
+  if (node.nodeType === Node.TEXT_NODE) node.data = node.data.replace(FOLD_MARKER, "");
+}
+
+/** Hides the blocks between a marked heading and the next heading of the same or a higher level. */
+export function foldMarkedSections(preview) {
+  let foldedAt = null;
+  // Blocks are walked across chunks, since the section of an `h1`-`h3` heading spans whole chunks.
+  for (const block of preview.querySelectorAll(":scope > html-chunk > *")) {
+    // Everything which is not a heading counts as deeper than one, so it belongs to the open fold.
+    const level = /^H[1-6]$/.test(block.tagName) ? parseInt(block.tagName[1]) : 7;
+    const folded = foldedAt !== null && level > foldedAt;
+    block.classList.toggle("myst-folded", folded);
+    if (folded || level === 7) continue;
+
+    // `data-fold` survives in chunks which were not rerendered, which keeps this idempotent.
+    if (!block.dataset.fold && FOLD_MARKER.test(block.textContent)) {
+      stripFoldMarker(block);
+      block.dataset.fold = "closed";
+    }
+    foldedAt = block.dataset.fold === "closed" ? level : null;
+  }
+}
+
+/** Returns whether the click landed on a marked heading. */
+export function toggleFoldOnClick(ev, preview) {
+  const heading = ev.target.closest?.("[data-fold]");
+  if (!heading) return false;
+  heading.dataset.fold = heading.dataset.fold === "closed" ? "open" : "closed";
+  foldMarkedSections(preview);
+  return true;
+}
 
 export function sanitize(unsafeHTML) {
   return purify.sanitize(unsafeHTML, {

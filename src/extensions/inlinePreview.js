@@ -1,5 +1,5 @@
 import { highlightingFor, HighlightStyle, syntaxHighlighting, syntaxTree } from "@codemirror/language";
-import { sanitize, TextManager } from "../text";
+import { FOLD_MARKER, sanitize, TextManager } from "../text";
 import { getStyleTags, tags } from "@lezer/highlight";
 import { EditorView } from "codemirror";
 import { Decoration, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
@@ -169,6 +169,11 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
             to,
             enter(node) {
               if (node.name.startsWith("ATXHeading") && nodeInMonospace(view.state, node)) return false;
+
+              if (node.name.startsWith("ATXHeading") && options.collapsibleHeadingMarker.value) {
+                const line = view.state.doc.lineAt(node.from);
+                if (FOLD_MARKER.test(line.text)) widgets.push(decorationHidden.range(line.from + line.text.lastIndexOf("(^)"), line.to));
+              }
               const elementToken = node.name.startsWith("SetextHeading") || tokenElement.includes(node.name);
               if ((elementToken && nodeInMonospace(view.state, node)) || node.name == "Frontmatter") {
                 const startLine = view.state.doc.lineAt(node.from);

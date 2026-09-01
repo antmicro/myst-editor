@@ -127,6 +127,13 @@ Some of the buttons include:
 
 In the top right corner you will find various view modes, including the source mode, preview mode, dual pane mode and the text diff mode, allowing you to see what changes were made.
 
+## Folded sections (^)
+
+Any heading ending in \`(^)\` starts folded, both in the editor and in the preview.
+Click the heading in the preview to unfold it, or use the fold marker in the editor gutter.
+
+### This subsection is folded along with it
+
 ## Custom transforms
 
 The editor allows you to easily extend the standard Markdown syntax without having to write your own \`markdown-it\` plugins using the custom transforms feature.
@@ -247,6 +254,7 @@ These features include:
           initialText: exampleText,
           title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
           transforms: exampleTransforms,
+          collapsibleHeadingMarker: true,
           collaboration: {
             enabled: collabEnabled,
             commentsEnabled: collabEnabled,
