@@ -11,7 +11,6 @@ import { createMystState, MystState, predefinedButtons, defaultButtons } from ".
 import { batch, computed, signal, effect, useSignal, useSignalEffect } from "@preact/signals";
 import { MystContainer } from "./styles/MystStyles";
 import { syncCheckboxes } from "./markdown/markdownCheckboxes";
-import { toggleFoldOnClick } from "./text";
 import { TableOfContents } from "./components/TableOfContents";
 import ErrorModal from "./components/ErrorModal";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -150,7 +149,7 @@ const MystEditor = () => {
                   onClick={(ev) => {
                     try {
                       if (options.onPreviewClick.value?.(ev)) return;
-                      if (toggleFoldOnClick(ev, preview.current)) return;
+                      if (text.toggleFoldOnClick(ev)) return;
 
                       syncCheckboxes(ev, text.lineMap, editorView.value);
 

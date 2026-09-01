@@ -305,18 +305,36 @@ export const MdStyles = css`
   }
 
   [data-fold] {
-    cursor: pointer;
+    position: relative;
+  }
 
-    &::after {
-      content: "▾";
-      font-size: 0.7em;
-      opacity: 0.5;
-      margin-left: 0.4em;
+  /* Same glyphs, color and spacing as the fold markers in the editor gutter. */
+  .myst-fold-arrow {
+    position: absolute;
+    right: 100%;
+    margin-right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    font-size: 16px;
+    text-align: center;
+    color: var(--editor-gutter-fg);
+    cursor: pointer;
+    user-select: none;
+    opacity: 0;
+
+    &::before {
+      content: "⌄";
     }
   }
 
-  [data-fold="closed"]::after {
-    content: "▸";
+  [data-fold]:hover .myst-fold-arrow,
+  [data-fold="closed"] .myst-fold-arrow {
+    opacity: 1;
+  }
+
+  [data-fold="closed"] .myst-fold-arrow::before {
+    content: "›";
   }
 
   .myst-folded {

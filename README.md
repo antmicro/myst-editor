@@ -247,7 +247,7 @@ Here are the options you can pass to the MystEditor function:
 - `unfoldedHeadings` *(`number?`)* - fold all but the given number of top level syntax nodes on startup.
   If the option is not set, nothing will be folded by default.
 - `collapsibleHeadingMarker` *(default: false)* - if enabled, any heading ending in `(^)` (e.g. `## Section (^)`) starts folded on startup.
-  The section is also folded in the preview, where clicking the heading toggles it, and the marker itself is hidden from the preview, inline mode and the outline.
+  The marker itself is hidden from the preview, inline mode and the outline.
 - `mapUrl` *(default: (tag, url) => url)* - function used to map `href` and `src` attributes. Tag is the name of the HTML element and url is the source url you can transform.
 - `yamlSchema` - must be an absoulte URL. If provided, a language server will launch in the background to provide tooltips, diagnostics and autocompletions based on the schema in YAML code blocks.
 - `onPreviewClick` *(`(ev: MouseEvent) => boolean`)* - callback for when the preview is clicked, if the builtin click actions should be skipped, it should return `true`

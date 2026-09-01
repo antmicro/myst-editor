@@ -143,7 +143,9 @@ export function findNearestElementForLine(lineNumber, lineMap, preview) {
     id = lineMap.get(num);
     if (id) {
       match = preview.querySelector(`[data-line-id="${id}"]`);
-      if (match) break;
+      // Folded elements have no layout, so callers cannot position anything against them.
+      if (match?.offsetParent) break;
+      match = null;
     }
   }
 

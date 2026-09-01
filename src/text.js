@@ -95,11 +95,44 @@ export class TextManager {
         .forEach((chunk) => (this.preview.value.querySelector(`html-chunk#html-chunk-${chunk.id}`).innerHTML = chunk.html));
     }
 
-    if (this.options.collapsibleHeadingMarker.value) foldMarkedSections(this.preview.value);
+    this.foldSections();
 
     this.chunks = newChunks;
     this.lastMd = this.md.value;
     this.lastMode = this.options.mode.value;
+  }
+
+  /** Makes every heading of the preview foldable and hides the blocks under the folded ones. */
+  foldSections() {
+    const useMarker = this.options.collapsibleHeadingMarker.value;
+    let foldedAt = null;
+    // Blocks are walked across chunks, since the section of an `h1`-`h3` heading spans whole chunks.
+    for (const block of this.preview.value.querySelectorAll(":scope > html-chunk > *")) {
+      // Everything which is not a heading counts as deeper than one, so it belongs to the open fold.
+      const level = /^H[1-6]$/.test(block.tagName) ? parseInt(block.tagName[1]) : 7;
+      const folded = foldedAt !== null && level > foldedAt;
+      block.classList.toggle("myst-folded", folded);
+      if (folded || level === 7) continue;
+
+      // `data-fold` survives in chunks which were not rerendered, which keeps this idempotent.
+      if (!block.dataset.fold) {
+        const marked = useMarker && FOLD_MARKER.test(block.textContent);
+        if (marked) stripFoldMarker(block);
+        block.dataset.fold = marked ? "closed" : "open";
+        // A real element, unlike a pseudo element, can be the target of a click.
+        block.insertAdjacentHTML("afterbegin", '<span class="myst-fold-arrow"></span>');
+      }
+      foldedAt = block.dataset.fold === "closed" ? level : null;
+    }
+  }
+
+  /** Returns whether the click landed on the fold arrow of a heading. */
+  toggleFoldOnClick(ev) {
+    const heading = ev.target.closest?.(".myst-fold-arrow")?.parentElement;
+    if (!heading) return false;
+    heading.dataset.fold = heading.dataset.fold === "closed" ? "open" : "closed";
+    this.foldSections();
+    return true;
   }
 
   observePreview() {
@@ -226,35 +259,6 @@ export function stripFoldMarker(heading) {
   let node = heading;
   while (node.lastChild) node = node.lastChild;
   if (node.nodeType === Node.TEXT_NODE) node.data = node.data.replace(FOLD_MARKER, "");
-}
-
-/** Hides the blocks between a marked heading and the next heading of the same or a higher level. */
-export function foldMarkedSections(preview) {
-  let foldedAt = null;
-  // Blocks are walked across chunks, since the section of an `h1`-`h3` heading spans whole chunks.
-  for (const block of preview.querySelectorAll(":scope > html-chunk > *")) {
-    // Everything which is not a heading counts as deeper than one, so it belongs to the open fold.
-    const level = /^H[1-6]$/.test(block.tagName) ? parseInt(block.tagName[1]) : 7;
-    const folded = foldedAt !== null && level > foldedAt;
-    block.classList.toggle("myst-folded", folded);
-    if (folded || level === 7) continue;
-
-    // `data-fold` survives in chunks which were not rerendered, which keeps this idempotent.
-    if (!block.dataset.fold && FOLD_MARKER.test(block.textContent)) {
-      stripFoldMarker(block);
-      block.dataset.fold = "closed";
-    }
-    foldedAt = block.dataset.fold === "closed" ? level : null;
-  }
-}
-
-/** Returns whether the click landed on a marked heading. */
-export function toggleFoldOnClick(ev, preview) {
-  const heading = ev.target.closest?.("[data-fold]");
-  if (!heading) return false;
-  heading.dataset.fold = heading.dataset.fold === "closed" ? "open" : "closed";
-  foldMarkedSections(preview);
-  return true;
 }
 
 export function sanitize(unsafeHTML) {
