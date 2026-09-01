@@ -99,6 +99,9 @@ export class ExtensionBuilder {
           marker.className = "cm-foldMarker";
           marker.dataset.fold = open ? "open" : "closed";
           marker.title = open ? "Fold line" : "Unfold line";
+          // Folding is handled on `click`, so suppressing the focus shift here is safe. Without it
+          // the editor blurs and refocuses, and inline mode rerenders the line under the cursor.
+          marker.addEventListener("mousedown", (ev) => ev.preventDefault());
           return marker;
         },
       }),
