@@ -1,7 +1,7 @@
 import { useContext, useRef } from "preact/hooks";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { ExtensionBuilder, skipAndFoldAll, foldMarkedHeadings } from "../extensions";
 import { YCommentsParent } from "./Comment";
 import commentIcon from "../icons/comment.svg?raw";
@@ -142,6 +142,18 @@ const CodeEditor = styled.div`
   .cm-gutterElement {
     color: var(--editor-gutter-fg);
   }
+
+  /* Rendered blocks are much taller than a line of text, which leaves the number stranded at the
+     top of them. CodeMirror sizes every gutter element to its line block, so centering is enough. */
+  ${(props) =>
+    props.$mode === "Inline" &&
+    css`
+      .cm-lineNumbers .cm-gutterElement {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+    `}
 
   .cm-foldGutter {
     margin-right: 5px;
