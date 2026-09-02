@@ -57,7 +57,7 @@ function getHeadingsFlat(/** @type {EditorState} */ state) {
   return headingsFlat;
 }
 
-function nestHeadings(headingsFlat) {
+export function nestHeadings(headingsFlat) {
   const headingsNested = [];
   const levelMap = {};
   headingsFlat.forEach((h) => {

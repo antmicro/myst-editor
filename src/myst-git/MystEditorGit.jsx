@@ -11,6 +11,7 @@ import Sidebar from "./Sidebar";
 import GitPickerModal from "./GitPickerModal";
 import { createLogger, Logger } from "../logger";
 import { scrollToPos } from "../utils";
+import { nestHeadings } from "../extensions/trackHeadings";
 
 /** Paths are relative to the repository root, so a leading `./` or `/` does not change what they point at. */
 const normalizePath = (path) => path?.replace(/^\.?\/+/, "");
@@ -33,6 +34,17 @@ const toctreeEntries = (body) =>
       if (separator === -1) return { name: line, description: "" };
       return { name: line.slice(0, separator).trim(), description: line.slice(separator + 3).trim() };
     });
+
+/** Headings of a document, in the shape the editor keeps them in. Read from the tokens, so that the
+ * ones inside code blocks are left out. */
+const parseHeadings = (md, content) => {
+  const lineStarts = [0];
+  for (let i = 0; i < content.length; i++) if (content[i] === "\n") lineStarts.push(i + 1);
+  const tokens = md.parse(content, {});
+  return tokens.flatMap((token, idx) =>
+    token.type === "heading_open" ? [{ level: parseInt(token.tag.slice(1)), text: tokens[idx + 1].content, pos: lineStarts[token.map[0]] }] : [],
+  );
+};
 
 /** Nests headings inside each other according to their levels, starting one level below the file itself. */
 function headingList(headings, file) {
@@ -132,7 +144,7 @@ const MystEditorGit = ({
   const commentStateToApply = useRef(null);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
   const indexFile = useSignal();
-  const { collab, options, editorView, text } = useContext(MystState);
+  const { collab, options, editorView, text, headings } = useContext(MystState);
   const commitDocuments = useRef(null);
 
   const indexedFiles = useComputed(() => {
@@ -168,11 +180,7 @@ const MystEditorGit = ({
       pageIndex.value = await Promise.all(
         entries.map(async (entry) => {
           const content = await getText(branch.peek(), commit.peek(), entry.file);
-          // Headings are read from the tokens, so that the ones inside code blocks are left out.
-          const tokens = md.parse(content, {});
-          const headings = tokens.flatMap((token, idx) =>
-            token.type === "heading_open" ? [{ level: parseInt(token.tag.slice(1)), text: tokens[idx + 1].content }] : [],
-          );
+          const headings = parseHeadings(md, content);
           // A leading first level heading is the title of the file rather than a part of its structure.
           const title = headings[0]?.level === 1 ? headings.shift().text : entry.fileName;
           return { ...entry, title, headings };
@@ -185,10 +193,11 @@ const MystEditorGit = ({
 
   async function switchFile(newFile) {
     const path = normalizePath(newFile);
-    const text = await getText(branch.peek(), commit.peek(), path);
+    const content = await getText(branch.peek(), commit.peek(), path);
     batch(() => {
       file.value = path;
-      options.initialText.value = text;
+      options.initialText.value = content;
+      headings.value = nestHeadings(parseHeadings(text.md.peek(), content));
     });
   }
 
