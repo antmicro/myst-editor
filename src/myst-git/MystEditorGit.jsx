@@ -158,20 +158,27 @@ const MystEditorGit = ({
     ),
   );
 
-  // Resolved titles for external integrations only; the built-in <TableOfContents> resolves its own.
+  // Titles and headings of the indexed files, used by the sidebar, the toctree and external integrations.
   const pageIndex = useSignal([]);
   useSignalEffect(() => {
-    if (!options.externalSidebar.value) return;
     const entries = indexedFiles.value;
+    const md = text.md.peek();
     (async () => {
-      const resolved = await Promise.all(
-        entries.map(async (f) => {
-          const text = await getText(branch.peek(), commit.peek(), f.file);
-          const headingMatch = text.match(/(?:^# (.+))|(?:^(.*)\n=+)/);
-          return { ...f, title: headingMatch ? (headingMatch[1] ?? headingMatch[2]) : f.file };
+      pageIndex.value = await Promise.all(
+        entries.map(async (entry) => {
+          const content = await getText(branch.peek(), commit.peek(), entry.file);
+          // Headings are read from the tokens, so that the ones inside code blocks are left out.
+          const tokens = md.parse(content, {});
+          const headings = tokens.flatMap((token, idx) =>
+            token.type === "heading_open" ? [{ level: parseInt(token.tag.slice(1)), text: tokens[idx + 1].content }] : [],
+          );
+          // A leading first level heading is the title of the file rather than a part of its structure.
+          const title = headings[0]?.level === 1 ? headings.shift().text : entry.fileName;
+          return { ...entry, title, headings };
         }),
       );
-      pageIndex.value = resolved;
+      // The toctree is rendered from the titles above, so the preview has to be rendered again.
+      text.renderText(false);
     })();
   });
 
@@ -470,7 +477,7 @@ const MystEditorGit = ({
       <StyleSheetManager target={props.parent}>
         <MystContainer id="myst-css-namespace" $noSidebar={options.externalSidebar.value}>
           {!options.externalSidebar.value && (
-            <Sidebar {...{ file, branch, commit, getText, indexFile, indexedFiles, unIndexedFiles, markedFiles, switchFile }} />
+            <Sidebar {...{ file, branch, commit, getText, indexFile, pageIndex, unIndexedFiles, markedFiles, switchFile }} />
           )}
           <GitPickerModal
             id="git-branch-picker"
@@ -582,29 +589,18 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   const mystToctreeDirective = {
     target: "mysttoctree",
     option_spec: { maxdepth: (v) => parseInt(v) },
-    transform: async (_, data) => {
-      const { indexedFiles, branch, commit } = window.myst_editor[editorId].git;
-      const md = window.myst_editor[editorId].state.text.md.peek();
-      const maxdepth = data.options.maxdepth ?? 1;
-      const entries = indexedFiles.peek().filter((entry) => entry.file !== normalizePath(params.index));
-
-      const items = await Promise.all(
-        entries.map(async (entry) => {
-          const text = await params.getText(branch.peek(), commit.peek(), entry.file);
-          // Headings are taken from the tokens, so that the ones inside code blocks are left out.
-          const tokens = md.parse(text, {});
-          const headings = tokens.flatMap((token, idx) =>
-            token.type === "heading_open" ? [{ level: parseInt(token.tag.slice(1)), text: tokens[idx + 1].content }] : [],
-          );
-          const title = headings[0]?.level === 1 ? headings.shift().text : entry.fileName;
+    // Kept synchronous, since only the results of asynchronous transforms are cached - and this one
+    // depends on the contents of other files, which the cache key does not cover.
+    transform: (_, data) => {
+      const maxdepth = data.options.maxdepth ?? 2;
+      const items = window.myst_editor[editorId].git.pageIndex
+        .peek()
+        .filter((entry) => entry.file !== normalizePath(params.index))
+        .map((entry) => {
           const description = entry.description ? ` - ${escapeHtml(entry.description)}` : "";
-
-          return `<li>${fileLink(entry.file, title)}${description}${headingList(
-            headings.filter((h) => h.level <= maxdepth),
-            entry.file,
-          )}</li>`;
-        }),
-      );
+          const headings = entry.headings.filter((heading) => heading.level <= maxdepth);
+          return `<li>${fileLink(entry.file, entry.title)}${description}${headingList(headings, entry.file)}</li>`;
+        });
 
       return `<ul>${items.join("")}</ul>`;
     },

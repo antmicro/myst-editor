@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useContext } from "preact/hooks";
 import { MystState } from "../mystState";
-import { useComputed, useSignal, useSignalEffect } from "@preact/signals";
+import { useComputed } from "@preact/signals";
 import { scrollToPos } from "../utils";
 
 const List = styled.div`
@@ -91,25 +91,9 @@ function Heading({ heading }) {
   );
 }
 
-export const TableOfContents = ({ indexedFiles, markedFiles, currentFile, onFileClick, getText, branch, commit }) => {
+export const TableOfContents = ({ pageIndex, markedFiles, currentFile, onFileClick }) => {
   const { headings, editorView, options, text } = useContext(MystState);
-
-  const fileList = useSignal([]);
-  useSignalEffect(() => {
-    const files = indexedFiles.value;
-    (async () => {
-      for (const f of files) {
-        const text = await getText(branch.peek(), commit.peek(), f.file);
-        const headingMatch = text.match(/(?:^# (.+))|(?:^(.*)\n=+)/);
-        if (!headingMatch) {
-          f.title = f.file;
-        } else {
-          f.title = headingMatch[1] ?? headingMatch[2];
-        }
-      }
-      fileList.value = files;
-    })();
-  });
+  const fileList = pageIndex;
 
   const fileHeadings = useComputed(() => headings.value.flatMap((h, i) => (i == 0 && h.level == 1 && h.pos === 0 ? h.children : h)));
 

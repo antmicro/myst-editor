@@ -50,19 +50,11 @@ const UnindexedFiles = styled.details`
 `;
 
 // Page-index data and `switchFile` are computed in MystEditorGit and passed in so an external integration can reuse them.
-const Sidebar = ({ file, branch, commit, getText, indexFile, indexedFiles, unIndexedFiles, markedFiles, switchFile }) => {
+const Sidebar = ({ file, indexFile, pageIndex, unIndexedFiles, markedFiles, switchFile }) => {
   return (
     <GitSidebar>
       {indexFile.value && file.value && (
-        <TableOfContents
-          indexedFiles={indexedFiles}
-          markedFiles={markedFiles}
-          currentFile={file.value}
-          onFileClick={(f) => switchFile(f.file)}
-          getText={getText}
-          branch={branch}
-          commit={commit}
-        />
+        <TableOfContents pageIndex={pageIndex} markedFiles={markedFiles} currentFile={file.value} onFileClick={(f) => switchFile(f.file)} />
       )}
       {unIndexedFiles.value.length > 0 && (
         <UnindexedFiles>
