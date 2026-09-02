@@ -139,7 +139,7 @@ export const TableOfContents = ({ indexedFiles, markedFiles, currentFile, onFile
             <li key={f.file}>
               <span
                 className={`file ${currentFile.startsWith(f.file) ? "active" : ""} ${markedFiles.value.includes(f.file) ? "marked" : ""}`}
-                title={`Go to file ${f.file}`}
+                title={f.description || `Go to file ${f.file}`}
                 onClick={() => onFileClick(f)}
               >
                 {fileLabel}

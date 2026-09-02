@@ -15,15 +15,18 @@ function demoMiddleCommitHash(seq) {
 
 const mainIndex = `# Demo Documentation
 
-\`\`\`{toctree}
-file1
-file2
+\`\`\`{mysttoctree}
+file1 - describes some aspect of the project
+file2 - explains another aspect of the project
 \`\`\`
 
 Welcome to the MyST editor git demo. Edit files, then use the Commit button to save.
 `;
 
-const featureIndex = mainIndex.replace("file2\n```", "file2\nfeature\n```");
+const featureIndex = mainIndex.replace(
+  "another aspect of the project\n",
+  "another aspect of the project\nfeature - contains an overview of the new feature\n",
+);
 
 const file1 = `# Document 1
 

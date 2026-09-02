@@ -19,6 +19,20 @@ function escapeHtml(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+const fileLink = (file, text) => `<span class="file-link" title="Switch to file" data-file-link="${file}">${escapeHtml(text)}</span>`;
+
+/** Nests headings inside each other according to their levels, starting one level below the file itself. */
+function headingList(headings, file) {
+  let html = "";
+  let depth = 1;
+  for (const heading of headings) {
+    html += "<ul>".repeat(Math.max(0, heading.level - depth)) + "</ul>".repeat(Math.max(0, depth - heading.level));
+    html += `<li>${fileLink(file, heading.text)}</li>`;
+    depth = heading.level;
+  }
+  return html + "</ul>".repeat(depth - 1);
+}
+
 const MystContainer = styled(MystCSSVars)`
   display: grid;
   grid-template-columns: ${(props) => (props.$noSidebar ? "1fr" : "300px 1fr")};
@@ -111,8 +125,8 @@ const MystEditorGit = ({
   // Lifted out of <Sidebar> so it can also be exposed to an external integration via externalSidebar.
   const indexedFiles = useComputed(() => {
     const entries = indexPath ? [{ file: indexPath, fileName: indexPath }] : [];
-    const start = "```{toctree}";
-    if (indexFile.value?.includes(start)) {
+    const start = ["```{mysttoctree}", "```{toctree}"].find((fence) => indexFile.value?.includes(fence));
+    if (start) {
       let body = indexFile.value.slice(indexFile.value.indexOf(start) + start.length);
       if (body.includes("```")) {
         body = body.slice(0, body.indexOf("```"));
@@ -123,7 +137,12 @@ const MystEditorGit = ({
             .split("\n")
             .map((l) => l.trim())
             .filter((l) => l && !l.startsWith(":"))
-            .map((f) => ({ file: prefix + f + ".md", fileName: f })),
+            .map((line) => {
+              // Everything after the first ` - ` describes the entry, so file names can contain hyphens.
+              const separator = line.indexOf(" - ");
+              const name = separator === -1 ? line : line.slice(0, separator).trim();
+              return { file: prefix + name + ".md", fileName: name, description: separator === -1 ? "" : line.slice(separator + 3).trim() };
+            }),
         );
       }
     }
@@ -559,11 +578,45 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
     },
   };
 
+  /** Renders the table of contents of the index file, together with the descriptions written in it. */
+  const mystToctreeDirective = {
+    target: "mysttoctree",
+    option_spec: { maxdepth: (v) => parseInt(v) },
+    transform: async (_, data) => {
+      const { indexedFiles, branch, commit } = window.myst_editor[editorId].git;
+      const md = window.myst_editor[editorId].state.text.md.peek();
+      const maxdepth = data.options.maxdepth ?? 1;
+      const entries = indexedFiles.peek().filter((entry) => entry.file !== normalizePath(params.index));
+
+      const items = await Promise.all(
+        entries.map(async (entry) => {
+          const text = await params.getText(branch.peek(), commit.peek(), entry.file);
+          // Headings are taken from the tokens, so that the ones inside code blocks are left out.
+          const tokens = md.parse(text, {});
+          const headings = tokens.flatMap((token, idx) =>
+            token.type === "heading_open" ? [{ level: parseInt(token.tag.slice(1)), text: tokens[idx + 1].content }] : [],
+          );
+          const title = headings[0]?.level === 1 ? headings.shift().text : entry.fileName;
+          const description = entry.description ? ` - ${escapeHtml(entry.description)}` : "";
+
+          return `<li>${fileLink(entry.file, title)}${description}${headingList(
+            headings.filter((h) => h.level <= maxdepth),
+            entry.file,
+          )}</li>`;
+        }),
+      );
+
+      return `<ul>${items.join("")}</ul>`;
+    },
+  };
+
   const state = createMystState({
     id: editorId,
     ...params,
     collaboration: { ...params.collaboration, mode: "manual" },
     transforms: [...params.transforms, fileLinkTransform],
+    // Listed first, so that an integration can override it with its own `mysttoctree`.
+    customDirectives: [mystToctreeDirective, ...(params.customDirectives ?? [])],
     onPreviewClick: (ev) => {
       if (params.onPreviewClick?.(ev)) return true;
       const file = ev.target.dataset?.fileLink;
