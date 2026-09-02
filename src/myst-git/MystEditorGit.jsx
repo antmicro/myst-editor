@@ -21,12 +21,25 @@ function escapeHtml(text) {
 
 const fileLink = (file, text) => `<span class="file-link" title="Switch to file" data-file-link="${file}">${escapeHtml(text)}</span>`;
 
+/** A toctree entry is a file name, optionally followed by ` - ` and a description of that file. */
+const toctreeEntries = (body) =>
+  body
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith(":"))
+    .map((line) => {
+      // The first ` - ` separates them, so that file names can contain hyphens themselves.
+      const separator = line.indexOf(" - ");
+      if (separator === -1) return { name: line, description: "" };
+      return { name: line.slice(0, separator).trim(), description: line.slice(separator + 3).trim() };
+    });
+
 /** Nests headings inside each other according to their levels, starting one level below the file itself. */
 function headingList(headings, file) {
   let html = "";
   let depth = 1;
   for (const heading of headings) {
-    html += "<ul>".repeat(Math.max(0, heading.level - depth)) + "</ul>".repeat(Math.max(0, depth - heading.level));
+    html += heading.level > depth ? "<ul>".repeat(heading.level - depth) : "</ul>".repeat(depth - heading.level);
     html += `<li>${fileLink(file, heading.text)}</li>`;
     depth = heading.level;
   }
@@ -122,28 +135,16 @@ const MystEditorGit = ({
   const { collab, options, editorView, text } = useContext(MystState);
   const commitDocuments = useRef(null);
 
-  // Lifted out of <Sidebar> so it can also be exposed to an external integration via externalSidebar.
   const indexedFiles = useComputed(() => {
     const entries = indexPath ? [{ file: indexPath, fileName: indexPath }] : [];
-    const start = ["```{mysttoctree}", "```{toctree}"].find((fence) => indexFile.value?.includes(fence));
+    const start = indexFile.value?.match(/```\{(?:myst)?toctree\}/);
     if (start) {
-      let body = indexFile.value.slice(indexFile.value.indexOf(start) + start.length);
+      let body = indexFile.value.slice(start.index + start[0].length);
       if (body.includes("```")) {
         body = body.slice(0, body.indexOf("```"));
         let prefix = docsRoot === "." ? "" : normalizePath(docsRoot).replace(/\/+$/, "");
         if (prefix !== "") prefix += "/";
-        entries.push(
-          ...body
-            .split("\n")
-            .map((l) => l.trim())
-            .filter((l) => l && !l.startsWith(":"))
-            .map((line) => {
-              // Everything after the first ` - ` describes the entry, so file names can contain hyphens.
-              const separator = line.indexOf(" - ");
-              const name = separator === -1 ? line : line.slice(0, separator).trim();
-              return { file: prefix + name + ".md", fileName: name, description: separator === -1 ? "" : line.slice(separator + 3).trim() };
-            }),
-        );
+        entries.push(...toctreeEntries(body).map(({ name, description }) => ({ file: prefix + name + ".md", fileName: name, description })));
       }
     }
     return entries.filter((f) => files.value.some((file) => file == f.file));
@@ -589,18 +590,18 @@ export default ({ additionalStyles, id, ...params }, /** @type {HTMLElement} */ 
   const mystToctreeDirective = {
     target: "mysttoctree",
     option_spec: { maxdepth: (v) => parseInt(v) },
-    // Kept synchronous, since only the results of asynchronous transforms are cached - and this one
-    // depends on the contents of other files, which the cache key does not cover.
+    // Kept synchronous - results of asynchronous transforms are cached, which would go stale here.
     transform: (_, data) => {
       const maxdepth = data.options.maxdepth ?? 2;
-      const items = window.myst_editor[editorId].git.pageIndex
-        .peek()
-        .filter((entry) => entry.file !== normalizePath(params.index))
-        .map((entry) => {
-          const description = entry.description ? ` - ${escapeHtml(entry.description)}` : "";
-          const headings = entry.headings.filter((heading) => heading.level <= maxdepth);
-          return `<li>${fileLink(entry.file, entry.title)}${description}${headingList(headings, entry.file)}</li>`;
-        });
+      const pageIndex = window.myst_editor[editorId].git.pageIndex.peek();
+
+      // Names and descriptions follow what is being typed, titles and headings are from the last commit.
+      const items = toctreeEntries(data.body).map(({ name, description }) => {
+        const page = pageIndex.find((entry) => entry.fileName === name);
+        const label = page ? fileLink(page.file, page.title) : escapeHtml(name);
+        const headings = page?.headings.filter((heading) => heading.level <= maxdepth) ?? [];
+        return `<li>${label}${description ? ` - ${escapeHtml(description)}` : ""}${headingList(headings, page?.file)}</li>`;
+      });
 
       return `<ul>${items.join("")}</ul>`;
     },
