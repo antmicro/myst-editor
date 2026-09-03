@@ -65,11 +65,13 @@ const Diff = () => {
     leftRef.current.appendChild(mergeView.current.b.dom);
     rightRef.current.appendChild(mergeView.current.a.dom);
 
-    const currButtons = options.includeButtons.value;
-    options.includeButtons.value = [...currButtons, { id: "discard", text: "Discard changes", action: () => modalRef.current.showModal() }];
+    options.includeButtons.value = [
+      ...options.includeButtons.peek(),
+      { id: "discard", text: "Discard changes", action: () => modalRef.current.showModal() },
+    ];
 
     return () => {
-      options.includeButtons.value = currButtons;
+      options.includeButtons.value = options.includeButtons.peek().filter((b) => b.id != "discard");
     };
   }, []);
 
