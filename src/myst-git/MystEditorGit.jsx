@@ -141,6 +141,7 @@ const MystEditorGit = ({
   const branchPickerOpen = useSignal(false);
   const commitPickerOpen = useSignal(false);
   const commitSummary = useSignal(null);
+  const preparingCommit = useSignal(false);
   const commentStateToApply = useRef(null);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
   const indexFile = useSignal();
@@ -291,40 +292,46 @@ const MystEditorGit = ({
     id: "commit",
     tooltip: "Compare changes and commit",
     icon: CommitIcon,
+    active: () => preparingCommit.value || commitSummary.value != null,
     action: async () => {
-      options.includeButtons.value = options.includeButtons.peek().filter((b) => b.id != "commit");
-      const changedFiles = docsWithChanges
-        .peek()
-        .filter((d) => d.branch === branch.peek() && d.commitHash === commit.peek().hash)
-        .map(({ file }) => file);
-      const otherFiles = changedFiles.filter((f) => f !== file.peek());
-      let documents = await setupFileConnections(repo, props, branch.peek(), commit.peek().hash, otherFiles, getText);
-      const currentText = collab.peek().ytext.toString();
-      const currentInitialText = options.initialText.peek();
-      if (otherFiles.length < changedFiles.length || currentText !== currentInitialText) {
-        documents.unshift({
-          client: collab.peek(),
-          file: file.peek(),
-          initialText: currentInitialText,
-          text: currentText,
-        });
-      }
-      documents = documents.map((d) => ({ ...d, textChanged: d.text != d.initialText, commentCount: d.client.ycomments.comments.peek().length }));
+      // Setting up the connections below takes a moment, during which the button can still be clicked.
+      if (preparingCommit.peek() || commitSummary.peek() != null) return;
+      preparingCommit.value = true;
+      try {
+        const changedFiles = docsWithChanges
+          .peek()
+          .filter((d) => d.branch === branch.peek() && d.commitHash === commit.peek().hash)
+          .map(({ file }) => file);
+        const otherFiles = changedFiles.filter((f) => f !== file.peek());
+        let documents = await setupFileConnections(repo, props, branch.peek(), commit.peek().hash, otherFiles, getText);
+        const currentText = collab.peek().ytext.toString();
+        const currentInitialText = options.initialText.peek();
+        if (otherFiles.length < changedFiles.length || currentText !== currentInitialText) {
+          documents.unshift({
+            client: collab.peek(),
+            file: file.peek(),
+            initialText: currentInitialText,
+            text: currentText,
+          });
+        }
+        documents = documents.map((d) => ({ ...d, textChanged: d.text != d.initialText, commentCount: d.client.ycomments.comments.peek().length }));
 
-      // Filter out documents without any changes and remove the change mark from the UI for them all
-      const unchangedDocs = documents.filter((d) => !d.textChanged && d.commentCount == 0);
-      cleanupConnections(unchangedDocs, collab);
-      unchangedDocs.map((d) => d.client.provider.roomname).forEach((r) => statusSocket.current.send(r));
-      documents = documents.filter((d) => d.textChanged || d.commentCount > 0);
+        // Filter out documents without any changes and remove the change mark from the UI for them all
+        const unchangedDocs = documents.filter((d) => !d.textChanged && d.commentCount == 0);
+        cleanupConnections(unchangedDocs, collab);
+        unchangedDocs.map((d) => d.client.provider.roomname).forEach((r) => statusSocket.current.send(r));
+        documents = documents.filter((d) => d.textChanged || d.commentCount > 0);
 
-      if (!documents.some((d) => d.textChanged)) {
-        toastNotify({ text: "No changes to commit" });
-        options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
-        return;
+        if (!documents.some((d) => d.textChanged)) {
+          toastNotify({ text: "No changes to commit" });
+          return;
+        }
+        documents.forEach(({ client }) => client.lock("A commit is being prepared for this document"));
+        commitDocuments.current = documents;
+        commitSummary.value = `MyST: update docs ${documents.map(({ file }) => file).join(", ")}`;
+      } finally {
+        preparingCommit.value = false;
       }
-      documents.forEach(({ client }) => client.lock("A commit is being prepared for this document"));
-      commitDocuments.current = documents;
-      commitSummary.value = `MyST: update docs ${documents.map(({ file }) => file).join(", ")}`;
     },
   };
   async function onCommit({ summary, message, stagedDocs }) {
@@ -367,12 +374,10 @@ const MystEditorGit = ({
       commitDocuments.current = null;
     } finally {
       cleanupConnections(newConnections, collab);
-      options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
     }
   }
   function onCommitCancel() {
     commitSummary.value = null;
-    options.includeButtons.value = [...options.includeButtons.peek(), commitButton];
     cleanupConnections(commitDocuments.current, collab);
     commitDocuments.current = null;
   }
