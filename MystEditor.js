@@ -69393,7 +69393,7 @@ const $s = RF(), $Vt = kr.div`
   }
 
   .myst-folded {
-    display: none;
+    display: none !important;
   }
 
   /* Folds are a reading aid, a printout should still contain the whole document. */
@@ -70967,33 +70967,29 @@ const xWt = kr.div`
     error: i
   } = Bi($s), s = Kn(), a = Kn(), o = Kn(), l = Kn();
   return Ha(() => {
-    var h, f;
-    if (o.current)
-      return !1;
-    o.current = new lWt({
+    var u, h;
+    return o.current ? !1 : (o.current = new lWt({
       a: {
-        doc: (h = t.initialText.peek()) == null ? void 0 : h.replace(/\r/g, ""),
+        doc: (u = t.initialText.peek()) == null ? void 0 : u.replace(/\r/g, ""),
         extensions: new hh().useReadonly().useLanguage(t.language.value, t.transforms.value).create()
       },
       b: {
-        doc: (f = e.text.peek()) == null ? void 0 : f.replace(/\r/g, ""),
-        extensions: hh.basicSetup().useLanguage("markdown", t.transforms.value).if(t.collaboration.value.enabled, (d) => d.useCollaboration({
+        doc: (h = e.text.peek()) == null ? void 0 : h.replace(/\r/g, ""),
+        extensions: hh.basicSetup().useLanguage("markdown", t.transforms.value).if(t.collaboration.value.enabled, (f) => f.useCollaboration({
           collabClient: n.value,
           editorView: r
-        })).if(!t.collaboration.value.enabled, (d) => d.useDefaultHistory()).addUpdateListener((d) => {
-          !d.docChanged || (e.shiftLineMap(d), e.text.value = d.view.state.doc.toString());
+        })).if(!t.collaboration.value.enabled, (f) => f.useDefaultHistory()).addUpdateListener((f) => {
+          !f.docChanged || (e.shiftLineMap(f), e.text.value = f.view.state.doc.toString());
         }).useExceptionSink(i).create()
       },
       root: t.parent
-    }), s.current.appendChild(o.current.b.dom), a.current.appendChild(o.current.a.dom);
-    const u = t.includeButtons.value;
-    return t.includeButtons.value = [...u, {
+    }), s.current.appendChild(o.current.b.dom), a.current.appendChild(o.current.a.dom), t.includeButtons.value = [...t.includeButtons.peek(), {
       id: "discard",
       text: "Discard changes",
       action: () => l.current.showModal()
     }], () => {
-      t.includeButtons.value = u;
-    };
+      t.includeButtons.value = t.includeButtons.peek().filter((f) => f.id != "discard");
+    });
   }, []), ys(() => {
     var u, h, f, d, p, g, m;
     (m = (h = (u = o.current) == null ? void 0 : u.a) == null ? void 0 : h.dispatch) == null || m.call(h, {
