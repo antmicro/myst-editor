@@ -136,7 +136,6 @@ const MystEditor = () => {
             {options.collaboration.value.enabled && !collab.value.ready.value && (
               <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
             )}
-            {options.collaboration.value.enabled && collab.value.lockMsg.value && <StatusBanner>{collab.value.lockMsg}</StatusBanner>}
             <MystWrapper className="myst-editor-wrapper" fullscreen={fullscreen.value}>
               <FlexWrapper id="editor-wrapper" className="flex-wrapper">
                 <CodeMirror />

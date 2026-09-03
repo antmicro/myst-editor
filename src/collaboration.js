@@ -8,12 +8,10 @@ import { YComments } from "./comments/ycomments";
 export class CollaborationClient {
   #synced = signal(false);
   #connected = signal(false);
-  #lockMsg = signal(null);
   #users = signal([]);
   #localUser = {};
   #offlineHandler;
   #onlineHandler;
-  lockMsg = computed(() => this.#lockMsg.value);
   users = computed(() => this.#users.value);
   #heartbeatInterval = null;
   storedSuggestions = signal([]);
@@ -118,23 +116,12 @@ export class CollaborationClient {
     }
 
     this.metaMap = this.ydoc.getMap("meta");
-    this.metaMap.observe(() => {
-      this.#lockMsg.value = this.metaMap.get("lock");
-    });
 
     const suggestions = this.ydoc.getArray("critic-suggestions");
     this.storedSuggestions.value = suggestions.toArray();
     suggestions.observe(() => {
       this.storedSuggestions.value = suggestions.toArray();
     });
-  }
-
-  lock(msg = "Document locked") {
-    this.metaMap.set("lock", msg);
-  }
-
-  unlock() {
-    this.metaMap.delete("lock");
   }
 
   storeSuggestion(suggestion) {

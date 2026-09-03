@@ -214,11 +214,6 @@ export class ExtensionBuilder {
     return this;
   }
 
-  useNoSelection() {
-    this.extensions.push(EditorView.editable.of(false));
-    return this;
-  }
-
   useReadonly() {
     this.extensions.push(EditorState.readOnly.of(true));
     return this;

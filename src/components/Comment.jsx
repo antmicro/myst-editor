@@ -103,7 +103,6 @@ const YComment = ({ commentId }) => {
         doc: ytext.toString(),
         extensions: new ExtensionBuilder()
           .disable(["Mod-z", "Mod-y", "Mod-Z"])
-          .if(collab.value.lockMsg.value, (b) => b.useReadonly().useNoSelection())
           .useCollaboration({ collabClient: { ytext, provider: collab.value.provider } })
           .addUpdateListener(updateHeight)
           .showCommentLineAuthors(lineAuthors)

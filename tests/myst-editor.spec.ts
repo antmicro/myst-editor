@@ -768,8 +768,6 @@ test.describe.parallel("MystEditorGit wrapper", () => {
     const pageB = await applyPageOpts(await context.newPage(), collabOpts, true);
 
     await pageA.getByTitle("Commit").click();
-    // Check if document is locked for the other user
-    await pageB.getByText("A commit is being prepared").waitFor();
 
     // Check if text used for commit contains the changes
     await expect(async () => {
@@ -791,6 +789,54 @@ test.describe.parallel("MystEditorGit wrapper", () => {
       await expect(pageA.locator("[data-git-commit]")).toContainText(hashA);
       await expect(pageB.locator("[data-git-commit]")).toContainText(hashB);
     }).toPass();
+  });
+
+  test("Carries changes made while commiting over to the new commit", async ({ context }) => {
+    const collabOpts = defaultCollabOpts();
+    const pageA = await applyPageOpts(await context.newPage(), collabOpts, true);
+    await clearEditor(pageA);
+    await insertToMainEditor(pageA, { from: 0, insert: "commited" });
+
+    const pageB = await applyPageOpts(await context.newPage(), collabOpts, true);
+    await expectText(pageB, "commited");
+
+    await pageA.getByTitle("Commit").click();
+    await pageA.locator("button[type=submit]").waitFor();
+
+    // Documents stay editable while a commit is being prepared
+    await insertToMainEditor(pageB, { from: "commited".length, insert: " and later" });
+    await expectText(pageA, "commited and later");
+
+    await pageA.click("button[type=submit]");
+    await pageA.waitForSelector(".cm-content");
+
+    await expect(async () => {
+      // The commit holds what was shown in the diff ...
+      const commited = await pageA.evaluate((id) => window.myst_editor[id].state.options.initialText.value, id);
+      expect(commited).toBe("commited");
+      // ... and the change made while it was being prepared is in the room of the new commit.
+      await expectText(pageA, "commited and later");
+      await expectText(pageB, "commited and later");
+    }).toPass();
+  });
+
+  test("Closes the commit modal when someone else commits first", async ({ context }) => {
+    const collabOpts = defaultCollabOpts();
+    const pageA = await applyPageOpts(await context.newPage(), collabOpts, true);
+    await clearEditor(pageA);
+    await insertToMainEditor(pageA, { from: 0, insert: "change" });
+
+    const pageB = await applyPageOpts(await context.newPage(), collabOpts, true);
+    await expectText(pageB, "change");
+
+    await pageA.getByTitle("Commit").click();
+    await pageA.locator("button[type=submit]").waitFor();
+
+    await pageB.getByTitle("Commit").click();
+    await pageB.click("button[type=submit]");
+
+    await expect(pageA.getByText("Someone else has commited in the meantime")).toBeVisible();
+    await expect(pageA.locator("button[type=submit]")).toBeHidden();
   });
 });
 
@@ -816,6 +862,11 @@ const clearEditor = async (page: Page) => {
     insert: "",
   });
 };
+
+const expectText = (page: Page, text: string) =>
+  expect(async () => {
+    expect(await page.evaluate((id) => window.myst_editor[id].text, id)).toBe(text);
+  }).toPass();
 
 const defaultCollabOpts = () => ({ collab_server: "ws://localhost:4455", room: crypto.randomUUID(), repo: `repos/${crypto.randomUUID()}` });
 

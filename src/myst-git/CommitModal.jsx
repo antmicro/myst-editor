@@ -117,6 +117,10 @@ const CommitModal = ({ initialSummary = "", onSubmit, onClose, documents = [], p
       stagedDocs.value = documents.map((d) => d.file);
       modalRef.current?.showModal?.();
       modalRef.current.onclose = onClose;
+    } else if (modalRef.current?.open) {
+      // Closed from the outside, where it has already been handled, so this is not a cancel.
+      modalRef.current.onclose = () => {};
+      modalRef.current.close();
     }
   }, [initialSummary]);
 

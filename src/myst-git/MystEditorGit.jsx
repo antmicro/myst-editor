@@ -142,7 +142,6 @@ const MystEditorGit = ({
   const commitPickerOpen = useSignal(false);
   const commitSummary = useSignal(null);
   const preparingCommit = useSignal(false);
-  const commentStateToApply = useRef(null);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
   const indexFile = useSignal();
   const { collab, options, editorView, text, headings } = useContext(MystState);
@@ -326,7 +325,6 @@ const MystEditorGit = ({
           toastNotify({ text: "No changes to commit" });
           return;
         }
-        documents.forEach(({ client }) => client.lock("A commit is being prepared for this document"));
         commitDocuments.current = documents;
         commitSummary.value = `MyST: update docs ${documents.map(({ file }) => file).join(", ")}`;
       } finally {
@@ -334,6 +332,30 @@ const MystEditorGit = ({
       }
     },
   };
+  /** Moves work which the commit did not include - later edits, unstaged files, comments - into the
+   * rooms of the new commit. It would otherwise stay in the previous commit's rooms, which no one
+   * will open again. Runs before other clients are told about the commit, as they would create the
+   * new rooms from the commited files and race this.
+   * TODO: in case of a crash partway through, report the files which were left behind. */
+  async function carryForward(hash, stagedDocs) {
+    const docs = commitDocuments.current
+      .map((d) => ({ ...d, commited: d.textChanged && stagedDocs.includes(d.file) ? d.text : d.initialText, current: d.client.ytext.toString() }))
+      .filter((d) => d.current !== d.commited || d.commentCount > 0);
+    const connections = await setupFileConnections(repo, props, branch.peek(), hash, docs.map((d) => d.file)); // prettier-ignore
+    for (const { client, file } of connections) {
+      const doc = docs.find((d) => d.file === file);
+      if (client.ytext.length === 0) {
+        client.ydoc.transact(() => {
+          client.ytext.insert(0, doc.current);
+          // Rooms holding exactly what was commited are not marked as changed.
+          client.metaMap.set("initial", doc.current === doc.commited);
+        });
+      }
+      if (doc.commentCount > 0) client.ycomments.applyState(doc.client.ycomments.encodeState());
+    }
+    return connections;
+  }
+
   async function onCommit({ summary, message, stagedDocs }) {
     let newConnections = [];
     try {
@@ -351,28 +373,16 @@ const MystEditorGit = ({
           .filter((d) => (d.textChanged && stagedDocs.includes(d.file)) || (!d.textChanged && d.commentCount > 0))
           .forEach(({ client }) => statusSocket.current.send(client.provider.roomname));
       }
-      // Store comment information for the other files, do not include comments from files where text changed but were not committed
-      const commentStates = commitDocuments.current
-        .filter((d) => d.client != collab.peek() && d.commentCount > 0 && (!d.textChanged || stagedDocs.includes(d.file)))
-        .reduce((states, { client, file }) => ({ ...states, [file]: client.ycomments.encodeState() }), {});
-      // Store comments for this file
-      commentStateToApply.current = collab.value.ycomments.encodeState();
       toastNotify({ text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } });
+      newConnections = await carryForward(hash, stagedDocs);
       commitDocuments.current.forEach(({ client }) => client.provider.awareness.setLocalStateField("newCommit", { hash, message: summary }));
-      cleanupConnections(commitDocuments.current, collab);
-      commitDocuments.current = null;
-
       switchCommit({ hash, message: summary }, true);
-
-      // Move comments over in other files
-      newConnections = await setupFileConnections(repo, props, branch.peek(), hash, Object.keys(commentStates));
-      newConnections.forEach(({ client, file }) => client.ycomments.applyState(commentStates[file]));
     } catch (error) {
       console.error(error);
       toastNotify({ text: `Error occured while commiting: ${error}` });
+    } finally {
       cleanupConnections(commitDocuments.current, collab);
       commitDocuments.current = null;
-    } finally {
       cleanupConnections(newConnections, collab);
     }
   }
@@ -467,17 +477,14 @@ const MystEditorGit = ({
         if (id === awareness.clientID) continue;
         const state = states.get(id);
         if (state.newCommit) {
+          if (commitSummary.peek() != null) {
+            // What we are about to commit was prepared against a commit which is no longer the latest one.
+            onCommitCancel();
+            toastNotify({ text: "Someone else has commited in the meantime, please review your changes again" });
+          }
           switchCommit(state.newCommit, true);
           return;
         }
-      }
-    });
-
-    // This is done to keep this signal effect from running in a cycle when some singals are updated in applyState.
-    queueMicrotask(() => {
-      if (commentStateToApply.current != null) {
-        collab.value.ycomments.applyState(commentStateToApply.current);
-        commentStateToApply.current = null;
       }
     });
   });
@@ -690,7 +697,6 @@ async function setupFileConnections(repo, props, branch, commitHash, files, getT
 
 function cleanupConnections(documents, currClient) {
   documents.forEach(({ client }) => {
-    client.unlock();
     if (client != currClient.peek()) client.destroy();
   });
 }
