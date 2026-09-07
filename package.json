@@ -69,5 +69,8 @@
   "alias": {
     "react": "@preact/compat",
     "react-dom": "@preact/compat"
+  },
+  "overrides": {
+    "pbkdf2": "3.1.3"
   }
 }
