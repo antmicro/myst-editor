@@ -199,7 +199,7 @@ const defaults = {
   title: "",
   subtitle: "",
   /** @type {"Both" | "Preview" | "Source" | "Diff" | "Resolved" | "Outline" | "Inline"} */
-  mode: "Both",
+  mode: "Inline",
   initialText: "",
   includeButtons: defaultButtons,
   topbar: true,

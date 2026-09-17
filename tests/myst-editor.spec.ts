@@ -896,6 +896,8 @@ const applyPageOpts = async (page: Page, opts: object, git = false) => {
 
   await page.goto(`${git ? "/myst-git/git.html" : "/"}?` + query.toString());
   await page.waitForSelector(".cm-content");
+  await page.evaluate((id) => (window.myst_editor[id].state.options.mode.value = "Both"), id);
+  await expect(page.locator("#preview-wrapper")).toBeVisible();
   if ("collab_server" in opts) {
     await collaborationReady(page);
   }
