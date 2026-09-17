@@ -68713,7 +68713,7 @@ const Ste = Ms.define(), MVt = (t, e) => {
   id: "",
   title: "",
   subtitle: "",
-  mode: "Both",
+  mode: "Inline",
   initialText: "",
   includeButtons: AVt,
   topbar: !0,
