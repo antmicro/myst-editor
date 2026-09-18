@@ -161,6 +161,21 @@ test.describe.parallel("With collaboration disabled", () => {
 
     // `checkLinks` invalidates links like `[bad]((url))`, which then render as plain text - so
     // there is no link here to nest anything inside, and transforms have to apply as usual.
+    // An invalidated link leaves a `link_open` token whose `link_close` was rewritten to text,
+    // so anything tracking link nesting must not get stuck treating the rest of the document as
+    // being inside a link.
+    test("Transforms still apply after a malformed [text]((url)) link", async ({ page }) => {
+      await clearEditor(page);
+      await insertChangesAndCheckOutput(
+        page,
+        {
+          from: 0,
+          insert: "[bad]((url)) #1234",
+        },
+        (html) => expect(html).toContain(`<a href="https://github.com/antmicro/myst-editor/issues/1234">#1234</a>`),
+      );
+    });
+
     test("Transforms still apply inside a malformed [text]((url)) link", async ({ page }) => {
       await clearEditor(page);
       await insertChangesAndCheckOutput(
