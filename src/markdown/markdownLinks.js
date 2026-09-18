@@ -2,19 +2,29 @@ import markdownIt from "markdown-it";
 
 /** Extension to markdownIt which invalidates links starting with `(` */
 export function checkLinks(/** @type {markdownIt} */ md) {
-  const defaultRule = md.renderer.rules.link_open;
+  const defaultOpen = md.renderer.rules.link_open;
+  const defaultClose = md.renderer.rules.link_close;
+
   md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
-    const render = defaultRule ?? self.renderToken.bind(self);
-    const href = tokens[idx].attrs?.find((a) => a[0] == "href")?.[1];
+    const href = tokens[idx].attrGet("href");
     if (href?.startsWith("(")) {
-      const linkLabel = tokens[idx + 1];
-      const linkClose = tokens[idx + 2];
-      linkLabel.content = `[${linkLabel.content}]`;
-      linkClose.type = "text";
-      linkClose.content = `(${href})`;
-      return "";
+      // The label can contain zero or many tokens, so find its matching close token.
+      let nesting = 1;
+      for (let i = idx + 1; i < tokens.length; i++) {
+        nesting += tokens[i].nesting;
+        if (nesting === 0) {
+          tokens[i].meta = { ...tokens[i].meta, invalidLinkHref: href };
+          return "[";
+        }
+      }
     }
 
-    return render(tokens, idx, options, env, self);
+    return defaultOpen ? defaultOpen(tokens, idx, options, env, self) : self.renderToken(tokens, idx, options);
+  };
+
+  md.renderer.rules.link_close = (tokens, idx, options, env, self) => {
+    const href = tokens[idx].meta?.invalidLinkHref;
+    if (href !== undefined) return `](${md.utils.escapeHtml(href)})`;
+    return defaultClose ? defaultClose(tokens, idx, options, env, self) : self.renderToken(tokens, idx, options);
   };
 }

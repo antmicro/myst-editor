@@ -100,6 +100,16 @@ test.describe.parallel("With collaboration disabled", () => {
   });
 
   test.describe("Renders input", () => {
+    test("Keeps links with parenthesized destinations as text", async ({ page }) => {
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: "[](()) [text](()) [**bold**](()) [valid](https://example.com)" });
+      const preview = page.locator(".myst-preview").first();
+      await expect(preview).toContainText("[](()) [text](()) [bold](()) valid");
+      await expect(preview.locator("strong")).toHaveText("bold");
+      await expect(preview.locator("a")).toHaveCount(1);
+      await expect(preview.locator("a")).toHaveAttribute("href", "https://example.com");
+    });
+
     [1, 2, 3].forEach((header) => {
       test("Renders header: " + header, async ({ page }) => {
         await clearEditor(page);
@@ -241,6 +251,13 @@ graph TD
   });
 
   test.describe.parallel("Inline mode", () => {
+    test("Renders an empty link label with a parenthesized destination", async ({ page }) => {
+      await startInlineMode(page);
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: "[](())" });
+      await expect(page.locator(".cm-inline-rendered-md")).toHaveText("[](())");
+    });
+
     test("Starts properly", async ({ page }) => {
       await startInlineMode(page);
       await clearEditor(page);
