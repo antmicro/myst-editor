@@ -126,6 +126,53 @@ test.describe.parallel("With collaboration disabled", () => {
       );
     });
 
+    test("Does not nest a link when a link-producing transform is used inside [text](link)", async ({ page }) => {
+      await clearEditor(page);
+      await insertChangesAndCheckOutput(
+        page,
+        {
+          from: 0,
+          insert: "See [issue #1234](https://example.com/issue/1234) for details",
+        },
+        (html) => {
+          expect(html).not.toContain(`href="https://github.com/antmicro/myst-editor/issues/1234"`);
+          expect(html).toContain(`href="https://example.com/issue/1234"`);
+          expect(html.replace(/<[^>]+>/g, "")).toContain("See issue #1234 for details");
+        },
+      );
+    });
+
+    // Only links produced by a transform are dropped, the transform itself still runs.
+    test("Still applies text-only transforms inside [text](link)", async ({ page }) => {
+      const [date] = new Date().toLocaleString("en-GB", { timeZone: "UTC" }).split(" ");
+      await clearEditor(page);
+      await insertChangesAndCheckOutput(
+        page,
+        {
+          from: 0,
+          insert: "[|date|](https://example.com)",
+        },
+        (html) => {
+          expect(html).toContain(`href="https://example.com"`);
+          expect(html).toContain(date);
+        },
+      );
+    });
+
+    // `checkLinks` invalidates links like `[bad]((url))`, which then render as plain text - so
+    // there is no link here to nest anything inside, and transforms have to apply as usual.
+    test("Transforms still apply inside a malformed [text]((url)) link", async ({ page }) => {
+      await clearEditor(page);
+      await insertChangesAndCheckOutput(
+        page,
+        {
+          from: 0,
+          insert: "[bad #1234]((url))",
+        },
+        (html) => expect(html).toContain(`<a href="https://github.com/antmicro/myst-editor/issues/1234">#1234</a>`),
+      );
+    });
+
     test("Renders async transforms", async ({ page }) => {
       const today = new Date().toLocaleString("en-GB", { timeZone: "UTC" });
       const [date, time] = today.split(" ");

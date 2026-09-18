@@ -21,7 +21,10 @@ class PreviewWrapper {
 
   fillPlaceholder(placeholderId, html) {
     const placeholder = this.preview.getElementById(placeholderId);
-    if (placeholder) placeholder.outerHTML = html;
+    if (!placeholder) return;
+    // If the placeholder sits inside a `[]()` link's label, don't let the resolved
+    // value introduce a nested link.
+    placeholder.outerHTML = placeholder.closest("a") ? stripAnchors(html) : html;
   }
 
   cancelTransform(placeholderId) {
@@ -87,6 +90,18 @@ class PreviewWrapper {
 const applyTransform = (txt, { transform, target }) => txt.replaceAll(target, transform);
 
 /**
+ * Unwraps any `<a>` tags a transform's output may contain, keeping their inner content.
+ * Used to stop a transform (e.g. issue links) from nesting a link inside a `[]()` link's
+ * label, while still letting transforms that just substitute plain text (e.g. `|date|`) work.
+ *
+ * Attributes are matched quote-aware rather than as `[^>]*`, so that a `>` inside an attribute
+ * value does not cut the match short and leave the rest of the tag behind as text.
+ *
+ * @param {string} html
+ */
+const stripAnchors = (html) => html.replace(/<a(?:\s(?:[^>"']|"[^"]*"|'[^']*')*)?>([\s\S]*?)<\/a>/gi, "$1");
+
+/**
  * @param {Transform[]} transforms
  * @returns {function(MarkdownIt): void}
  */
@@ -98,8 +113,24 @@ const markdownReplacer = (transforms, editorParent, cache) => (markdownIt) => {
     beginTarget: new RegExp(`^(?:${t.target instanceof RegExp ? t.target.source : escapeRE(t.target)})`, t.target.flags ?? "g"),
   }));
 
+  // `env` is per-render, so it can flag whether the token being rendered sits inside a `[]()`
+  // link - Markdown links cannot nest, so a boolean is enough.
+  const trackLink = (rule, insideLink) => {
+    const defaultRule = markdownIt.renderer.rules[rule];
+    markdownIt.renderer.rules[rule] = (tokens, idx, options, env, self) => {
+      env.insideLink = insideLink;
+      return (defaultRule ?? self.renderToken.bind(self))(tokens, idx, options, env, self);
+    };
+  };
+  trackLink("link_open", true);
+  trackLink("link_close", false);
+
   const defaultTextRule = markdownIt.renderer.rules.text;
-  markdownIt.renderer.rules.text = (...args) => mappedTransforms.reduce(applyTransform, defaultTextRule(...args));
+  markdownIt.renderer.rules.text = (tokens, idx, options, env, ...rest) => {
+    const transformed = mappedTransforms.reduce(applyTransform, defaultTextRule(tokens, idx, options, env, ...rest));
+    // Transforms which produce a link would otherwise nest one inside the link's label.
+    return env.insideLink ? stripAnchors(transformed) : transformed;
+  };
 
   // This ruler entry ensures that no preexisting inline Markdown rules will be applied to any text that matches a transform.
   // The `text` rule above will handle it instead.
