@@ -75,6 +75,31 @@ const Topbar = styled.div`
     }
   }
 
+  @media (hover: none) and (pointer: coarse), (max-width: 768px) {
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-600) transparent;
+
+    .side {
+      flex-shrink: 0;
+    }
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 3px;
+      background: var(--gray-600);
+    }
+  }
+
   @media print {
     & {
       display: none;

@@ -54,6 +54,14 @@ const MystWrapper = styled.div`
   position: relative;
   background-color: var(--panel-bg);
   ${(props) => props.fullscreen && "box-sizing:border-box; height: calc(100vh - 60px);"}
+
+  @media (hover: none) and (pointer: coarse), (max-width: 768px) {
+    padding: 0;
+
+    .flex-wrapper > * {
+      min-height: 0;
+    }
+  }
 `;
 
 const StatusBanner = styled.div`
