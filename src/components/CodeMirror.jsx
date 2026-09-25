@@ -3,6 +3,7 @@ import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import styled, { css } from "styled-components";
 import { ExtensionBuilder, skipAndFoldAll, foldMarkedHeadings } from "../extensions";
+import { restoreCollaborationSelection, saveCollaborationSelection } from "../collaborationSelection";
 import { YCommentsParent } from "./Comment";
 import commentIcon from "../icons/comment.svg?raw";
 import { MystState } from "../mystState";
@@ -303,10 +304,25 @@ const CodeMirror = () => {
   const focusScroll = useRef(null);
   const lastTyped = useRef(null);
   const renderTimer = useRef(null);
+  const savedCollaborationSelection = useRef(null);
+  const activeCollaborationView = useRef(null);
+  const destroyedViews = useRef(new WeakSet());
+
+  const destroyEditorView = (view) => {
+    if (!view || destroyedViews.current.has(view)) return;
+
+    const activeView = activeCollaborationView.current;
+    if (activeView?.view === view) {
+      savedCollaborationSelection.current = saveCollaborationSelection(view, activeView.collabClient);
+      activeCollaborationView.current = null;
+    }
+    view.destroy();
+    destroyedViews.current.add(view);
+  };
 
   useSignalEffect(() => {
     if (!options.collaboration.value.enabled || (collab.value.editorReady.value && !error.value)) return;
-    editorView.value?.destroy();
+    destroyEditorView(editorView.value);
 
     const view = new EditorView({
       root: options.parent,
@@ -321,7 +337,7 @@ const CodeMirror = () => {
     collab.value?.ycomments?.registerCodeMirror(view);
 
     return () => {
-      view.destroy();
+      destroyEditorView(view);
     };
   });
 
@@ -333,32 +349,38 @@ const CodeMirror = () => {
   });
 
   useSignalEffect(() => {
+    const collabClient = collab.value;
     if (options.collaboration.value.enabled) {
-      if (!collab.value.ready.value || error.value) return;
+      if (!collabClient.ready.value || error.value) return;
 
-      collab.value.initializeText(options.initialText.peek());
-      if (!collab.value.editorReady.value) return;
+      collabClient.initializeText(options.initialText.peek());
+      if (!collabClient.editorReady.value) return;
 
-      text.text.value = collab.value.ytext.toString();
-      collab.value.ytext.observe((ev, tr) => {
+      text.text.value = collabClient.ytext.toString();
+      collabClient.ytext.observe((ev, tr) => {
         if (!tr.local) return;
         lastTyped.current = performance.now();
       });
     }
 
+    const restoredSelection = options.collaboration.value.enabled
+      ? restoreCollaborationSelection(savedCollaborationSelection.current, collabClient)
+      : undefined;
+
     const startState = EditorState.create({
       root: options.parent,
-      doc: options.collaboration.value.enabled ? collab.value.ytext.toString() : text.text.peek(),
+      doc: options.collaboration.value.enabled ? collabClient.ytext.toString() : text.text.peek(),
+      selection: restoredSelection,
       extensions: ExtensionBuilder.basicSetup()
         .useLanguage(options.language.value, options.transforms.value)
         .useLineNumbers()
         .useCompartment(userExtensionsCompartment, [])
         .useSpellcheck(options.spellcheckOpts.value)
         .if(options.collaboration.value.enabled, (b) => {
-          return b.useCollaboration({ collabClient: collab.value, editorView });
+          return b.useCollaboration({ collabClient, editorView });
         })
         .if(!options.collaboration.value.enabled, (b) => b.useDefaultHistory())
-        .if(options.collaboration.value.commentsEnabled, (b) => b.useComments({ ycomments: collab.value.ycomments }))
+        .if(options.collaboration.value.commentsEnabled, (b) => b.useComments({ ycomments: collabClient.ycomments }))
         .addUpdateListener((update) => {
           if (!update.docChanged) return;
           clearTimeout(renderTimer.current);
@@ -386,6 +408,9 @@ const CodeMirror = () => {
       state: startState,
       parent: editorMountpoint.current,
     });
+    if (options.collaboration.value.enabled) {
+      activeCollaborationView.current = { view, collabClient };
+    }
     editorView.value = view;
     window.myst_editor[options.id.value].main_editor = view;
 
@@ -394,6 +419,11 @@ const CodeMirror = () => {
     }
     if (options.collapsibleHeadingMarker.value) {
       foldMarkedHeadings(view);
+    }
+
+    if (restoredSelection) {
+      view.dispatch({ effects: EditorView.scrollIntoView(restoredSelection.main.head) });
+      if (savedCollaborationSelection.current.focused) view.focus();
     }
 
     collab.value?.ycomments?.registerCodeMirror(view);
@@ -406,7 +436,7 @@ const CodeMirror = () => {
     }, 0);
 
     return () => {
-      view.destroy();
+      destroyEditorView(view);
     };
   });
 

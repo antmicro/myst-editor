@@ -631,6 +631,42 @@ test.describe.parallel("With collaboration enabled", () => {
     }).toPass();
   });
 
+  test("Preserves the selection after reconnecting", async ({ context }) => {
+    const collabOpts = defaultCollabOpts();
+    const pageA = await applyPageOpts(await context.newPage(), collabOpts);
+    const pageB = await applyPageOpts(await context.newPage(), collabOpts);
+
+    await clearEditor(pageA);
+    await insertToMainEditor(pageA, { from: 0, insert: "first\nsecond\nthird" });
+    await expectText(pageB, "first\nsecond\nthird");
+
+    await pageA.evaluate((id) => {
+      const editor = window.myst_editor[id];
+      editor.main_editor.focus();
+      editor.main_editor.dispatch({ selection: { anchor: 6, head: 12 } });
+      editor.state.collab.value.provider.disconnect();
+    }, id);
+    await pageA.waitForFunction((id) => !window.myst_editor[id].state.collab.value.ready.value, id);
+
+    // A relative Yjs position should keep the selection on "second" even when a
+    // collaborator changes the document while this client is disconnected.
+    await insertToMainEditor(pageB, { from: 0, insert: "prefix " });
+    await pageA.evaluate((id) => window.myst_editor[id].state.collab.value.provider.connect(), id);
+    await collaborationReady(pageA);
+
+    await expect(async () => {
+      const state = await pageA.evaluate((id) => {
+        const editor = window.myst_editor[id].main_editor;
+        return {
+          selectedText: editor.state.sliceDoc(editor.state.selection.main.from, editor.state.selection.main.to),
+          anchor: editor.state.selection.main.anchor,
+          head: editor.state.selection.main.head,
+        };
+      }, id);
+      expect(state).toEqual({ selectedText: "second", anchor: 13, head: 19 });
+    }).toPass();
+  });
+
   test.describe("Comments", () => {
     test("Positions are synced", async ({ context }) => {
       const collabOpts = defaultCollabOpts();
