@@ -34,12 +34,6 @@ const formatError = (error, src, options, getLogString, editorView, collabClient
       .map((c) => c.lineNumber)
       .toSorted((a, b) => a - b)
       .join(", ")}]`;
-    const suggestionLines = [...collabClient.ycomments.suggestions.entries()]
-      .filter(([_, values]) => values.length > 0)
-      .map(([id]) => parseInt(collabClient.ycomments.positions().get(id)))
-      .filter(Boolean)
-      .toSorted((a, b) => a - b);
-    documentInfo += `\nSuggestions: line count ${suggestionLines.length}, lines [${suggestionLines.join(", ")}]`;
   }
   const logs = `Logs:\n${getLogString()}`;
 

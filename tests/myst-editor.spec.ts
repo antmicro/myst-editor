@@ -516,6 +516,29 @@ This text shouldn't merge inside the previous block~~}`,
 });
 
 test.describe.parallel("With collaboration enabled", () => {
+  test("Error modal copies error details to the clipboard", async ({ context }) => {
+    await context.grantPermissions(["clipboard-write", "clipboard-read"]);
+    const page = await applyPageOpts(await context.newPage(), defaultCollabOpts());
+
+    await page.evaluate((id) => {
+      window.myst_editor[id].state.error.value = { src: "test", error: new Error("Test error") };
+    }, id);
+
+    const dialog = page.getByRole("dialog");
+    const copyButton = dialog.getByRole("button");
+    await expect(dialog).toBeVisible();
+    await expect(copyButton).toHaveText("Copy error to clipboard");
+    await copyButton.click();
+    await expect(copyButton).toHaveText("Copied!");
+
+    await expect(async () => {
+      const clipboard = await page.evaluate(() => navigator.clipboard.readText());
+      expect(clipboard).toContain("Error detected from: test");
+      expect(clipboard).toContain("Error: Test error");
+      expect(clipboard).toContain("Comments: count 0, lines []");
+    }).toPass();
+  });
+
   test("Initializes an empty document only once", async ({ context }) => {
     const collabOpts = defaultCollabOpts();
     const page = await applyPageOpts(await context.newPage(), collabOpts);
