@@ -2,8 +2,8 @@ import { highlightingFor, HighlightStyle, syntaxHighlighting, syntaxTree } from 
 import { FOLD_MARKER, sanitize, TextManager } from "../text";
 import { getStyleTags, tags } from "@lezer/highlight";
 import { EditorView } from "codemirror";
-import { Decoration, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
-import { RangeSet, StateEffect, StateField } from "@codemirror/state";
+import { Decoration, keymap, ViewPlugin, ViewUpdate, WidgetType } from "@codemirror/view";
+import { EditorSelection, Prec, RangeSet, StateEffect, StateField } from "@codemirror/state";
 import { findSoruceMappedPreviousElement } from "./syncDualPane";
 import { getLineById } from "../markdown/markdownSourceMap";
 import { criticMarkup } from "./criticMarkup";
@@ -26,12 +26,15 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     { tag: [tags.content], ...baseFont },
     { tag: tags.meta, color: "darkgrey" },
   ]);
+  // CodeMirror probes the logical line start during vertical cursor movement. Keep source list markers and indentation measurable;
+  // using display: none here makes ArrowUp skip consecutive decorated lines.
   const markdownTheme = EditorView.theme({
     "&": { fontSize: "16px" },
-    ".cm-inline-bullet *": { display: "none" },
-    ".cm-inline-ordered-list-marker *": { display: "none" },
+    ".cm-inline-bullet, .cm-inline-ordered-list-marker": { display: "inline-grid" },
+    ".cm-inline-bullet > *, .cm-inline-ordered-list-marker > *": { visibility: "hidden", gridArea: "1 / 1" },
+    ".cm-inline-bullet::after, .cm-inline-ordered-list-marker::after": { gridArea: "1 / 1" },
     ".cm-inline-indent": { display: "inline-block" },
-    ".cm-inline-indent *": { display: "none" },
+    ".cm-inline-indent *": { visibility: "hidden" },
     ":is(.cm-widgetBuffer:has(+ .inline-custom-styles), .inline-custom-styles + .cm-widgetBuffer)": { display: "none" },
     ".cm-critic-meta": { display: "none" },
   });
@@ -50,10 +53,47 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       return (rFrom >= nodeFrom && rFrom <= nodeTo) || (rTo >= nodeFrom && rTo <= nodeTo) || (nodeFrom >= rFrom && nodeTo <= rTo);
     });
   const nodeInMonospace = (...args) => nodeInSelection(...args) || nodeInSuggestion(...args);
+  const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Checkbox", "HTMLBlock"];
+
+  const moveCursorVertically = (forward) => (view) => {
+    const moveRange = (range) => {
+      if (!range.empty) return EditorSelection.cursor(forward ? range.to : range.from);
+
+      let moved = view.moveVertically(range, forward);
+      if (moved.head == range.head) moved = view.moveToLineBoundary(range, forward);
+
+      // A rendered block is a single replacement widget. CodeMirror cannot map a
+      // vertical position inside that widget back to its source, and may return
+      // the far boundary of the range. Enter it at the boundary nearest to the
+      // cursor instead, which also reveals the source for further movement.
+      let boundary = null;
+      if (forward ? moved.head > range.head : moved.head < range.head) {
+        syntaxTree(view.state).iterate({
+          from: Math.min(range.head, moved.head),
+          to: Math.max(range.head, moved.head),
+          enter(node) {
+            if (!renderedBlockNodes.includes(node.name) || nodeInMonospace(view.state, node)) return;
+
+            const crossed = forward ? range.head <= node.from && moved.head >= node.to : range.head >= node.to && moved.head <= node.from;
+            if (!crossed) return;
+
+            const candidate = forward ? node.from : node.to;
+            if (boundary == null || (forward ? candidate < boundary : candidate > boundary)) boundary = candidate;
+          },
+        });
+      }
+
+      return boundary == null ? moved : EditorSelection.cursor(boundary, forward ? 1 : -1, undefined, moved.goalColumn);
+    };
+
+    const selection = EditorSelection.create(view.state.selection.ranges.map(moveRange), view.state.selection.mainIndex);
+    if (selection.eq(view.state.selection, true)) return false;
+    view.dispatch({ selection, scrollIntoView: true, userEvent: "select" });
+    return true;
+  };
 
   const focusEffect = StateEffect.define();
 
-  const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Checkbox", "HTMLBlock"];
   const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
   class RenderedMarkdownWidget extends WidgetType {
     constructor(src, isBlock, start, end, cssClasses = []) {
@@ -277,6 +317,12 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
         syntaxHighlighting(markdownHighlightStyle),
         markdownTheme,
         renderMdInline(),
+        Prec.high(
+          keymap.of([
+            { key: "ArrowUp", run: moveCursorVertically(false), preventDefault: true },
+            { key: "ArrowDown", run: moveCursorVertically(true), preventDefault: true },
+          ]),
+        ),
         EditorView.focusChangeEffect.of((_, focus) => focusEffect.of(focus)),
       ],
       decorations: (v) => v.decorations,

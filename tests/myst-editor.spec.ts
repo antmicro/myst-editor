@@ -248,6 +248,114 @@ graph TD
       await page.waitForSelector(".inline-custom-styles");
     });
 
+    test("ArrowUp does not skip list items", async ({ page }) => {
+      await startInlineMode(page);
+      await clearEditor(page);
+      await insertToMainEditor(page, {
+        from: 0,
+        insert: [
+          "## List",
+          "",
+          "- The first list item is deliberately long enough to wrap onto another visual line in the editor.",
+          "- The second list item is deliberately long enough to wrap onto another visual line in the editor.",
+          "- The third list item is deliberately long enough to wrap onto another visual line in the editor.",
+        ].join("\n"),
+      });
+      await expect(page.locator(".cm-inline-bullet")).toHaveCount(3);
+
+      await page.evaluate((id) => {
+        const view = window.myst_editor[id].main_editor;
+        const line = view.state.doc.line(5);
+        const pos = line.from + 20;
+        view.dispatch({ selection: { anchor: pos } });
+        view.focus();
+      }, id);
+      await page.keyboard.press("ArrowUp");
+
+      const cursorLine = await page.evaluate((id) => {
+        const view = window.myst_editor[id].main_editor;
+        return view.state.doc.lineAt(view.state.selection.main.head).number;
+      }, id);
+      expect(cursorLine).toBe(4);
+    });
+
+    test("ArrowUp does not skip fenced blocks", async ({ page }) => {
+      await startInlineMode(page);
+      await clearEditor(page);
+      await insertToMainEditor(page, {
+        from: 0,
+        insert: [
+          "before",
+          "~~~mermaid",
+          "gitGraph",
+          "  commit",
+          "  commit",
+          "  branch develop",
+          "  commit",
+          "  checkout main",
+          "  commit",
+          "~~~",
+          "after",
+        ].join("\n"),
+      });
+      await expect(page.locator(".cm-inline-rendered-md")).toHaveCount(1);
+
+      await page.evaluate((id) => {
+        const view = window.myst_editor[id].main_editor;
+        const line = view.state.doc.line(11);
+        view.dispatch({ selection: { anchor: line.from + 2 } });
+        view.focus();
+      }, id);
+      await page.keyboard.press("ArrowUp");
+
+      const cursorLine = await page.evaluate((id) => {
+        const view = window.myst_editor[id].main_editor;
+        return view.state.doc.lineAt(view.state.selection.main.head).number;
+      }, id);
+      expect(cursorLine).toBe(10);
+    });
+
+    test("ArrowUp does not skip indented blocks", async ({ page }) => {
+      await startInlineMode(page);
+      await clearEditor(page);
+      await insertToMainEditor(page, {
+        from: 0,
+        insert: [
+          "ggg~~~mermaid",
+          "   gitGraph",
+          "   commit",
+          "   commit",
+          "   branch develop",
+          "   commit",
+          "   commit",
+          "   commit",
+          "   checkout main",
+          "   commit",
+          "   commit",
+          "~~~SS",
+        ].join("\n"),
+      });
+
+      await page.evaluate((id) => {
+        const view = window.myst_editor[id].main_editor;
+        const line = view.state.doc.line(11);
+        view.dispatch({ selection: { anchor: line.from + 2 } });
+        view.focus();
+      }, id);
+
+      const visitedLines = [];
+      for (let line = 10; line >= 1; line--) {
+        await page.keyboard.press("ArrowUp");
+        visitedLines.push(
+          await page.evaluate((id) => {
+            const view = window.myst_editor[id].main_editor;
+            return view.state.doc.lineAt(view.state.selection.main.head).number;
+          }, id),
+        );
+      }
+      expect(visitedLines).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+    });
+
     test.describe("Common transforms", () => {
       test("Bold text is being rendered", async ({ page }) => {
         await startInlineMode(page);
