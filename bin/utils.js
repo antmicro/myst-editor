@@ -12,6 +12,7 @@ import { callbackHandler } from "./callback.js";
 import { isCallbackSet } from "./callback.js";
 
 import logChanges, { logAsync } from "./logging.js";
+import { decodeInitializeMessage, encodeInitializedMessage, initializeYText, messageInitialize } from "../src/collaborationUtils.js";
 
 const CALLBACK_DEBOUNCE_WAIT = parseInt(process.env.CALLBACK_DEBOUNCE_WAIT) || 2000;
 const CALLBACK_DEBOUNCE_MAXWAIT = parseInt(process.env.CALLBACK_DEBOUNCE_MAXWAIT) || 10000;
@@ -327,6 +328,13 @@ const messageListener = (conn, doc, message) => {
         break;
       case messageAwareness: {
         awarenessProtocol.applyAwarenessUpdate(doc.awareness, decoding.readVarUint8Array(decoder), conn);
+        break;
+      }
+      case messageInitialize: {
+        logAsync(doc.name, { event: "ws-message-recv", type: "initialize", connectionId: conn.__connectionId });
+
+        initializeYText(doc, decodeInitializeMessage(message));
+        send(doc, conn, encodeInitializedMessage());
         break;
       }
     }

@@ -305,7 +305,7 @@ const CodeMirror = () => {
   const renderTimer = useRef(null);
 
   useSignalEffect(() => {
-    if (!options.collaboration.value.enabled || (collab.value.ready.value && !error.value)) return;
+    if (!options.collaboration.value.enabled || (collab.value.editorReady.value && !error.value)) return;
     editorView.value?.destroy();
 
     const view = new EditorView({
@@ -336,15 +336,8 @@ const CodeMirror = () => {
     if (options.collaboration.value.enabled) {
       if (!collab.value.ready.value || error.value) return;
 
-      if (collab.value.ytext.toString().length === 0 && options.initialText.peek().length > 0) {
-        console.warn("[Collaboration] Remote state is empty, overriding with local state");
-        text.text.value = options.initialText.peek();
-        collab.value.ydoc.transact(() => {
-          collab.value.ytext.insert(0, options.initialText.peek());
-          const metaMap = collab.value.ydoc.getMap("meta");
-          metaMap.set("initial", true);
-        });
-      }
+      collab.value.initializeText(options.initialText.peek());
+      if (!collab.value.editorReady.value) return;
 
       text.text.value = collab.value.ytext.toString();
       collab.value.ytext.observe((ev, tr) => {
@@ -419,7 +412,7 @@ const CodeMirror = () => {
 
   return (
     <CodeEditor className="myst-main-editor" ref={editorMountpoint} $mode={options.mode.value} id={`${options.id.value}-editor`}>
-      {options.collaboration.value.commentsEnabled && collab.value.ready.value && collab.value.ycomments?.mainCodeMirror && <YCommentsParent />}
+      {options.collaboration.value.commentsEnabled && collab.value.editorReady.value && collab.value.ycomments?.mainCodeMirror && <YCommentsParent />}
     </CodeEditor>
   );
 };

@@ -2,6 +2,7 @@ import { batch, computed, signal } from "@preact/signals";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 import * as awarenessProtocol from "y-protocols/awareness.js";
+import { encodeInitializeMessage, initializeYText, messageInitialized } from "./collaborationUtils";
 import { hideUsernames } from "./extensions/hideUsernames";
 import { YComments } from "./comments/ycomments";
 
@@ -12,9 +13,11 @@ export class CollaborationClient {
   #localUser = {};
   #offlineHandler;
   #onlineHandler;
+  #initializationRequested = false;
   users = computed(() => this.#users.value);
   #heartbeatInterval = null;
   storedSuggestions = signal([]);
+  editorReady = signal(false);
 
   constructor(settings, editorOptions = { id: null, parent: null, hideUsernameDelay: null, getAvatar: () => {}, getUserUrl: () => {} }) {
     this.ready = computed(() => this.#synced.value && this.#connected.value);
@@ -27,6 +30,9 @@ export class CollaborationClient {
       awareness: new awarenessProtocol.Awareness(this.ydoc),
       maxBackoffTime: 2500,
     });
+    this.provider.messageHandlers[messageInitialized] = () => {
+      this.editorReady.value = true;
+    };
     if (settings.mode === "local") {
       this.provider.shouldConnect = true;
       this.provider.connectBc();
@@ -82,7 +88,13 @@ export class CollaborationClient {
     }
 
     this.provider.on("sync", (sync) => (this.#synced.value = sync));
-    this.provider.on("status", ({ status }) => (this.#connected.value = status == "connected"));
+    this.provider.on("status", ({ status }) => {
+      const connected = status == "connected";
+      this.#connected.value = connected;
+      if (!connected && !this.editorReady.peek()) {
+        this.#initializationRequested = false;
+      }
+    });
     this.#offlineHandler = () => {
       if (this.settings.mode !== "local" && import.meta.env.PROD) {
         this.provider.disconnect();
@@ -139,6 +151,39 @@ export class CollaborationClient {
     const idx = suggestions.toArray().findIndex((s) => s.id === id);
     if (idx === -1) return;
     suggestions.delete(idx, 1);
+  }
+
+  #initializeLocally(text) {
+    const initialize = async () => {
+      // Give pending BroadcastChannel updates a chance to apply after the
+      // previous holder releases the lock.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      initializeYText(this.ydoc, text);
+      this.editorReady.value = true;
+    };
+
+    if (navigator.locks) {
+      navigator.locks.request(`myst-editor-initial-text:${this.settings.room}`, initialize);
+    } else {
+      initialize();
+    }
+  }
+
+  initializeText(text) {
+    if (this.editorReady.peek() || this.#initializationRequested) return;
+    this.#initializationRequested = true;
+
+    if (this.settings.mode === "local") {
+      this.#initializeLocally(text);
+      return;
+    }
+
+    if (!this.provider.ws || this.provider.ws.readyState !== WebSocket.OPEN) {
+      this.#initializationRequested = false;
+      return;
+    }
+
+    this.provider.ws.send(encodeInitializeMessage(text));
   }
 
   destroy() {

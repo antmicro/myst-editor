@@ -478,14 +478,47 @@ This text shouldn't merge inside the previous block~~}`,
 });
 
 test.describe.parallel("With collaboration enabled", () => {
-  test("Keeps the initial document if collaborative state is empty", async ({ context }) => {
-    const page = await applyPageOpts(await context.newPage(), defaultCollabOpts());
+  test("Initializes an empty document only once", async ({ context }) => {
+    const collabOpts = defaultCollabOpts();
+    const page = await applyPageOpts(await context.newPage(), collabOpts);
 
     await expect(async () => {
       const editorContent = await page.evaluate((id) => window.myst_editor[id].text, id);
       expect(editorContent).toMatch(/^# This is MyST Editor/);
       expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
     }).toPass();
+
+    const syncedPage = await applyPageOpts(await context.newPage(), collabOpts);
+    await clearEditor(page);
+    await expectText(page, "");
+    await expectText(syncedPage, "");
+    await syncedPage.close();
+
+    const reopenedPage = await applyPageOpts(await context.newPage(), collabOpts, false, false);
+    await expectText(reopenedPage, "");
+  });
+
+  test("Does not duplicate the initial document when local peers open simultaneously", async ({ context }) => {
+    const localOpts = { room: crypto.randomUUID() };
+    const pageA = await context.newPage();
+    const pageB = await context.newPage();
+
+    await Promise.all([applyPageOpts(pageA, localOpts), applyPageOpts(pageB, localOpts)]);
+
+    const initialText = await pageA.evaluate((id) => window.myst_editor[id].state.options.initialText.value, id);
+    await expectText(pageA, initialText);
+    await expectText(pageB, initialText);
+  });
+
+  test("Does not duplicate the initial document for a local peer which joins later", async ({ context }) => {
+    const localOpts = { room: crypto.randomUUID() };
+    const pageA = await applyPageOpts(await context.newPage(), localOpts);
+    const initialText = await pageA.evaluate((id) => window.myst_editor[id].state.options.initialText.value, id);
+
+    const pageB = await applyPageOpts(await context.newPage(), localOpts);
+
+    await expectText(pageA, initialText);
+    await expectText(pageB, initialText);
   });
 
   test("Rejects the initial document if collaborative state is not empty", async ({ context }) => {
@@ -869,6 +902,18 @@ test.describe.parallel("MystEditorGit wrapper", () => {
     await expect(page.locator("[data-git-commit]")).toContainText(DEMO_FEATURE_TIP);
   });
 
+  test("Does not duplicate repository content when peers open simultaneously", async ({ context }) => {
+    const collabOpts = defaultCollabOpts();
+    const pageA = await context.newPage();
+    const pageB = await context.newPage();
+
+    await Promise.all([applyPageOpts(pageA, collabOpts, true), applyPageOpts(pageB, collabOpts, true)]);
+
+    const initialText = await pageA.evaluate((id) => window.myst_editor[id].state.options.initialText.value, id);
+    await expectText(pageA, initialText);
+    await expectText(pageB, initialText);
+  });
+
   test("Synces document between peers", async ({ context }) => {
     const collabOpts = defaultCollabOpts();
     const pageA = await applyPageOpts(await context.newPage(), collabOpts, true);
@@ -1040,7 +1085,11 @@ const expectText = (page: Page, text: string) =>
 
 const defaultCollabOpts = () => ({ collab_server: "ws://localhost:4455", room: crypto.randomUUID(), repo: `repos/${crypto.randomUUID()}` });
 
-const collaborationReady = (page: Page) => page.waitForFunction((id) => window?.myst_editor[id]?.state?.collab?.value?.ready?.value, id);
+const collaborationReady = (page: Page) =>
+  page.waitForFunction(
+    (id) => window?.myst_editor[id]?.state?.collab?.value?.ready?.value && window.myst_editor[id].state.collab.value.editorReady.value,
+    id,
+  );
 
 const insertChangesAndCheckOutput = async (page: Page, changes: ChangeSpec | null, check: (html: string) => void | Promise<void>) => {
   await insertToMainEditor(page, changes);
@@ -1050,7 +1099,7 @@ const insertChangesAndCheckOutput = async (page: Page, changes: ChangeSpec | nul
   }).toPass();
 };
 
-const applyPageOpts = async (page: Page, opts: object, git = false) => {
+const applyPageOpts = async (page: Page, opts: object, git = false, expectInitialText = true) => {
   let query = new URLSearchParams();
   Object.entries(opts).forEach(([k, v]) => query.set(k, v));
 
@@ -1068,14 +1117,15 @@ const applyPageOpts = async (page: Page, opts: object, git = false) => {
   await page.waitForSelector(".cm-content");
   await page.evaluate((id) => (window.myst_editor[id].state.options.mode.value = "Both"), id);
   await expect(page.locator("#preview-wrapper")).toBeVisible();
-  if ("collab_server" in opts) {
+  if (!("collab" in opts) || opts.collab !== "false") {
     await collaborationReady(page);
   }
-  // Wait for initial text
-  await expect(async () => {
-    const text = await page.evaluate((id) => window.myst_editor[id].text, id);
-    expect(text).not.toHaveLength(0);
-  }).toPass();
+  if (expectInitialText) {
+    await expect(async () => {
+      const text = await page.evaluate((id) => window.myst_editor[id].text, id);
+      expect(text).not.toHaveLength(0);
+    }).toPass();
+  }
   return page;
 };
 

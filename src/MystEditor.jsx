@@ -141,7 +141,7 @@ const MystEditor = () => {
         <ErrorBoundary>
           <EditorParent mode={options.mode.value} fullscreen={fullscreen.value}>
             {options.topbar.value && <EditorTopbar alert={alert} buttons={buttons} />}
-            {options.collaboration.value.enabled && !collab.value.ready.value && (
+            {options.collaboration.value.enabled && !collab.value.editorReady.value && (
               <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
             )}
             <MystWrapper className="myst-editor-wrapper" fullscreen={fullscreen.value}>
@@ -180,7 +180,7 @@ const MystEditor = () => {
               {options.mode.value == "Resolved" &&
                 options.collaboration.value.commentsEnabled &&
                 options.collaboration.value.resolvingCommentsEnabled &&
-                collab.value.ready.value && (
+                collab.value.editorReady.value && (
                   <FlexWrapper id="resolved-wrapper" className="flex-wrapper">
                     <ResolvedComments />
                   </FlexWrapper>
