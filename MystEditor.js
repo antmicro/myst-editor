@@ -63487,6 +63487,11 @@ const B$ = /\{[~+-]{2}((?:.|\n)+)[~+-]{2}\}/g, HUt = Qr.transactionFilter.of((t)
     },
     ".cm-critic-meta": {
       display: "none"
+    },
+    ".cm-inline-rendered-md details": {
+      display: "inline-block",
+      verticalAlign: "top",
+      maxWidth: "calc(100% - 2ch)"
     }
   }), l = ["InlineCode", "Emphasis", "StrongEmphasis", "Strikethrough", "FencedCode", "Image", "Blockquote"], u = Bt.replace({}), h = Bt.mark({
     class: "cm-inline-mono"
@@ -63541,8 +63546,8 @@ const B$ = /\{[~+-]{2}((?:.|\n)+)[~+-]{2}\}/g, HUt = Qr.transactionFilter.of((t)
       return T.innerHTML = xxe(E(this.src)), T;
     }
     ignoreEvent(T) {
-      var O, E;
-      return T.type == "mousedown" && (((O = e.onPreviewClick.peek()) == null ? void 0 : O(T)) || T.target.tagName == "A" || ((E = T.target.parentNode) == null ? void 0 : E.tagName) == "A");
+      var O, E, _;
+      return T.type == "mousedown" && (((O = e.onPreviewClick.peek()) == null ? void 0 : O(T)) || ((_ = (E = T.target).closest) == null ? void 0 : _.call(E, "a, summary")) != null);
     }
   }
   function x(S) {
