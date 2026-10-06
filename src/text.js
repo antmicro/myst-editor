@@ -18,6 +18,7 @@ import { markdownCheckboxes } from "./markdown/markdownCheckboxes";
 import { markdownFrontmatter } from "./markdown/markdownFrontmatter";
 import { getReviewItems } from "./extensions/review";
 import { markdownReview, reviewKey } from "./markdown/markdownReview";
+import { markdownListSpacing } from "./markdown/markdownListSpacing";
 
 export const markdownUpdatedEffect = StateEffect.define();
 
@@ -56,6 +57,7 @@ export class TextManager {
         .use(useCustomDirectives(options.customDirectives.value, options.parent, cache.transform))
         .use(markdownMermaid, { lineMap: this.lineMap, parent: options.parent, theme: options.mermaidTheme.value })
         .use(markdownSourceMap)
+        .use(markdownListSpacing)
         .use(checkLinks)
         .use(colonFencedBlocks)
         .use(markdownItMapUrls, options.mapUrl.value)

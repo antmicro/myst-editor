@@ -1,6 +1,6 @@
 import { EditorView } from "codemirror";
 import { markdownUpdatedEffect } from "../text";
-import { findNearestElementForLine, getLineById } from "../markdown/markdownSourceMap";
+import { findPreviewTargetForLine, getLineById } from "../markdown/markdownSourceMap";
 import { EditorSelection } from "@codemirror/state";
 
 const previewTopPadding = 20;
@@ -29,12 +29,12 @@ export const syncPreviewWithCursor = (text, lastTyped) => {
       const preview = text.preview.peek();
       if (!preview) return;
 
-      const [matchingElem, matchingLine] = findNearestElementForLine(cursorLineAfter, text.lineMap, preview);
-      if (matchingElem) {
+      const target = findPreviewTargetForLine(cursorLineAfter, text.lineMap, preview, update.state.doc);
+      if (target) {
         scrollPreviewElemIntoView({
           view: update.view,
-          matchingLine,
-          matchingElem,
+          matchingLine: target.line,
+          matchingRect: target.rect,
           behavior: "smooth",
           preview,
         });
@@ -49,10 +49,8 @@ export const syncPreviewWithCursor = (text, lastTyped) => {
 /** @param {Object} param0
  * @param {EditorView} param0.view
  */
-function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior = "auto", preview }) {
+function scrollPreviewElemIntoView({ view, matchingLine, matchingRect, behavior = "auto", preview }) {
   const cursorBlock = view.lineBlockAt(view.state.doc.line(matchingLine).from);
-  let matchingRect = matchingElem.getBoundingClientRect();
-
   // Get the editor line’s screen position, then add the preview element’s distance from it to the current preview scroll.
   const cursorScreenTop = view.documentTop + cursorBlock.top;
   const top = preview.scrollTop + matchingRect.top - cursorScreenTop;

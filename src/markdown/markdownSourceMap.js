@@ -188,6 +188,35 @@ export function findNearestElementForLine(lineNumber, lineMap, preview) {
   return [match, num];
 }
 
+/** Place an unmapped blank source line in the visual gap between its surrounding rendered lines. */
+export function findPreviewTargetForLine(lineNumber, lineMap, preview, doc) {
+  const [previous, previousLine] = findNearestElementForLine(lineNumber, lineMap, preview);
+  if (!previous) return null;
+
+  const previousRect = previous.getBoundingClientRect();
+  if (previousLine === lineNumber || doc.line(lineNumber).text.trim() !== "") {
+    return { element: previous, rect: previousRect, line: previousLine };
+  }
+
+  for (let nextLine = lineNumber + 1; nextLine <= doc.lines; nextLine++) {
+    const id = lineMap.get(nextLine);
+    if (!id) continue;
+    const next = preview.querySelector(`[data-line-id="${id}"]`);
+    if (!next?.offsetParent) continue;
+
+    const nextRect = next.getBoundingClientRect();
+    const gap = nextRect.top - previousRect.bottom;
+    if (gap <= 0) break;
+
+    const blankLines = nextLine - previousLine - 1;
+    const height = Math.min(previousRect.height, gap / blankLines);
+    const center = previousRect.bottom + (gap * (lineNumber - previousLine)) / (nextLine - previousLine);
+    return { element: next, rect: { top: center - height / 2, left: nextRect.left, height }, line: lineNumber };
+  }
+
+  return { element: previous, rect: previousRect, line: previousLine };
+}
+
 export function getLineById(lineMap, id) {
   for (const [line, value] of lineMap.entries()) {
     if (value === id) {

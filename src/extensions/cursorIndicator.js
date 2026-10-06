@@ -1,6 +1,6 @@
 import { EditorView } from "codemirror";
 import { markdownUpdatedEffect } from "../text";
-import { findNearestElementForLine } from "../markdown/markdownSourceMap";
+import { findPreviewTargetForLine } from "../markdown/markdownSourceMap";
 
 export const cursorIndicator = (text) =>
   EditorView.updateListener.of((update) => {
@@ -17,16 +17,15 @@ export const cursorIndicator = (text) =>
     const preview = text.preview.peek();
     if (!preview) return;
 
-    const [matchingElem] = findNearestElementForLine(cursorLineAfter, text.lineMap, preview);
+    const target = findPreviewTargetForLine(cursorLineAfter, text.lineMap, preview, update.state.doc);
     const previewElement = preview.querySelector(".cm-previewFocus");
-    if (matchingElem && update.view.hasFocus) {
+    if (target && update.view.hasFocus) {
       const previewRect = preview.getBoundingClientRect();
-      let matchingRect = matchingElem.getBoundingClientRect();
+      const { element: matchingElem, rect: matchingRect } = target;
 
       previewElement.style.top = `${matchingRect.top - previewRect.top + preview.scrollTop}px`;
       // the decoration of a list item is not contained within it's clientRect
-      const leftPos =
-        matchingRect.left - previewRect.left - 12.5 - (matchingElem.tagName === "LI" || matchingElem.parentElement.tagName === "LI" ? 17 : 0);
+      const leftPos = matchingRect.left - previewRect.left - 12.5 - (matchingElem.closest("li") ? 17 : 0);
       previewElement.style.left = `${leftPos}px`;
       previewElement.style.height = `${matchingRect.height}px`;
     } else {

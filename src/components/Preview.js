@@ -238,12 +238,36 @@ export const MdStyles = css`
     p {
       padding: 0px;
     }
+    > p:last-child,
+    > p:has(+ ul, + ol) {
+      margin-bottom: 0;
+    }
+    > ul,
+    > ol {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    > ul.myst-list-after-blank,
+    > ol.myst-list-after-blank {
+      margin-top: 1em;
+    }
+    &.myst-list-item-after-blank {
+      margin-top: 1em;
+    }
   }
   ul,
   ol {
     list-style: revert;
     padding-left: 40px;
     padding-top: 0.5em;
+  }
+  p:has(+ ul:not(.myst-list-after-blank), + ol:not(.myst-list-after-blank)) {
+    margin-bottom: 0;
+  }
+  p + ul:not(.myst-list-after-blank),
+  p + ol:not(.myst-list-after-blank) {
+    margin-top: 0;
+    padding-top: 0;
   }
   /* Add some padding to the outermost ul */
   &[class^="Preview"] > ul {

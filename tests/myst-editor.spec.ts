@@ -1,9 +1,8 @@
-import { ChangeSpec } from "@codemirror/state";
-import { test, expect, Page } from "@playwright/test";
-import { EditorView } from "codemirror";
-import { execFileSync } from "node:child_process";
+import type { ChangeSpec } from "@codemirror/state";
+import { test, expect, type Page } from "@playwright/test";
+import type { EditorView } from "codemirror";
 import fs from "fs/promises";
-import { createMystState } from "../src/mystState";
+import type { createMystState } from "../src/mystState";
 import { DEMO_FEATURE_TIP } from "../src/myst-git/demo-data.js";
 
 declare global {
@@ -45,6 +44,135 @@ test.describe.parallel("With collaboration disabled", () => {
       expect(editorContent).toMatch(/^# This is MyST Editor/);
       expect(editorContent.indexOf(editorContent.slice(0, 20))).toBe(editorContent.lastIndexOf(editorContent.slice(0, 20))); // Assert that content isn't duplicated
     }).toPass();
+  });
+
+  test("Spaces only the list item preceded by a blank line", async ({ page }) => {
+    await clearEditor(page);
+    await insertToMainEditor(page, {
+      from: 0,
+      insert: ["* Parent A", "  * Child A", "* Parent B", "  * Child B", "", "* Parent C", "  * Child C"].join("\n"),
+    });
+
+    const items = page.locator(".myst-preview html-chunk > ul > li");
+    await expect(items).toHaveCount(3);
+    await expect(items.nth(0)).not.toHaveClass(/myst-list-item-after-blank/);
+    await expect(items.nth(1)).not.toHaveClass(/myst-list-item-after-blank/);
+    await expect(items.nth(2)).toHaveClass(/myst-list-item-after-blank/);
+
+    for (let index = 0; index < 3; index++) {
+      const margins = await items.nth(index).evaluate((item) => ({
+        paragraph: getComputedStyle(item.querySelector(":scope > p")!).marginBottom,
+        nestedListTop: getComputedStyle(item.querySelector(":scope > ul")!).marginTop,
+        nestedListBottom: getComputedStyle(item.querySelector(":scope > ul")!).marginBottom,
+      }));
+      expect(margins).toEqual({ paragraph: "0px", nestedListTop: "0px", nestedListBottom: "0px" });
+    }
+    expect(await items.nth(2).evaluate((item) => parseFloat(getComputedStyle(item).marginTop))).toBeGreaterThan(0);
+  });
+
+  test("Spaces a nested list when a blank line separates it from its parent", async ({ page }) => {
+    await clearEditor(page);
+    await insertToMainEditor(page, {
+      from: 0,
+      insert: ["* Parent A", "  * Child A", "* Parent B", "", "  * Child B"].join("\n"),
+    });
+
+    const nestedLists = page.locator(".myst-preview html-chunk > ul > li > ul");
+    await expect(nestedLists).toHaveCount(2);
+    await expect(nestedLists.nth(0)).not.toHaveClass(/myst-list-after-blank/);
+    await expect(nestedLists.nth(1)).toHaveClass(/myst-list-after-blank/);
+    expect(await nestedLists.nth(0).evaluate((list) => getComputedStyle(list).marginTop)).toBe("0px");
+    expect(await nestedLists.nth(1).evaluate((list) => parseFloat(getComputedStyle(list).marginTop))).toBeGreaterThan(0);
+  });
+
+  test.describe("Paragraph followed by a list", () => {
+    const features = ["- real-time editing", "- seeing remote cursors", "  - resolved comments"];
+
+    for (const { name, blankLine } of [
+      { name: "without a blank line", blankLine: false },
+      { name: "with a blank line", blankLine: true },
+    ]) {
+      test(name, async ({ page }) => {
+        await clearEditor(page);
+        await insertToMainEditor(page, {
+          from: 0,
+          insert: ["These features include:", ...(blankLine ? [""] : []), ...features].join("\n"),
+        });
+
+        const list = page.locator(".myst-preview html-chunk > p + ul");
+        await expect(list).toHaveCount(1);
+        if (blankLine) await expect(list).toHaveClass(/myst-list-after-blank/);
+        else await expect(list).not.toHaveClass(/myst-list-after-blank/);
+
+        const spacing = await list.evaluate((element) => {
+          const paragraph = element.previousElementSibling!;
+          return {
+            gap: element.querySelector("li")!.getBoundingClientRect().top - paragraph.getBoundingClientRect().bottom,
+            paragraphBottom: getComputedStyle(paragraph).marginBottom,
+            listTop: getComputedStyle(element).marginTop,
+            listPaddingTop: getComputedStyle(element).paddingTop,
+          };
+        });
+        if (blankLine) {
+          expect(spacing.gap).toBeGreaterThan(16);
+          expect(parseFloat(spacing.paragraphBottom)).toBeGreaterThan(0);
+          expect(parseFloat(spacing.listTop)).toBeGreaterThan(0);
+        } else {
+          expect(spacing).toMatchObject({ paragraphBottom: "0px", listTop: "0px", listPaddingTop: "0px" });
+        }
+      });
+    }
+  });
+
+  test("Keeps the preview cursor before bullets and inside blank list gaps", async ({ page }) => {
+    await clearEditor(page);
+    await insertToMainEditor(page, {
+      from: 0,
+      insert: ["* Parent", "", "  * First child", "", "  * Second child"].join("\n"),
+    });
+    await expect(page.locator(".myst-preview html-chunk > ul > li > ul > li")).toHaveCount(2);
+
+    for (const [line, renderedLine, previousLine] of [
+      [1, 1, null],
+      [2, 3, 1],
+      [3, 3, null],
+      [4, 5, 3],
+      [5, 5, null],
+    ]) {
+      await page.evaluate(
+        ({ id, line }) => {
+          const view = window.myst_editor[id].main_editor;
+          view.dispatch({ selection: { anchor: view.state.doc.line(line).from } });
+          view.focus();
+        },
+        { id, line },
+      );
+      await expect(page.locator(".myst-preview .cm-previewFocus")).toBeVisible();
+
+      const positions = await page.evaluate(
+        ({ id, renderedLine, previousLine }) => {
+          const state = window.myst_editor[id].state;
+          const preview = state.text.preview.peek()!;
+          const findLine = (number: number) => preview.querySelector(`[data-line-id="${state.text.lineMap.get(number)}"]`)!;
+          const highlight = preview.querySelector(".cm-previewFocus")!.getBoundingClientRect();
+          const rendered = findLine(renderedLine).getBoundingClientRect();
+          return {
+            markerOffset: rendered.left - highlight.left,
+            markerTop: highlight.top,
+            markerBottom: highlight.bottom,
+            nextTop: rendered.top,
+            previousBottom: previousLine == null ? null : findLine(previousLine).getBoundingClientRect().bottom,
+          };
+        },
+        { id, renderedLine, previousLine },
+      );
+      expect(positions.markerOffset).toBeGreaterThan(27);
+      expect(positions.markerOffset).toBeLessThan(31);
+      if (positions.previousBottom != null) {
+        expect(positions.markerTop).toBeGreaterThanOrEqual(positions.previousBottom - 1);
+        expect(positions.markerBottom).toBeLessThanOrEqual(positions.nextTop + 1);
+      }
+    }
   });
 
   test("Keeps the template confirmation dialog outside the hover dropdown", async ({ page }) => {
