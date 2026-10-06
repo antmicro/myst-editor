@@ -37,6 +37,9 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     ".cm-inline-indent *": { visibility: "hidden" },
     ":is(.cm-widgetBuffer:has(+ .inline-custom-styles), .inline-custom-styles + .cm-widgetBuffer)": { display: "none" },
     ".cm-critic-meta": { display: "none" },
+    // Shrink-to-fit so that the rest of the line stays clickable - that is how you get to the source
+    // of a disclosure widget whose summary handles its own clicks.
+    ".cm-inline-rendered-md details": { display: "inline-block", verticalAlign: "top", maxWidth: "calc(100% - 2ch)" },
   });
 
   const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "Strikethrough", "FencedCode", "Image", "Blockquote"];
@@ -128,7 +131,9 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     }
 
     ignoreEvent(ev) {
-      return ev.type == "mousedown" && (options.onPreviewClick.peek()?.(ev) || ev.target.tagName == "A" || ev.target.parentNode?.tagName == "A");
+      // Elements with an activation behavior of their own are left to the browser - the
+      // `preventDefault` in the mousedown handler below would otherwise swallow it.
+      return ev.type == "mousedown" && (options.onPreviewClick.peek()?.(ev) || ev.target.closest?.("a, summary") != null);
     }
   }
 

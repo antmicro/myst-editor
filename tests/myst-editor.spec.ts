@@ -356,6 +356,27 @@ graph TD
       expect(visitedLines).toEqual([10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
     });
 
+    test("Details elements can be toggled and still lead to their source", async ({ page }) => {
+      await startInlineMode(page);
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: `<details>\n<summary>Click me</summary>\nHidden body\n</details>` });
+
+      // Clicking the summary toggles it and leaves the line rendered
+      const details = page.locator(".cm-inline-rendered-md details");
+      const summary = page.locator(".cm-inline-rendered-md summary");
+      await expect(details).toHaveJSProperty("open", false);
+      await summary.click();
+      await expect(details).toHaveJSProperty("open", true);
+      await summary.click();
+      await expect(details).toHaveJSProperty("open", false);
+
+      // The details does not take up the whole line, so the rest of it still opens the source
+      const line = page.locator(".cm-content .cm-line").first();
+      const box = (await line.boundingBox())!;
+      await line.click({ position: { x: box.width - 5, y: box.height / 2 } });
+      await expect(details).toHaveCount(0);
+    });
+
     test.describe("Common transforms", () => {
       test("Bold text is being rendered", async ({ page }) => {
         await startInlineMode(page);

@@ -32,6 +32,10 @@ You can toggle a mode where the Markdown will be rendered right in the editor.
 
 ![Inline Mode Demo](./assets/inline.gif)
 
+Clicking rendered output in this mode puts the caret on the line it came from, so that you can edit the source.
+Links and `<summary>` elements keep their own behavior instead, so to edit a `<details>` click next to it on the
+same line, or anywhere in its body.
+
 ### Collaborative editing
 
 You can work on a document with multiple people at the same time.
