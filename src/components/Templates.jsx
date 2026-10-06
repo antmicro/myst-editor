@@ -43,7 +43,11 @@ async function fetchTemplates(templateListUrl) {
     if (templates[key].error) continue;
 
     try {
-      const res = await fetch(templates[key].templatetext);
+      const templateTextUrl = new URL(templates[key].templatetext, window.location.origin);
+      if (!["http:", "https:"].includes(templateTextUrl.protocol)) {
+        throw new Error("Unsupported protocol for templatetext URL");
+      }
+      const res = await fetch(templateTextUrl);
       if (!res.ok) throw new Error(`${res.status} Failed to fetch template text`);
       templates[key].templatetext = await res.text();
     } catch (err) {
