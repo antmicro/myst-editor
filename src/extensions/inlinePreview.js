@@ -105,11 +105,12 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       this.isBlock = isBlock;
       this.start = start;
       this.end = end;
+      this.md = text.md.peek();
       this.cssClasses = cssClasses;
     }
 
     eq(widget) {
-      return this.src === widget.src;
+      return this.src === widget.src && this.md === widget.md;
     }
 
     toDOM() {
@@ -119,13 +120,12 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
         content.classList.add("inline-custom-styles");
       }
       this.cssClasses.flatMap((c) => c.split(" ")).forEach((c) => content.classList.add(c));
-      const md = text.md.peek();
-
       for (let l = this.start; l <= this.end; l++) {
         text.lineMap.delete(l);
       }
 
-      const render = (src) => (this.isBlock ? md.render(src, { lineMap: text.lineMap, startLine: this.start, chunkId: 0 }) : md.renderInline(src));
+      const render = (src) =>
+        this.isBlock ? this.md.render(src, { lineMap: text.lineMap, startLine: this.start, chunkId: 0 }) : this.md.renderInline(src);
       content.innerHTML = sanitize(render(this.src));
       return content;
     }
@@ -184,7 +184,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
         const selectionChanged =
           transaction.startState.doc.lineAt(transaction.startState.selection.main.head).number !==
           transaction.state.doc.lineAt(transaction.state.selection.main.head).number;
-        if (!initialUpdate && !focusChanged && !transaction.docChanged && !selectionChanged) return curr;
+        if (!initialUpdate && !focusChanged && !transaction.docChanged && !selectionChanged && !transaction.reconfigured) return curr;
         if (initialUpdate) initialUpdate = false;
         return RangeSet.of(replaceMd(transaction.state), true);
       },

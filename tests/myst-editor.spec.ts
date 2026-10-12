@@ -394,6 +394,31 @@ graph TD
       await expect(details).toHaveCount(0);
     });
 
+    test("Open links in new tabs updates rendered links in inline preview", async ({ page }) => {
+      await startInlineMode(page);
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: "[Example](https://example.com/)" });
+
+      const link = page.locator('.cm-inline-rendered-md a[href="https://example.com/"]');
+      await expect(link).toBeVisible();
+      await expect(link).not.toHaveAttribute("target", "_blank");
+
+      await page.getByTitle("Editor settings").hover();
+      const setting = page.locator('label[for="links-new-tab"]');
+      await setting.click();
+      await expect(link).toHaveAttribute("target", "_blank");
+      await setting.click();
+      await expect(link).not.toHaveAttribute("target", "_blank");
+      await setting.click();
+      await expect(link).toHaveAttribute("target", "_blank");
+      await page.mouse.move(1200, 700);
+
+      const popupPromise = page.waitForEvent("popup");
+      await link.click();
+      const popup = await popupPromise;
+      await popup.close();
+    });
+
     test.describe("Common transforms", () => {
       test("Bold text is being rendered", async ({ page }) => {
         await startInlineMode(page);
