@@ -52783,15 +52783,23 @@ ${O}`, T.classList.remove("mermaid");
   };
 };
 function $Bt(t) {
-  const e = t.renderer.rules.link_open;
-  t.renderer.rules.link_open = (r, n, i, s, a) => {
-    var u, h;
-    const o = e != null ? e : a.renderToken.bind(a), l = (h = (u = r[n].attrs) == null ? void 0 : u.find((f) => f[0] == "href")) == null ? void 0 : h[1];
+  const e = t.renderer.rules.link_open, r = t.renderer.rules.link_close;
+  t.renderer.rules.link_open = (n, i, s, a, o) => {
+    const l = n[i].attrGet("href");
     if (l != null && l.startsWith("(")) {
-      const f = r[n + 1], d = r[n + 2];
-      return f.content = `[${f.content}]`, d.type = "text", d.content = `(${l})`, "";
+      let u = 1;
+      for (let h = i + 1; h < n.length; h++)
+        if (u += n[h].nesting, u === 0)
+          return n[h].meta = {
+            ...n[h].meta,
+            invalidLinkHref: l
+          }, "[";
     }
-    return o(r, n, i, s, a);
+    return e ? e(n, i, s, a, o) : o.renderToken(n, i, s);
+  }, t.renderer.rules.link_close = (n, i, s, a, o) => {
+    var u;
+    const l = (u = n[i].meta) == null ? void 0 : u.invalidLinkHref;
+    return l !== void 0 ? `](${t.utils.escapeHtml(l)})` : r ? r(n, i, s, a, o) : o.renderToken(n, i, s);
   };
 }
 function BBt(t) {
