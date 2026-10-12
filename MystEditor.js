@@ -72367,15 +72367,10 @@ ${(p = t.stack) != null ? p : ""}`;
   let h = `Document:
 Lines: ${i.state.doc.lines}
 Length: ${i.state.doc.length}`;
-  if (s) {
-    h += `
+  s && (h += `
 User count: ${s.users.peek().length}`, h += `
-Comments: count ${s.ycomments.comments.peek().length}, lines [${s.ycomments.comments.peek().map((m) => m.lineNumber).toSorted((m, v) => m - v).join(", ")}]`, h += `
-Resolved comments: count ${s.ycomments.resolver().resolvedCommentsList.peek().length}, lines [${s.ycomments.resolver().resolvedCommentsList.peek().map((m) => m.lineNumber).toSorted((m, v) => m - v).join(", ")}]`;
-    const g = [...s.ycomments.suggestions.entries()].filter(([m, v]) => v.length > 0).map(([m]) => parseInt(s.ycomments.positions().get(m))).filter(Boolean).toSorted((m, v) => m - v);
-    h += `
-Suggestions: line count ${g.length}, lines [${g.join(", ")}]`;
-  }
+Comments: count ${s.ycomments.comments.peek().length}, lines [${s.ycomments.comments.peek().map((g) => g.lineNumber).toSorted((g, m) => g - m).join(", ")}]`, h += `
+Resolved comments: count ${s.ycomments.resolver().resolvedCommentsList.peek().length}, lines [${s.ycomments.resolver().resolvedCommentsList.peek().map((g) => g.lineNumber).toSorted((g, m) => g - m).join(", ")}]`);
   const f = `Logs:
 ${n()}`;
   return `\`\`\`
