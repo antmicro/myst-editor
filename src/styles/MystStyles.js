@@ -36,6 +36,7 @@ export const MystCSSVars = styled.div`
   --switch-bg: var(--gray-500);
   --switch-active-bg: var(--blue-500);
   --panel-bg: white;
+  --panel-fg: black;
   --box-shadow: var(--gray-600);
   --icon-invert: 0;
   --string-fg: var(--brown-500);
@@ -100,6 +101,7 @@ darkTheme.replaceSync(`
     --switch-bg: #5c5c5c;
     --modal-bg: #1a1a1a;
     --panel-bg: #1a1a1a;
+    --panel-fg: white;
     --box-shadow: #333;
     --icon-invert: 1;
     --string-fg: #ffa657;

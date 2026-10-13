@@ -1,18 +1,38 @@
-import { useContext, useRef } from "preact/hooks";
+import { useContext, useEffect, useRef } from "preact/hooks";
 import { EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import styled, { css } from "styled-components";
-import { ExtensionBuilder, skipAndFoldAll, foldMarkedHeadings } from "../extensions";
+import { ExtensionBuilder, skipAndFoldAll, foldMarkedHeadings, multipleSelectionsCompartment, suggestionsCompartment } from "../extensions";
 import { restoreCollaborationSelection, saveCollaborationSelection } from "../collaborationSelection";
-import { YCommentsParent } from "./Comment";
+import {
+  addReviewComment,
+  getAllReviewItems,
+  setReviewStateEffect,
+  showCommentsCompartment,
+  showCommentsFacet,
+  reviewSidebarCompartment,
+  reviewSidebarFacet,
+  reviewSidebarWideCompartment,
+  reviewSidebarWideFacet,
+  suggestionsTypingExtension,
+} from "../extensions/review";
 import commentIcon from "../icons/comment.svg?raw";
 import { MystState } from "../mystState";
 import { userExtensionsCompartment } from "./Settings";
 import { useSignalEffect } from "@preact/signals";
 import { FoldChevron, MdStyles } from "./Preview";
 import { Logger } from "../logger";
+import { ReviewStyles } from "../extensions/reviewTheme";
 
 const CodeEditor = styled.div`
+  ${(props) =>
+    props.$reviews &&
+    css`
+      .cm-editor {
+        ${ReviewStyles}
+      }
+    `}
+
   border-radius: var(--border-radius);
   background: ${(props) => (props.$mode != "Inline" ? "var(--editor-bg)" : "var(--panel-bg)")};
   font-family: monospace;
@@ -20,6 +40,7 @@ const CodeEditor = styled.div`
   resize: none;
   border: 0;
   padding: 20px;
+  padding-right: 5px;
   box-sizing: border-box;
   height: 100%;
   scrollbar-width: thin;
@@ -98,14 +119,15 @@ const CodeEditor = styled.div`
 
   .cm-editor {
     outline: 0;
+    height: 100%;
   }
 
-  .cm-scroller {
+  .cm-editor .cm-scroller {
     overflow: visible;
   }
 
   .cm-error {
-    text-decoration: underline var(--error-bg) 2px;
+    text-decoration: spelling-error;
   }
 
   .cm-link {
@@ -298,7 +320,21 @@ const CodeEditor = styled.div`
 `;
 
 const CodeMirror = () => {
-  const { editorView, options, collab, userSettings, linter, text, headings, error, suggestMode } = useContext(MystState);
+  const {
+    editorView,
+    options,
+    collab,
+    userSettings,
+    linter,
+    text,
+    headings,
+    error,
+    suggestMode,
+    showComments,
+    reviewItems,
+    reviewSidebarExpanded,
+    reviewSidebarWide,
+  } = useContext(MystState);
   const logger = useContext(Logger);
   const editorMountpoint = useRef(null);
   const focusScroll = useRef(null);
@@ -320,6 +356,33 @@ const CodeMirror = () => {
     destroyedViews.current.add(view);
   };
 
+  // Track sidebar space and reset card expansion when the editor crosses 800px.
+  useEffect(() => {
+    const element = editorMountpoint.current;
+    if (!element) return;
+
+    let wasWide = null;
+    const updateAvailability = () => {
+      const width = element.getBoundingClientRect().width;
+      if (width === 0) return;
+      const isWide = width >= 800;
+      if (wasWide === null ? !isWide : wasWide !== isWide) reviewSidebarExpanded.value = isWide;
+      reviewSidebarWide.value = isWide;
+      wasWide = isWide;
+    };
+    const ResizeObserverClass = element.ownerDocument.defaultView?.ResizeObserver;
+    const observer = ResizeObserverClass ? new ResizeObserverClass(updateAvailability) : null;
+    observer?.observe(element);
+    element.ownerDocument.defaultView?.addEventListener("resize", updateAvailability);
+    updateAvailability();
+
+    return () => {
+      observer?.disconnect();
+      element.ownerDocument.defaultView?.removeEventListener("resize", updateAvailability);
+      reviewSidebarWide.value = false;
+    };
+  }, []);
+
   useSignalEffect(() => {
     if (!options.collaboration.value.enabled || (collab.value.editorReady.value && !error.value)) return;
     destroyEditorView(editorView.value);
@@ -334,8 +397,6 @@ const CodeMirror = () => {
     });
     view.dom.style.opacity = "0.5";
 
-    collab.value?.ycomments?.registerCodeMirror(view);
-
     return () => {
       destroyEditorView(view);
     };
@@ -345,6 +406,49 @@ const CodeMirror = () => {
     const userExtensions = userSettings.value.filter((s) => s.enabled && s.extension).map((s) => s.extension);
     editorView.value?.dispatch?.({
       effects: userExtensionsCompartment.reconfigure(userExtensions),
+    });
+  });
+
+  // Sync suggest mode with CodeMirror; keep only the main selection when enabling it.
+  useSignalEffect(() => {
+    const enabled = suggestMode.value;
+    const reviewEnabled = options.collaboration.value.commentsEnabled;
+    const view = editorView.value;
+
+    if (!view || !reviewEnabled) return;
+
+    view.dispatch({
+      selection: enabled && view.state.selection.ranges.length > 1 ? view.state.selection.asSingle() : undefined,
+      effects: [
+        suggestionsCompartment.reconfigure(enabled ? suggestionsTypingExtension : []),
+        multipleSelectionsCompartment.reconfigure(EditorState.allowMultipleSelections.of(!enabled)),
+      ],
+    });
+  });
+
+  // Show or hide review cards while keeping inline markup and review state intact.
+  useSignalEffect(() => {
+    const visible = showComments.value;
+    const reviewEnabled = options.collaboration.value.commentsEnabled;
+    const view = editorView.value;
+
+    if (!view || !reviewEnabled) return;
+
+    view.dispatch({ effects: showCommentsCompartment.reconfigure(showCommentsFacet.of(visible)) });
+  });
+
+  // Sync card expansion and sidebar space with CodeMirror's review layout.
+  useSignalEffect(() => {
+    const expanded = reviewSidebarExpanded.value;
+    const wide = reviewSidebarWide.value;
+    const reviewEnabled = options.collaboration.value.commentsEnabled;
+    const view = editorView.value;
+    if (!view || !reviewEnabled) return;
+    view.dispatch({
+      effects: [
+        reviewSidebarCompartment.reconfigure(reviewSidebarFacet.of(expanded)),
+        reviewSidebarWideCompartment.reconfigure(reviewSidebarWideFacet.of(wide)),
+      ],
     });
   });
 
@@ -363,6 +467,11 @@ const CodeMirror = () => {
       });
     }
 
+    // Seed the width facet before constructing the editor; the resize effect keeps it current.
+    const reviewSidebarWideAtMount = editorMountpoint.current.getBoundingClientRect().width >= 800;
+    reviewSidebarWide.value = reviewSidebarWideAtMount;
+    if (!options.collaboration.value.commentsEnabled) reviewItems.value = new Map();
+
     const restoredSelection = options.collaboration.value.enabled
       ? restoreCollaborationSelection(savedCollaborationSelection.current, collabClient)
       : undefined;
@@ -380,13 +489,23 @@ const CodeMirror = () => {
           return b.useCollaboration({ collabClient, editorView });
         })
         .if(!options.collaboration.value.enabled, (b) => b.useDefaultHistory())
-        .if(options.collaboration.value.commentsEnabled, (b) => b.useComments({ ycomments: collabClient.ycomments }))
         .addUpdateListener((update) => {
-          if (!update.docChanged) return;
+          const reviewEnabled = options.collaboration.peek().commentsEnabled;
+          const reviewsChanged = reviewEnabled && update.transactions.some((tr) => tr.effects.some((effect) => effect.is(setReviewStateEffect)));
+          if (!update.docChanged && !reviewsChanged) {
+            return;
+          }
+
+          if (reviewEnabled) reviewItems.value = getAllReviewItems(update.state);
+
+          // Apply every document change, even when a later review update replaces the timer.
+          if (update.docChanged) text.shiftLineMap(update);
           clearTimeout(renderTimer.current);
           renderTimer.current = setTimeout(() => {
-            text.shiftLineMap(update);
-            text.text.value = view.state.doc.toString();
+            const source = update.state.doc.toString();
+            // Changing the text already triggers a preview render with the latest reviews.
+            if (text.text.peek() === source) text.renderText(false);
+            else text.text.value = source;
           });
         })
         .useFixFoldingScroll(focusScroll)
@@ -399,11 +518,17 @@ const CodeMirror = () => {
         .useExceptionSink(error)
         .useLogger(logger)
         .if(options.cmDarkTheme.value, (b) => b.useCmDarkTheme())
-        .useCriticMarkup()
-        .if(suggestMode.value, (b) => b.useSuggestMode())
+        .if(options.collaboration.value.commentsEnabled, (b) =>
+          b
+            .useReview(reviewItems, showComments.peek(), reviewSidebarExpanded.peek(), reviewSidebarWideAtMount, options.avatarCrossorigin)
+            .useSuggestions(suggestMode.peek())
+            .useTooltipSelection((view, selection) => {
+              showComments.value = true;
+              return addReviewComment(view, selection);
+            }),
+        )
         .create(),
     });
-
     const view = new EditorView({
       state: startState,
       parent: editorMountpoint.current,
@@ -436,14 +561,19 @@ const CodeMirror = () => {
     }, 0);
 
     return () => {
+      clearTimeout(renderTimer.current);
       destroyEditorView(view);
     };
   });
 
   return (
-    <CodeEditor className="myst-main-editor" ref={editorMountpoint} $mode={options.mode.value} id={`${options.id.value}-editor`}>
-      {options.collaboration.value.commentsEnabled && collab.value.editorReady.value && collab.value.ycomments?.mainCodeMirror && <YCommentsParent />}
-    </CodeEditor>
+    <CodeEditor
+      className="myst-main-editor"
+      ref={editorMountpoint}
+      $mode={options.mode.value}
+      $reviews={options.collaboration.value.commentsEnabled}
+      id={`${options.id.value}-editor`}
+    />
   );
 };
 

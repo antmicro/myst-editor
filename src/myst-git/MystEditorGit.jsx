@@ -303,23 +303,29 @@ const MystEditorGit = ({
           .map(({ file }) => file);
         const otherFiles = changedFiles.filter((f) => f !== file.peek());
         let documents = await setupFileConnections(repo, props, branch.peek(), commit.peek().hash, otherFiles, getText);
-        const currentText = collab.peek().ytext.toString();
+        const currentClient = collab.peek();
+        const currentText = currentClient.ytext.toString();
         const currentInitialText = options.initialText.peek();
-        if (otherFiles.length < changedFiles.length || currentText !== currentInitialText) {
+        if (otherFiles.length < changedFiles.length || currentText !== currentInitialText || currentClient.reviewAdapter.getReviewIds().length > 0) {
           documents.unshift({
-            client: collab.peek(),
+            client: currentClient,
             file: file.peek(),
             initialText: currentInitialText,
             text: currentText,
           });
         }
-        documents = documents.map((d) => ({ ...d, textChanged: d.text != d.initialText, commentCount: d.client.ycomments.comments.peek().length }));
+        documents = documents.map((d) => ({
+          ...d,
+          textChanged: d.text != d.initialText,
+          commentCount: d.client.ycomments?.comments.peek().length ?? 0,
+          reviewCount: d.client.reviewAdapter.getReviewIds().length,
+        }));
 
         // Filter out documents without any changes and remove the change mark from the UI for them all
-        const unchangedDocs = documents.filter((d) => !d.textChanged && d.commentCount == 0);
+        const unchangedDocs = documents.filter((d) => !d.textChanged && d.commentCount == 0 && d.reviewCount == 0);
         cleanupConnections(unchangedDocs, collab);
         unchangedDocs.map((d) => d.client.provider.roomname).forEach((r) => statusSocket.current.send(r));
-        documents = documents.filter((d) => d.textChanged || d.commentCount > 0);
+        documents = documents.filter((d) => d.textChanged || d.commentCount > 0 || d.reviewCount > 0);
 
         if (!documents.some((d) => d.textChanged)) {
           toastNotify({ text: "No changes to commit" });
@@ -332,15 +338,20 @@ const MystEditorGit = ({
       }
     },
   };
-  /** Moves work which the commit did not include - later edits, unstaged files, comments - into the
+  /** Moves work which the commit did not include - later edits, unstaged files, comments, reviews - into the
    * rooms of the new commit. It would otherwise stay in the previous commit's rooms, which no one
    * will open again. Runs before other clients are told about the commit, as they would create the
    * new rooms from the commited files and race this.
    * TODO: in case of a crash partway through, report the files which were left behind. */
   async function carryForward(hash, stagedDocs) {
     const docs = commitDocuments.current
-      .map((d) => ({ ...d, commited: d.textChanged && stagedDocs.includes(d.file) ? d.text : d.initialText, current: d.client.ytext.toString() }))
-      .filter((d) => d.current !== d.commited || d.commentCount > 0);
+      .map((d) => ({
+        ...d,
+        commited: d.textChanged && stagedDocs.includes(d.file) ? d.text : d.initialText,
+        current: d.client.ytext.toString(),
+        reviewCount: d.client.reviewAdapter.getReviewIds().length,
+      }))
+      .filter((d) => d.current !== d.commited || d.commentCount > 0 || d.reviewCount > 0);
     const connections = await setupFileConnections(repo, props, branch.peek(), hash, docs.map((d) => d.file)); // prettier-ignore
     for (const { client, file } of connections) {
       const doc = docs.find((d) => d.file === file);
@@ -352,6 +363,13 @@ const MystEditorGit = ({
         });
       }
       if (doc.commentCount > 0) client.ycomments.applyState(doc.client.ycomments.encodeState());
+      if (doc.reviewCount > 0) {
+        const reviews = doc.client.reviewAdapter
+          .getReviewIds()
+          .map((id) => [id, doc.client.reviewAdapter.getReview(id)])
+          .filter(([, review]) => review);
+        client.reviewAdapter.applyChanges(new Map(reviews));
+      }
     }
     return connections;
   }
@@ -368,9 +386,13 @@ const MystEditorGit = ({
       if (!statusSocket.current || statusSocket.current.readyState !== 1) {
         console.warn("Document statuses not available");
       } else {
-        // Let the server know the changes have been commited (also includes comments)
+        // Let the server know the changes have been commited (also includes comments and reviews)
         commitDocuments.current
-          .filter((d) => (d.textChanged && stagedDocs.includes(d.file)) || (!d.textChanged && d.commentCount > 0))
+          .filter(
+            (d) =>
+              (d.textChanged && stagedDocs.includes(d.file)) ||
+              (!d.textChanged && (d.commentCount > 0 || d.client.reviewAdapter.getReviewIds().length > 0)),
+          )
           .forEach(({ client }) => statusSocket.current.send(client.provider.roomname));
       }
       toastNotify({ text: "Changes have been commited. ", link: { text: "See in Gitlab", href: webUrl } });
@@ -682,7 +704,7 @@ async function setupFileConnections(repo, props, branch, commitHash, files, getT
               wsUrl: props.collaboration.wsUrl,
               room: `${repo}/${branch}/${commitHash}/${file}`,
               mode: "websocket",
-              commentsEnabled: true,
+              commentsEnabled: props.collaboration.commentsEnabled,
             },
             { id: props.id },
           );

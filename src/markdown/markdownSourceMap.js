@@ -1,4 +1,5 @@
 import markdownIt from "markdown-it";
+import { applyFencedCodeReviews } from "./markdownReview";
 
 const SRC_LINE_ID = "data-line-id";
 const randomLineId = () => Math.random().toString().replace(".", "");
@@ -101,8 +102,7 @@ function wrapTextInSpan(/** @type {markdownIt} */ md) {
   };
 }
 
-/** Currently the contents of a fenced code block are treated as a singular string so we need to wrap each line with a `span` to attach line metadata.
-    If we ever decide to add syntax highlighting in fenced code blocks, this will need to be changed. **/
+/** Split rendered code text nodes into line spans, clone their formatting elements, then add source-map IDs and reviews. */
 function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
   const defaultFenceRule = md.renderer.rules.fence;
   md.renderer.rules.fence = (tokens, idx, options, env, self) => {
@@ -119,17 +119,53 @@ function wrapFencedLinesInSpan(/** @type {markdownIt} */ md) {
     const parser = new DOMParser();
     const defaultHTML = parser.parseFromString(defaultOutput, "text/html");
     const codeElem = defaultHTML.querySelector("pre > code");
-    const defaultContent = codeElem.innerHTML;
+    if (!codeElem) return defaultOutput;
+
     const startLine = token.map[0] + env.startLine - (env.chunkId !== 0);
-    codeElem.innerHTML = defaultContent
-      .split("\n")
-      .filter((_, i, lines) => i !== lines.length - 1)
-      .map((l, i) => {
-        const id = randomLineId();
-        env.lineMap.set(startLine + i + 1, id);
-        return `<span ${SRC_LINE_ID}="${id}">${l}</span>`;
-      })
-      .join("\n");
+    const sourceText = codeElem.textContent;
+    const walker = defaultHTML.createTreeWalker(codeElem, 4);
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+    const fragment = defaultHTML.createDocumentFragment();
+    const lines = [];
+    let line = defaultHTML.createElement("span");
+    const appendLine = () => {
+      const id = randomLineId();
+      env.lineMap.set(startLine + lines.length + 1, id);
+      line.setAttribute(SRC_LINE_ID, id);
+      lines.push(line);
+      fragment.appendChild(line);
+    };
+
+    for (const node of textNodes) {
+      const ancestors = [];
+      for (let parent = node.parentElement; parent && parent !== codeElem; parent = parent.parentElement) {
+        ancestors.unshift(parent);
+      }
+
+      const parts = node.textContent.split("\n");
+      parts.forEach((part, index) => {
+        if (part) {
+          let target = line;
+          for (const ancestor of ancestors) {
+            const clone = ancestor.cloneNode(false);
+            target.appendChild(clone);
+            target = clone;
+          }
+          target.appendChild(defaultHTML.createTextNode(part));
+        }
+        if (index < parts.length - 1) {
+          appendLine();
+          fragment.appendChild(defaultHTML.createTextNode("\n"));
+          line = defaultHTML.createElement("span");
+        }
+      });
+    }
+    if (sourceText && !sourceText.endsWith("\n")) appendLine();
+
+    codeElem.replaceChildren(fragment);
+    applyFencedCodeReviews(token, lines);
 
     return defaultHTML.body.innerHTML;
   };

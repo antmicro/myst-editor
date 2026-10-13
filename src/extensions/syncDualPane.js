@@ -51,13 +51,11 @@ export const syncPreviewWithCursor = (text, lastTyped) => {
  */
 function scrollPreviewElemIntoView({ view, matchingLine, matchingElem, behavior = "auto", preview }) {
   const cursorBlock = view.lineBlockAt(view.state.doc.line(matchingLine).from);
-  const previewRect = preview.getBoundingClientRect();
-  const editor = view.dom.parentElement;
   let matchingRect = matchingElem.getBoundingClientRect();
 
-  const elemScrollOffset = cursorBlock.top + previewTopPadding;
-
-  const top = matchingRect.top + preview.scrollTop - elemScrollOffset - previewRect.top + (editor?.scrollTop ?? 0);
+  // Get the editor line’s screen position, then add the preview element’s distance from it to the current preview scroll.
+  const cursorScreenTop = view.documentTop + cursorBlock.top;
+  const top = preview.scrollTop + matchingRect.top - cursorScreenTop;
   preview.scrollTo({ top, behavior });
 }
 
@@ -118,7 +116,7 @@ function scrollEditorToLine(elem, preview, line, editor) {
   const lineBlock = editor.lineBlockAt(line.from);
   const targetRect = elem.getBoundingClientRect();
   const previewRect = preview.current.getBoundingClientRect();
-  const editorParent = editor.dom.parentElement;
+  const editorParent = editor.scrollDOM;
 
   const editorScrollOffset = targetRect.top;
   const top = lineBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;

@@ -11,6 +11,7 @@ import { createMystState, MystState, predefinedButtons, defaultButtons } from ".
 import { batch, computed, signal, effect, useSignal, useSignalEffect } from "@preact/signals";
 import { MystContainer } from "./styles/MystStyles";
 import { syncCheckboxes } from "./markdown/markdownCheckboxes";
+import { hasVisibleReviewAnchor } from "./extensions/reviewStateField";
 import { TableOfContents } from "./components/TableOfContents";
 import ErrorModal from "./components/ErrorModal";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -93,7 +94,7 @@ const FlexWrapper = styled.div`
 const hideBodyScrollIf = (val) => (document.documentElement.style.overflow = val ? "hidden" : "visible");
 
 const MystEditor = () => {
-  const { editorView, cache, options, collab, text, suggestMode } = useContext(MystState);
+  const { editorView, cache, options, collab, text, suggestMode, showComments, reviewItems, reviewSidebarExpanded } = useContext(MystState);
   const fullscreen = useSignal(false);
   useSignalEffect(() => hideBodyScrollIf(fullscreen.value));
 
@@ -121,17 +122,30 @@ const MystEditor = () => {
         alertFor("Rich links refreshed!", 1);
       },
       "suggest-mode": () => (suggestMode.value = !suggestMode.peek()),
+      "show-comments": () => {
+        showComments.value = true;
+        reviewSidebarExpanded.value = !reviewSidebarExpanded.peek();
+      },
     }),
     [],
   );
 
+  const commentsEnabled = options.collaboration.value.commentsEnabled;
+  const editorReady = !options.collaboration.value.enabled || collab.value?.editorReady.value;
+  const hasReviewCards = [...reviewItems.value.values()].some(hasVisibleReviewAnchor);
   const buttons = useMemo(
     () =>
-      options.includeButtons.value.map((b) => ({
-        ...b,
-        action: b.action || buttonActions[b.id],
-      })),
-    [options.includeButtons.value, buttonActions],
+      options.includeButtons.value
+        .filter((b) => {
+          if (b.id === "suggest-mode") return commentsEnabled;
+          if (b.id === "show-comments") return commentsEnabled && hasReviewCards;
+          return true;
+        })
+        .map((b) => ({
+          ...b,
+          action: b.action || buttonActions[b.id],
+        })),
+    [options.includeButtons.value, commentsEnabled, hasReviewCards, buttonActions],
   );
 
   return (
@@ -141,9 +155,7 @@ const MystEditor = () => {
         <ErrorBoundary>
           <EditorParent mode={options.mode.value} fullscreen={fullscreen.value}>
             {options.topbar.value && <EditorTopbar alert={alert} buttons={buttons} />}
-            {options.collaboration.value.enabled && !collab.value.editorReady.value && (
-              <StatusBanner>Connecting to the collaboration server ...</StatusBanner>
-            )}
+            {options.collaboration.value.enabled && !editorReady && <StatusBanner>Connecting to the collaboration server ...</StatusBanner>}
             <MystWrapper className="myst-editor-wrapper" fullscreen={fullscreen.value}>
               <FlexWrapper id="editor-wrapper" className="flex-wrapper">
                 <CodeMirror />
@@ -177,14 +189,11 @@ const MystEditor = () => {
                   <Diff />
                 </FlexWrapper>
               )}
-              {options.mode.value == "Resolved" &&
-                options.collaboration.value.commentsEnabled &&
-                options.collaboration.value.resolvingCommentsEnabled &&
-                collab.value.editorReady.value && (
-                  <FlexWrapper id="resolved-wrapper" className="flex-wrapper">
-                    <ResolvedComments />
-                  </FlexWrapper>
-                )}
+              {options.mode.value == "Resolved" && options.collaboration.value.commentsEnabled && editorReady && (
+                <FlexWrapper id="resolved-wrapper" className="flex-wrapper">
+                  <ResolvedComments />
+                </FlexWrapper>
+              )}
               {options.mode.value === "Outline" && (
                 <FlexWrapper className="flex-wrapper">
                   <TableOfContents />

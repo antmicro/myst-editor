@@ -1,10 +1,15 @@
 import { useContext } from "preact/hooks";
 import styled from "styled-components";
-import ResolvedComment from "./ResolvedComment";
-import CommentIcon from "../icons/comment.svg";
 import { MystState } from "../mystState";
 import { useComputed } from "@preact/signals";
-import ResolvedSuggestion from "./ResolvedSuggestion";
+import {
+  deleteResolvedReview,
+  restoreResolvedReview,
+  getRestorableReviewAnchors,
+  getCurrentUser,
+  isCommentAuthor,
+} from "../extensions/reviewCommands";
+import { ResolvedReviewComment, ResolvedReviewSuggestion } from "./ResolvedReview";
 
 const ResolvedWrapper = styled.div`
   background-color: var(--panel-bg);
@@ -49,37 +54,33 @@ const Container = styled.div`
 const NoCommentsText = styled.p`
   padding: 10px 6px;
   margin: 0;
-
-  img {
-    margin: 0 5px;
-    transform: translateY(20%);
-    filter: invert(var(--icon-invert));
-  }
-
-  span {
-    color: #e7473c;
-    line-height: 25px;
-    font-size: 10px;
-    margin: 0 5px;
-  }
 `;
 
 function dateComparator(c1, c2) {
-  return c1.resolvedDate - c2.resolvedDate;
+  return (c1.resolvedAt ?? 0) - (c2.resolvedAt ?? 0);
 }
 
-const ResolvedComments = () => {
-  const { collab } = useContext(MystState);
-  const ycomments = collab.value.ycomments;
-  const suggestions = collab.value.storedSuggestions;
-  const resolvedComments = useComputed(() => ycomments.resolver().resolvedCommentsList.value.sort(dateComparator));
-  const commentContents = useComputed(() =>
-    resolvedComments.value.reduce((contents, { commentId }) => {
-      contents[commentId] = ycomments.getTextForComment(commentId).toString();
-      return contents;
-    }, {}),
+function groupResolvedSuggestions(reviewItems) {
+  const groups = new Map();
+
+  for (const review of reviewItems.values()) {
+    if (!review.resolved || review.kind !== "suggestion") continue;
+    const groupId = review.replacementId ?? review.id;
+    const group = groups.get(groupId) ?? [];
+    group.push(review);
+    groups.set(groupId, group);
+  }
+
+  return [...groups.values()].sort((a, b) => dateComparator(a[0], b[0]));
+}
+
+const ResolvedReviews = () => {
+  const { editorView, reviewItems } = useContext(MystState);
+  const currentUser = editorView.value ? getCurrentUser(editorView.value.state) : null;
+  const resolvedComments = useComputed(() =>
+    [...reviewItems.value.values()].filter((review) => review.resolved && review.kind === "comment").sort(dateComparator),
   );
-  const authors = useComputed(() => resolvedComments.value.map((c) => ycomments.lineAuthors(c.commentId)));
+  const resolvedSuggestions = useComputed(() => groupResolvedSuggestions(reviewItems.value));
 
   return (
     <ResolvedWrapper className="myst-resolved">
@@ -87,17 +88,15 @@ const ResolvedComments = () => {
       <VerticalSparator />
       <Container>
         {resolvedComments.value.length === 0 ? (
-          <NoCommentsText>
-            No resolved comments yet, to resolve a comment hover over it's icon <img src={CommentIcon} /> and click <span>RESOLVE</span>
-          </NoCommentsText>
+          <NoCommentsText>No resolved comments yet.</NoCommentsText>
         ) : (
-          resolvedComments.value.map((c, idx) => (
-            <ResolvedComment
-              key={c.commentId}
-              c={c}
-              authors={authors.value[idx]}
-              ycomments={ycomments}
-              content={commentContents.value[c.commentId]}
+          resolvedComments.value.map((review) => (
+            <ResolvedReviewComment
+              key={review.id}
+              review={review}
+              canRestore={getRestorableReviewAnchors(editorView.value, review).length > 0}
+              onRestore={() => restoreResolvedReview(editorView.value, review.id)}
+              onDelete={isCommentAuthor(currentUser, review) ? () => deleteResolvedReview(editorView.value, review.id) : undefined}
             />
           ))
         )}
@@ -106,14 +105,14 @@ const ResolvedComments = () => {
       <h1 className="suggestions-heading">Resolved suggestions</h1>
       <VerticalSparator />
       <Container>
-        {suggestions.value.length === 0 ? (
+        {resolvedSuggestions.value.length === 0 ? (
           <NoCommentsText>No resolved suggestions yet.</NoCommentsText>
         ) : (
-          suggestions.value.map((s, idx) => <ResolvedSuggestion key={idx} suggestion={s} />)
+          resolvedSuggestions.value.map((reviews) => <ResolvedReviewSuggestion key={reviews[0].replacementId ?? reviews[0].id} reviews={reviews} />)
         )}
       </Container>
     </ResolvedWrapper>
   );
 };
 
-export default ResolvedComments;
+export default ResolvedReviews;

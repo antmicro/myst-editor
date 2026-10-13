@@ -34,12 +34,14 @@ const AvatarsWrapper = styled.div`
   }
 `;
 
-export const Avatar = ({ name, color, avatarUrl, userUrl }) => {
-  const { options } = useContext(MystState);
+export const Avatar = ({ name, color, avatarUrl, userUrl, avatarCrossorigin }) => {
+  const state = useContext(MystState);
+  // Review cards render outside MystState.Provider and pass this option explicitly.
+  const crossOrigin = (avatarCrossorigin ?? state?.options?.avatarCrossorigin)?.value ?? null;
 
   return (
     <a href={userUrl || "#"} target="_blank" rel="noreferrer">
-      <img src={avatarUrl} key={name} title={name} class="avatar" style={`border-color: ${color}`} crossOrigin={options.avatarCrossorigin.value} />
+      <img src={avatarUrl} key={name} title={name} class="avatar" style={`border-color: ${color}`} crossOrigin={crossOrigin} />
     </a>
   );
 };

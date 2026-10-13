@@ -1,7 +1,7 @@
 // https://github.com/yjs/y-codemirror.next/blob/637183e997f2ff6ba7f6bf737307f049c93dee12/src/y-sync.js#L100
 // I placed this here so that we can customize syncing yjs updates with CodeMirror and mark remote and local updates.
 
-import { Annotation } from "@codemirror/state";
+import { Annotation, Facet } from "@codemirror/state";
 import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { ySyncFacet } from "y-codemirror.next";
 import { Transaction } from "yjs";
@@ -9,6 +9,7 @@ import { Transaction } from "yjs";
 const ySyncAnnotation = Annotation.define();
 export const yRemoteAnnotation = Annotation.define();
 export const yHistoryAnnotation = Annotation.define();
+export const collabClientFacet = Facet.define();
 
 /**
  * @extends {import("@codemirror/view").PluginValue}

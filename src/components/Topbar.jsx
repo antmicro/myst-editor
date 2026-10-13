@@ -339,6 +339,19 @@ const SuggestIcon = () => (
   </svg>
 );
 
+const ReviewCommentIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path d="M8 11h.01M12 11h.01M16 11h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+  </svg>
+);
+
 const icons = {
   fullscreen: FullscreenIcon,
   "copy-html": CopyIcon,
@@ -347,10 +360,11 @@ const icons = {
   settings: SettingsIcon,
   templates: TemplatesIcon,
   "suggest-mode": SuggestIcon,
+  "show-comments": ReviewCommentIcon,
 };
 
 export const EditorTopbar = ({ alert, buttons }) => {
-  const { options, editorView, collab, suggestMode } = useContext(MystState);
+  const { options, editorView, collab, suggestMode, showComments, reviewSidebarExpanded } = useContext(MystState);
   const titleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.title.value)));
   const subtitleHtml = useComputed(() => purify.sanitize(renderMdLinks(options.subtitle.value)));
   const emptyDiff = useSignal(false);
@@ -371,7 +385,7 @@ export const EditorTopbar = ({ alert, buttons }) => {
       },
       { id: "outline", text: "Table of Contents", action: () => (options.mode.value = "Outline"), icon: TocIcon },
     ];
-    if (options.collaboration.value.resolvingCommentsEnabled) {
+    if (options.collaboration.value.commentsEnabled) {
       modeButtons.push({ id: "resolved", text: "Resolved", action: () => (options.mode.value = "Resolved"), icon: ResolvedIcon });
     }
 
@@ -389,7 +403,7 @@ export const EditorTopbar = ({ alert, buttons }) => {
             <div key={button.id}>
               <TopbarButton
                 className="icon"
-                active={button.active?.({ suggestMode })}
+                active={button.active?.({ suggestMode, showComments, reviewSidebarExpanded })}
                 type="button"
                 title={button.tooltip}
                 name={button.id}
@@ -434,7 +448,7 @@ export const EditorTopbar = ({ alert, buttons }) => {
 
         {options.onExit.value && (
           <TopbarButton className="icon" active={false} type="button" title={"Quit"} name={"Quit"} onClick={() => options.onExit.value()}>
-            <ExitIcon></ExitIcon>
+            <ExitIcon />
           </TopbarButton>
         )}
       </div>

@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { Avatar } from "./Avatars";
 
 const ResolvedLine = styled.p`
   font-size: 16px;
@@ -18,10 +17,16 @@ const LineNumber = styled.span`
   color: var(--editor-gutter-fg);
 `;
 
+const VerticalSparator = styled.hr`
+  border: none;
+  height: 1px;
+  background-color: var(--gray-600);
+  margin-bottom: 0;
+`;
+
 const EntryContainer = styled.div`
   background-color: color-mix(in srgb, ${(props) => props.color}, white);
   color: black;
-  border: 2px solid ${(props) => props.color};
   padding-top: 10px;
   margin-left: -1px;
   width: calc(100% - 3px);
@@ -29,7 +34,7 @@ const EntryContainer = styled.div`
 
   .topbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     line-height: 22px;
     padding: 0 6px;
@@ -63,19 +68,15 @@ const EntryContainer = styled.div`
   }
 `;
 
-const ResolvedEntry = ({ user, lineNumber, action, className, lineText, options, children }) => {
+const ResolvedEntry = ({ lineNumber, action, className, lineText, options, children }) => {
   return (
     <div style="position: relative;" className={className}>
       <ResolvedLine>
         <LineNumber>{lineNumber}</LineNumber>
         {lineText}
       </ResolvedLine>
-      <EntryContainer color={user.color}>
+      <EntryContainer>
         <div className="topbar">
-          <div>
-            <Avatar {...user} />
-            <span className="author">{user.name}</span>
-          </div>
           <div>
             <span className="action">{action}</span>
             {options}
@@ -83,6 +84,7 @@ const ResolvedEntry = ({ user, lineNumber, action, className, lineText, options,
         </div>
         {children}
       </EntryContainer>
+      <VerticalSparator />
     </div>
   );
 };

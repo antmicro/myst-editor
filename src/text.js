@@ -15,8 +15,9 @@ import { StateEffect } from "@codemirror/state";
 import hljs from "highlight.js/lib/core";
 import yamlHighlight from "highlight.js/lib/languages/yaml";
 import { markdownCheckboxes } from "./markdown/markdownCheckboxes";
-import { criticMarkup } from "./markdown/markdownCriticMarkup";
 import { markdownFrontmatter } from "./markdown/markdownFrontmatter";
+import { getReviewItems } from "./extensions/review";
+import { markdownReview, reviewKey } from "./markdown/markdownReview";
 
 export const markdownUpdatedEffect = StateEffect.define();
 
@@ -49,8 +50,9 @@ export class TextManager {
         },
       })
         .use(markdownitDocutils, { directives: { ...directivesDefault, ...newDirectives } })
-        .use(markdownReplacer(options.transforms.value, options.parent, cache.transform))
-        .use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))
+        .use(markdownReplacer(options.transforms.value, options.parent, cache.transform));
+      if (options.collaboration.value.commentsEnabled) md.use(markdownReview);
+      md.use(useCustomRoles(options.customRoles.value, options.parent, cache.transform))
         .use(useCustomDirectives(options.customDirectives.value, options.parent, cache.transform))
         .use(markdownMermaid, { lineMap: this.lineMap, parent: options.parent, theme: options.mermaidTheme.value })
         .use(markdownSourceMap)
@@ -58,7 +60,6 @@ export class TextManager {
         .use(colonFencedBlocks)
         .use(markdownItMapUrls, options.mapUrl.value)
         .use(markdownCheckboxes)
-        .use(criticMarkup)
         .use(markdownFrontmatter);
       if (options.backslashLineBreak.value) md.use(backslashLineBreakPlugin);
       userSettings.value.filter((s) => s.enabled && s.markdown).forEach((s) => md.use(s.markdown));
@@ -155,8 +156,19 @@ export class TextManager {
   }
 
   splitTextIntoChunks(chunkLookup = {}) {
+    const state = this.editorView.value?.state;
+    const reviewItems = state && this.options.collaboration.value.commentsEnabled ? [...getReviewItems(state).values()] : [];
+    // Chunks render separately, so track where each starts to convert document-relative review positions
+    // into chunk-relative ones
+    let sourceOffset = 0;
+
     return this.text.value
       .split(/(?=\n#{1,3} )/g)
+      .map((text) => {
+        const chunk = { text, sourceOffset };
+        sourceOffset += text.length;
+        return chunk;
+      })
       .reduce((chunks, textChunk) => {
         const lastChunkIdx = chunks.length - 1;
         const lastChunk = chunks[lastChunkIdx];
@@ -166,19 +178,23 @@ export class TextManager {
           if (lastChunkIdx == 0) startLine = lastChunk.startLine + lastChunk.text.split("\n").length;
           else startLine = lastChunk.startLine + lastChunk.text.trimLeft().split("\n").length;
         }
-        const endLine = startLine + textChunk.trimStart().split("\n").length - 1;
+        const endLine = startLine + textChunk.text.trimStart().split("\n").length - 1;
 
         const fenceRegex = /^[`:~]{3}/gm;
         if (countOccurences(lastChunk?.text, fenceRegex) % 2 != 0) {
-          chunks[lastChunkIdx] = { text: lastChunk.text + textChunk, startLine: lastChunk.startLine, endLine };
+          chunks[lastChunkIdx] = { ...lastChunk, text: lastChunk.text + textChunk.text, endLine };
         } else {
-          chunks.push({ text: textChunk, startLine, endLine });
+          chunks.push({ ...textChunk, startLine, endLine });
         }
         return chunks;
       }, [])
-      .map(({ text, startLine, endLine }, chunkId) => {
+      .map(({ text, sourceOffset, startLine, endLine }, chunkId) => {
+        const chunkReviewItems = reviewItems.filter(({ anchors }) =>
+          anchors.some(({ from, to }) => from < sourceOffset + text.length && to > sourceOffset),
+        );
+        const chunkReviewKey = reviewKey(chunkReviewItems);
         // We need to take into account both the chunk content and position
-        const hash = new IMurMurHash(text + chunkId.toString(), 42).result();
+        const hash = new IMurMurHash(text + chunkId.toString() + chunkReviewKey, 42).result();
 
         // Clear source mappings for chunk we are rerendering
         if (!(hash in chunkLookup)) {
@@ -188,7 +204,17 @@ export class TextManager {
         }
 
         const html =
-          chunkLookup[hash]?.html || sanitize(this.md.value.render(text, { chunkId, startLine, lineMap: this.lineMap, view: this.editorView.value }));
+          chunkLookup[hash]?.html ||
+          sanitize(
+            this.md.value.render(text, {
+              chunkId,
+              startLine,
+              lineMap: this.lineMap,
+              view: this.editorView.value,
+              sourceOffset,
+              reviewItems: chunkReviewItems,
+            }),
+          );
         return { text, hash, id: chunkId, html, oldId: chunkLookup[hash]?.oldId };
       });
   }

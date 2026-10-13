@@ -5,7 +5,10 @@ const formatter = new Intl.RelativeTimeFormat("en", { style: "long" });
 
 export const useTimeDifference = (timestamp) => {
   const difference = useSignal({ amount: 0, unit: "second" });
-  const timeText = useComputed(() => formatter.format(-difference.value.amount, difference.value.unit));
+  const timeText = useComputed(() => {
+    if (difference.value.amount < 60 && difference.value.unit === "second") return "less than a minute ago";
+    return formatter.format(-difference.value.amount, difference.value.unit);
+  });
   const timer = useRef(null);
 
   function setTimeDifference() {

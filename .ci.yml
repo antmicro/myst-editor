@@ -100,3 +100,12 @@ deploy-docs:
   except:
     variables:
       - $CI_COMMIT_REF_NAME =~ /experiment.*/i
+
+migration-tests:
+  stage: build
+  image: node:20
+  when: manual
+  before_script:
+    - npm ci --prefix bin
+  script:
+    - node --test bin/migrate-comments.test.js

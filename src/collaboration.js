@@ -5,6 +5,7 @@ import * as awarenessProtocol from "y-protocols/awareness.js";
 import { encodeInitializeMessage, initializeYText, messageInitialized } from "./collaborationUtils";
 import { hideUsernames } from "./extensions/hideUsernames";
 import { YComments } from "./comments/ycomments";
+import { reviewTransactionOrigin, YjsReviewAdapter } from "./yjsReviewAdapter";
 
 export class CollaborationClient {
   #synced = signal(false);
@@ -116,10 +117,16 @@ export class CollaborationClient {
         hideDelay: editorOptions.hideUsernameDelay,
       });
     }
-
     this.ytext = this.ydoc.getText("codemirror");
-    this.undoManager = new Y.UndoManager(this.ytext, {
-      trackedOrigins: new Set([this.provider.doc.clientID, null]),
+    const yreviews = this.ydoc.getMap("live-reviews");
+    this.reviewAdapter = new YjsReviewAdapter({
+      ydoc: this.ydoc,
+      ytext: this.ytext,
+      yreviews,
+      getLocalUser: () => this.#localUser,
+    });
+    this.undoManager = new Y.UndoManager([this.ytext, yreviews], {
+      trackedOrigins: new Set([this.provider.doc.clientID, null, reviewTransactionOrigin]),
       ignoreRemoteMapChanges: true,
     });
 
@@ -128,12 +135,15 @@ export class CollaborationClient {
     }
 
     this.metaMap = this.ydoc.getMap("meta");
-
     const suggestions = this.ydoc.getArray("critic-suggestions");
     this.storedSuggestions.value = suggestions.toArray();
     suggestions.observe(() => {
       this.storedSuggestions.value = suggestions.toArray();
     });
+  }
+
+  get localUser() {
+    return { ...this.#localUser };
   }
 
   storeSuggestion(suggestion) {
@@ -151,6 +161,53 @@ export class CollaborationClient {
     const idx = suggestions.toArray().findIndex((s) => s.id === id);
     if (idx === -1) return;
     suggestions.delete(idx, 1);
+  }
+
+  setLiveReview(reviewItem) {
+    const anchors = reviewItem.anchors.map(({ id, from, to }) => ({
+      id,
+      fromRelative: Y.encodeRelativePosition(Y.createRelativePositionFromTypeIndex(this.ytext, from, -1)),
+      toRelative: Y.encodeRelativePosition(Y.createRelativePositionFromTypeIndex(this.ytext, to, 1)),
+    }));
+
+    this.yreviews.set(reviewItem.id, {
+      id: reviewItem.id,
+      kind: reviewItem.kind,
+      type: reviewItem.type ?? null,
+      text: reviewItem.text,
+      comments: reviewItem.comments ?? [],
+      draft: reviewItem.draft ?? false,
+      resolved: reviewItem.resolved ?? false,
+      resolution: reviewItem.resolution ?? null,
+      resolvedAt: reviewItem.resolvedAt ?? null,
+      resolvedBy: reviewItem.resolvedBy ?? null,
+      resolvedAnchors: reviewItem.resolvedAnchors ?? [],
+      replacementId: reviewItem.replacementId ?? null,
+      anchors,
+      author: reviewItem.author ?? this.#localUser,
+      createdAt: reviewItem.createdAt ?? Date.now(),
+    });
+  }
+
+  getLiveReview(sharedReview) {
+    const anchors = sharedReview.anchors
+      .map(({ id, fromRelative, toRelative }) => {
+        const from = Y.createAbsolutePositionFromRelativePosition(Y.decodeRelativePosition(fromRelative), this.ydoc);
+        const to = Y.createAbsolutePositionFromRelativePosition(Y.decodeRelativePosition(toRelative), this.ydoc);
+        return from && to ? { id, from: from.index, to: to.index } : null;
+      })
+      .filter(Boolean);
+
+    if (anchors.length === 0) return null;
+
+    return {
+      ...sharedReview,
+      anchors,
+    };
+  }
+
+  removeLiveReview(id) {
+    this.yreviews.delete(id);
   }
 
   #initializeLocally(text) {

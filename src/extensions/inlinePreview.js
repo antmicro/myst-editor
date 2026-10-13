@@ -6,7 +6,9 @@ import { Decoration, keymap, ViewPlugin, ViewUpdate, WidgetType } from "@codemir
 import { EditorSelection, Prec, RangeSet, StateEffect, StateField } from "@codemirror/state";
 import { findSoruceMappedPreviousElement } from "./syncDualPane";
 import { getLineById } from "../markdown/markdownSourceMap";
-import { criticMarkup } from "./criticMarkup";
+import { reviewKey } from "../markdown/markdownReview";
+import { getReviewItems, getSuggestions, reviewCardPosition, setReviewStateEffect } from "./review";
+import { reviewState } from "./reviewStateField";
 
 export const inlinePreview = (/** @type {TextManager} */ text, options, editorView) => {
   const previewFont = "Lato";
@@ -40,12 +42,29 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     // Shrink-to-fit so that the rest of the line stays clickable - that is how you get to the source
     // of a disclosure widget whose summary handles its own clicks.
     ".cm-inline-rendered-md details": { display: "inline-block", verticalAlign: "top", maxWidth: "calc(100% - 2ch)" },
+    ".cm-error:has(.tok-heading)": { textDecoration: "none" },
+    ".cm-error .tok-heading": { textDecoration: "spelling-error" },
+    ".suggestions-insert:has(.tok-heading)": { textDecoration: "none" },
+    ".suggestions-insert .tok-heading": { textDecoration: "underline 2px var(--green-500)", textDecorationThickness: "2px" },
+    ".suggestions-delete:has(.tok-heading)": { textDecoration: "none" },
+    ".suggestions-delete .tok-heading": { textDecoration: "line-through 3px red" },
   });
 
   const tokenElement = ["InlineCode", "Emphasis", "StrongEmphasis", "Strikethrough", "FencedCode", "Image", "Blockquote"];
   const decorationHidden = Decoration.replace({});
   const decorationMonospace = Decoration.mark({ class: "cm-inline-mono" });
-  const nodeInSuggestion = (state, node) => state.field(criticMarkup).suggestionRanges.some((r) => node.from >= r.from && node.to <= r.to);
+  let suggestionState;
+  let currentSuggestionRanges = [];
+  const suggestionRanges = (state) => {
+    if (state !== suggestionState) {
+      suggestionState = state;
+      currentSuggestionRanges = options.collaboration.peek().commentsEnabled
+        ? [...getSuggestions(state).values()].flatMap(({ anchors }) => anchors).filter(({ from, to }) => from < to)
+        : [];
+    }
+    return currentSuggestionRanges;
+  };
+  const nodeInSuggestion = (state, node) => suggestionRanges(state).some((range) => node.from >= range.from && node.to <= range.to);
   const nodeInSelection = (state, node) =>
     editorView.peek()?.hasFocus &&
     state.selection.ranges.some((r) => {
@@ -98,19 +117,32 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
   const focusEffect = StateEffect.define();
 
   const renderedInlineNodes = ["Link", "URL", "InlineCode", "Role", "Transform"];
+  // CodeMirror hides widgets inside replaced ranges, so keep review cards at the rendered node's boundary.
+  const mapReviewCardPosition = (state, position) => {
+    let mappedPosition = position;
+    for (let node = syntaxTree(state).resolveInner(position, -1); node; node = node.parent) {
+      if ((renderedBlockNodes.includes(node.name) || renderedInlineNodes.includes(node.name)) && !nodeInSelection(state, node)) {
+        mappedPosition = node.to;
+      }
+    }
+    return mappedPosition;
+  };
   class RenderedMarkdownWidget extends WidgetType {
-    constructor(src, isBlock, start, end, cssClasses = []) {
+    constructor(src, isBlock, start, end, sourceOffset, reviewItems, cssClasses = []) {
       super();
       this.src = src;
       this.isBlock = isBlock;
       this.start = start;
       this.end = end;
       this.md = text.md.peek();
+      this.sourceOffset = sourceOffset; // The Markdown renderer only sees fragment, while review anchors use full-document positions.
+      this.reviewItems = reviewItems;
+      this.reviewKey = reviewKey(reviewItems);
       this.cssClasses = cssClasses;
     }
 
     eq(widget) {
-      return this.src === widget.src && this.md === widget.md;
+      return this.src === widget.src && this.reviewKey === widget.reviewKey && this.md === widget.md;
     }
 
     toDOM() {
@@ -124,8 +156,14 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
         text.lineMap.delete(l);
       }
 
-      const render = (src) =>
-        this.isBlock ? this.md.render(src, { lineMap: text.lineMap, startLine: this.start, chunkId: 0 }) : this.md.renderInline(src);
+      const env = {
+        lineMap: text.lineMap,
+        startLine: this.start,
+        chunkId: 0,
+        sourceOffset: this.sourceOffset,
+        reviewItems: this.reviewItems,
+      };
+      const render = (src) => (this.isBlock ? this.md.render(src, env) : this.md.renderInline(src, env));
       content.innerHTML = sanitize(render(this.src));
       return content;
     }
@@ -160,9 +198,21 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
         const parent = node.node.parent.toTree();
         const tags = getStyleTags(parent)?.tags;
         const parentClass = parent.type.name.startsWith("ATXHeading") && tags ? highlightingFor(state, tags) : null;
+        const reviewItems = options.collaboration.peek().commentsEnabled
+          ? [...getReviewItems(state).values()].filter(({ anchors }) => anchors.some(({ from, to }) => from < node.to && to > node.from))
+          : [];
 
+        const sourceOffset = node.from;
         const decoration = Decoration.replace({
-          widget: new RenderedMarkdownWidget(src, isBlock, lineFrom.number, lineTo.number, parentClass ? [parentClass] : []),
+          widget: new RenderedMarkdownWidget(
+            src,
+            isBlock,
+            lineFrom.number,
+            lineTo.number,
+            sourceOffset,
+            reviewItems,
+            parentClass ? [parentClass] : [],
+          ),
         });
 
         decorations.push(decoration.range(node.from, node.to));
@@ -181,10 +231,12 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
 
       update(curr, transaction) {
         const focusChanged = transaction.effects.some((e) => e.is(focusEffect));
+        const reviewsChanged = transaction.effects.some((effect) => effect.is(setReviewStateEffect));
         const selectionChanged =
           transaction.startState.doc.lineAt(transaction.startState.selection.main.head).number !==
           transaction.state.doc.lineAt(transaction.state.selection.main.head).number;
-        if (!initialUpdate && !focusChanged && !transaction.docChanged && !selectionChanged && !transaction.reconfigured) return curr;
+        if (!initialUpdate && !focusChanged && !reviewsChanged && !transaction.docChanged && !selectionChanged && !transaction.reconfigured)
+          return curr;
         if (initialUpdate) initialUpdate = false;
         return RangeSet.of(replaceMd(transaction.state), true);
       },
@@ -195,7 +247,8 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
     });
   };
 
-  return ViewPlugin.fromClass(
+  const renderedMarkdown = renderMdInline();
+  const previewPlugin = ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.decorations = this.process(view);
@@ -278,8 +331,9 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
             }
           });
 
-          const { suggestionRanges } = view.state.field(criticMarkup);
-          suggestionRanges.filter((r) => nodeInSelection(view.state, r)).forEach((r) => widgets.push(decorationMonospace.range(r.from, r.to)));
+          suggestionRanges(view.state)
+            .filter((range) => nodeInSelection(view.state, range))
+            .forEach((range) => widgets.push(decorationMonospace.range(range.from, range.to)));
         }
 
         // Make all indenting same width as monospace text indent
@@ -321,7 +375,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       provide: () => [
         syntaxHighlighting(markdownHighlightStyle),
         markdownTheme,
-        renderMdInline(),
+        renderedMarkdown,
         Prec.high(
           keymap.of([
             { key: "ArrowUp", run: moveCursorVertically(false), preventDefault: true },
@@ -370,4 +424,12 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       },
     },
   );
+
+  // Card positions follow inline rendering and selection even when the reviews themselves are unchanged.
+  const cardPosition = reviewCardPosition.compute([renderedMarkdown, "selection"], (state) =>
+    options.collaboration.peek().commentsEnabled && state.field(reviewState, false)?.reviewItems.size
+      ? (state, position) => mapReviewCardPosition(state, position)
+      : mapReviewCardPosition,
+  );
+  return [cardPosition, previewPlugin];
 };

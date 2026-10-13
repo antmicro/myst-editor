@@ -3,29 +3,20 @@
 :::{figure-md} suggest-change
 ![Suggest Change](./assets/suggestion.png)
 
-Change suggestion
+Suggestion example
 :::
 
-You can make use of the [CriticMarkup](https://fletcher.github.io/MultiMarkdown-6/syntax/critic.html) syntax to add suggestions in a document.
-From the editor, you can accept or reject suggestions using the buttons visible after each one.
+You can make use of the `Toggle suggest mode` to add suggestions in a document.
+You can accept or reject suggestions using the buttons visible in a suggestion card beside the editor. After clicking the suggestion card it allows you to comment on the suggestion.
 
 ```{tip}
-To make adding suggestions easier you can use the `Toggle suggest mode` button in the left of the topbar.
-When active, it will turn all your changes into suggestions.
-You can type anywhere to add text, select and delete text to make a deletion suggestion or select text and start typing to suggest a replacement.
+You can make replace suggestion by selecting text you want to replace and start typing your suggested changes.
 ```
 
-## Supported syntax
+## Resolved suggestions 
 
-- Additions
-    ```md
-    This is some text{++ and this is a suggestion++}.
-    ```
-- Deletions
-    ```md
-    This is some text{-- text--}.
-    ```
-- Substitutions
-    ```md
-    This {~~was~>is~~} some text.
-    ```
+To see Resolved suggestions and it's comments open the resolved panel hidden in the [topbar](topbar.md).
+
+## Suggestion undo/redo
+
+Suggestions you made are remembered so you can use `CTRL + Z` to undo your suggestion or `CTRL + Y` if u want to reapply your suggestion after deletion.

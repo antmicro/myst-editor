@@ -387,6 +387,31 @@ export const MdStyles = css`
   .hljs-comment {
     color: var(--string-fg);
   }
+
+  [data-suggestion-type="insert"],
+  [data-suggestion-type="insert"] * {
+    color: var(--green-500);
+    background: var(--inserted-bg);
+  }
+
+  [data-suggestion-type="insert"] {
+    text-decoration: underline var(--green-500);
+  }
+
+  [data-suggestion-type="delete"],
+  [data-suggestion-type="delete"] * {
+    color: var(--red-500);
+    background: var(--deleted-bg);
+  }
+
+  [data-suggestion-type="delete"] {
+    text-decoration: line-through 2px var(--red-500);
+  }
+
+  [data-review-kind="comment"] {
+    background-color: rgba(0, 135, 255, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(0, 131, 225, 0.45);
+  }
 `;
 
 const Preview = styled.div`

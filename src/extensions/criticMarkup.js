@@ -2,9 +2,8 @@ import { Decoration, EditorView, WidgetType } from "@codemirror/view";
 import acceptImg from "../icons/accept.svg?url";
 import rejectImg from "../icons/reject.svg?url";
 import { Annotation, EditorSelection, EditorState, Range, StateField } from "@codemirror/state";
-import { yHistoryAnnotation, yRemoteAnnotation } from "./collab";
+import { collabClientFacet, yHistoryAnnotation, yRemoteAnnotation } from "./collab";
 import { criticMarkers } from "../markdown/markdownCriticMarkup";
-import { collabClientFacet } from ".";
 
 const criticMetaDeco = Decoration.mark({ class: "cm-critic-meta" });
 const criticInsDeco = Decoration.mark({ class: "cm-critic-ins" });

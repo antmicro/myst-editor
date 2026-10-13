@@ -42,18 +42,11 @@ You can work on a document with multiple people at the same time.
 
 ![Collaboration Demo](./assets/collab.gif)
 
-### Comments
+### Comments && Suggestions
 
-The editor has a comments feature, allowing you to add text that will not appear in the preview.
+The editor has a comments and suggestions feature, allowing you to comment on selected text or suggest changes that could be accepted or rejected. Each comment or suggestion can have seperate discussion.
 
-![Comments Demo](./assets/comments.gif)
-
-### Suggestions
-
-You can suggest changes that others can accept or reject later.
-Suggestions are based on the [CriticMarkup](https://fletcher.github.io/MultiMarkdown-6/syntax/critic.html) syntax.
-
-![Suggestions Demo](./assets/suggestions.gif)
+![Comments && Suggestions Demo](./assets/reviews.gif)
 
 ### Templates
 
@@ -228,7 +221,7 @@ Here are the options you can pass to the MystEditor function:
 - `templateList` - path/url to a JSON file containing your document templates. For an example, see `public/linkedtemplatelist.json`.
 - `collaboration` - options related to live collaboration:
   - `enabled` *(default: false)*
-  - `commentsEnabled` *(default: false)* - enable basic comment functionality,
+  - `commentsEnabled` *(default: false)* - enable review comments and suggestions, including their toolbar controls and resolved review view.
   - `resolvingCommentsEnabled` *(default: false)* - enable resolving comments,
   - `wsUrl` *(example: ws://example:4444)* - URL of the websocket server
   - `username`

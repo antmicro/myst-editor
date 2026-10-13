@@ -1,5 +1,5 @@
 import { lineNumbers, highlightSpecialChars, drawSelection, dropCursor, rectangularSelection, crosshairCursor, keymap } from "@codemirror/view";
-import { Annotation, Compartment, EditorSelection, EditorState, Facet, Prec } from "@codemirror/state";
+import { Annotation, Compartment, EditorSelection, EditorState, Prec } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { yCollab } from "y-codemirror.next";
 import { markdown } from "@codemirror/lang-markdown";
@@ -22,7 +22,7 @@ import {
 import { syncPreviewWithCursor } from "./syncDualPane";
 import { cursorIndicator } from "./cursorIndicator";
 import { yaml, yamlFrontmatter } from "@codemirror/lang-yaml";
-import { ySync } from "./collab";
+import { collabClientFacet, ySync } from "./collab";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import { lintKeymap } from "@codemirror/lint";
@@ -37,6 +37,9 @@ import { classHighlighter, tags } from "@lezer/highlight";
 import { loggerFacet } from "../logger";
 import { FOLD_MARKER } from "../text";
 import { criticHistory, criticMarkup, suggestMode } from "./criticMarkup";
+import { reviewStateExtension, suggestionsTypingExtension } from "./review";
+import { tooltipSelection } from "./tooltipSelection";
+export { collabClientFacet };
 
 const getRelativeCursorLocation = (view) => {
   const { from } = view.state.selection.main;
@@ -59,7 +62,6 @@ export const folded = (update) => update.transactions.some((t) => t.effects.some
 
 /** Marks folds which the editor performs on its own, so that they are not treated as user actions. */
 export const programmaticFold = Annotation.define();
-export const collabClientFacet = Facet.define();
 
 const syntaxHighlight = HighlightStyle.define([
   { tag: [tags.heading, tags.strong], fontWeight: "bold" },
@@ -86,6 +88,8 @@ const syntaxHighlight = HighlightStyle.define([
 ]);
 
 export const lineNumbersCompartment = new Compartment();
+export const suggestionsCompartment = new Compartment();
+export const multipleSelectionsCompartment = new Compartment();
 
 export class ExtensionBuilder {
   constructor(base = []) {
@@ -109,7 +113,7 @@ export class ExtensionBuilder {
         },
       }),
       dropCursor(),
-      EditorState.allowMultipleSelections.of(true),
+      multipleSelectionsCompartment.of(EditorState.allowMultipleSelections.of(true)),
       indentOnInput(),
       bracketMatching(),
       autocompletion(),
@@ -361,6 +365,21 @@ export class ExtensionBuilder {
 
   useSuggestMode() {
     this.extensions.push(suggestMode);
+    return this;
+  }
+
+  useReview(reviewItemsStore, showComments = true, reviewSidebarExpanded = false, reviewSidebarWide = false, avatarCrossorigin = null) {
+    this.extensions.push(reviewStateExtension(reviewItemsStore, showComments, reviewSidebarExpanded, reviewSidebarWide, avatarCrossorigin));
+    return this;
+  }
+
+  useSuggestions(enabled) {
+    this.extensions.push(suggestionsCompartment.of(enabled ? suggestionsTypingExtension : []));
+    return this;
+  }
+
+  useTooltipSelection(onSelect) {
+    this.extensions.push(tooltipSelection(onSelect));
     return this;
   }
 

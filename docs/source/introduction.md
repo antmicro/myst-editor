@@ -14,5 +14,6 @@ This manual consists of the following chapters:
 - [](mermaid.md) - discusses support for [Mermaid diagrams](https://mermaid.js.org/)
 - [](rich-links.md) - introduces editor-specific syntax for linking to external entities
 - [](comments.md) - showcases how to use comment functionalities
+- [](suggestions.md) - showcases how to use suggestions
 
 To try MyST Editor, go to its [current demo](https://antmicro.github.io/myst-editor/).

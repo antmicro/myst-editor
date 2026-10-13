@@ -27,6 +27,11 @@ export const predefinedButtons = {
   refresh: { id: "refresh", tooltip: "Refresh issue links" },
   settings: { id: "settings", tooltip: "Editor settings", dropdown: Settings },
   suggestMode: { id: "suggest-mode", tooltip: "Toggle suggest mode", active: (state) => state.suggestMode.value },
+  showComments: {
+    id: "show-comments",
+    tooltip: "Toggle full comments and suggestions",
+    active: (state) => state.showComments.value && state.reviewSidebarExpanded.value,
+  },
 };
 
 export const defaultButtons = [
@@ -37,6 +42,7 @@ export const defaultButtons = [
   predefinedButtons.printToPdf,
   predefinedButtons.templateManager,
   predefinedButtons.suggestMode,
+  predefinedButtons.showComments,
 ];
 
 // The vim plugin stores some functions as globals, but we need to differentiate between editors
@@ -240,6 +246,7 @@ const defaults = {
   externalSidebar: false,
   showTitle: true,
   showModeButtons: true,
+  reviewSidebarExpanded: true,
   // Called with { state, git } once the git API is ready.
   onReady: null,
   language: "markdown",
@@ -266,10 +273,12 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
       return browserSetting ? { ...s, enabled: browserSetting.enabled } : s;
     });
   }
+  const reviewItems = signal(new Map());
   /** @type {Signal<CollaborationClient>} */
   const collab = signal(null);
   const collabCleanup = effect(() => {
     if (!signalOptions.collaboration.value.enabled) return;
+    reviewItems.value = new Map();
     const client = new CollaborationClient(signalOptions.collaboration.value, {
       id: signalOptions.id.value,
       parent: opts.parent,
@@ -307,6 +316,10 @@ export function createMystState(/** @type {typeof defaults} */ opts) {
     /** @type {Signal<{ src: string; error: Error } | null>} */
     error: signal(null),
     suggestMode: signal(false),
+    showComments: signal(true),
+    reviewSidebarExpanded: signalOptions.reviewSidebarExpanded,
+    reviewSidebarWide: signal(false),
+    reviewItems,
   };
   state.text = new TextManager({ ...signalOptions, ...state });
 

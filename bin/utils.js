@@ -228,6 +228,14 @@ async function onCommentChange(docname, commentMap) {
   }
 }
 
+async function onReviewChange(docname, reviewMap) {
+  if (reviewMap.size != 0) {
+    markDocWithChanges(docname, { reviews: true });
+  } else {
+    unmarkDocWithChanges(docname, { reviews: true });
+  }
+}
+
 /**
  * @param {Y.Doc} doc
  * @param {string} docname
@@ -281,6 +289,8 @@ export const getYDoc = async (docname, gc = true, attempt = 0) => {
       // watch doc for changes
       const commentMap = doc.getMap();
       commentMap.observe(() => onCommentChange(docname, commentMap));
+      const reviewMap = doc.getMap("live-reviews");
+      reviewMap.observe(() => onReviewChange(docname, reviewMap));
       doc.getText("codemirror").observe(() => onTextChange(doc, docname));
     }
 
@@ -567,7 +577,7 @@ export const setupStatusConnection = async (conn, req) => {
 
   conn.on("message", async (data) => {
     if (!data) return;
-    await unmarkDocWithChanges(data, { comments: true, text: true });
+    await unmarkDocWithChanges(data, { comments: true, reviews: true, text: true });
   });
 
   conn.on("close", () => {

@@ -24,6 +24,7 @@ Starting from the left, the left side topbar visible in {numref}`left-side-butto
   You can undo this action, however any comments in the document will be removed.
   ```
 - `Toggle suggest mode` - toggles a mode that turns all your changes to the document into suggestions.
+- `Toggle full comments and suggestions` - expands or collapses comment and suggestion cards. This button is hidden when there are no active comments or suggestions.
 
 ## Document Name
 
