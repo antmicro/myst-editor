@@ -365,8 +365,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#supported-syntax" class="md-nav__link">
-    <span class="md-ellipsis">Supported syntax</span>
+  <a href="#resolved-suggestions" class="md-nav__link">
+    <span class="md-ellipsis">Resolved suggestions</span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#suggestion-undo-redo" class="md-nav__link">
+    <span class="md-ellipsis">Suggestion undo/redo</span>
   </a>
   
 </li>
@@ -403,34 +410,18 @@
 <img alt="Suggest Change" src="_images/suggestion.png" />
 <figcaption>
 <p><span class="caption-number">Figure 12 </span><span class="caption-text"><span class="caption-text">
-Change suggestion</span><a class="headerlink" href="#suggest-change" title="Permalink to this image">¶</a></figcaption>
+Suggestion example</span><a class="headerlink" href="#suggest-change" title="Permalink to this image">¶</a></figcaption>
 </figure>
-<p>You can make use of the <a class="reference external" href="https://fletcher.github.io/MultiMarkdown-6/syntax/critic.html">CriticMarkup</a> syntax to add suggestions in a document.
-From the editor, you can accept or reject suggestions using the buttons visible after each one.</p>
+<p>You can make use of the <code class="docutils literal notranslate"><span class="pre">Toggle</span> <span class="pre">suggest</span> <span class="pre">mode</span></code> to add suggestions in a document.
+You can accept or reject suggestions using the buttons visible in a suggestion card beside the editor. After clicking the suggestion card it allows you to comment on the suggestion.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>To make adding suggestions easier you can use the <code class="docutils literal notranslate"><span class="pre">Toggle</span> <span class="pre">suggest</span> <span class="pre">mode</span></code> button in the left of the topbar.
-When active, it will turn all your changes into suggestions.
-You can type anywhere to add text, select and delete text to make a deletion suggestion or select text and start typing to suggest a replacement.</p>
+<p>You can make replace suggestion by selecting text you want to replace and start typing your suggested changes.</p>
 </div>
-<h2 id="supported-syntax">Supported syntax<a class="headerlink" href="#supported-syntax" title="Link to this heading">¶</a></h2>
-<ul>
-<li><p>Additions</p>
-<div class="highlight-md notranslate"><div class="highlight"><pre><span></span><code>This is some text{++ and this is a suggestion++}.
-</code></pre></div>
-</div>
-</li>
-<li><p>Deletions</p>
-<div class="highlight-md notranslate"><div class="highlight"><pre><span></span><code>This is some text{-- text--}.
-</code></pre></div>
-</div>
-</li>
-<li><p>Substitutions</p>
-<div class="highlight-md notranslate"><div class="highlight"><pre><span></span><code>This {~~was~&gt;is~~} some text.
-</code></pre></div>
-</div>
-</li>
-</ul>
+<h2 id="resolved-suggestions">Resolved suggestions<a class="headerlink" href="#resolved-suggestions" title="Link to this heading">¶</a></h2>
+<p>To see Resolved suggestions and it’s comments open the resolved panel hidden in the <a class="reference internal" href="topbar.html"><span class="std std-doc">topbar</span></a>.</p>
+<h2 id="suggestion-undo-redo">Suggestion undo/redo<a class="headerlink" href="#suggestion-undo-redo" title="Link to this heading">¶</a></h2>
+<p>Suggestions you made are remembered so you can use <code class="docutils literal notranslate"><span class="pre">CTRL</span> <span class="pre">+</span> <span class="pre">Z</span></code> to undo your suggestion or <code class="docutils literal notranslate"><span class="pre">CTRL</span> <span class="pre">+</span> <span class="pre">Y</span></code> if u want to reapply your suggestion after deletion.</p>
 
 
   <hr>
@@ -438,7 +429,7 @@ You can type anywhere to add text, select and delete text to make a deletion sug
   <small>
     
       Last update:
-      2026-10-12
+      2026-10-13
     
   </small>
 </div>
@@ -491,7 +482,7 @@ You can type anywhere to add text, select and delete text to make a deletion sug
         
     </div>
   
-      <a href="https://github.com/antmicro/myst-editor/tree/a8d2d9b9bc4afbaaa3e3107e836db465df16b211">a8d2d9b9</a>
+      <a href="https://github.com/antmicro/myst-editor/tree/cccbd1e05894118eba5a1a4c86c29a15085318dc">cccbd1e0</a>
         @ <a href="https://github.com/antmicro/myst-editor/tree/main">main</a>
   
 </div>
