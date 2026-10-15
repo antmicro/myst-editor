@@ -3,6 +3,9 @@ import preact from "@preact/preset-vite";
 import { resolve } from "path";
 import macrosPlugin from "vite-plugin-babel-macros";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import { execFileSync } from "node:child_process";
+
+const commitSha = process.env.CI_COMMIT_SHA || process.env.GITHUB_SHA || execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -38,6 +41,7 @@ export default defineConfig({
   },
   define: {
     "process.env": {},
+    __MYST_EDITOR_SHA__: JSON.stringify(commitSha),
   },
   // https://github.com/redhat-developer/yaml-language-server/issues/1014
   resolve: {

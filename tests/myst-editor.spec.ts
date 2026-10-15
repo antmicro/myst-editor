@@ -1,6 +1,7 @@
 import { ChangeSpec } from "@codemirror/state";
 import { test, expect, Page } from "@playwright/test";
 import { EditorView } from "codemirror";
+import { execFileSync } from "node:child_process";
 import fs from "fs/promises";
 import { createMystState } from "../src/mystState";
 import { DEMO_FEATURE_TIP } from "../src/myst-git/demo-data.js";
@@ -246,6 +247,19 @@ test.describe.parallel("With collaboration disabled", () => {
       const clipboard = await page.evaluate(() => navigator.clipboard.readText());
       expect(clipboard).toContain("<h1>");
     }).toPass();
+  });
+
+  test("Settings build hint copies the full editor commit", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-write", "clipboard-read"]);
+    const commit = process.env.CI_COMMIT_SHA || process.env.GITHUB_SHA || execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+
+    await page.getByTitle("Editor settings").hover();
+    const buildHint = page.getByRole("button", { name: `Copy ${commit}` });
+    await expect(buildHint).toHaveText(`build ${commit.slice(0, 10)}`);
+
+    await buildHint.click();
+    await expect(buildHint).toHaveText("copied");
+    await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(commit);
   });
 
   test("Mermaid diagrams", async ({ page }) => {

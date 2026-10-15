@@ -75,6 +75,10 @@ const Topbar = styled.div`
     }
   }
 
+  button[name="settings"] + .btn-dropdown .dropdown-content {
+    padding-bottom: 10px;
+  }
+
   @media (hover: none) and (pointer: coarse), (max-width: 768px) {
     justify-content: flex-start;
     overflow-x: auto;

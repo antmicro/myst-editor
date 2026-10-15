@@ -1,8 +1,9 @@
-import { useContext } from "preact/hooks";
+/* global __MYST_EDITOR_SHA__ */
+import { useContext, useEffect, useRef } from "preact/hooks";
 import styled from "styled-components";
 import { MystState } from "../mystState";
 import { Compartment } from "@codemirror/state";
-import { useSignalEffect } from "@preact/signals";
+import { useSignal, useSignalEffect } from "@preact/signals";
 
 const SettingsList = styled.div`
   width: 240px;
@@ -74,6 +75,30 @@ const ToggleContainer = styled.span`
   }
 `;
 
+const BuildButton = styled.button`
+  display: block;
+  width: fit-content;
+  margin: 12px 0 0 auto;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.5;
+  font: 11px/1.2 monospace;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    opacity: 1;
+    outline: 1px solid var(--accent-dark);
+    outline-offset: 3px;
+  }
+`;
+
 const Toggle = ({ ...props }) => {
   return (
     <ToggleContainer>
@@ -84,6 +109,31 @@ const Toggle = ({ ...props }) => {
 };
 
 export const userExtensionsCompartment = new Compartment();
+const editorCommit = __MYST_EDITOR_SHA__;
+
+const BuildInfo = () => {
+  const copyLabel = useSignal(null);
+  const copyResetTimeout = useRef();
+
+  useEffect(() => () => clearTimeout(copyResetTimeout.current), []);
+
+  async function copyCommit() {
+    try {
+      await navigator.clipboard.writeText(editorCommit);
+      copyLabel.value = "copied";
+    } catch {
+      copyLabel.value = "copy failed";
+    }
+    clearTimeout(copyResetTimeout.current);
+    copyResetTimeout.current = setTimeout(() => (copyLabel.value = null), 500);
+  }
+
+  return (
+    <BuildButton type="button" title={`Copy ${editorCommit}`} aria-label={`Copy ${editorCommit}`} onClick={copyCommit}>
+      <span>{copyLabel.value ?? `build ${editorCommit.slice(0, 10)}`}</span>
+    </BuildButton>
+  );
+};
 
 const Settings = () => {
   const { userSettings } = useContext(MystState);
@@ -107,6 +157,7 @@ const Settings = () => {
           </li>
         ))}
       </ul>
+      <BuildInfo />
     </SettingsList>
   );
 };
