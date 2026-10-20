@@ -16,7 +16,7 @@ build:
     - npm ci
   script:
     - npm run check-format
-    - npm run build
+    - MYST_EDITOR_COMMIT_URL="${CI_PROJECT_URL%/*}/repositories/${CI_PROJECT_URL##*/}/commit/{sha}" npm run build
   artifacts:
     paths:
       - dist

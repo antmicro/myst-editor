@@ -6,6 +6,8 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { execFileSync } from "node:child_process";
 
 const commitSha = process.env.CI_COMMIT_SHA || process.env.GITHUB_SHA || execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+// Set by CI, so the repository URL doesn't have to be stored here
+const commitUrl = process.env.MYST_EDITOR_COMMIT_URL?.replaceAll("{sha}", commitSha) || null;
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -42,6 +44,7 @@ export default defineConfig({
   define: {
     "process.env": {},
     __MYST_EDITOR_SHA__: JSON.stringify(commitSha),
+    __MYST_EDITOR_COMMIT_URL__: JSON.stringify(commitUrl),
   },
   // https://github.com/redhat-developer/yaml-language-server/issues/1014
   resolve: {

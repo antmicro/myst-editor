@@ -249,17 +249,14 @@ test.describe.parallel("With collaboration disabled", () => {
     }).toPass();
   });
 
-  test("Settings build hint copies the full editor commit", async ({ page, context }) => {
-    await context.grantPermissions(["clipboard-write", "clipboard-read"]);
+  test("Settings build hint shows and links the editor commit", async ({ page }) => {
     const commit = process.env.CI_COMMIT_SHA || process.env.GITHUB_SHA || execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+    const commitUrl = process.env.MYST_EDITOR_COMMIT_URL?.replaceAll("{sha}", commit);
 
     await page.getByTitle("Editor settings").hover();
-    const buildHint = page.getByRole("button", { name: `Copy ${commit}` });
-    await expect(buildHint).toHaveText(`build ${commit.slice(0, 10)}`);
-
-    await buildHint.click();
-    await expect(buildHint).toHaveText("copied");
-    await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(commit);
+    const buildLabel = page.getByText(`build ${commit.slice(0, 10)}`);
+    await expect(buildLabel).toBeVisible();
+    if (commitUrl) await expect(buildLabel).toHaveAttribute("href", commitUrl);
   });
 
   test("Mermaid diagrams", async ({ page }) => {

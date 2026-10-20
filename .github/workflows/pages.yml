@@ -17,6 +17,8 @@ jobs:
           python-version: 3.11
 
       - name: Build
+        env:
+          MYST_EDITOR_COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/{sha}
         run: |
           npm ci && npm run build
           mkdir public

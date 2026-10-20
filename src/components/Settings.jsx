@@ -1,9 +1,9 @@
-/* global __MYST_EDITOR_SHA__ */
-import { useContext, useEffect, useRef } from "preact/hooks";
+/* global __MYST_EDITOR_SHA__, __MYST_EDITOR_COMMIT_URL__ */
+import { useContext } from "preact/hooks";
 import styled from "styled-components";
 import { MystState } from "../mystState";
 import { Compartment } from "@codemirror/state";
-import { useSignal, useSignalEffect } from "@preact/signals";
+import { useSignalEffect } from "@preact/signals";
 
 const SettingsList = styled.div`
   width: 240px;
@@ -75,24 +75,24 @@ const ToggleContainer = styled.span`
   }
 `;
 
-const BuildButton = styled.button`
-  display: block;
-  width: fit-content;
-  margin: 12px 0 0 auto;
-  padding: 2px 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  opacity: 0.5;
+const BuildInfoContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
   font: 11px/1.2 monospace;
-  cursor: pointer;
 
-  &:hover {
+  > * {
+    padding: 2px 0;
+    color: inherit;
+    opacity: 0.5;
+  }
+
+  a:hover {
     opacity: 0.8;
     text-decoration: underline;
   }
 
-  &:focus-visible {
+  a:focus-visible {
     opacity: 1;
     outline: 1px solid var(--accent-dark);
     outline-offset: 3px;
@@ -110,28 +110,21 @@ const Toggle = ({ ...props }) => {
 
 export const userExtensionsCompartment = new Compartment();
 const editorCommit = __MYST_EDITOR_SHA__;
+const editorCommitUrl = __MYST_EDITOR_COMMIT_URL__;
 
 const BuildInfo = () => {
-  const copyLabel = useSignal(null);
-  const copyResetTimeout = useRef();
-
-  useEffect(() => () => clearTimeout(copyResetTimeout.current), []);
-
-  async function copyCommit() {
-    try {
-      await navigator.clipboard.writeText(editorCommit);
-      copyLabel.value = "copied";
-    } catch {
-      copyLabel.value = "copy failed";
-    }
-    clearTimeout(copyResetTimeout.current);
-    copyResetTimeout.current = setTimeout(() => (copyLabel.value = null), 500);
-  }
+  const label = `build ${editorCommit.slice(0, 10)}`;
 
   return (
-    <BuildButton type="button" title={`Copy ${editorCommit}`} aria-label={`Copy ${editorCommit}`} onClick={copyCommit}>
-      <span>{copyLabel.value ?? `build ${editorCommit.slice(0, 10)}`}</span>
-    </BuildButton>
+    <BuildInfoContainer>
+      {editorCommitUrl ? (
+        <a href={editorCommitUrl} target="_blank" rel="noreferrer" title={`Open ${editorCommit}`}>
+          {label}
+        </a>
+      ) : (
+        <span title={editorCommit}>{label}</span>
+      )}
+    </BuildInfoContainer>
   );
 };
 
