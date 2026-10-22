@@ -54459,7 +54459,7 @@ const Oqt = Cr.div`
 }) => /* @__PURE__ */ Ce(Sqt, { children: [
   /* @__PURE__ */ Ce("input", { type: "checkbox", ...t }),
   /* @__PURE__ */ Ce("label", { htmlFor: t.id, title: "Toggle setting" })
-] }), bee = new ql(), xee = "193c4b66fd98839d4404e6d8ff17a4c42bab09ce", Eqt = "https://github.com/antmicro/myst-editor/commit/193c4b66fd98839d4404e6d8ff17a4c42bab09ce", _qt = () => {
+] }), bee = new ql(), xee = "f19697940e4b610ff28aac550dd1a3688b3771ff", Eqt = "https://github.com/antmicro/myst-editor/commit/f19697940e4b610ff28aac550dd1a3688b3771ff", _qt = () => {
   const t = `build ${xee.slice(0, 10)}`;
   return /* @__PURE__ */ Ce(Tqt, { children: /* @__PURE__ */ Ce("a", { href: Eqt, target: "_blank", rel: "noreferrer", title: `Open ${xee}`, children: t }) });
 }, Aqt = () => {
@@ -60027,7 +60027,7 @@ const Dwe = ({
   }, [t, p, L]);
   const I = (Y) => {
     var Z, te;
-    (te = (Z = Y.target).closest) != null && te.call(Z, "button, input, a") || (Y.preventDefault(), !(L && u) && (f == null || f()));
+    (te = (Z = Y.target).closest) != null && te.call(Z, "button, input, a") || L && u || f == null || f();
   }, F = () => {
     A(""), _(!1), d == null || d();
   }, U = () => {
