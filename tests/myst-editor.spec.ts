@@ -594,6 +594,41 @@ graph TD
       await expect(page.locator(".review-selection")).toBeVisible();
     });
 
+    test("Copies comment text and replies from a review card", async ({ page, context }) => {
+      await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+      await setupReviewTest(page, "# Heading", { selection: { anchor: 2, head: 9 }, selectionEvent: null, suggestMode: false });
+
+      const copyText = async (content: ReturnType<Page["locator"]>, expected: string) => {
+        const bounds = await content.evaluate((element) => {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          const rect = range.getBoundingClientRect();
+          return { left: rect.left, right: rect.right, top: rect.top, height: rect.height };
+        });
+
+        await page.mouse.move(bounds.left - 2, bounds.top + bounds.height / 2);
+        await page.mouse.down();
+        await page.mouse.move(bounds.right + 2, bounds.top + bounds.height / 2, { steps: 10 });
+        await page.mouse.up();
+
+        await expect.poll(() => page.evaluate(() => window.getSelection()?.toString())).toBe(expected);
+        await page.keyboard.press("ControlOrMeta+C");
+        await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(expected);
+      };
+
+      const commentBody = "Test comment text";
+      const commentCard = await createComment(page, commentBody);
+      await expandReviewCards(page);
+      const commentText = commentCard.locator(".cm-comment-card-content");
+      await copyText(commentText, commentBody);
+
+      await commentText.click();
+      const replyText = "Test reply text";
+      await commentCard.getByRole("textbox", { name: "Reply or add others with @" }).fill(replyText);
+      await commentCard.getByRole("button", { name: "Reply" }).click();
+      await copyText(commentCard.locator(".cm-review-card-comment-text"), replyText);
+    });
+
     test("Can use suggest mode", async ({ page }) => {
       await setupReviewTest(page, `# Heading`, { selection: { anchor: 2, head: 9 }, selectionEvent: null });
       await page.keyboard.type("Better heading");

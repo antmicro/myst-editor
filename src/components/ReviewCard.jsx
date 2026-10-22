@@ -196,7 +196,6 @@ export const ReviewCard = ({
 
   const selectCard = (event) => {
     if (event.target.closest?.("button, input, a")) return;
-    event.preventDefault();
 
     if (showComposer && selected) return;
 
