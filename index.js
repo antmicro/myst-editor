@@ -1,5 +1,29 @@
-import m, { defaultButtons as h } from "./MystEditor.js";
-let l = `# This is MyST Editor
+import u, { defaultButtons as p } from "./MystEditor.js";
+(function() {
+  const t = document.createElement("link").relList;
+  if (t && t.supports && t.supports("modulepreload"))
+    return;
+  for (const o of document.querySelectorAll('link[rel="modulepreload"]'))
+    l(o);
+  new MutationObserver((o) => {
+    for (const i of o)
+      if (i.type === "childList")
+        for (const a of i.addedNodes)
+          a.tagName === "LINK" && a.rel === "modulepreload" && l(a);
+  }).observe(document, { childList: !0, subtree: !0 });
+  function r(o) {
+    const i = {};
+    return o.integrity && (i.integrity = o.integrity), o.referrerpolicy && (i.referrerPolicy = o.referrerpolicy), o.crossorigin === "use-credentials" ? i.credentials = "include" : o.crossorigin === "anonymous" ? i.credentials = "omit" : i.credentials = "same-origin", i;
+  }
+  function l(o) {
+    if (o.ep)
+      return;
+    o.ep = !0;
+    const i = r(o);
+    fetch(o.href, i);
+  }
+})();
+let g = `# This is MyST Editor
 
 A Markdown editor using the [markdown-it parser](https://github.com/markdown-it/markdown-it), based on the [CommonMark specification](https://spec.commonmark.org/0.31.2/).
 We added some extensions so that users can make use of various features of the [MyST Markdown flavor](https://mystmd.org/).
@@ -56,7 +80,7 @@ You can also use:
 
 ## Mermaid diagrams
 
-We have integrated the [Mermaid](https://mermaid.js.org/) diagramming tool with our editor, enabling you to add various diagrams and flowcharts to your documents.
+Mermaid diagrams are rendered with [Pele](https://github.com/obsidianmd/pele), enabling you to add diagrams and flowcharts to your documents.
 An overview of the Mermaid syntax is available [here](https://mermaid.js.org/intro/).
 
 ### Graphs
@@ -156,24 +180,24 @@ These features include:
 - comments - add some text that does not show up in the preview
   - resolved comments - a new view to see comments that were resolved`;
 console.log("Welcome to the MyST editor demo. The right hand side should auto update.");
-const n = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], a = new URLSearchParams(window.location.search), c = a.get("room") || "0", d = a.get("username") || Math.floor(Math.random() * 1e3).toString(), u = n[Math.floor(Math.random() * n.length)];
-let p = [{
+const m = ["#30bced", "#60c771", "#e6aa3a", "#cbb63e", "#ee6352", "#9ac2c9", "#8acb88", "#14b2c4"], s = new URLSearchParams(window.location.search), f = s.get("room") || "0", h = s.get("username") || Math.floor(Math.random() * 1e3).toString(), w = m[Math.floor(Math.random() * m.length)];
+let y = [{
   target: "say",
-  transform: async (e) => d + " says: '" + e + "'"
-}], g = [{
+  transform: async (e) => h + " says: '" + e + "'"
+}], b = [{
   target: "bold",
   transform: (e, t) => `<b style="white-space: pre-wrap;">${t.body}</b>`
-}], w = [{
+}], v = [{
   target: /[0-9a-z\-]+\/[0-9a-z\-]+#\d{1,10}/g,
   transform: (e) => {
-    const [t, i] = e.split("#");
-    return `<a href="https://github.com/${t}/issues/${i}">${e}</a>`;
+    const [t, r] = e.split("#");
+    return `<a href="https://github.com/${t}/issues/${r}">${e}</a>`;
   }
 }, {
   target: /[0-9a-z\-]+\/[0-9a-z\-]+\!\d+/g,
   transform: (e) => {
-    const [t, i] = e.split("!");
-    return `<a href="https://github.com/${t}/pull/${i}">${e}</a>`;
+    const [t, r] = e.split("!");
+    return `<a href="https://github.com/${t}/pull/${r}">${e}</a>`;
   }
 }, {
   target: new RegExp("(^|(?<=\\s))#\\d+", "g"),
@@ -196,29 +220,29 @@ let p = [{
     timeZone: "UTC"
   })))
 }];
-const s = {}.VITE_COLLAB != "OFF" && a.get("collab") != "false";
-var r;
-const o = (r = {}.VITE_WS_URL) != null ? r : a.get("collab_server");
-m({
+const d = {}.VITE_COLLAB != "OFF" && s.get("collab") != "false";
+var c;
+const n = (c = {}.VITE_WS_URL) != null ? c : s.get("collab_server");
+u({
   id: "demo",
   templatelist: "linkedtemplatelist.json",
-  initialText: l,
+  initialText: g,
   title: "[MyST Editor](https://github.com/antmicro/myst-editor/) demo",
-  transforms: w,
+  transforms: v,
   collapsibleHeadingMarker: !0,
   collaboration: {
-    enabled: s,
-    commentsEnabled: s,
-    resolvingCommentsEnabled: s,
-    wsUrl: o != null ? o : "#",
-    username: d,
-    room: c,
-    color: u,
-    mode: o ? "websocket" : "local"
+    enabled: d,
+    commentsEnabled: d,
+    resolvingCommentsEnabled: d,
+    wsUrl: n != null ? n : "#",
+    username: h,
+    room: f,
+    color: w,
+    mode: n ? "websocket" : "local"
   },
-  customRoles: p,
-  customDirectives: g,
-  includeButtons: h.concat([{
+  customRoles: y,
+  customDirectives: b,
+  includeButtons: p.concat([{
     text: "Custom button",
     action: () => alert("Custom button action")
   }]),

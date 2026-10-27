@@ -1,3 +1,4 @@
+import "./index.js";
 import { MystEditorGit as F } from "./MystEditor.js";
 const L = "docs", C = "docs/index.md", R = 45, A = 45, d = "4a3f2b1", w = "e7c91d0";
 function j(e) {
