@@ -70,38 +70,29 @@ const List = styled.div`
 `;
 
 function Heading({ heading }) {
-  let children;
-  if (heading.children.length > 0) {
-    children = (
-      <ul>
-        {heading.children.map((c) => (
-          <Heading key={c.pos} heading={c} />
-        ))}
-      </ul>
-    );
-  }
+  const state = useContext(MystState);
 
   return (
     <li>
-      <span title="Go to heading" className="heading" data-heading-pos={heading.pos}>
+      <span title="Go to heading" className="heading" onClick={() => scrollToPos(heading.pos, state)}>
         {heading.text}
       </span>
-      {children}
+      {heading.children.length > 0 && (
+        <ul>
+          {heading.children.map((child) => (
+            <Heading key={child.pos} heading={child} />
+          ))}
+        </ul>
+      )}
     </li>
   );
 }
 
 export const TableOfContents = ({ pageIndex, markedFiles, currentFile, onFileClick }) => {
-  const { headings, editorView, options, text } = useContext(MystState);
+  const { headings } = useContext(MystState);
   const fileList = pageIndex;
 
   const fileHeadings = useComputed(() => headings.value.flatMap((h, i) => (i == 0 && h.level == 1 && h.pos === 0 ? h.children : h)));
-
-  function handleHeadingClick(ev) {
-    const posAttr = ev.target?.dataset?.headingPos;
-    if (!posAttr) return;
-    scrollToPos(parseInt(posAttr, 10), { editorView, options, text });
-  }
 
   return (
     <List>
@@ -129,7 +120,7 @@ export const TableOfContents = ({ pageIndex, markedFiles, currentFile, onFileCli
                 {fileLabel}
               </span>
               {currentFile.startsWith(f.file) && (
-                <ul id="headings" onClick={handleHeadingClick}>
+                <ul id="headings">
                   {fileHeadings.value.map((h) => (
                     <Heading heading={h} key={h.pos} />
                   ))}

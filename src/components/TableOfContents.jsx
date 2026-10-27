@@ -1,7 +1,6 @@
 import { useContext } from "preact/hooks";
 import styled from "styled-components";
 import { MystState } from "../mystState";
-import { useSignalEffect } from "@preact/signals";
 import { scrollToPos } from "../utils";
 
 const Wrapper = styled.div`
@@ -56,43 +55,32 @@ const HeadingList = styled.div`
 `;
 
 function Heading({ heading }) {
-  let children;
-  if (heading.children.length > 0) {
-    children = (
-      <ul>
-        {heading.children.map((c) => (
-          <Heading key={c.pos} heading={c} />
-        ))}
-      </ul>
-    );
-  }
+  const state = useContext(MystState);
 
   return (
     <li>
-      <span title="Go to heading" data-heading-pos={heading.pos}>
+      <span title="Go to heading" onClick={() => scrollToPos(heading.pos, state)}>
         {heading.text}
       </span>
-      {children}
+      {heading.children.length > 0 && (
+        <ul>
+          {heading.children.map((child) => (
+            <Heading key={child.pos} heading={child} />
+          ))}
+        </ul>
+      )}
     </li>
   );
 }
 
 export const TableOfContents = () => {
-  const { headings, editorView, options, text } = useContext(MystState);
-
-  useSignalEffect(() => console.log(headings.value));
-
-  function handleClick(ev) {
-    const posAttr = ev.target?.dataset?.headingPos;
-    if (!posAttr) return;
-    scrollToPos(parseInt(posAttr, 10), { editorView, options, text });
-  }
+  const { headings } = useContext(MystState);
 
   return (
     <Wrapper>
       <h1>Table of Contents</h1>
       <VerticalSparator />
-      <HeadingList onClick={handleClick}>
+      <HeadingList>
         <ul>
           {headings.value.map((h) => (
             <Heading heading={h} key={h.pos} />

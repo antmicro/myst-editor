@@ -144,7 +144,8 @@ const MystEditorGit = ({
   const preparingCommit = useSignal(false);
   const { docsWithChanges, statusSocket } = useWatchChanges(props, repo);
   const indexFile = useSignal();
-  const { collab, options, editorView, text, headings } = useContext(MystState);
+  const mystState = useContext(MystState);
+  const { collab, options, text, headings } = mystState;
   const commitDocuments = useRef(null);
 
   const indexedFiles = useComputed(() => {
@@ -201,8 +202,11 @@ const MystEditorGit = ({
     });
   }
 
+  /**
+   * @param {number} pos Nonnegative integer character offset of the heading.
+   */
   function scrollToHeading(pos) {
-    scrollToPos(pos, { editorView, options, text });
+    scrollToPos(pos, mystState);
   }
 
   useEffect(() => {

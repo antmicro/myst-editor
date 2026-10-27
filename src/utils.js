@@ -1,9 +1,14 @@
 import { EditorView } from "codemirror";
 import { findNearestElementForLine } from "./markdown/markdownSourceMap";
 
-export function scrollToPos(pos, { editorView, options, text }) {
+/**
+ * @param {number} pos Nonnegative integer offset of the heading in the active document.
+ * @param {object} context Editor state used for navigation.
+ */
+export function scrollToPos(pos, { editorView, options, text, collab }) {
   const view = editorView.peek();
-  if (!view) return;
+  // While switching rooms the headings already describe the new file, but the view still holds the old one.
+  if (!view || (options.collaboration.peek().enabled && !collab.peek()?.editorReady.peek())) return;
   view.dispatch({ selection: { anchor: pos, head: pos }, effects: EditorView.scrollIntoView(pos, { y: "start" }) });
 
   // In Preview mode the editor is hidden, so the scroll above is invisible - scroll the preview pane instead.

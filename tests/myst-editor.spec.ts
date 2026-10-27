@@ -2396,6 +2396,26 @@ test.describe.parallel("With collaboration enabled", () => {
 });
 
 test.describe.parallel("MystEditorGit wrapper", () => {
+  test("Ignores sidebar headings until the switched room is ready", async ({ context }) => {
+    const page = await applyPageOpts(await context.newPage(), defaultCollabOpts(), true);
+
+    // The new file's headings arrive before its document, so they would point into the old one.
+    const { pos, head } = await page.evaluate(async (id) => {
+      const { state, git, main_editor } = window.myst_editor[id] as any;
+      main_editor.dispatch({ selection: { anchor: 0 } });
+      await git.switchFile("docs/file1.md");
+      const pos = state.headings.value[0].children.at(-1).pos;
+      git.scrollToHeading(pos);
+      return { pos, head: main_editor.state.selection.main.head };
+    }, id);
+    expect(head).toBe(0);
+
+    await expect(async () => {
+      await page.evaluate(({ id, pos }) => (window.myst_editor[id] as any).git.scrollToHeading(pos), { id, pos });
+      expect(await page.evaluate((id) => window.myst_editor[id].main_editor.state.selection.main.head, id)).toBe(pos);
+    }).toPass();
+  });
+
   test("Shows branch and commit in subtitle", async ({ context }) => {
     const page = await applyPageOpts(await context.newPage(), defaultCollabOpts(), true);
     await expect(page.locator("[data-git-branch]")).toContainText("feature");
