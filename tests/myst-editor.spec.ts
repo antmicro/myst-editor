@@ -270,8 +270,19 @@ graph TD
     A-->B
 \`\`\``,
       },
-      (html) => expect(html).toContain("<svg"),
+      (html) => expect(html).toContain('class="pele pele-flowchart"'),
     );
+  });
+
+  test("Invalid Mermaid diagrams show a safe error", async ({ page }) => {
+    await clearEditor(page);
+    await insertToMainEditor(page, {
+      from: 0,
+      insert: "```mermaid\n<img src=x onerror=alert(1)>\n```",
+    });
+
+    await expect(page.locator(".myst-preview pre").first()).toContainText("Mermaid error:");
+    await expect(page.locator(".myst-preview img")).toHaveCount(0);
   });
 
   test.describe.parallel("Inline mode", () => {
@@ -1766,6 +1777,50 @@ This text shouldn't merge inside the previous block~~}`,
   });
 });
 
+test("Loads Pele only when a Mermaid diagram is rendered", async ({ page }) => {
+  const peleRequests: string[] = [];
+  page.on("request", (request) => {
+    if (/\/assets\/lazy-[^/]+\.js$/.test(new URL(request.url()).pathname)) {
+      peleRequests.push(request.url());
+    }
+  });
+
+  await page.route("**/mermaid-lazy-test.html", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: `
+        <div id="myst"></div>
+        <script type="module">
+          import MystEditor from "/MystEditor.js";
+          MystEditor(
+            { id: "${id}", initialText: "# Plain Markdown",  mode: "Both"},
+            document.getElementById("myst"),
+          );
+        </script>
+      `,
+    }),
+  );
+
+  await page.goto("/mermaid-lazy-test.html");
+  await expect(page.locator(".myst-preview").first()).toContainText("Plain Markdown");
+  expect(peleRequests).toHaveLength(0);
+
+  await clearEditor(page);
+  await insertChangesAndCheckOutput(
+    page,
+    {
+      from: 0,
+      insert: `\`\`\`mermaid
+graph TD
+    A-->B
+\`\`\``,
+    },
+    (html) => expect(html).toContain("<svg"),
+  );
+
+  expect(peleRequests).toHaveLength(1);
+});
+
 test.describe.parallel("With collaboration enabled", () => {
   test("Error modal copies error details to the clipboard", async ({ context }) => {
     await context.grantPermissions(["clipboard-write", "clipboard-read"]);
@@ -2531,13 +2586,12 @@ test.describe.parallel("MystEditorGit wrapper", () => {
   });
 });
 
-test("dist/MystEditor.js exports src/MystEditor.js module", async () => {
-  const module = await fs.readFile("dist/MystEditor.js");
-  expect(module.length).toBeGreaterThan(3000);
+test("dist/MystEditor.js exports the editor module", async () => {
+  const entry = await fs.readFile("dist/MystEditor.js", "utf8");
+  expect(entry).toMatch(/\bexport\s*(?:default\b|\{[^}]*\bdefault\b)/s);
+  expect(entry.length).toBeGreaterThan(3000);
 
-  const moduleContent = module.toString();
-
-  ["spellcheckOpts", "transforms", "collaboration", "ycomments", "commentsEnabled"].forEach((s) => expect(moduleContent).toContain(s));
+  ["spellcheckOpts", "transforms", "collaboration", "ycomments", "commentsEnabled"].forEach((s) => expect(entry).toContain(s));
 });
 
 ///////////////////////// UTILITY FUNCTIONS /////////////////////////

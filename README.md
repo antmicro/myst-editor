@@ -106,8 +106,10 @@ npm i && npm run build
 
 You can embed this editor on another website.
 
-After building, you should see a `dist` folder with `MystEditor.css` and `MystEditor.js` in it.
-Put those files alongside your HTML.
+After building, the `dist` folder contains `MystEditor.css`, `MystEditor.js` and an `assets` directory with additional JavaScript chunks.
+Deploy the complete folder and preserve this directory structure because `MystEditor.js` and its generated chunks load files from `assets`.
+
+The [Pele](https://github.com/obsidianmd/pele) renderer loads asynchronously when the editor renders its first Mermaid diagram. Pages without Mermaid diagrams do not download its chunks.
 
 Add a link to the CSS file into your HTML:
 
@@ -249,7 +251,7 @@ Here are the options you can pass to the MystEditor function:
 - `yamlSchema` - must be an absoulte URL. If provided, a language server will launch in the background to provide tooltips, diagnostics and autocompletions based on the schema in YAML code blocks.
 - `onPreviewClick` *(`(ev: MouseEvent) => boolean`)* - callback for when the preview is clicked, if the builtin click actions should be skipped, it should return `true`
 - `onDiscardChanges` *(`() => void`)* - callback for when changes are discarded from the diff view mode
-- `mermaidTheme` *(default: "neutral")* - theme to use for Mermaid.js diagrams
+- `mermaidTheme` *(default: "neutral")* - color palette for Mermaid diagrams rendered by Pele. `dark` and `forest` have dedicated palettes; other values use the editor's colors. Pele uses its own layout, so diagrams may look different from Mermaid.js. Override `--pele-*` CSS variables to customize the palette.
 - `cmDarkTheme` *(default: false)* - whether to use a dark theme for CodeMirror
 - `onExit` *(`() => void | false`)* - If provided an exit button will be shown. The button will execute the provided hook.
 

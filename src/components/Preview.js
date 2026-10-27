@@ -367,6 +367,35 @@ export const MdStyles = css`
     padding: 0;
     display: flex;
     justify-content: center;
+    --pele-bg: var(--panel-bg);
+    --pele-fg: currentColor;
+    --pele-line: currentColor;
+    --pele-surface: var(--editor-bg);
+    --pele-surface-alt: var(--button-bg-hover);
+    --pele-border: var(--border);
+    --pele-accent: var(--accent-dark);
+    --pele-error: var(--error-bg);
+  }
+
+  .mermaid[data-mermaid-theme="dark"] {
+    background-color: var(--pele-bg);
+    --pele-bg: #252525;
+    --pele-fg: #f4f4f4;
+    --pele-line: #f4f4f4;
+    --pele-surface: #383838;
+    --pele-surface-alt: #474747;
+    --pele-border: #777;
+  }
+
+  .mermaid[data-mermaid-theme="forest"] {
+    background-color: var(--pele-bg);
+    --pele-bg: #f4f8f1;
+    --pele-fg: #1c3922;
+    --pele-line: #376641;
+    --pele-surface: #dcebd4;
+    --pele-surface-alt: #c8dec0;
+    --pele-border: #709872;
+    --pele-accent: #2d7044;
   }
 
   input[type="checkbox"] {

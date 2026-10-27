@@ -1,4 +1,3 @@
-import mermaid from "mermaid";
 import { waitForElement } from "../utils";
 import { getLineById } from "./markdownSourceMap";
 import IMurMurHash from "imurmurhash";
@@ -11,11 +10,8 @@ const markdownItMermaid = (md, { lineMap, parent, theme }) => {
   const hashSeed = 42;
   // key = hash of diagram source code
   const contentCache = new Map();
-
-  mermaid.initialize({
-    theme,
-    suppressErrorRendering: true,
-  });
+  let pelePromise;
+  const loadPele = () => (pelePromise ??= import("pele/lazy"));
 
   const original =
     md.renderer.rules.fence ||
@@ -39,20 +35,16 @@ const markdownItMermaid = (md, { lineMap, parent, theme }) => {
     }
     const id = Math.random().toString().replace(".", "");
     token.attrSet("id", `mermaid-${id}`);
+    token.attrSet("data-mermaid-theme", theme);
 
     if (cached) {
       token.attrSet("class", "mermaid");
     }
 
     if (!cached || cached.code !== code) {
-      const container = document.createElement("div");
-      container.style.position = "fixed";
-      container.style.visibility = "none";
-      document.body.appendChild(container);
-
       waitForElement(parent, `mermaid-${id}`).then((el) => {
-        mermaid
-          .render(`mermaid-${id}`, code, container)
+        loadPele()
+          .then(({ renderAsync }) => renderAsync(code, { idPrefix: `mermaid-${id}` }))
           .then(({ svg }) => {
             const saved = { svg, code, hash };
             lineCache.set(lineNumber, saved);
@@ -61,16 +53,15 @@ const markdownItMermaid = (md, { lineMap, parent, theme }) => {
             el.className = "mermaid";
           })
           .catch((err) => {
-            el.innerHTML = `<b>Mermaid error:</b>\n${err}`;
+            const label = document.createElement("b");
+            label.textContent = "Mermaid error:";
+            el.replaceChildren(label, document.createTextNode(`\n${err}`));
             el.classList.remove("mermaid");
-          })
-          .finally(() => {
-            container.remove();
           });
       });
     }
 
-    return `<pre ${self.renderAttrs(token)}>${cached?.svg ?? code}</pre>`;
+    return `<pre ${self.renderAttrs(token)}>${cached?.svg ?? md.utils.escapeHtml(code)}</pre>`;
   };
 };
 

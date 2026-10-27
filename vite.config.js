@@ -31,12 +31,15 @@ export default defineConfig({
     rollupOptions: {
       output: {
         assetFileNames: "MystEditor.css",
-        manualChunks: (id) => {
-          if (id.includes("index.html")) return "index";
-          if (id.includes("myst-git/git.html") || id.includes("myst-git/demo-data") || id.includes("myst-git/stubGitBackend")) {
-            return "git";
-          }
-          return "MystEditor";
+        chunkFileNames: "assets/[name]-[hash].js",
+        manualChunks: {
+          MystEditor: [resolve(__dirname, "src/MystEditor.jsx")],
+          index: [resolve(__dirname, "src/index.html")],
+          git: [
+            resolve(__dirname, "src/myst-git/git.html"),
+            resolve(__dirname, "src/myst-git/demo-data.js"),
+            resolve(__dirname, "src/myst-git/stubGitBackend.js"),
+          ],
         },
       },
     },
