@@ -274,9 +274,11 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
               }
               const elementToken = node.name.startsWith("SetextHeading") || tokenElement.includes(node.name);
               if ((elementToken && nodeInMonospace(view.state, node)) || node.name == "Frontmatter") {
-                const startLine = view.state.doc.lineAt(node.from);
-                const endLine = view.state.doc.lineAt(node.to);
-                widgets.push(decorationMonospace.range(startLine.from, endLine.to));
+                // Editing reveals whole source lines; a suggestion only reveals its own syntax.
+                const wholeLines = node.name == "Frontmatter" || nodeInSelection(view.state, node);
+                const from = wholeLines ? view.state.doc.lineAt(node.from).from : node.from;
+                const to = wholeLines ? view.state.doc.lineAt(node.to).to : node.to;
+                widgets.push(decorationMonospace.range(from, to));
                 return false;
               }
 

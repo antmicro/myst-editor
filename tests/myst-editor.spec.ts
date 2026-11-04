@@ -494,6 +494,63 @@ graph TD
       });
     }
 
+    for (const [label, content] of [
+      ["inline code", "`code`"],
+      ["bold text", "**bold**"],
+      ["multiline code", "`code\ncontinued`"],
+      ["wrapped text", "`code` ".repeat(30).trim()],
+    ]) {
+      for (const action of ["insert", "delete", "replace"]) {
+        test(`Keeps surrounding prose proportional for ${action} suggestions containing ${label}`, async ({ page }) => {
+          const prefix = "Before ";
+          const suffix = " after.";
+          const original = action === "insert" ? "" : action === "replace" ? "old text" : content;
+          await setupReviewTest(page, `${prefix}${original}${suffix}\n\nOther paragraph`);
+          await page.evaluate(
+            ({ id, action, content, from, to }) => {
+              window.myst_editor[id].main_editor.dispatch({
+                changes: { from, to, insert: action === "delete" ? "" : content },
+                userEvent: action === "delete" ? "delete" : "input.type",
+              });
+            },
+            { id, action, content, from: prefix.length, to: prefix.length + original.length },
+          );
+          await startInlineMode(page);
+
+          const proseFonts = () =>
+            page.locator(".cm-content").evaluate((element) => {
+              const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+              const fonts = [];
+              while (walker.nextNode()) {
+                const node = walker.currentNode;
+                if (node.textContent?.includes("Before ") || node.textContent?.includes(" after.")) {
+                  fonts.push(getComputedStyle(node.parentElement!).fontFamily);
+                }
+              }
+              return fonts;
+            });
+
+          await page.evaluate((id) => {
+            const editor = window.myst_editor[id].main_editor;
+            editor.dispatch({ selection: { anchor: editor.state.doc.length } });
+            editor.contentDOM.blur();
+          }, id);
+          await expect.poll(proseFonts).toEqual(["Lato", "Lato"]);
+          const suggestion = page.locator(`.cm-content .suggestions-${action === "delete" ? "delete" : "insert"}`);
+          await expect(suggestion).not.toHaveCount(0);
+          expect((await suggestion.allTextContents()).join("")).toBe(content.replaceAll("\n", ""));
+
+          await moveMainEditorCursor(page, 0);
+          await expect.poll(proseFonts).toEqual(["monospace", "monospace"]);
+          await page.evaluate((id) => {
+            const editor = window.myst_editor[id].main_editor;
+            editor.dispatch({ selection: { anchor: editor.state.doc.length } });
+          }, id);
+          await expect.poll(proseFonts).toEqual(["Lato", "Lato"]);
+        });
+      }
+    }
+
     test("Renders an empty link label with a parenthesized destination", async ({ page }) => {
       await startInlineMode(page);
       await clearEditor(page);
