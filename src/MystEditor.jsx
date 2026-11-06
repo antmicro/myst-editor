@@ -270,3 +270,4 @@ export { defaultButtons, predefinedButtons, batch, computed, signal, effect, Mys
 export { default as MystEditorGit } from "./myst-git/MystEditorGit";
 export { CollaborationClient } from "./collaboration";
 export { darkTheme } from "./styles/MystStyles";
+export { scrollToPos } from "./utils";
