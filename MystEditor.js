@@ -37980,7 +37980,7 @@ const Mqe = We.div`
 }) => /* @__PURE__ */ M($qe, { children: [
   /* @__PURE__ */ M("input", { type: "checkbox", ...t }),
   /* @__PURE__ */ M("label", { htmlFor: t.id, title: "Toggle setting" })
-] }), u2 = new pi(), h2 = "a4f8caa82abb3dd6b7d81a2f1544b52357d69dde", Lqe = "https://github.com/antmicro/myst-editor/commit/a4f8caa82abb3dd6b7d81a2f1544b52357d69dde", Iqe = () => {
+] }), u2 = new pi(), h2 = "4bbd6a37c3f863c00b01a861e4f4e34f58088455", Lqe = "https://github.com/antmicro/myst-editor/commit/4bbd6a37c3f863c00b01a861e4f4e34f58088455", Iqe = () => {
   const t = `build ${h2.slice(0, 10)}`;
   return /* @__PURE__ */ M(Dqe, { children: /* @__PURE__ */ M("a", { href: Lqe, target: "_blank", rel: "noreferrer", title: `Open ${h2}`, children: t }) });
 }, Nqe = () => {
@@ -45539,7 +45539,7 @@ function gZe(t) {
   }), n);
 }
 function mZe() {
-  return new Worker("" + new URL("assets/yamlLSPWorker.6fdd5481.js", import.meta.url).href);
+  return new Worker("" + new URL("assets/yamlLSPWorker.b7e1368b.js", import.meta.url).href);
 }
 var wd = { exports: {} }, yc = typeof Reflect == "object" ? Reflect : null, S2 = yc && typeof yc.apply == "function" ? yc.apply : function(e, n, r) {
   return Function.prototype.apply.call(e, n, r);
@@ -59576,6 +59576,7 @@ export {
   A4e as defaultButtons,
   hi as effect,
   Qo as predefinedButtons,
+  Wx as scrollToPos,
   cn as signal
 };
 //# sourceMappingURL=MystEditor.js.map
