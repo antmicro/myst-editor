@@ -1,7 +1,7 @@
 import MarkdownIt from "markdown-it";
 import { Directive, directivePlugin, Role, rolePlugin } from "markdown-it-docutils";
 import { waitForElement } from "../utils";
-import { escapeRE } from "markdown-it/lib/common/utils";
+import { splitReviewExclusions } from "./markdownReview";
 
 /**
  * @typedef {{
@@ -11,6 +11,8 @@ import { escapeRE } from "markdown-it/lib/common/utils";
  *
  * A transformation which will be applied to the output of `markdown-it`.
  * `transform` will be applied to all matches of `target`.
+ * A bare URL fully matching a transform isn't auto-linked, so only the transform's output is shown.
+ * Top-level output elements marked with `data-review-exclude` (e.g. an MR badge) are left out of comment highlights.
  */
 
 class PreviewWrapper {
@@ -22,9 +24,12 @@ class PreviewWrapper {
   fillPlaceholder(placeholderId, html) {
     const placeholder = this.preview.getElementById(placeholderId);
     if (!placeholder) return;
+    const reviewWrapper = placeholder.parentElement?.closest("[data-review-kind], [data-suggestion-type]");
     // If the placeholder sits inside a `[]()` link's label, don't let the resolved
     // value introduce a nested link.
     placeholder.outerHTML = placeholder.closest("a") ? stripAnchors(html) : html;
+    // Async results arrive after the review highlight was rendered, so split it now.
+    if (reviewWrapper) splitReviewExclusions(reviewWrapper);
   }
 
   cancelTransform(placeholderId) {
@@ -42,17 +47,20 @@ class PreviewWrapper {
   createTransformPlaceholder(input, promise, target) {
     const placeholderId = "placeholder-" + Math.random().toString().slice(2);
 
-    promise
-      .then(waitForElement(this.preview, placeholderId))
-      .then((result) => {
+    // The rendered HTML may not be in the DOM yet, so wait for the placeholder before filling it.
+    // The error handler only covers the transform, so a failure while filling can't overwrite the cache.
+    const placeholderReady = () => waitForElement(this.preview, placeholderId);
+    promise.then(
+      (result) => {
         this.cache.set(input, result);
-        this.fillPlaceholder(placeholderId, result);
-      })
-      .catch((err) => {
+        return placeholderReady().then(() => this.fillPlaceholder(placeholderId, result));
+      },
+      (err) => {
         console.error("Error in custom transform:", target, "Caused by input:", input, "Error:", err);
-        this.cancelTransform(placeholderId);
         this.cache.set(input, input);
-      });
+        return placeholderReady().then(() => this.cancelTransform(placeholderId));
+      },
+    );
 
     return `<span id="${placeholderId}">${input}</span>`;
   }
@@ -107,11 +115,41 @@ const stripAnchors = (html) => html.replace(/<a(?:\s(?:[^>"']|"[^"]*"|'[^']*')*)
  */
 const markdownReplacer = (transforms, editorParent, cache) => (markdownIt) => {
   const preview = new PreviewWrapper(editorParent, cache);
+  /**
+   * Builds a regex that matches `target` only at the start of a string, or the whole string with `wholeMatch`.
+   * Global/sticky flags are dropped so `exec`/`test` don't carry `lastIndex` between calls.
+   *
+   * @param {string | RegExp} target
+   * @param {boolean} [wholeMatch]
+   */
+  const anchoredTarget = (target, wholeMatch = false) => {
+    const source = target instanceof RegExp ? target.source : markdownIt.utils.escapeRE(target);
+    const flags = target instanceof RegExp ? target.flags.replace(/[gy]/g, "") : "";
+    return new RegExp(`^(?:${source})${wholeMatch ? "$" : ""}`, flags);
+  };
   const mappedTransforms = transforms.map((t) => ({
     ...preview.overloadTransform(t),
     /** A regular expression for a transform that only matches at the beggining of a string, useful for parsing */
-    beginTarget: new RegExp(`^(?:${t.target instanceof RegExp ? t.target.source : escapeRE(t.target)})`, t.target.flags ?? "g"),
+    beginTarget: anchoredTarget(t.target),
+    wholeTarget: anchoredTarget(t.target, true),
   }));
+
+  // Undo auto-linking of bare URLs that a transform fully matches: the transform's output
+  // (e.g. issue and MR links) replaces the URL, and would otherwise be nested in a link.
+  markdownIt.core.ruler.after("linkify", "unlink_transformed_urls", (state) => {
+    for (const block of state.tokens) {
+      const children = block.children ?? [];
+      for (let idx = children.length - 3; idx >= 0; idx--) {
+        const [open, text, close] = children.slice(idx, idx + 3);
+        if (open.type !== "link_open" || open.markup !== "linkify" || text.type !== "text" || close.type !== "link_close") continue;
+        // Match escaped text, like the `text` renderer rule below does.
+        const escaped = markdownIt.utils.escapeHtml(text.content);
+        if (!mappedTransforms.some(({ wholeTarget }) => wholeTarget.test(escaped))) continue;
+        text.level = open.level;
+        children.splice(idx, 3, text);
+      }
+    }
+  });
 
   // `env` is per-render, so it can flag whether the token being rendered sits inside a `[]()`
   // link - Markdown links cannot nest, so a boolean is enough.

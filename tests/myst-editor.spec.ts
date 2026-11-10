@@ -294,6 +294,33 @@ test.describe.parallel("With collaboration disabled", () => {
       );
     });
 
+    for (const asyncTransform of [false, true]) {
+      test(`Replaces a bare URL with ${asyncTransform ? "async" : "sync"} issue and MR links`, async ({ page }) => {
+        await page.evaluate(
+          ({ id, asyncTransform }) => {
+            window.myst_editor[id].state.options.transforms.value = [
+              {
+                target: /https:\/\/example\.com\/issues\/\d+/g,
+                transform: (input) => {
+                  const html = `<a href="${input}">Issue</a> <a href="https://example.com/merge_requests/42">MR</a>`;
+                  return asyncTransform ? Promise.resolve(html) : html;
+                },
+              },
+            ];
+          },
+          { id, asyncTransform },
+        );
+        await clearEditor(page);
+        const url = "https://example.com/issues/42";
+        await insertToMainEditor(page, { from: 0, insert: url });
+
+        const preview = page.locator(".myst-preview").first();
+        await expect(preview.getByRole("link", { name: "Issue", exact: true })).toHaveAttribute("href", url);
+        await expect(preview.getByRole("link", { name: "MR", exact: true })).toHaveAttribute("href", "https://example.com/merge_requests/42");
+        await expect(preview.locator("a")).toHaveCount(2);
+      });
+    }
+
     // Only links produced by a transform are dropped, the transform itself still runs.
     test("Still applies text-only transforms inside [text](link)", async ({ page }) => {
       const [date] = new Date().toLocaleString("en-GB", { timeZone: "UTC" }).split(" ");
@@ -829,6 +856,35 @@ graph TD
       await page.keyboard.type("!");
       await expect(page.locator('.myst-preview p [data-suggestion-type="insert"]')).toHaveText("!");
     });
+
+    for (const asyncTransform of [false, true]) {
+      test(`Leaves review-excluded ${asyncTransform ? "async" : "sync"} transform output out of comment highlights`, async ({ page }) => {
+        await page.evaluate(
+          ({ id, asyncTransform }) => {
+            window.myst_editor[id].state.options.transforms.value = [
+              {
+                target: /https:\/\/example\.com\/issues\/\d+/g,
+                transform: (input) => {
+                  const html = `<a href="${input}">Issue</a> <a href="https://example.com/merge_requests/42" data-review-exclude>MR</a>`;
+                  return asyncTransform ? Promise.resolve(html) : html;
+                },
+              },
+            ];
+          },
+          { id, asyncTransform },
+        );
+        const url = "https://example.com/issues/42";
+        const source = `See ${url} here`;
+        const start = source.indexOf(url);
+        await setupReviewTest(page, source, { selection: { anchor: start, head: start + url.length }, suggestMode: false });
+        await createComment(page, "Review issue link");
+
+        const preview = page.locator(".myst-preview").first();
+        await expect(preview.getByRole("link", { name: "MR", exact: true })).toBeVisible();
+        await expect(preview.locator('[data-review-kind="comment"]')).toHaveText("Issue");
+        await expect(preview.locator('[data-review-kind="comment"] [data-review-exclude]')).toHaveCount(0);
+      });
+    }
 
     test("Marks comments in multiline raw HTML inside a blockquote", async ({ page }) => {
       const source = "> <div>\n> Review me\n> </div>";

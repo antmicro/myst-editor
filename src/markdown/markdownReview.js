@@ -270,6 +270,44 @@ export function applyFencedCodeReviews(token, lineElements) {
   });
 }
 
+const REVIEW_EXCLUDE_ATTR = "data-review-exclude";
+
+/**
+ * Splits a review highlight around its direct children marked with `data-review-exclude`
+ * so they are neither highlighted nor open the review card.
+ * Blank text next to an excluded element is left unhighlighted too.
+ *
+ * @param {Element} wrapper
+ */
+export function splitReviewExclusions(wrapper) {
+  const nodes = [...wrapper.childNodes];
+  const isExcluded = (node) => node?.nodeType === Node.ELEMENT_NODE && node.hasAttribute(REVIEW_EXCLUDE_ATTR);
+  if (!nodes.some(isExcluded)) return;
+
+  const parts = [];
+  let current = null;
+  nodes.forEach((node, i) => {
+    const isBlankEdge = node.nodeType === Node.TEXT_NODE && !node.textContent.trim() && (isExcluded(nodes[i - 1]) || isExcluded(nodes[i + 1]));
+    if (isExcluded(node) || isBlankEdge) {
+      current = null;
+      parts.push(node);
+      return;
+    }
+    if (!current) parts.push((current = wrapper.cloneNode(false)));
+    current.append(node);
+  });
+  wrapper.replaceWith(...parts);
+}
+
+/** @param {string} attrs @param {string} html */
+const wrapTransformedReview = (attrs, html) => {
+  if (!html.includes(REVIEW_EXCLUDE_ATTR)) return `<span ${attrs}>${html}</span>`;
+  const template = document.createElement("template");
+  template.innerHTML = `<span ${attrs}>${html}</span>`;
+  splitReviewExclusions(template.content.firstElementChild);
+  return template.innerHTML;
+};
+
 /** @param {markdownIt} md */
 export function markdownReview(md) {
   const defaultTextRule = md.renderer.rules.text;
@@ -295,7 +333,7 @@ export function markdownReview(md) {
     const defaultOutput = defaultTextRule(tokens, idx, options, env, self);
     if (defaultOutput !== md.utils.escapeHtml(token.content)) {
       const attrs = renderAttributes(md, reviewAttributes(uniqueReviews(segments)));
-      return attrs ? `<span ${attrs}>${defaultOutput}</span>` : defaultOutput;
+      return attrs ? wrapTransformedReview(attrs, defaultOutput) : defaultOutput;
     }
 
     return segments
