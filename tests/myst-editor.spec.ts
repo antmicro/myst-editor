@@ -441,6 +441,50 @@ graph TD
   });
 
   test.describe.parallel("Inline mode", () => {
+    for (const [name, destination] of [
+      ["an image", "(/inline-image.svg)"],
+      ["an escaped image", "\\(/inline-image.svg)"],
+    ]) {
+      test(`Clicking below ${name} keeps the active line and gutter in place`, async ({ page }) => {
+        await page.route("**/inline-image.svg", (route) =>
+          route.fulfill({
+            contentType: "image/svg+xml",
+            body: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><rect width="20" height="20"/></svg>',
+          }),
+        );
+        await startInlineMode(page);
+        await clearEditor(page);
+        await insertToMainEditor(page, { from: 0, insert: `![IMAGE TEXT]${destination}\nright below\nthird` });
+        await moveMainEditorCursor(page, 0);
+
+        const lineBelow = page.locator(".cm-content > .cm-line").nth(1);
+        const before = (await lineBelow.boundingBox())!;
+        await lineBelow.click({ position: { x: 30, y: before.height / 2 } });
+        await expect(page.locator(".cm-inline-rendered-md")).toBeVisible();
+        if (!destination.startsWith("\\")) {
+          const image = page.locator(".cm-inline-rendered-md img");
+          await expect(image).toBeVisible();
+          await expect(image).toHaveJSProperty("naturalHeight", 20);
+        }
+        await expect(lineBelow).toHaveClass(/cm-activeLine/);
+
+        // A one-line image must not introduce empty rows above and below its widget.
+        await expect(async () => {
+          const after = (await lineBelow.boundingBox())!;
+          expect(Math.abs(after.y - before.y)).toBeLessThan(1);
+          const number = page.locator(".cm-lineNumbers .cm-gutterElement").filter({ hasText: /^2$/ });
+          const gutter = (await number.boundingBox())!;
+          expect(Math.abs(gutter.y - after.y)).toBeLessThan(1);
+        }).toPass({ timeout: 3000 });
+        expect(
+          await page.evaluate((id) => {
+            const view = window.myst_editor[id].main_editor;
+            return view.state.doc.lineAt(view.state.selection.main.head).number;
+          }, id),
+        ).toBe(2);
+      });
+    }
+
     test("Renders an empty link label with a parenthesized destination", async ({ page }) => {
       await startInlineMode(page);
       await clearEditor(page);

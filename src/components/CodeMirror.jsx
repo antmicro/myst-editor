@@ -242,6 +242,13 @@ const CodeEditor = styled.div`
       font-size: 16px;
       /* Takes back the mid-word breaking of the line, without which content too long to fit widens the editor instead of wrapping. */
       word-break: inherit;
+
+      /* Keep block paragraphs (including images) from splitting the surrounding line into extra rows. */
+      &:has(> p) {
+        display: inline-block;
+        max-width: 100%;
+        vertical-align: top;
+      }
     }
 
     ${MdStyles}
