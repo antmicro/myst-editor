@@ -173,7 +173,7 @@ const MystEditor = () => {
                       syncCheckboxes(ev, text.lineMap, editorView.value);
 
                       if (options.syncScroll.value && options.mode.value == "Both") {
-                        handlePreviewClickToScroll(ev, text.lineMap, preview, editorView.value);
+                        handlePreviewClickToScroll(ev, text.lineMap, editorView.value);
                       }
                     } catch (e) {
                       console.error("The following error occured while handling a click on the preview pane");

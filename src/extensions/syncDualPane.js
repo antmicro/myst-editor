@@ -3,7 +3,6 @@ import { markdownUpdatedEffect } from "../text";
 import { findPreviewTargetForLine, getLineById } from "../markdown/markdownSourceMap";
 import { EditorSelection } from "@codemirror/state";
 
-const previewTopPadding = 20;
 const debounceTimeout = 100;
 /** This is the best way I can think of to check if the user caused the markdown to update.
  * If it takes longer than this to update the preview, we have bigger problems.
@@ -60,10 +59,9 @@ function scrollPreviewElemIntoView({ view, matchingLine, matchingRect, behavior 
 /**
  * @param {{ target: HTMLElement }} ev
  * @param {Map<number, string>} lineMap
- * @param {HTMLElement} preview
  * @param { EditorView } editor
  */
-export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
+export function handlePreviewClickToScroll(ev, lineMap, editor) {
   let id = ev.target.getAttribute("data-line-id");
   let elem = ev.target;
   if (!id) {
@@ -86,7 +84,7 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
     });
   }
   function keepScrolling() {
-    const { canScroll, editorParent } = scrollEditorToLine(elem, preview, line, editor);
+    const { canScroll, editorParent } = scrollEditorToLine(elem, line, editor);
     if (canScroll) {
       editorParent.addEventListener("scrollend", keepScrolling, { once: true });
     } else {
@@ -96,7 +94,7 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
 
   if (line.from >= visible.from && line.to <= visible.to) {
     // if visible -> scroll just once
-    const { canScroll, editorParent } = scrollEditorToLine(elem, preview, line, editor);
+    const { canScroll, editorParent } = scrollEditorToLine(elem, line, editor);
     if (canScroll) {
       editorParent.addEventListener("scrollend", setCursor, { once: true });
     } else {
@@ -110,14 +108,13 @@ export function handlePreviewClickToScroll(ev, lineMap, preview, editor) {
   }
 }
 
-function scrollEditorToLine(elem, preview, line, editor) {
+function scrollEditorToLine(elem, line, editor) {
   const lineBlock = editor.lineBlockAt(line.from);
   const targetRect = elem.getBoundingClientRect();
-  const previewRect = preview.current.getBoundingClientRect();
-  const editorParent = editor.scrollDOM;
+  // The surrounding source pane scrolls; CodeMirror's scroller has overflow: visible.
+  const editorParent = editor.dom.parentElement;
 
-  const editorScrollOffset = targetRect.top;
-  const top = lineBlock.top - editorScrollOffset + previewRect.top + previewTopPadding;
+  const top = editorParent.scrollTop + editor.documentTop + lineBlock.top - targetRect.top;
   const direction = Math.sign(editorParent.scrollTop - top);
   const threshhold = 5;
   const canScroll =

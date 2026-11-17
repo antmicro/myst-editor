@@ -95,12 +95,14 @@ const defaultUserSettings = [
         constructor(view) {
           this.view = view;
           this.observer = new ResizeObserver(() => {
-            view.dom.style.paddingBottom = `${view.dom.parentElement.clientHeight - 20 - view.defaultLineHeight}px`;
+            // Padding the fixed-height editor wrapper collapses its scroller and breaks viewport rendering.
+            view.contentDOM.style.paddingBottom = `${view.dom.parentElement.clientHeight - 20 - view.defaultLineHeight}px`;
+            view.requestMeasure();
           });
           this.observer.observe(view.dom.parentElement);
         }
         destroy() {
-          this.view.dom.style.paddingBottom = "0px";
+          this.view.contentDOM.style.removeProperty("padding-bottom");
           this.observer.disconnect();
         }
       },
