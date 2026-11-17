@@ -38019,7 +38019,7 @@ const Lqe = We.div`
 }) => /* @__PURE__ */ M(Qqe, { children: [
   /* @__PURE__ */ M("input", { type: "checkbox", ...t }),
   /* @__PURE__ */ M("label", { htmlFor: t.id, title: "Toggle setting" })
-] }), u2 = new pi(), h2 = "9e3d387b735177cb27cdcd0d822e76c5ba62ac1a", Bqe = "https://github.com/antmicro/myst-editor/commit/9e3d387b735177cb27cdcd0d822e76c5ba62ac1a", qqe = () => {
+] }), u2 = new pi(), h2 = "246d638991fa96091c3c44e1b7c28b486ff8b35e", Bqe = "https://github.com/antmicro/myst-editor/commit/246d638991fa96091c3c44e1b7c28b486ff8b35e", qqe = () => {
   const t = `build ${h2.slice(0, 10)}`;
   return /* @__PURE__ */ M(Iqe, { children: /* @__PURE__ */ M("a", { href: Bqe, target: "_blank", rel: "noreferrer", title: `Open ${h2}`, children: t }) });
 }, Zqe = () => {
@@ -56113,6 +56113,13 @@ const oje = (t, e) => ({
       font-size: 16px;
       /* Takes back the mid-word breaking of the line, without which content too long to fit widens the editor instead of wrapping. */
       word-break: inherit;
+
+      /* Keep block paragraphs (including images) from splitting the surrounding line into extra rows. */
+      &:has(> p) {
+        display: inline-block;
+        max-width: 100%;
+        vertical-align: top;
+      }
     }
 
     ${gq}
