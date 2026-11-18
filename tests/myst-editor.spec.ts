@@ -2005,6 +2005,30 @@ This text shouldn't merge inside the previous block~~}`,
   });
 });
 
+test("Search highlights matches and scrolls to the next one", async ({ page }) => {
+  await applyPageOpts(page, { collab: "false" });
+  await startInlineMode(page);
+  const source = Array.from({ length: 160 }, (_, index) =>
+    [5, 80, 150].includes(index) ? `Line ${index + 1}: searchneedle` : `Line ${index + 1}: ordinary text`,
+  ).join("\n");
+  await clearEditor(page);
+  await insertToMainEditor(page, { from: 0, insert: source });
+  await moveMainEditorCursor(page, 0);
+
+  await pressMainEditorShortcut(page, "Control+f");
+  const search = page.getByRole("textbox", { name: "Find", exact: true });
+  await expect(search).toBeFocused();
+  await search.pressSequentially("searchneedle");
+
+  const selectedMatch = page.locator(".cm-searchMatch-selected");
+  for (const line of [6, 81, 151, 6]) {
+    await search.press("Enter");
+    await expect(selectedMatch).toHaveText("searchneedle");
+    await expect(selectedMatch).toBeInViewport();
+    await expect(page.locator(".cm-line").filter({ has: selectedMatch })).toContainText(`Line ${line}:`);
+  }
+});
+
 test("Loads Pele only when a Mermaid diagram is rendered", async ({ page }) => {
   const peleRequests: string[] = [];
   page.on("request", (request) => {

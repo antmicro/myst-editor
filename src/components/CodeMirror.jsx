@@ -119,7 +119,7 @@ const CodeEditor = styled.div`
 
   .cm-editor {
     outline: 0;
-    height: 100%;
+    min-height: 100%;
   }
 
   .cm-editor .cm-scroller {
