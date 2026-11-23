@@ -441,6 +441,15 @@ graph TD
   });
 
   test.describe.parallel("Inline mode", () => {
+    test("Renders horizontal rules", async ({ page }) => {
+      await startInlineMode(page);
+      await clearEditor(page);
+      await insertToMainEditor(page, { from: 0, insert: "before\n\n---\n\nafter" });
+      await moveMainEditorCursor(page, 0);
+
+      await expect(page.locator(".cm-inline-rendered-md hr")).toBeVisible();
+    });
+
     for (const [name, destination] of [
       ["an image", "(/inline-image.svg)"],
       ["an escaped image", "\\(/inline-image.svg)"],

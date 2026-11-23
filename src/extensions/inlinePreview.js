@@ -75,7 +75,7 @@ export const inlinePreview = (/** @type {TextManager} */ text, options, editorVi
       return (rFrom >= nodeFrom && rFrom <= nodeTo) || (rTo >= nodeFrom && rTo <= nodeTo) || (nodeFrom >= rFrom && nodeTo <= rTo);
     });
   const nodeInMonospace = (...args) => nodeInSelection(...args) || nodeInSuggestion(...args);
-  const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Checkbox", "HTMLBlock"];
+  const renderedBlockNodes = ["Table", "Blockquote", "FencedCode", "Image", "Checkbox", "HTMLBlock", "HorizontalRule"];
 
   const moveCursorVertically = (forward) => (view) => {
     const moveRange = (range) => {
