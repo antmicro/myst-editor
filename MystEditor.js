@@ -35892,12 +35892,12 @@ function Wx(t, {
   options: n,
   text: r,
   collab: i
-}) {
-  var l;
-  const s = e.peek();
-  if (!s || n.collaboration.peek().enabled && !((l = i.peek()) != null && l.editorReady.peek()))
+}, s = "smooth") {
+  var c;
+  const o = e.peek();
+  if (!o || n.collaboration.peek().enabled && !((c = i.peek()) != null && c.editorReady.peek()))
     return;
-  s.dispatch({
+  o.dispatch({
     selection: {
       anchor: t,
       head: t
@@ -35906,13 +35906,13 @@ function Wx(t, {
       y: "start"
     })
   });
-  const o = n.mode.peek() === "Preview" && r.preview.peek();
-  if (!o)
+  const a = n.mode.peek() === "Preview" && r.preview.peek();
+  if (!a)
     return;
-  const [a] = fN(s.state.doc.lineAt(t).number, r.lineMap, o);
-  !a || o.scrollTo({
-    top: o.scrollTop + a.getBoundingClientRect().top - o.getBoundingClientRect().top,
-    behavior: "smooth"
+  const [l] = fN(o.state.doc.lineAt(t).number, r.lineMap, a);
+  !l || a.scrollTo({
+    top: a.scrollTop + l.getBoundingClientRect().top - a.getBoundingClientRect().top,
+    behavior: s
   });
 }
 async function pN(t, e) {
@@ -38019,7 +38019,7 @@ const Lqe = We.div`
 }) => /* @__PURE__ */ M(Qqe, { children: [
   /* @__PURE__ */ M("input", { type: "checkbox", ...t }),
   /* @__PURE__ */ M("label", { htmlFor: t.id, title: "Toggle setting" })
-] }), u2 = new pi(), h2 = "2fe6785616630a41180589c2980ff0cbe3db3f16", Bqe = "https://github.com/antmicro/myst-editor/commit/2fe6785616630a41180589c2980ff0cbe3db3f16", qqe = () => {
+] }), u2 = new pi(), h2 = "928bee3ad33083283c094c88a6e290bb840480c9", Bqe = "https://github.com/antmicro/myst-editor/commit/928bee3ad33083283c094c88a6e290bb840480c9", qqe = () => {
   const t = `build ${h2.slice(0, 10)}`;
   return /* @__PURE__ */ M(Iqe, { children: /* @__PURE__ */ M("a", { href: Bqe, target: "_blank", rel: "noreferrer", title: `Open ${h2}`, children: t }) });
 }, Zqe = () => {
