@@ -38019,7 +38019,7 @@ const Lqe = We.div`
 }) => /* @__PURE__ */ M(Qqe, { children: [
   /* @__PURE__ */ M("input", { type: "checkbox", ...t }),
   /* @__PURE__ */ M("label", { htmlFor: t.id, title: "Toggle setting" })
-] }), u2 = new pi(), h2 = "928bee3ad33083283c094c88a6e290bb840480c9", Bqe = "https://github.com/antmicro/myst-editor/commit/928bee3ad33083283c094c88a6e290bb840480c9", qqe = () => {
+] }), u2 = new pi(), h2 = "f470acdb582f49539dbd3e60af05c0e83ca99278", Bqe = "https://github.com/antmicro/myst-editor/commit/f470acdb582f49539dbd3e60af05c0e83ca99278", qqe = () => {
   const t = `build ${h2.slice(0, 10)}`;
   return /* @__PURE__ */ M(Iqe, { children: /* @__PURE__ */ M("a", { href: Bqe, target: "_blank", rel: "noreferrer", title: `Open ${h2}`, children: t }) });
 }, Zqe = () => {
@@ -53953,7 +53953,7 @@ ${e.doc.toString()}`, uq = (t, e) => {
       const q = H.doc.lineAt(te.from).number, X = H.doc.lineAt(te.to).number, Oe = H.doc.lineAt(Z.from).number, le = H.doc.lineAt(Z.to).number;
       return q >= Oe && q <= le || X >= Oe && X <= le || Oe >= q && le <= X;
     });
-  }, b = (...H) => O(...H) || g(...H), S = ["Table", "Blockquote", "FencedCode", "Image", "Checkbox", "HTMLBlock"], C = (H) => (Z) => {
+  }, b = (...H) => O(...H) || g(...H), S = ["Table", "Blockquote", "FencedCode", "Image", "Checkbox", "HTMLBlock", "HorizontalRule"], C = (H) => (Z) => {
     const j = (q) => {
       if (!q.empty)
         return ee.cursor(H ? q.to : q.from);
