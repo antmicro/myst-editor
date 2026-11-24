@@ -5,7 +5,7 @@ import { findNearestElementForLine } from "./markdown/markdownSourceMap";
  * @param {number} pos Nonnegative integer offset of the heading in the active document.
  * @param {object} context Editor state used for navigation.
  */
-export function scrollToPos(pos, { editorView, options, text, collab }) {
+export function scrollToPos(pos, { editorView, options, text, collab }, behavior = "smooth") {
   const view = editorView.peek();
   // While switching rooms the headings already describe the new file, but the view still holds the old one.
   if (!view || (options.collaboration.peek().enabled && !collab.peek()?.editorReady.peek())) return;
@@ -16,7 +16,7 @@ export function scrollToPos(pos, { editorView, options, text, collab }) {
   if (!preview) return;
   const [elem] = findNearestElementForLine(view.state.doc.lineAt(pos).number, text.lineMap, preview);
   if (!elem) return;
-  preview.scrollTo({ top: preview.scrollTop + elem.getBoundingClientRect().top - preview.getBoundingClientRect().top, behavior: "smooth" });
+  preview.scrollTo({ top: preview.scrollTop + elem.getBoundingClientRect().top - preview.getBoundingClientRect().top, behavior });
 }
 
 export async function waitForElement(parent, id) {
