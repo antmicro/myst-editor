@@ -2054,23 +2054,23 @@ function uZ(t, e, n) {
     return function(E, D, Y) {
       var ue = E.attrs, he = E.componentStyle, oe = E.defaultProps, H = E.foldedComponentIds, Z = E.styledComponentId, j = E.target, te = ul.useContext(t$), q = dy(), X = E.shouldForwardProp || q.shouldForwardProp;
       ({}).NODE_ENV !== "production" && Jp(Z);
-      var Oe = A6(D, te, oe) || Ec, le = function(Pe, ft, _t) {
+      var Oe = A6(D, te, oe) || Ec, ae = function(Pe, ft, _t) {
         for (var ut, gt = zr(zr({}, ft), { className: void 0, theme: _t }), Jt = 0; Jt < Pe.length; Jt += 1) {
           var vt = Rc(ut = Pe[Jt]) ? ut(gt) : ut;
           for (var Ue in vt)
             gt[Ue] = Ue === "className" ? Ua(gt[Ue], vt[Ue]) : Ue === "style" ? zr(zr({}, gt[Ue]), vt[Ue]) : vt[Ue];
         }
         return ft.className && (gt.className = Ua(gt.className, ft.className)), gt;
-      }(ue, D, Oe), Re = le.as || j, be = {};
-      for (var ke in le)
-        le[ke] === void 0 || ke[0] === "$" || ke === "as" || ke === "theme" && le.theme === Oe || (ke === "forwardedAs" ? be.as = le.forwardedAs : X && !X(ke, Re) || (be[ke] = le[ke], X || {}.NODE_ENV !== "development" || A4(ke) || E_.has(ke) || !cy.has(Re) || (E_.add(ke), console.warn('styled-components: it looks like an unknown prop "'.concat(ke, '" is being sent through to the DOM, which will likely trigger a React console error. If you would like automatic filtering of unknown props, you can opt-into that behavior via `<StyleSheetManager shouldForwardProp={...}>` (connect an API like `@emotion/is-prop-valid`) or consider using transient props (`$` prefix for automatic filtering.)')))));
+      }(ue, D, Oe), Re = ae.as || j, be = {};
+      for (var ke in ae)
+        ae[ke] === void 0 || ke[0] === "$" || ke === "as" || ke === "theme" && ae.theme === Oe || (ke === "forwardedAs" ? be.as = ae.forwardedAs : X && !X(ke, Re) || (be[ke] = ae[ke], X || {}.NODE_ENV !== "development" || A4(ke) || E_.has(ke) || !cy.has(Re) || (E_.add(ke), console.warn('styled-components: it looks like an unknown prop "'.concat(ke, '" is being sent through to the DOM, which will likely trigger a React console error. If you would like automatic filtering of unknown props, you can opt-into that behavior via `<StyleSheetManager shouldForwardProp={...}>` (connect an API like `@emotion/is-prop-valid`) or consider using transient props (`$` prefix for automatic filtering.)')))));
       var xe = function(Pe, ft) {
         var _t = dy(), ut = Pe.generateAndInjectStyles(ft, _t.styleSheet, _t.stylis);
         return {}.NODE_ENV !== "production" && Jp(ut), ut;
-      }(he, le);
+      }(he, ae);
       ({}).NODE_ENV !== "production" && E.warnTooManyClasses && E.warnTooManyClasses(xe);
       var Me = Ua(H, Z);
-      return xe && (Me += " " + xe), le.className && (Me += " " + le.className), be[hO(Re) && !cy.has(Re) ? "class" : "className"] = Me, Y && (be.ref = Y), Er(Re, be);
+      return xe && (Me += " " + xe), ae.className && (Me += " " + ae.className), be[hO(Re) && !cy.has(Re) ? "class" : "className"] = Me, Y && (be.ref = Y), Er(Re, be);
     }(P, R, B);
   }
   C.displayName = h;
@@ -9691,8 +9691,8 @@ function b7(t, e, n) {
   function P(B, E, D) {
     let Y = 1e9, ue = -1e9, he = [];
     function oe(j, te, q, X, Oe) {
-      let le = t.coordsAtPos(j, j == D.to ? -2 : 2), Re = t.coordsAtPos(q, q == D.from ? 2 : -2);
-      !le || !Re || (Y = Math.min(le.top, Re.top, Y), ue = Math.max(le.bottom, Re.bottom, ue), Oe == Xt.LTR ? he.push(s && te ? h : le.left, s && X ? f : Re.right) : he.push(!s && X ? h : Re.left, !s && te ? f : le.right));
+      let ae = t.coordsAtPos(j, j == D.to ? -2 : 2), Re = t.coordsAtPos(q, q == D.from ? 2 : -2);
+      !ae || !Re || (Y = Math.min(ae.top, Re.top, Y), ue = Math.max(ae.bottom, Re.bottom, ue), Oe == Xt.LTR ? he.push(s && te ? h : ae.left, s && X ? f : Re.right) : he.push(!s && X ? h : Re.left, !s && te ? f : ae.right));
     }
     let H = B != null ? B : D.from, Z = E != null ? E : D.to;
     for (let j of t.visibleRanges)
@@ -9700,10 +9700,10 @@ function b7(t, e, n) {
         for (let te = Math.max(j.from, H), q = Math.min(j.to, Z); ; ) {
           let X = t.state.doc.lineAt(te);
           for (let Oe of t.bidiSpans(X)) {
-            let le = Oe.from + X.from, Re = Oe.to + X.from;
-            if (le >= q)
+            let ae = Oe.from + X.from, Re = Oe.to + X.from;
+            if (ae >= q)
               break;
-            Re > te && oe(Math.max(le, te), B == null && le <= H, Math.min(Re, q), E == null && Re >= Z, Oe.dir);
+            Re > te && oe(Math.max(ae, te), B == null && ae <= H, Math.min(Re, q), E == null && Re >= Z, Oe.dir);
           }
           if (te = X.to + 1, te >= q)
             break;
@@ -11820,12 +11820,12 @@ function O9(t) {
         return;
       } else
         throw new RangeError(`Unrecognized record size: ${j}`);
-    let X = l[oe], Oe, le, Re = H - B;
-    if (Z - H <= i && (le = b(a.pos - E, ue))) {
-      let be = new Uint16Array(le.size - le.skip), ke = a.pos - le.size, xe = be.length;
+    let X = l[oe], Oe, ae, Re = H - B;
+    if (Z - H <= i && (ae = b(a.pos - E, ue))) {
+      let be = new Uint16Array(ae.size - ae.skip), ke = a.pos - ae.size, xe = be.length;
       for (; a.pos > ke; )
-        xe = S(le.start, be, xe);
-      Oe = new ca(be, Z - le.start, r), Re = le.start - B;
+        xe = S(ae.start, be, xe);
+      Oe = new ca(be, Z - ae.start, r), Re = ae.start - B;
     } else {
       let be = a.pos - j;
       a.next();
@@ -17912,10 +17912,10 @@ Vk.write = function(t, e, n, r, i, s) {
       }
       se === null ? (se = 65533, Qe = 1) : se > 65535 && (se -= 65536, $.push(se >>> 10 & 1023 | 55296), se = 56320 | se & 1023), $.push(se), U += Qe;
     }
-    return le($);
+    return ae($);
   }
   const Oe = 4096;
-  function le(T) {
+  function ae(T) {
     const w = T.length;
     if (w <= Oe)
       return String.fromCharCode.apply(String, T);
@@ -36429,7 +36429,7 @@ function SN() {
     ARIA_ATTR: q,
     IS_SCRIPT_OR_DATA: X,
     ATTR_WHITESPACE: Oe,
-    CUSTOM_ELEMENT: le
+    CUSTOM_ELEMENT: ae
   } = t2;
   let {
     IS_ALLOWED_URI: Re
@@ -36619,7 +36619,7 @@ function SN() {
     }
     return !0;
   }, Lt = function(z) {
-    return z !== "annotation-xml" && YA(z, le);
+    return z !== "annotation-xml" && YA(z, ae);
   }, $t = function(z) {
     de(oe.beforeSanitizeAttributes, z, null);
     const {
@@ -37324,24 +37324,24 @@ const Iv = CN, l2 = zo, c2 = Symbol("nomatch"), Aqe = 7, QN = function(t) {
     X += q.parentNode ? q.parentNode.className : "";
     const Oe = a.languageDetectRe.exec(X);
     if (Oe) {
-      const le = Y(Oe[1]);
-      return le || (a2(s.replace("{}", Oe[1])), a2("Falling back to no-highlight mode for this block.", q)), le ? Oe[1] : "no-highlight";
+      const ae = Y(Oe[1]);
+      return ae || (a2(s.replace("{}", Oe[1])), a2("Falling back to no-highlight mode for this block.", q)), ae ? Oe[1] : "no-highlight";
     }
-    return X.split(/\s+/).find((le) => l(le) || Y(le));
+    return X.split(/\s+/).find((ae) => l(ae) || Y(ae));
   }
   function u(q, X, Oe) {
-    let le = "", Re = "";
-    typeof X == "object" ? (le = q, Oe = X.ignoreIllegals, Re = X.language) : (ql("10.7.0", "highlight(lang, code, ...args) has been deprecated."), ql("10.7.0", `Please use highlight(code, options) instead.
-https://github.com/highlightjs/highlight.js/issues/2277`), Re = q, le = X), Oe === void 0 && (Oe = !0);
+    let ae = "", Re = "";
+    typeof X == "object" ? (ae = q, Oe = X.ignoreIllegals, Re = X.language) : (ql("10.7.0", "highlight(lang, code, ...args) has been deprecated."), ql("10.7.0", `Please use highlight(code, options) instead.
+https://github.com/highlightjs/highlight.js/issues/2277`), Re = q, ae = X), Oe === void 0 && (Oe = !0);
     const be = {
-      code: le,
+      code: ae,
       language: Re
     };
     j("before:highlight", be);
     const ke = be.result ? be.result : h(be.language, be.code, Oe);
     return ke.code = be.code, j("after:highlight", ke), ke;
   }
-  function h(q, X, Oe, le) {
+  function h(q, X, Oe, ae) {
     const Re = /* @__PURE__ */ Object.create(null);
     function be(G, ie) {
       return G.keywords[ie];
@@ -37482,7 +37482,7 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Re = q, le = X), Oe =
     if (!st)
       throw al(s.replace("{}", q)), new Error('Unknown language: "' + q + '"');
     const fn = _qe(st);
-    let en = "", Le = le || fn;
+    let en = "", Le = ae || fn;
     const tn = {}, nt = new a.__emitter(a);
     Ue();
     let Ke = "", En = 0, nn = 0, dn = 0, wt = !1;
@@ -37549,11 +37549,11 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Re = q, le = X), Oe =
   }
   function d(q, X) {
     X = X || a.languages || Object.keys(e);
-    const Oe = f(q), le = X.filter(Y).filter(he).map(
+    const Oe = f(q), ae = X.filter(Y).filter(he).map(
       (Me) => h(Me, q, !1)
     );
-    le.unshift(Oe);
-    const Re = le.sort((Me, Pe) => {
+    ae.unshift(Oe);
+    const Re = ae.sort((Me, Pe) => {
       if (Me.relevance !== Pe.relevance)
         return Pe.relevance - Me.relevance;
       if (Me.language && Pe.language) {
@@ -37567,8 +37567,8 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Re = q, le = X), Oe =
     return xe.secondBest = ke, xe;
   }
   function g(q, X, Oe) {
-    const le = X && n[X] || Oe;
-    q.classList.add("hljs"), q.classList.add(`language-${le}`);
+    const ae = X && n[X] || Oe;
+    q.classList.add("hljs"), q.classList.add(`language-${ae}`);
   }
   function O(q) {
     let X = null;
@@ -37588,7 +37588,7 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Re = q, le = X), Oe =
         q.innerHTML
       );
     X = q;
-    const le = X.textContent, Re = Oe ? u(le, { language: Oe, ignoreIllegals: !0 }) : d(le);
+    const ae = X.textContent, Re = Oe ? u(ae, { language: Oe, ignoreIllegals: !0 }) : d(ae);
     q.innerHTML = Re.value, q.dataset.highlighted = "yes", g(q, Oe, Re.language), q.result = {
       language: Re.language,
       re: Re.relevance,
@@ -37596,7 +37596,7 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Re = q, le = X), Oe =
     }, Re.secondBest && (q.secondBest = {
       language: Re.secondBest.language,
       relevance: Re.secondBest.relevance
-    }), j("after:highlightElement", { el: q, result: Re, text: le });
+    }), j("after:highlightElement", { el: q, result: Re, text: ae });
   }
   function b(q) {
     a = l2(a, q);
@@ -37622,11 +37622,11 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Re = q, le = X), Oe =
     let Oe = null;
     try {
       Oe = X(t);
-    } catch (le) {
+    } catch (ae) {
       if (al("Language definition for '{}' could not be registered.".replace("{}", q)), i)
-        al(le);
+        al(ae);
       else
-        throw le;
+        throw ae;
       Oe = o;
     }
     Oe.name || (Oe.name = q), e[q] = Oe, Oe.rawDefinition = X.bind(null, t), Oe.aliases && ue(Oe.aliases, { languageName: q });
@@ -37671,8 +37671,8 @@ https://github.com/highlightjs/highlight.js/issues/2277`), Re = q, le = X), Oe =
   }
   function j(q, X) {
     const Oe = q;
-    r.forEach(function(le) {
-      le[Oe] && le[Oe](X);
+    r.forEach(function(ae) {
+      ae[Oe] && ae[Oe](X);
     });
   }
   function te(q) {
@@ -38019,7 +38019,7 @@ const Lqe = We.div`
 }) => /* @__PURE__ */ M(Qqe, { children: [
   /* @__PURE__ */ M("input", { type: "checkbox", ...t }),
   /* @__PURE__ */ M("label", { htmlFor: t.id, title: "Toggle setting" })
-] }), u2 = new pi(), h2 = "f470acdb582f49539dbd3e60af05c0e83ca99278", Bqe = "https://github.com/antmicro/myst-editor/commit/f470acdb582f49539dbd3e60af05c0e83ca99278", qqe = () => {
+] }), u2 = new pi(), h2 = "76f6b451168357e6074dee8f8c3eda242423d18a", Bqe = "https://github.com/antmicro/myst-editor/commit/76f6b451168357e6074dee8f8c3eda242423d18a", qqe = () => {
   const t = `build ${h2.slice(0, 10)}`;
   return /* @__PURE__ */ M(Iqe, { children: /* @__PURE__ */ M("a", { href: Bqe, target: "_blank", rel: "noreferrer", title: `Open ${h2}`, children: t }) });
 }, Zqe = () => {
@@ -38715,7 +38715,7 @@ function Jqe(t) {
   var Z = function() {
     var p = 100, m = -1, v = 0, y = 0, x = new Array(p);
     function _(N, V, W) {
-      var ae = m % p, ce = x[ae];
+      var le = m % p, ce = x[le];
       function ne(fe) {
         var ve = ++m % p, Ge = x[ve];
         Ge && Ge.clear(), x[ve] = N.setBookmark(fe);
@@ -38731,17 +38731,17 @@ function Jqe(t) {
       m += V, m > v ? m = v : m < y && (m = y);
       var W = x[(p + m) % p];
       if (W && !W.find()) {
-        var ae = V > 0 ? 1 : -1, ce, ne = N.getCursor();
+        var le = V > 0 ? 1 : -1, ce, ne = N.getCursor();
         do
-          if (m += ae, W = x[(p + m) % p], W && (ce = W.find()) && !J(ne, ce))
+          if (m += le, W = x[(p + m) % p], W && (ce = W.find()) && !J(ne, ce))
             break;
         while (m < v && m > y);
       }
       return W;
     }
     function L(N, V) {
-      var W = m, ae = A(N, V);
-      return m = W, ae && ae.find();
+      var W = m, le = A(N, V);
+      return m = W, le && le.find();
     }
     return {
       cachedCursor: void 0,
@@ -38817,7 +38817,7 @@ function Jqe(t) {
       m.value = m.defaultValue;
     }
   }
-  var le, Re = {
+  var ae, Re = {
     enterVimMode: a,
     leaveVimMode: l,
     buildKeyMap: function() {
@@ -38902,16 +38902,16 @@ function Jqe(t) {
         if (A())
           return !0;
         y.inputState.keyBuffer.push(m);
-        var W = y.inputState.keyBuffer.join(""), ae = m.length == 1, ce = tn.matchCommand(W, r, y.inputState, "insert"), ne = y.inputState.changeQueue;
+        var W = y.inputState.keyBuffer.join(""), le = m.length == 1, ce = tn.matchCommand(W, r, y.inputState, "insert"), ne = y.inputState.changeQueue;
         if (ce.type == "none")
           return it(x), !1;
         if (ce.type == "partial") {
-          if (ce.expectLiteralNext && (y.expectLiteralNext = !0), le && window.clearTimeout(le), le = ae && window.setTimeout(
+          if (ce.expectLiteralNext && (y.expectLiteralNext = !0), ae && window.clearTimeout(ae), ae = le && window.setTimeout(
             function() {
               y.insertMode && y.inputState.keyBuffer.length && it(x);
             },
             H("insertModeEscKeysTimeout")
-          ), ae) {
+          ), le) {
             var K = x.listSelections();
             (!ne || ne.removed.length != K.length) && (ne = y.inputState.changeQueue = new mt()), ne.inserted += m;
             for (var fe = 0; fe < K.length; fe++) {
@@ -38919,9 +38919,9 @@ function Jqe(t) {
               ne.removed[fe] = (ne.removed[fe] || "") + qe;
             }
           }
-          return !ae;
+          return !le;
         }
-        if (y.expectLiteralNext = !1, le && window.clearTimeout(le), ce.command && ne) {
+        if (y.expectLiteralNext = !1, ae && window.clearTimeout(ae), ce.command && ne) {
           for (var K = x.listSelections(), fe = 0; fe < K.length; fe++) {
             var et = K[fe].head;
             x.replaceRange(
@@ -38942,13 +38942,13 @@ function Jqe(t) {
         var W = y.inputState.keyBuffer.join("");
         if (/^[1-9]\d*$/.test(W))
           return !0;
-        var ae = /^(\d*)(.*)$/.exec(W);
-        if (!ae)
+        var le = /^(\d*)(.*)$/.exec(W);
+        if (!le)
           return it(x), !1;
-        var ce = y.visualMode ? "visual" : "normal", ne = ae[2] || ae[1];
+        var ce = y.visualMode ? "visual" : "normal", ne = le[2] || le[1];
         y.inputState.operatorShortcut && y.inputState.operatorShortcut.slice(-1) == ne && (ne = y.inputState.operatorShortcut);
         var K = tn.matchCommand(ne, r, y.inputState, ce);
-        return K.type == "none" ? (it(x), !1) : K.type == "partial" ? (K.expectLiteralNext && (y.expectLiteralNext = !0), !0) : K.type == "clear" ? (it(x), !0) : (y.expectLiteralNext = !1, y.inputState.keyBuffer.length = 0, ae = /^(\d*)(.*)$/.exec(W), ae && ae[1] && ae[1] != "0" && y.inputState.pushRepeatDigit(ae[1]), K.command);
+        return K.type == "none" ? (it(x), !1) : K.type == "partial" ? (K.expectLiteralNext && (y.expectLiteralNext = !0), !0) : K.type == "clear" ? (it(x), !0) : (y.expectLiteralNext = !1, y.inputState.keyBuffer.length = 0, le = /^(\d*)(.*)$/.exec(W), le && le[1] && le[1] != "0" && y.inputState.pushRepeatDigit(le[1]), K.command);
       }
       var V;
       return y.insertMode ? V = L() : V = N(), V === !1 ? !y.insertMode && m.length === 1 ? function() {
@@ -39029,8 +39029,8 @@ function Jqe(t) {
         var V = Re.handleKey(p, L, "mapping");
         if (!V && N && x.insertMode) {
           if (L[0] == "<") {
-            var W = L.toLowerCase().slice(1, -1), ae = W.split("-");
-            if (W = ae.pop() || "", W == "lt")
+            var W = L.toLowerCase().slice(1, -1), le = W.split("-");
+            if (W = le.pop() || "", W == "lt")
               L = "<";
             else if (W == "space")
               L = " ";
@@ -39349,7 +39349,7 @@ function Jqe(t) {
         }
         dr ? p.scrollIntoView(BS(p, !y, dr), 30) : (eO(p), p.scrollTo(L.left, L.top));
       }
-      function ae(fe, ve, Ge) {
+      function le(fe, ve, Ge) {
         var qe = gt(fe);
         qe == "<Esc>" || qe == "<C-c>" || qe == "<C-[>" || qe == "<BS>" && ve == "" ? (X.searchHistoryController.pushInput(ve), X.searchHistoryController.reset(), Zu(p, A), eO(p), p.scrollTo(L.left, L.top), t.e_stop(fe), it(p), Ge(), p.focus()) : qe == "<Up>" || qe == "<Down>" ? t.e_stop(fe) : qe == "<C-u>" && (t.e_stop(fe), Ge(""));
       }
@@ -39365,7 +39365,7 @@ function Jqe(t) {
               prefix: _,
               desc: "(JavaScript regexp)",
               onKeyUp: W,
-              onKeyDown: ae
+              onKeyDown: le
             });
           break;
         case "wordUnderCursor":
@@ -39403,7 +39403,7 @@ function Jqe(t) {
       });
     },
     evalInput: function(p, m) {
-      var v = m.inputState, y = v.motion, x = v.motionArgs || { repeat: 1 }, _ = v.operator, A = v.operatorArgs || {}, L = v.registerName, N = m.sel, V = U(m.visualMode ? ie(p, N.head) : p.getCursor("head")), W = U(m.visualMode ? ie(p, N.anchor) : p.getCursor("anchor")), ae = U(V), ce = U(W), ne, K, fe;
+      var v = m.inputState, y = v.motion, x = v.motionArgs || { repeat: 1 }, _ = v.operator, A = v.operatorArgs || {}, L = v.registerName, N = m.sel, V = U(m.visualMode ? ie(p, N.head) : p.getCursor("head")), W = U(m.visualMode ? ie(p, N.anchor) : p.getCursor("anchor")), le = U(V), ce = U(W), ne, K, fe;
       if (_ && this.recordLastEdit(m, v), v.repeatOverride !== void 0 ? fe = v.repeatOverride : fe = v.getRepeat(), fe > 0 && x.explicitRepeat ? x.repeatIsExplicit = !0 : (x.noRepeat || !x.explicitRepeat && fe === 0) && (fe = 1, x.repeatIsExplicit = !1), v.selectedCharacter && (x.selectedCharacter = A.selectedCharacter = v.selectedCharacter), x.repeat = fe, it(p), y) {
         var ve = nt[y](p, V, x, m, v);
         if (m.lastMotion = nt[y], !ve)
@@ -39412,7 +39412,7 @@ function Jqe(t) {
           var Ge = X.jumpList, qe = Ge.cachedCursor;
           qe ? (de(p, qe, ve), delete Ge.cachedCursor) : de(p, V, ve);
         }
-        ve instanceof Array ? (K = ve[0], ne = ve[1]) : ne = ve, ne || (ne = U(V)), m.visualMode ? (m.visualBlock && ne.ch === 1 / 0 || (ne = ie(p, ne, ae)), K && (K = ie(p, K)), K = K || ce, N.anchor = K, N.head = ne, Br(p), Ie(
+        ve instanceof Array ? (K = ve[0], ne = ve[1]) : ne = ve, ne || (ne = U(V)), m.visualMode ? (m.visualBlock && ne.ch === 1 / 0 || (ne = ie(p, ne, le)), K && (K = ie(p, K)), K = K || ce, N.anchor = K, N.head = ne, Br(p), Ie(
           p,
           m,
           "<",
@@ -39422,7 +39422,7 @@ function Jqe(t) {
           m,
           ">",
           se(K, ne) ? ne : K
-        )) : _ || (ne = ie(p, ne, ae), p.setCursor(ne.line, ne.ch));
+        )) : _ || (ne = ie(p, ne, le), p.setCursor(ne.line, ne.ch));
       }
       if (_) {
         if (A.lastSel) {
@@ -39455,7 +39455,7 @@ function Jqe(t) {
               Et == "line" && (Hn[0].head = new e(Hn[0].head.line + 1, 0));
           }
         } else {
-          if (Nn = U(K || ce), tr = U(ne || ae), se(tr, Nn)) {
+          if (Nn = U(K || ce), tr = U(ne || le), se(tr, Nn)) {
             var iO = Nn;
             Nn = tr, tr = iO;
           }
@@ -39517,9 +39517,9 @@ function Jqe(t) {
           var V = N[0], W = new e(N[1].line, N[1].ch - 1);
           if (y.visualMode) {
             (y.visualLine || y.visualBlock) && (y.visualLine = !1, y.visualBlock = !1, t.signal(p, "vim-mode-change", { mode: "visual", subMode: "" }));
-            var ae = y.sel.anchor;
-            if (ae)
-              return _.isReversed() ? v.forward ? [ae, V] : [ae, W] : v.forward ? [ae, W] : [ae, V];
+            var le = y.sel.anchor;
+            if (le)
+              return _.isReversed() ? v.forward ? [le, V] : [le, W] : v.forward ? [le, W] : [le, V];
           } else
             y.visualMode = !0, y.visualLine = !1, y.visualBlock = !1, t.signal(p, "vim-mode-change", { mode: "visual", subMode: "" });
           return L ? [W, V] : [V, W];
@@ -39547,8 +39547,8 @@ function Jqe(t) {
           if (!!C(L)) {
             var N = y.marks[L].find(), V = v.forward ? se(N, A) : se(A, N);
             if (!V && !(v.linewise && N.line == A.line)) {
-              var W = J(A, x), ae = v.forward ? yt(A, N, x) : yt(x, N, A);
-              (W || ae) && (x = N);
+              var W = J(A, x), le = v.forward ? yt(A, N, x) : yt(x, N, A);
+              (W || le) && (x = N);
             }
           }
       }
@@ -39571,8 +39571,8 @@ function Jqe(t) {
         default:
           y.lastHPos = _;
       }
-      var A = v.repeat + (v.repeatOffset || 0), L = v.forward ? x.line + A : x.line - A, N = p.firstLine(), V = p.lastLine(), W = p.findPosV(x, v.forward ? A : -A, "line", y.lastHSPos), ae = v.forward ? W.line > L : W.line < L;
-      return ae && (L = W.line, _ = W.ch), L < N && x.line == N ? this.moveToStartOfLine(p, m, v, y) : L > V && x.line == V ? z(p, m, v, y, !0) : (v.toFirstChar && (_ = Ct(p.getLine(L)), y.lastHPos = _), y.lastHSPos = p.charCoords(new e(L, _), "div").left, new e(L, _));
+      var A = v.repeat + (v.repeatOffset || 0), L = v.forward ? x.line + A : x.line - A, N = p.firstLine(), V = p.lastLine(), W = p.findPosV(x, v.forward ? A : -A, "line", y.lastHSPos), le = v.forward ? W.line > L : W.line < L;
+      return le && (L = W.line, _ = W.ch), L < N && x.line == N ? this.moveToStartOfLine(p, m, v, y) : L > V && x.line == V ? z(p, m, v, y, !0) : (v.toFirstChar && (_ = Ct(p.getLine(L)), y.lastHPos = _), y.lastHSPos = p.charCoords(new e(L, _), "div").left, new e(L, _));
     },
     moveByDisplayLines: function(p, m, v, y) {
       var x = m;
@@ -39723,7 +39723,7 @@ function Jqe(t) {
       } else if (_[A])
         V = !0, N = Bu(p, m, A, L);
       else if (A === "W" || A === "w")
-        for (var ae = v.repeat || 1; ae-- > 0; ) {
+        for (var le = v.repeat || 1; le-- > 0; ) {
           var ce = Xe(p, {
             inclusive: L,
             innerWord: !L,
@@ -39844,8 +39844,8 @@ function Jqe(t) {
         else if (L === !1)
           W = V.toUpperCase();
         else
-          for (var ae = 0; ae < V.length; ae++) {
-            var ce = V.charAt(ae);
+          for (var le = 0; le < V.length; le++) {
+            var ce = V.charAt(le);
             W += B(ce) ? ce.toLowerCase() : ce.toUpperCase();
           }
         A.push(W);
@@ -39998,8 +39998,8 @@ function Jqe(t) {
         L = Ye(p, y.line);
         var V = "", W = 0;
         if (!m.keepSpaces) {
-          var ae = p.getLine(y.line + 1);
-          W = ae.search(/\S/), W == -1 ? W = ae.length : V = " ";
+          var le = p.getLine(y.line + 1);
+          W = le.search(/\S/), W == -1 ? W = le.length : V = " ";
         }
         p.replaceRange(
           V,
@@ -40043,7 +40043,7 @@ function Jqe(t) {
           var A = p.getOption("tabSize"), L = function(nr) {
             var Hn = nr.split("	").length - 1, as = nr.split(" ").length - 1;
             return Hn * A + as * 1;
-          }, N = p.getLine(p.getCursor().line), V = L(N.match(/^\s*/)[0]), W = y.replace(/\n$/, ""), ae = y !== W, ce = L(y.match(/^\s*/)[0]), y = W.replace(/^\s*/gm, function(nr) {
+          }, N = p.getLine(p.getCursor().line), V = L(N.match(/^\s*/)[0]), W = y.replace(/\n$/, ""), le = y !== W, ce = L(y.match(/^\s*/)[0]), y = W.replace(/^\s*/gm, function(nr) {
             var Hn = V + (L(nr) - ce);
             if (Hn < 0)
               return "";
@@ -40053,7 +40053,7 @@ function Jqe(t) {
             } else
               return Array(Hn + 1).join(" ");
           });
-          y += ae ? `
+          y += le ? `
 ` : "";
         }
         if (m.repeat > 1)
@@ -40132,9 +40132,9 @@ function Jqe(t) {
       else {
         var W = p.getRange(x, A);
         if (W = W.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, y), W = W.replace(/[^\n]/g, y), v.visualBlock) {
-          var ae = new Array(p.getOption("tabSize") + 1).join(" ");
+          var le = new Array(p.getOption("tabSize") + 1).join(" ");
           W = p.getSelection(), W = W.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, y);
-          var ce = W.replace(/\t/g, ae).replace(/[^\n]/g, y).split(`
+          var ce = W.replace(/\t/g, le).replace(/[^\n]/g, y).split(`
 `);
           p.replaceSelections(ce);
         } else
@@ -40147,7 +40147,7 @@ function Jqe(t) {
         ;
       if (!(!m.backtrack && L <= v.ch)) {
         if (_) {
-          var V = _[2] || _[4], W = _[3] || _[5], ae = m.increase ? 1 : -1, ce = { "0b": 2, 0: 8, "": 10, "0x": 16 }[V.toLowerCase()], ne = parseInt(_[1] + W, ce) + ae * m.repeat;
+          var V = _[2] || _[4], W = _[3] || _[5], le = m.increase ? 1 : -1, ce = { "0b": 2, 0: 8, "": 10, "0x": 16 }[V.toLowerCase()], ne = parseInt(_[1] + W, ce) + le * m.repeat;
           N = ne.toString(ce);
           var K = V ? new Array(W.length - N.length + 1 + _[1].length).join("0") : "";
           N.charAt(0) === "-" ? N = "-" + V + K + N.substr(1) : N = V + K + N;
@@ -40269,13 +40269,13 @@ function Jqe(t) {
     p.setCursor(new e(m, y)), p.replaceRange(x, p.getCursor());
   }
   function mi(p, m) {
-    var v = [], y = p.listSelections(), x = U(p.clipPos(m)), _ = !J(m, x), A = p.getCursor("head"), L = Sr(y, A), N = J(y[L].head, y[L].anchor), V = y.length - 1, W = V - L > L ? V : 0, ae = y[W].anchor, ce = Math.min(ae.line, x.line), ne = Math.max(ae.line, x.line), K = ae.ch, fe = x.ch, ve = y[W].head.ch - K, Ge = fe - K;
+    var v = [], y = p.listSelections(), x = U(p.clipPos(m)), _ = !J(m, x), A = p.getCursor("head"), L = Sr(y, A), N = J(y[L].head, y[L].anchor), V = y.length - 1, W = V - L > L ? V : 0, le = y[W].anchor, ce = Math.min(le.line, x.line), ne = Math.max(le.line, x.line), K = le.ch, fe = x.ch, ve = y[W].head.ch - K, Ge = fe - K;
     ve > 0 && Ge <= 0 ? (K++, _ || fe--) : ve < 0 && Ge >= 0 ? (K--, N || fe++) : ve < 0 && Ge == -1 && (K--, fe++);
     for (var qe = ce; qe <= ne; qe++) {
       var et = { anchor: new e(qe, K), head: new e(qe, fe) };
       v.push(et);
     }
-    return p.setSelections(v), m.ch = fe, ae.ch = K, ae;
+    return p.setSelections(v), m.ch = fe, le.ch = K, le;
   }
   function rn(p, m, v) {
     for (var y = [], x = 0; x < v; x++) {
@@ -40301,8 +40301,8 @@ function Jqe(t) {
       if (L) {
         var N = L.width, V = L.height;
         A = new e(_.line + V, _.ch + N);
-        for (var W = [], ae = _.line; ae < A.line; ae++) {
-          var ce = new e(ae, _.ch), ne = new e(ae, A.ch), K = { anchor: ce, head: ne };
+        for (var W = [], le = _.line; le < A.line; le++) {
+          var ce = new e(le, _.ch), ne = new e(le, A.ch), K = { anchor: ce, head: ne };
           W.push(K);
         }
         p.setSelections(W);
@@ -40357,9 +40357,9 @@ function Jqe(t) {
         primary: 0
       };
     } else if (v == "block") {
-      var V = Math.min(_.line, x.line), W = _.ch, ae = Math.max(_.line, x.line), ce = x.ch;
+      var V = Math.min(_.line, x.line), W = _.ch, le = Math.max(_.line, x.line), ce = x.ch;
       W < ce ? ce += 1 : W += 1;
-      for (var ne = ae - V + 1, K = x.line == V ? 0 : ne - 1, fe = [], ve = 0; ve < ne; ve++)
+      for (var ne = le - V + 1, K = x.line == V ? 0 : ne - 1, fe = [], ve = 0; ve < ne; ve++)
         fe.push({
           anchor: new e(V + ve, W),
           head: new e(V + ve, ce)
@@ -40400,7 +40400,7 @@ function Jqe(t) {
     return m == -1 ? p.length : m;
   }
   function Xe(p, { inclusive: m, innerWord: v, bigWord: y, noSymbol: x, multiline: _ }, A) {
-    var L = A || Oi(p), N = p.getLine(L.line), V = N, W = L.line, ae = W, ce = L.ch, ne, K = x ? h[0] : f[0];
+    var L = A || Oi(p), N = p.getLine(L.line), V = N, W = L.line, le = W, ce = L.ch, ne, K = x ? h[0] : f[0];
     if (v && /\s/.test(N.charAt(ce)))
       K = function(Ft) {
         return /\s/.test(Ft);
@@ -40418,7 +40418,7 @@ function Jqe(t) {
     for (var fe = ce, ve = ce; K(N.charAt(ve)) && ve >= 0; )
       ve--;
     if (ve++, ne)
-      fe = ne.to, ae = ne.line, V = p.getLine(ae), !V && fe == 0 && fe++;
+      fe = ne.to, le = ne.line, V = p.getLine(le), !V && fe == 0 && fe++;
     else
       for (; K(N.charAt(fe)) && fe < N.length; )
         fe++;
@@ -40433,7 +40433,7 @@ function Jqe(t) {
         !ve && !qe && (ve = et);
       }
     }
-    return { start: new e(W, ve), end: new e(ae, fe) };
+    return { start: new e(W, ve), end: new e(le, fe) };
   }
   function F(p, m, v) {
     var y = m;
@@ -40527,10 +40527,10 @@ function Jqe(t) {
       forward: v,
       depth: 0,
       curMoveThrough: !1
-    }, ae = De[y];
-    if (!ae)
+    }, le = De[y];
+    if (!le)
       return x;
-    var ce = Lt[ae].init, ne = Lt[ae].isComplete;
+    var ce = Lt[le].init, ne = Lt[le].isComplete;
     for (ce && ce(W); N !== A && m; ) {
       if (W.index += _, W.nextCh = W.lineText.charAt(W.index), !W.nextCh) {
         if (N += _, W.lineText = p.getLine(N) || "", _ > 0)
@@ -40555,16 +40555,16 @@ function Jqe(t) {
     for (; ; ) {
       if (x && L == "")
         return { from: 0, to: 0, line: _ };
-      for (var W = N > 0 ? L.length : -1, ae = W, ce = W; A != W; ) {
+      for (var W = N > 0 ? L.length : -1, le = W, ce = W; A != W; ) {
         for (var ne = !1, K = 0; K < V.length && !ne; ++K)
           if (V[K](L.charAt(A))) {
-            for (ae = A; A != W && V[K](L.charAt(A)); )
+            for (le = A; A != W && V[K](L.charAt(A)); )
               A += N;
-            if (ce = A, ne = ae != ce, ae == m.ch && _ == m.line && ce == ae + N)
+            if (ce = A, ne = le != ce, le == m.ch && _ == m.line && ce == le + N)
               continue;
             return {
-              from: Math.min(ae, ce + 1),
-              to: Math.max(ae, ce),
+              from: Math.min(le, ce + 1),
+              to: Math.max(le, ce),
               line: _
             };
           }
@@ -40581,8 +40581,8 @@ function Jqe(t) {
     for (var N = !(y && x), V = 0; V < v; V++) {
       var W = Qt(p, m, y, _, N);
       if (!W) {
-        var ae = Ye(p, p.lastLine());
-        L.push(y ? { line: p.lastLine(), from: ae, to: ae } : { line: 0, from: 0, to: 0 });
+        var le = Ye(p, p.lastLine());
+        L.push(y ? { line: p.lastLine(), from: le, to: le } : { line: 0, from: 0, to: 0 });
         break;
       }
       L.push(W), m = new e(W.line, y ? W.to - 1 : W.from);
@@ -40619,11 +40619,11 @@ function Jqe(t) {
   }
   function ht(p, m, v, y, x) {
     var _ = m.line, A = p.firstLine(), L = p.lastLine(), N, V, W = _;
-    function ae(ve) {
+    function le(ve) {
       return !p.getLine(ve);
     }
     function ce(ve, Ge, qe) {
-      return qe ? ae(ve) != ae(ve + Ge) : !ae(ve) && ae(ve + Ge);
+      return qe ? le(ve) != le(ve + Ge) : !le(ve) && le(ve + Ge);
     }
     if (y) {
       for (; A <= W && W <= L && v > 0; )
@@ -40635,10 +40635,10 @@ function Jqe(t) {
       var K = ne.sel.anchor;
       ce(K.line, -1, !0) && (!x || K.line != _) && (_ += 1);
     }
-    var fe = ae(_);
+    var fe = le(_);
     for (W = _; W <= L && v; W++)
-      ce(W, 1, !0) && (!x || ae(W) != fe) && v--;
-    for (V = new e(W, 0), W > L && !fe ? fe = !0 : x = !1, W = _; W > A && !((!x || ae(W) == fe || W == _) && ce(W, -1, !0)); W--)
+      ce(W, 1, !0) && (!x || le(W) != fe) && v--;
+    for (V = new e(W, 0), W > L && !fe ? fe = !0 : x = !1, W = _; W > A && !((!x || le(W) == fe || W == _) && ce(W, -1, !0)); W--)
       ;
     return N = new e(W, 0), { start: N, end: V };
   }
@@ -40646,11 +40646,11 @@ function Jqe(t) {
     function _(V) {
       V.pos + V.dir < 0 || V.pos + V.dir >= V.line.length ? V.line = null : V.pos += V.dir;
     }
-    function A(V, W, ae, ce) {
+    function A(V, W, le, ce) {
       var ne = V.getLine(W), K = {
         line: ne,
         ln: W,
-        pos: ae,
+        pos: le,
         dir: ce
       };
       if (K.line === "")
@@ -40668,11 +40668,11 @@ function Jqe(t) {
       }
       return { ln: K.ln, pos: fe + 1 };
     }
-    function L(V, W, ae, ce) {
+    function L(V, W, le, ce) {
       var ne = V.getLine(W), K = {
         line: ne,
         ln: W,
-        pos: ae,
+        pos: le,
         dir: ce
       };
       if (K.line === "")
@@ -40705,12 +40705,12 @@ function Jqe(t) {
       } else
         V.pos += V.dir;
     }
-    function _(N, V, W, ae) {
+    function _(N, V, W, le) {
       var ve = N.getLine(V), ce = ve === "", ne = {
         line: ve,
         ln: V,
         pos: W,
-        dir: ae
+        dir: le
       }, K = {
         ln: ne.ln,
         pos: ne.pos
@@ -40731,12 +40731,12 @@ function Jqe(t) {
         }
       return K;
     }
-    function A(N, V, W, ae) {
+    function A(N, V, W, le) {
       var fe = N.getLine(V), ce = {
         line: fe,
         ln: V,
         pos: W,
-        dir: ae
+        dir: le
       }, ne = {
         ln: ce.ln,
         pos: null
@@ -40786,18 +40786,18 @@ function Jqe(t) {
     }[v], L = p.getLine(x.line).charAt(x.ch), N = L === A ? 1 : 0, V = p.scanForBracket(new e(x.line, x.ch + N), -1, void 0, { bracketRegex: _ }), W = p.scanForBracket(new e(x.line, x.ch + N), 1, void 0, { bracketRegex: _ });
     if (!V || !W)
       return null;
-    var ae = V.pos, ce = W.pos;
-    if (ae.line == ce.line && ae.ch > ce.ch || ae.line > ce.line) {
-      var ne = ae;
-      ae = ce, ce = ne;
+    var le = V.pos, ce = W.pos;
+    if (le.line == ce.line && le.ch > ce.ch || le.line > ce.line) {
+      var ne = le;
+      le = ce, ce = ne;
     }
-    return y ? ce.ch += 1 : ae.ch += 1, { start: ae, end: ce };
+    return y ? ce.ch += 1 : le.ch += 1, { start: le, end: ce };
   }
   function Bu(p, m, v, y) {
-    var x = U(m), _ = p.getLine(x.line), A = _.split(""), L, N, V, W, ae = A.indexOf(v);
-    if (x.ch < ae)
-      x.ch = ae;
-    else if (ae < x.ch && A[x.ch] == v) {
+    var x = U(m), _ = p.getLine(x.line), A = _.split(""), L, N, V, W, le = A.indexOf(v);
+    if (x.ch < le)
+      x.ch = le;
+    else if (le < x.ch && A[x.ch] == v) {
       var ce = /string/.test(p.getTokenTypeAt(ye(m, 0, 1))), ne = /string/.test(p.getTokenTypeAt(m)), K = ce && !ne;
       K || (N = x.ch, --x.ch);
     }
@@ -41100,8 +41100,8 @@ function Jqe(t) {
       N.input = v;
       try {
         this.parseInput_(m, L, N);
-      } catch (ae) {
-        throw jt(m, ae + ""), ae;
+      } catch (le) {
+        throw jt(m, le + ""), le;
       }
       x.visualMode && zt(m);
       var V, W;
@@ -41122,8 +41122,8 @@ function Jqe(t) {
       }
       try {
         ZS[W](m, N), (!V || !V.possiblyAsync) && N.callback && N.callback();
-      } catch (ae) {
-        throw jt(m, ae + ""), ae;
+      } catch (le) {
+        throw jt(m, le + ""), le;
       }
     }
     parseInput_(m, v, y) {
@@ -41316,8 +41316,8 @@ function Jqe(t) {
         var W = H(_, p, y);
         W instanceof Error ? jt(p, W.message) : W === !0 || W === !1 ? jt(p, " " + (W ? "" : "no") + _) : jt(p, "  " + _ + "=" + W);
       } else {
-        var ae = oe(_, A, p, y);
-        ae instanceof Error && jt(p, ae.message);
+        var le = oe(_, A, p, y);
+        le instanceof Error && jt(p, le.message);
       }
     },
     setlocal: function(p, m) {
@@ -41377,7 +41377,7 @@ function Jqe(t) {
       var V = m.line || p.firstLine(), W = m.lineEnd || m.line || p.lastLine();
       if (V == W)
         return;
-      var ae = new e(V, 0), ce = new e(W, Ye(p, W)), ne = p.getRange(ae, ce).split(`
+      var le = new e(V, 0), ce = new e(W, Ye(p, W)), ne = p.getRange(le, ce).split(`
 `), K = _ == "decimal" ? /(-?)([\d]+)/ : _ == "hex" ? /(-?)(?:0x)?([0-9a-f]+)/i : _ == "octal" ? /([0-7]+)/ : null, fe = _ == "decimal" ? 10 : _ == "hex" ? 16 : _ == "octal" ? 8 : void 0, ve = [], Ge = [];
       if (_ || A)
         for (var qe = 0; qe < ne.length; qe++) {
@@ -41417,7 +41417,7 @@ function Jqe(t) {
           Nn[qe] != tr && ne.push(Nn[qe]), tr = Nn[qe];
       }
       p.replaceRange(ne.join(`
-`), ae, ce);
+`), le, ce);
     },
     vglobal: function(p, m) {
       this.global(p, m);
@@ -41456,9 +41456,9 @@ function Jqe(t) {
           jt(p, "Invalid regex: " + L);
           return;
         }
-      for (var V = qr(p).getQuery(), W = [], ae = x; ae <= _; ae++) {
-        var ce = p.getLine(ae), ne = V.test(ce);
-        ne !== y && W.push(N ? p.getLineHandle(ae) : ce);
+      for (var V = qr(p).getQuery(), W = [], le = x; le <= _; le++) {
+        var ce = p.getLine(le), ne = V.test(ce);
+        ne !== y && W.push(N ? p.getLineHandle(le) : ce);
       }
       if (!N) {
         jt(p, W.join(`
@@ -41507,7 +41507,7 @@ function Jqe(t) {
         jt(p, "No previous substitute regular expression");
         return;
       }
-      var ae = qr(p), ce = ae.getQuery(), ne = m.line !== void 0 ? m.line : p.getCursor().line, K = m.lineEnd || ne;
+      var le = qr(p), ce = le.getQuery(), ne = m.line !== void 0 ? m.line : p.getCursor().line, K = m.lineEnd || ne;
       ne == p.firstLine() && K == p.lastLine() && (K = 1 / 0), N && (ne = K, K = ne + N - 1);
       var fe = ie(p, new e(ne, 0)), ve = p.getSearchCursor(ce, fe);
       r4(p, V, W, ne, K, ve, ce, _, m.callback);
@@ -41572,8 +41572,8 @@ function Jqe(t) {
               return;
             }
             for (var W = 0; W <= V - N; W++) {
-              var ae = String.fromCharCode(N + W);
-              delete v.marks[ae];
+              var le = String.fromCharCode(N + W);
+              delete v.marks[le];
             }
           } else {
             jt(p, "Invalid argument: " + A + "-");
@@ -41586,7 +41586,7 @@ function Jqe(t) {
   }, Vi = new n4();
   function r4(p, m, v, y, x, _, A, L, N) {
     p.state.vim.exMode = !0;
-    var V = !1, W, ae, ce;
+    var V = !1, W, le, ce;
     function ne() {
       p.operation(function() {
         for (; !V; )
@@ -41596,7 +41596,7 @@ function Jqe(t) {
     }
     function K() {
       var et = p.getRange(_.from(), _.to()), Ft = et.replace(A, L), dr = _.to().line;
-      _.replace(Ft), ae = _.to().line, x += ae - dr, ce = ae < dr;
+      _.replace(Ft), le = _.to().line, x += le - dr, ce = le < dr;
     }
     function fe() {
       var et = W && U(_.to()), Ft = _.findNext();
@@ -41604,7 +41604,7 @@ function Jqe(t) {
     }
     function ve() {
       for (; fe() && t4(_.from(), y, x); )
-        if (!(!v && _.from().line == ae && !ce)) {
+        if (!(!v && _.from().line == le && !ce)) {
           p.scrollIntoView(_.from(), 30), p.setSelection(_.from(), _.to()), W = _.from(), V = !1;
           return;
         }
@@ -41685,7 +41685,7 @@ function Jqe(t) {
     var _ = x.keyBuffer, A = 0;
     v.isPlaying = !0, v.replaySearchQueries = x.searchQueries.slice(0);
     for (var L = 0; L < _.length; L++)
-      for (var N = _[L], V, W, ae = /<(?:[CSMA]-)*\w+>|./gi; V = ae.exec(N); )
+      for (var N = _[L], V, W, le = /<(?:[CSMA]-)*\w+>|./gi; V = le.exec(N); )
         if (W = V[0], Re.handleKey(p, W, "macro"), m.insertMode) {
           var ce = x.insertModeChanges[A++].changes;
           X.macroModeState.lastInsertModeChanges.changes = ce, HS(p, ce, 1), Do(p);
@@ -41778,8 +41778,8 @@ function Jqe(t) {
     function N(W) {
       if (x.lastInsertModeChanges.changes.length > 0) {
         W = m.lastEditActionCommand ? W : 1;
-        var ae = x.lastInsertModeChanges;
-        HS(p, ae.changes, W);
+        var le = x.lastInsertModeChanges;
+        HS(p, le.changes, W);
       }
     }
     if (m.inputState = m.lastEditInputState, _ && _.interlaceInsertRepeat)
@@ -41834,14 +41834,14 @@ function Jqe(t) {
     else {
       var N = rO(_), V = _.inputState.changeQueueList || [];
       y.operation(function() {
-        var ae;
+        var le;
         y.curOp && (y.curOp.isVimOp = !0);
         var W = 0;
         y.forEachSelection(function() {
           y.state.vim.inputState.changeQueue = V[W];
           var ce = y.getCursor("head"), ne = y.getCursor("anchor"), K = se(ce, ne) ? 0 : -1, fe = se(ce, ne) ? -1 : 0;
           ce = ye(ce, 0, K), ne = ye(ne, 0, fe), y.state.vim.sel.head = ce, y.state.vim.sel.anchor = ne, x = Re.handleKey(y, m, v), y.virtualSelection && (V[W] = y.state.vim.inputState.changeQueue, y.state.vim = rO(N)), W++;
-        }), ((ae = y.curOp) == null ? void 0 : ae.cursorActivity) && !x && (y.curOp.cursorActivity = !1), y.state.vim = _, _.inputState.changeQueueList = V, _.inputState.changeQueue = null;
+        }), ((le = y.curOp) == null ? void 0 : le.cursorActivity) && !x && (y.curOp.cursorActivity = !1), y.state.vim = _, _.inputState.changeQueueList = V, _.inputState.changeQueue = null;
       }, !0);
     }
     return x && !_.visualMode && !_.insert && _.visualMode != y.somethingSelected() && XS(y, _), x;
@@ -43588,10 +43588,10 @@ const GN = ({
   const Oe = (ke) => {
     var xe, Me;
     (Me = (xe = ke.target).closest) != null && Me.call(xe, "button, input, a") || X && c || h == null || h();
-  }, le = () => {
+  }, ae = () => {
     oe(""), ue(!1), f == null || f();
   }, Re = () => {
-    le(), b == null || b();
+    ae(), b == null || b();
   }, be = (ke) => {
     ke.preventDefault();
     const xe = he.trim();
@@ -43605,7 +43605,7 @@ const GN = ({
       },
       createdAt: Date.now()
     };
-    S == null || S(Me), le();
+    S == null || S(Me), ae();
   };
   return /* @__PURE__ */ M("span", { ref: j, className: `cm-review-card cm-${e}-card ${c || X ? "cm-review-card-selected" : ""} ${B}`.trim(), "data-review-id": t, "data-review-kind": e, ...D, onPointerDown: Oe, children: [
     /* @__PURE__ */ M(eB, { author: n, createdAt: r, kind: e, actions: s, avatarCrossorigin: l, legacy: i }),
@@ -48642,7 +48642,7 @@ var VB = {};
   })(oe || (oe = {}));
   function H(Z, j, te, q) {
     const X = te !== void 0 ? te : t.NullLogger;
-    let Oe = 0, le = 0, Re = 0;
+    let Oe = 0, ae = 0, Re = 0;
     const be = "2.0";
     let ke;
     const xe = /* @__PURE__ */ new Map();
@@ -48659,7 +48659,7 @@ var VB = {};
       return F === null ? "res-unknown-" + (++Re).toString() : "res-" + F.toString();
     }
     function dn() {
-      return "not-" + (++le).toString();
+      return "not-" + (++ae).toString();
     }
     function wt(F, de) {
       r.Message.isRequest(de) ? F.set(En(de.id), de) : r.Message.isResponse(de) ? F.set(nn(de.id), de) : F.set(dn(), de);
@@ -51511,14 +51511,14 @@ var sR;
     }
     Q.hasId = sn;
   })(Oe || (t.StaticRegistrationOptions = Oe = {}));
-  var le;
+  var ae;
   (function(Q) {
     function sn(Ct) {
       const Xe = Ct;
       return Xe && (Xe.documentSelector === null || H.is(Xe.documentSelector));
     }
     Q.is = sn;
-  })(le || (t.TextDocumentRegistrationOptions = le = {}));
+  })(ae || (t.TextDocumentRegistrationOptions = ae = {}));
   var Re;
   (function(Q) {
     function sn(Xe) {
@@ -53950,8 +53950,8 @@ ${e.doc.toString()}`, uq = (t, e) => {
   }) => Z < j) : []), f), g = (H, Z) => d(H).some((j) => Z.from >= j.from && Z.to <= j.to), O = (H, Z) => {
     var j;
     return ((j = n.peek()) == null ? void 0 : j.hasFocus) && H.selection.ranges.some((te) => {
-      const q = H.doc.lineAt(te.from).number, X = H.doc.lineAt(te.to).number, Oe = H.doc.lineAt(Z.from).number, le = H.doc.lineAt(Z.to).number;
-      return q >= Oe && q <= le || X >= Oe && X <= le || Oe >= q && le <= X;
+      const q = H.doc.lineAt(te.from).number, X = H.doc.lineAt(te.to).number, Oe = H.doc.lineAt(Z.from).number, ae = H.doc.lineAt(Z.to).number;
+      return q >= Oe && q <= ae || X >= Oe && X <= ae || Oe >= q && ae <= X;
     });
   }, b = (...H) => O(...H) || g(...H), S = ["Table", "Blockquote", "FencedCode", "Image", "Checkbox", "HTMLBlock", "HorizontalRule"], C = (H) => (Z) => {
     const j = (q) => {
@@ -53963,10 +53963,10 @@ ${e.doc.toString()}`, uq = (t, e) => {
       return (H ? X.head > q.head : X.head < q.head) && Tt(Z.state).iterate({
         from: Math.min(q.head, X.head),
         to: Math.max(q.head, X.head),
-        enter(le) {
-          if (!S.includes(le.name) || b(Z.state, le) || !(H ? q.head <= le.from && X.head >= le.to : q.head >= le.to && X.head <= le.from))
+        enter(ae) {
+          if (!S.includes(ae.name) || b(Z.state, ae) || !(H ? q.head <= ae.from && X.head >= ae.to : q.head >= ae.to && X.head <= ae.from))
             return;
-          const be = H ? le.from : le.to;
+          const be = H ? ae.from : ae.to;
           (Oe == null || (H ? be < Oe : be > Oe)) && (Oe = be);
         }
       }), Oe == null ? X : ee.cursor(Oe, H ? 1 : -1, void 0, X.goalColumn);
@@ -53983,8 +53983,8 @@ ${e.doc.toString()}`, uq = (t, e) => {
     return j;
   };
   class E extends Xn {
-    constructor(Z, j, te, q, X, Oe, le = []) {
-      super(), this.src = Z, this.isBlock = j, this.start = te, this.end = q, this.md = t.md.peek(), this.sourceOffset = X, this.reviewItems = Oe, this.reviewKey = Vx(Oe), this.cssClasses = le;
+    constructor(Z, j, te, q, X, Oe, ae = []) {
+      super(), this.src = Z, this.isBlock = j, this.start = te, this.end = q, this.md = t.md.peek(), this.sourceOffset = X, this.reviewItems = Oe, this.reviewKey = Vx(Oe), this.cssClasses = ae;
     }
     eq(Z) {
       return this.src === Z.src && this.reviewKey === Z.reviewKey && this.md === Z.md;
@@ -54018,10 +54018,10 @@ ${e.doc.toString()}`, uq = (t, e) => {
           return;
         if (b(H, j))
           return !1;
-        const q = H.doc.lineAt(j.from), X = H.doc.lineAt(j.to), Oe = te && X.number > q.number, le = j.from - q.from;
+        const q = H.doc.lineAt(j.from), X = H.doc.lineAt(j.to), Oe = te && X.number > q.number, ae = j.from - q.from;
         let Re = H.doc.sliceString(j.from, j.to);
-        Oe && le > 0 && (Re = Re.split(`
-`).map((ut, gt) => gt == 0 ? ut : ut.slice(le)).join(`
+        Oe && ae > 0 && (Re = Re.split(`
+`).map((ut, gt) => gt == 0 ? ut : ut.slice(ae)).join(`
 `));
         const be = j.node.parent.toTree(), ke = (_t = DD(be)) == null ? void 0 : _t.tags, xe = be.type.name.startsWith("ATXHeading") && ke ? zD(H, ke) : null, Me = e.collaboration.peek().commentsEnabled ? [...OB(H).values()].filter(({
           anchors: ut
@@ -54066,48 +54066,48 @@ ${e.doc.toString()}`, uq = (t, e) => {
         Tt(H.state).iterate({
           from: X,
           to: Oe,
-          enter(le) {
-            if (le.name.startsWith("ATXHeading") && b(H.state, le))
+          enter(ae) {
+            if (ae.name.startsWith("ATXHeading") && b(H.state, ae))
               return !1;
-            if (le.name.startsWith("ATXHeading") && e.collapsibleHeadingMarker.value) {
-              const be = H.state.doc.lineAt(le.from);
+            if (ae.name.startsWith("ATXHeading") && e.collapsibleHeadingMarker.value) {
+              const be = H.state.doc.lineAt(ae.from);
               bd.test(be.text) && Z.push(c.range(be.from + be.text.lastIndexOf("(^)"), be.to));
             }
-            if ((le.name.startsWith("SetextHeading") || l.includes(le.name)) && b(H.state, le) || le.name == "Frontmatter") {
-              const be = H.state.doc.lineAt(le.from), ke = H.state.doc.lineAt(le.to);
-              return Z.push(u.range(be.from, ke.to)), !1;
+            if ((ae.name.startsWith("SetextHeading") || l.includes(ae.name)) && b(H.state, ae) || ae.name == "Frontmatter") {
+              const be = ae.name == "Frontmatter" || O(H.state, ae), ke = be ? H.state.doc.lineAt(ae.from).from : ae.from, xe = be ? H.state.doc.lineAt(ae.to).to : ae.to;
+              return Z.push(u.range(ke, xe)), !1;
             }
-            if (le.name === "ListMark" && le.matchContext(["BulletList", "ListItem"]) && !b(H.state, le) && Z.push(we.mark({
+            if (ae.name === "ListMark" && ae.matchContext(["BulletList", "ListItem"]) && !b(H.state, ae) && Z.push(we.mark({
               class: "cm-inline-bullet"
-            }).range(le.from, le.to)), le.name === "ListMark" && le.matchContext(["OrderedList", "ListItem"]) && !b(H.state, le)) {
-              const be = le.node.parent.parent.getChildren("ListItem").flatMap((Me) => Me.getChildren("ListMark")), ke = parseInt(H.state.doc.sliceString(be[0].from, be[0].to)), xe = be.findIndex((Me) => Me.from == le.from) + ke;
+            }).range(ae.from, ae.to)), ae.name === "ListMark" && ae.matchContext(["OrderedList", "ListItem"]) && !b(H.state, ae)) {
+              const be = ae.node.parent.parent.getChildren("ListItem").flatMap((Me) => Me.getChildren("ListMark")), ke = parseInt(H.state.doc.sliceString(be[0].from, be[0].to)), xe = be.findIndex((Me) => Me.from == ae.from) + ke;
               Z.push(we.mark({
                 class: "cm-inline-ordered-list-marker",
                 attributes: {
                   "data-item-num": `${xe}.`
                 }
-              }).range(le.from, le.to));
+              }).range(ae.from, ae.to));
             }
-            if (le.name === "HeaderMark") {
-              const be = le.node.parent.type.name, ke = be.startsWith("ATX") ? le.to + 1 : le.to, xe = H.state.doc.lineAt(le.from), Me = xe.text.slice(le.to - xe.from).trim();
-              be.startsWith("ATX") && Me.length == 0 ? console.warn(`Empty heading in inline mode, not rendering(line ${xe.number}): "${xe.text}"`) : Z.push(c.range(le.from, ke));
+            if (ae.name === "HeaderMark") {
+              const be = ae.node.parent.type.name, ke = be.startsWith("ATX") ? ae.to + 1 : ae.to, xe = H.state.doc.lineAt(ae.from), Me = xe.text.slice(ae.to - xe.from).trim();
+              be.startsWith("ATX") && Me.length == 0 ? console.warn(`Empty heading in inline mode, not rendering(line ${xe.number}): "${xe.text}"`) : Z.push(c.range(ae.from, ke));
             }
-            (le.name == "EmphasisMark" || le.name == "StrikethroughMark") && !b(H.state, le) && Z.push(c.range(le.from, le.to)), le.name == "HardBreak" && !b(H.state, le) && Z.push(c.range(le.from, le.from + 1));
+            (ae.name == "EmphasisMark" || ae.name == "StrikethroughMark") && !b(H.state, ae) && Z.push(c.range(ae.from, ae.to)), ae.name == "HardBreak" && !b(H.state, ae) && Z.push(c.range(ae.from, ae.from + 1));
           }
         });
       (te = n.peek()) != null && te.hasFocus && (H.state.selection.ranges.forEach((X) => {
-        const Oe = H.state.doc.lineAt(X.from), le = H.state.doc.lineAt(X.to);
-        Oe.from != le.to && Z.push(u.range(Oe.from, le.to));
+        const Oe = H.state.doc.lineAt(X.from), ae = H.state.doc.lineAt(X.to);
+        Oe.from != ae.to && Z.push(u.range(Oe.from, ae.to));
       }), d(H.state).filter((X) => O(H.state, X)).forEach((X) => Z.push(u.range(X.from, X.to))));
       const j = (q = n.peek()) != null && q.hasFocus ? new Set(H.state.selection.ranges.flatMap((X) => {
-        const Oe = H.state.doc.lineAt(X.from).number, le = H.state.doc.lineAt(X.to).number;
+        const Oe = H.state.doc.lineAt(X.from).number, ae = H.state.doc.lineAt(X.to).number;
         return Array.from({
-          length: le - Oe + 1
+          length: ae - Oe + 1
         }, (Re, be) => be + Oe);
       })) : /* @__PURE__ */ new Set();
       for (const X of H.visibleRanges) {
-        const Oe = H.state.doc.lineAt(X.from).number, le = H.state.doc.lineAt(X.to).number;
-        for (let Re = Oe; Re <= le; Re++) {
+        const Oe = H.state.doc.lineAt(X.from).number, ae = H.state.doc.lineAt(X.to).number;
+        for (let Re = Oe; Re <= ae; Re++) {
           if (j.has(Re))
             continue;
           const be = H.state.doc.line(Re), ke = be.text.length - be.text.trimStart().length;
@@ -54139,12 +54139,12 @@ ${e.doc.toString()}`, uq = (t, e) => {
       mousedown(H, Z) {
         if (!(!(H.target instanceof Element) || !H.target.matches(".cm-inline-rendered-md *")))
           if (H.preventDefault(), H.target.tagName == "INPUT") {
-            const j = Z.state.doc.lineAt(Z.posAtDOM(H.target)), te = j.text.indexOf("[") + 1, q = j.from + te, X = q + 1, le = j.text.slice(te, te + 1) == " " ? "x" : " ";
+            const j = Z.state.doc.lineAt(Z.posAtDOM(H.target)), te = j.text.indexOf("[") + 1, q = j.from + te, X = q + 1, ae = j.text.slice(te, te + 1) == " " ? "x" : " ";
             Z.dispatch({
               changes: {
                 from: q,
                 to: X,
-                insert: le
+                insert: ae
               }
             });
           } else {
@@ -59050,7 +59050,7 @@ const nUe = We(Nq)`
     options: te,
     text: q,
     headings: X
-  } = Z, Oe = Dt(null), le = or(() => {
+  } = Z, Oe = Dt(null), ae = or(() => {
     var me;
     const G = d ? [{
       file: d,
@@ -59072,7 +59072,7 @@ const nUe = We(Nq)`
       }
     }
     return G.filter((ye) => C.value.some((T) => T == ye.file));
-  }), Re = or(() => C.value.filter((G) => !le.value.some((ie) => ie.file === G))), be = or(() => C.value.filter((G) => he.value.some(({
+  }), Re = or(() => C.value.filter((G) => !ae.value.some((ie) => ie.file === G))), be = or(() => C.value.filter((G) => he.value.some(({
     branch: ie,
     commitHash: me,
     file: ye
@@ -59081,7 +59081,7 @@ const nUe = We(Nq)`
     return ie == O.value && ((T = S.value) == null ? void 0 : T.hash) === me && G == ye;
   }))), ke = qt([]);
   $n(() => {
-    const G = le.value, ie = q.md.peek();
+    const G = ae.value, ie = q.md.peek();
     (async () => (ke.value = await Promise.all(G.map(async (me) => {
       var k;
       const ye = await a(O.peek(), S.peek(), me.file), T = YR(ie, ye), w = ((k = T[0]) == null ? void 0 : k.level) === 1 ? T.shift().text : me.fileName;
@@ -59112,7 +59112,7 @@ const nUe = We(Nq)`
       room: R,
       statusSocket: oe,
       indexFile: H,
-      indexedFiles: le,
+      indexedFiles: ae,
       unIndexedFiles: Re,
       markedFiles: be,
       pageIndex: ke,
